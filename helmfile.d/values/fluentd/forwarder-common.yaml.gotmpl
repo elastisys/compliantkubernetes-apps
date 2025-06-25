@@ -1,11 +1,20 @@
 nameOverride: fluentd
 
+{{- $global := dict
+  "registry" (ternary (dig "uri" "" .Values.images.global.registry) "" .Values.images.global.registry.enabled)
+  "repository" (ternary (dig "uri" "" .Values.images.global.repository) "" .Values.images.global.repository.enabled)
+}}
+{{- with .Values.images | dig "fluentd" "forwarder" "" }}
+{{- with merge (include "container_uri.parse" . | fromJson) $global }}
 image:
-  # This is our own fork-image (https://github.com/elastisys/fluentd-elasticsearch).
-  # This can later be replaced with the original image (https://github.com/monotek/fluentd-elasticsearch) when our changes is merged.
-  # This image is included in falco k8s_containers and user_known_package_manager_in_container macros
-  repository: {{ .Values.fluentd.forwarder.image.repository }}
-  tag: {{ .Values.fluentd.forwarder.image.tag }}
+  {{- with include "gen.reg-rep-img" . }}
+  repository: {{ . }}
+  {{- end }}
+  {{- if or .tag .digest }}
+  tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
+  {{- end }}
+{{- end }}
+{{- end }}
 
 serviceMonitor:
   enabled: true

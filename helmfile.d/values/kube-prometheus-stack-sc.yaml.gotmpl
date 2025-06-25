@@ -1,8 +1,27 @@
+{{- $global := dict
+  "registry" (ternary (dig "uri" "" .Values.images.global.registry) "" .Values.images.global.registry.enabled)
+  "repository" (ternary (dig "uri" "" .Values.images.global.repository) "" .Values.images.global.repository.enabled)
+}}
 defaultRules:
   # Provided by prometheus-alerts instead
   create: false
 
 kube-state-metrics:
+  {{- with .Values.images | dig "monitoring" "kubeStateMetrics" "" }}
+  {{- with merge (include "container_uri.parse" . | fromJson) $global }}
+  image:
+    {{- with .registry }}
+    registry: {{ . }}
+    {{- end }}
+    {{- with join "/" (compact (list .repository .image)) }}
+    repository: {{ . }}
+    {{- end }}
+    {{- if or .tag .digest }}
+    tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
+    {{- end }}
+  {{- end }}
+  {{- end }}
+
   selfMonitor:
     enabled: true
   resources: {{- toYaml .Values.kubeStateMetrics.resources | nindent 4 }}
@@ -73,6 +92,21 @@ kubeEtcd:
     {{- end }}
 
 alertmanager:
+  {{- with .Values.images | dig "monitoring" "kubeStateMetrics" "" }}
+  {{- with merge (include "container_uri.parse" . | fromJson) $global }}
+  image:
+    {{- with .registry }}
+    registry: {{ . }}
+    {{- end }}
+    {{- with join "/" (compact (list .repository .image)) }}
+    repository: {{ . }}
+    {{- end }}
+    {{- if or .tag .digest }}
+    tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
+    {{- end }}
+  {{- end }}
+  {{- end }}
+
   config:
     # See https://prometheus.io/docs/alerting/configuration/
     inhibit_rules: []
@@ -174,9 +208,25 @@ alertmanager:
     storage: {{- toYaml .Values.prometheus.alertmanagerSpec.storage | nindent 6 }}
     topologySpreadConstraints: {{- toYaml .Values.prometheus.alertmanagerSpec.topologySpreadConstraints | nindent 6 }}
     affinity: {{- toYaml .Values.prometheus.alertmanagerSpec.affinity | nindent 6 }}
-{{- if .Values | get "prometheus.alertmanagerSpec.image" nil }}
+
+    {{- with .Values.images | dig "monitoring" "alertmanager" "" }}
+    {{- with merge (include "container_uri.parse" . | fromJson) $global }}
+    image:
+      {{- with .registry }}
+      registry: {{ . }}
+      {{- end }}
+      {{- with join "/" (compact (list .repository .image)) }}
+      repository: {{ . }}
+      {{- end }}
+      {{- if or .tag .digest }}
+      tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
+      {{- end }}
+    {{- end }}
+    {{- else }}
+    {{- if .Values | get "prometheus.alertmanagerSpec.image" nil }}
     image: {{- toYaml .Values.prometheus.alertmanagerSpec.image | nindent 6 }}
-{{- end }}
+    {{- end }}
+    {{- end }}
 
 kubeControllerManager:
   enabled: false
@@ -188,9 +238,54 @@ grafana:
 
 prometheusOperator:
   resources: {{- toYaml .Values.prometheusOperator.resources | nindent 4 }}
+  {{- with .Values.images | dig "monitoring" "prometheusOperator" "" }}
+  {{- with merge (include "container_uri.parse" . | fromJson) $global }}
+  image:
+    {{- with .registry }}
+    registry: {{ . }}
+    {{- end }}
+    {{- with join "/" (compact (list .repository .image)) }}
+    repository: {{ . }}
+    {{- end }}
+    {{- if or .tag .digest }}
+    tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
+    {{- end }}
+  {{- end }}
+  {{- end }}
 
   prometheusConfigReloader:
     resources: {{- toYaml .Values.prometheusOperator.prometheusConfigReloader.resources | nindent 6 }}
+    {{- with .Values.images | dig "monitoring" "configReloader" "" }}
+    {{- with merge (include "container_uri.parse" . | fromJson) $global }}
+    image:
+      {{- with .registry }}
+      registry: {{ . }}
+      {{- end }}
+      {{- with join "/" (compact (list .repository .image)) }}
+      repository: {{ . }}
+      {{- end }}
+      {{- if or .tag .digest }}
+      tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
+      {{- end }}
+    {{- end }}
+    {{- end }}
+
+  {{- with .Values.images | dig "monitoring" "admissionWebhooksPatch" "" }}
+  {{- with merge (include "container_uri.parse" . | fromJson) $global }}
+  admissionWebhooks:
+    patch:
+      image:
+        {{- with .registry }}
+        registry: {{ . }}
+        {{- end }}
+        {{- with join "/" (compact (list .repository .image)) }}
+        repository: {{ . }}
+        {{- end }}
+        {{- if or .tag .digest }}
+        tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
+        {{- end }}
+  {{- end }}
+  {{- end }}
 
 prometheus:
   prometheusSpec:
@@ -210,6 +305,21 @@ prometheus:
     nodeSelector: {{- toYaml .Values.prometheus.nodeSelector | nindent 8 }}
     affinity: {{- toYaml .Values.prometheus.affinity | nindent 8 }}
     tolerations: {{- toYaml .Values.prometheus.tolerations | nindent 8 }}
+
+    {{- with .Values.images | dig "monitoring" "prometheus" "" }}
+    {{- with merge (include "container_uri.parse" . | fromJson) $global }}
+    image:
+      {{- with .registry }}
+      registry: {{ . }}
+      {{- end }}
+      {{- with join "/" (compact (list .repository .image)) }}
+      repository: {{ . }}
+      {{- end }}
+      {{- if or .tag .digest }}
+      tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
+      {{- end }}
+    {{- end }}
+    {{- end }}
 
     {{- if and .Values.thanos.enabled .Values.thanos.receiver.enabled }}
     remoteWrite:
@@ -263,3 +373,20 @@ prometheus-node-exporter:
           sourceLabels:
           - __meta_kubernetes_pod_node_name
           targetLabel: instance
+  {{- with .Values.images | dig "monitoring" "nodeExporter" "" }}
+  {{- with merge (include "container_uri.parse" . | fromJson) $global }}
+  image:
+    {{- with .registry }}
+    registry: {{ . }}
+    {{- end }}
+    {{- with join "/" (compact (list .repository .image)) }}
+    repository: {{ . }}
+    {{- end }}
+    {{- with .tag }}
+    tag: {{ . }}
+    {{- end }}
+    {{- with .digest }}
+    digest: {{ . }}
+    {{- end }}
+  {{- end }}
+  {{- end }}

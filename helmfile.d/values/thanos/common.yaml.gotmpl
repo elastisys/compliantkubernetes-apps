@@ -1,8 +1,27 @@
+{{- $global := dict
+  "registry" (ternary (dig "uri" "" .Values.images.global.registry) "" .Values.images.global.registry.enabled)
+  "repository" (ternary (dig "uri" "" .Values.images.global.repository) "" .Values.images.global.repository.enabled)
+}}
 # common values for thanos
 # all components are disabled and are instead enabled in separate values files
 global:
   security:
     allowInsecureImages: true
+{{- with .Values.images | dig "thanos" "image" "" }}
+{{- with merge (include "container_uri.parse" . | fromJson) $global }}
+  imageRegistry: ""
+
+image:
+  registry: "{{ .registry }}"
+  {{- with include "gen.rep-img" . }}
+  repository: {{ . }}
+  {{- end }}
+  {{- if or .tag .digest }}
+  tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
+  {{- end }}
+{{- end }}
+{{- end }}
+
 bucketweb:
   enabled: false
   networkPolicy:

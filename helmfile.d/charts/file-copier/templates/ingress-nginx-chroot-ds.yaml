@@ -25,7 +25,9 @@ spec:
           sleep 2s
           cp -L /mnt/ingress-nginx-chroot.json /var/lib/kubelet/seccomp/profiles/
           sleep infinity
-        image: busybox:1.36
+        {{- with .Values.ingressNginxChroot.fileCopierImage }}
+        image: {{ .image }}:{{ .tag }}{{- if .digest }}@{{ .digest }}{{- end }}
+        {{- end }}
         name: file-copier
         resources:
           limits:

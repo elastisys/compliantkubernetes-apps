@@ -20,7 +20,7 @@ spec:
             fsGroup: 1000
           containers:
             - name: run
-              image: ghcr.io/elastisys/backup-postgres:1.5.0
+              image: "{{ .Values.image.repository }}{{- with .Values.image.tag }}:{{ . }}{{ end }}"
               command: ['/bin/bash', '/scripts/harbor-backup.sh']
               env:
               {{- if .Values.s3.enabled }}

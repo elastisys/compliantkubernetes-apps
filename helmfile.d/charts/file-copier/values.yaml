@@ -2,3 +2,7 @@ ingressNginxChroot:
   enabled: false
   tolerations: []
   affinity: {}
+  fileCopierImage:
+    image: busybox
+    tag: 1.36
+    digest: ""

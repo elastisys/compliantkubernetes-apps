@@ -15,6 +15,25 @@ setup_file() {
   env.setup
 
   env.init openstack capi dev
+
+  yq.set sc .externalDns.enabled 'true'
+  yq.set sc .fluentd.enabled 'true'
+  yq.set sc .gpu.enabled 'true'
+  yq.set sc .harbor.backup.enabled 'true'
+  yq.set sc .kured.enabled 'true'
+  yq.set sc .kyverno.enabled 'true'
+  yq.set sc .opensearch.snapshot.enabled 'true'
+  yq.set sc .tektonPipelines.enabled 'true'
+  yq.set sc .thanos.enabled 'true'
+  yq.set sc .thanos.receiver.enabled 'true'
+  yq.set sc .velero.enabled 'true'
+  yq.set sc .metricsServer.enabled 'true'
+  yq.set sc .trivy.enabled 'true'
+  _setup_rclone sc sync
+
+  yq.set wc .hnc.enabled 'true'
+  yq.set wc .velero.enabled 'true'
+  _setup_rclone wc sync
 }
 
 setup() {
@@ -25,6 +44,7 @@ setup() {
   env.private
 
   export _templates_output="${CK8S_CONFIG_PATH}/tmp/images-templates"
+  export _optional_registries='(docker\.io/)?(nvcr\.io/nvidia/)?(ghcr\.io/)?(quay\.io/)?(registry\.k8s\.io/)?(mirror\.gcr\.io/)?'
 
   read -r -a _image_properties < <(_get_test_prop image_property)
   read -r -a _helmfile_selectors < <(_get_test_prop helmfile_selector)
@@ -77,7 +97,7 @@ should_use_our_image() {
   for ((i = 0; i < ${#_container_names[@]}; i++)); do
     run --separate-stderr _extract_image "${_container_names[i]}" "${_template_files[i]}"
 
-    assert_output --regexp '^a-custom-image.*$'
+    assert_output --regexp '^'"$_optional_registries"'a-custom-image.*$'
   done
 }
 
@@ -88,7 +108,7 @@ should_use_our_image_and_tag() {
   for ((i = 0; i < ${#_container_names[@]}; i++)); do
     run --separate-stderr _extract_image "${_container_names[i]}" "${_template_files[i]}"
 
-    assert_output --regexp '^a-custom-image:v1\.2\.3$'
+    assert_output --regexp '^'"$_optional_registries"'a-custom-image:v1\.2\.3$'
   done
 }
 
@@ -99,7 +119,7 @@ should_use_our_image_tag_and_digest() {
   for ((i = 0; i < ${#_container_names[@]}; i++)); do
     run --separate-stderr _extract_image "${_container_names[i]}" "${_template_files[i]}"
 
-    assert_output --regexp '^a-custom-image:v1\.2\.3@sha256:babafacecaca$'
+    assert_output --regexp '^'"$_optional_registries"'a-custom-image:v1\.2\.3@sha256:babafacecaca$'
   done
 }
 
@@ -110,7 +130,7 @@ should_use_our_repository_image_tag_and_digest() {
   for ((i = 0; i < ${#_container_names[@]}; i++)); do
     run --separate-stderr _extract_image "${_container_names[i]}" "${_template_files[i]}"
 
-    assert_output --regexp '^a-custom-repo/a-custom-image:v1\.2\.3@sha256:babafacecaca$'
+    assert_output --regexp '^'"$_optional_registries"'a-custom-repo/a-custom-image:v1\.2\.3@sha256:babafacecaca$'
   done
 }
 
@@ -157,7 +177,7 @@ should_use_their_own_repository_even_when_global_is_enabled() {
   for ((i = 0; i < ${#_container_names[@]}; i++)); do
     run --separate-stderr _extract_image "${_container_names[i]}" "${_template_files[i]}"
 
-    assert_output --regexp '^(docker\.io/)?a-custom-repository/a-custom-image:v1\.2\.3'
+    assert_output --regexp '^'"$_optional_registries"'a-custom-repository/a-custom-image:v1\.2\.3'
   done
 }
 
@@ -169,7 +189,7 @@ should_use_the_global_repository_when_it_doesnt_specify_one() {
   for ((i = 0; i < ${#_container_names[@]}; i++)); do
     run --separate-stderr _extract_image "${_container_names[i]}" "${_template_files[i]}"
 
-    assert_output --regexp '^(docker\.io/)?the-global-repository/a-custom-image:v1\.2\.3'
+    assert_output --regexp '^'"$_optional_registries"'the-global-repository/a-custom-image:v1\.2\.3'
   done
 }
 
@@ -234,17 +254,22 @@ should_not_set_the_image_field_if_only_sha_is_specified() {
 _set_container_uris() {
   for _image_property in "${_image_properties[@]}"; do
     yq.set sc ".images.${_image_property}" "\"${1}\""
+    yq.set wc ".images.${_image_property}" "\"${1}\""
   done
 }
 
 _enable_global_registry() {
   yq.set sc .images.global.registry.enabled 'true'
   yq.set sc .images.global.registry.uri "\"${1}\""
+  yq.set wc .images.global.registry.enabled 'true'
+  yq.set wc .images.global.registry.uri "\"${1}\""
 }
 
 _enable_global_repository() {
   yq.set sc .images.global.repository.enabled 'true'
   yq.set sc .images.global.repository.uri "\"${1}\""
+  yq.set wc .images.global.repository.enabled 'true'
+  yq.set wc .images.global.repository.uri "\"${1}\""
 }
 
 _generate_templates() {
@@ -252,7 +277,9 @@ _generate_templates() {
   for _helmfile_selector in "${_helmfile_selectors[@]}"; do
     _selector_args+=("--selector" "${_helmfile_selector}")
   done
-  helmfile -e service_cluster "${_selector_args[@]}" -f "${ROOT}/helmfile.d" -q template --output-dir-template "${_templates_output}"
+
+  helmfile -e service_cluster "${_selector_args[@]}" -f "${ROOT}/helmfile.d" -q template --output-dir-template "${_templates_output}/sc" || true
+  helmfile -e workload_cluster "${_selector_args[@]}" -f "${ROOT}/helmfile.d" -q template --output-dir-template "${_templates_output}/wc" || true
 }
 
 _get_test_prop() {
@@ -273,4 +300,21 @@ _extract_image() {
     + (.spec.template.spec.initContainers // [])
     + (.spec.jobTemplate.spec.template.spec.containers // [])
     ) | .[] | select(.name == "'"${_container_name}"'") | .image' <"${_templates_output}/${_template_file}"
+}
+
+_setup_rclone() {
+  local _cluster="$1"
+  local _scope="$2"
+
+  yq.set "${_cluster}" ".objectStorage.type" '"s3"'
+  yq.set "${_cluster}" ".objectStorage.${_scope}.enabled" 'true'
+  yq.set "${_cluster}" ".objectStorage.${_scope}.s3.region" '"foo"'
+  yq.set "${_cluster}" ".objectStorage.${_scope}.s3.regionEndpoint" '"bar"'
+  yq.set "${_cluster}" ".objectStorage.${_scope}.s3.accessKey" '"baz"'
+  yq.set "${_cluster}" ".objectStorage.${_scope}.s3.secretKey" '"secret"'
+  yq.set "${_cluster}" ".objectStorage.${_scope}.s3.forcePathStyle" 'false'
+  yq.set "${_cluster}" ".objectStorage.${_scope}.syncDefaultBuckets" 'false'
+  yq.set "${_cluster}" ".objectStorage.${_scope}.buckets" "[]"
+  yq.set "${_cluster}" ".objectStorage.${_scope}.buckets[0].source" '"a-bucket"'
+  yq.set "${_cluster}" ".objectStorage.${_scope}.buckets[0].destinationType" '"s3"'
 }

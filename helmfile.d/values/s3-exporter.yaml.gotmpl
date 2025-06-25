@@ -14,3 +14,20 @@ resources: {{- toYaml .Values.s3Exporter.resources | nindent 2  }}
 nodeSelector: {{- toYaml .Values.s3Exporter.nodeSelector | nindent 2  }}
 tolerations: {{- toYaml .Values.s3Exporter.tolerations | nindent 2  }}
 affinity: {{- toYaml .Values.s3Exporter.affinity | nindent 2  }}
+
+{{- $global := dict
+  "registry" (ternary (dig "uri" "" .Values.images.global.registry) "" .Values.images.global.registry.enabled)
+  "repository" (ternary (dig "uri" "" .Values.images.global.repository) "" .Values.images.global.repository.enabled)
+}}
+
+{{- with .Values.images | dig "monitoring" "s3Exporter" "" }}
+{{- with merge (include "container_uri.parse" . | fromJson) $global }}
+image:
+  {{- with include "gen.reg-rep-img" . }}
+  repository: {{ . }}
+  {{- end }}
+  {{- if or .tag .digest }}
+  tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
+  {{- end }}
+{{- end }}
+{{- end }}

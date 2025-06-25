@@ -11,3 +11,19 @@ gc:
   enabled: {{ .Values.harbor.gc.enabled }}
   forceConfigure: {{ .Values.harbor.gc.forceConfigure }}
   schedule: {{ .Values.harbor.gc.schedule }}
+
+{{- $global := dict
+  "registry" (ternary (dig "uri" "" .Values.images.global.registry) "" .Values.images.global.registry.enabled)
+  "repository" (ternary (dig "uri" "" .Values.images.global.repository) "" .Values.images.global.repository.enabled)
+}}
+{{- with .Values.images | dig "harbor" "initJob" "" }}
+{{- with merge (include "container_uri.parse" . | fromJson) $global }}
+image:
+  {{- with include "gen.reg-rep-img" . }}
+  repository: {{ . }}
+  {{- end }}
+  {{- if or .tag .digest }}
+  tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
+  {{- end }}
+{{- end }}
+{{- end }}

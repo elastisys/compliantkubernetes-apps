@@ -1,3 +1,8 @@
+{{- $global := dict
+  "registry" (ternary (dig "uri" "" .Values.images.global.registry) "" .Values.images.global.registry.enabled)
+  "repository" (ternary (dig "uri" "" .Values.images.global.repository) "" .Values.images.global.repository.enabled)
+}}
+
 falco:
   json_output: true
   syscall_event_drops:
@@ -28,6 +33,19 @@ falco:
   container_engines:
     cri:
       enabled: true
+
+{{- with .Values.images | dig "falco" "image" "" }}
+{{- with merge (include "container_uri.parse" . | fromJson) $global }}
+image:
+  registry: ""
+  {{- with include "gen.reg-rep-img" . }}
+  repository: {{ . }}
+  {{- end }}
+  {{- if or .tag .digest }}
+  tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
+  {{- end }}
+{{- end }}
+{{- end }}
 
 metrics:
   enabled: true
@@ -63,6 +81,18 @@ driver:
   {{- end }}
   loader:
     initContainer:
+      {{- with .Values.images | dig "falco" "driverLoaderInit" "" }}
+      {{- with merge (include "container_uri.parse" . | fromJson) $global }}
+      image:
+        registry: ""
+        {{- with include "gen.reg-rep-img" . }}
+        repository: {{ . }}
+        {{- end }}
+        {{- if or .tag .digest }}
+        tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
+        {{- end }}
+      {{- end }}
+      {{- end }}
       securityContext:
         runAsUser: 0
         privileged: true
@@ -79,6 +109,20 @@ affinity: {{- toYaml .Values.falco.affinity | nindent 2  }}
 tolerations: {{- toYaml .Values.falco.tolerations | nindent 2  }}
 
 falcoctl:
+  {{- with .Values.images | dig "falco" "falcoctl" "" }}
+  {{- with merge (include "container_uri.parse" . | fromJson) $global }}
+  image:
+    {{- with .registry }}
+    registry: {{ . }}
+    {{- end }}
+    {{- if or .repository .image }}
+    repository: {{ join "/" (compact (list .repository .image)) }}
+    {{- end }}
+    {{- if or .tag .digest }}
+    tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
+    {{- end }}
+  {{- end }}
+  {{- end }}
   artifact:
     install:
       enabled: {{ .Values.falco.artifact.install.enabled }}
@@ -430,6 +474,20 @@ falcosidekick:
       minimumpriority: {{ .Values.falco.alerts.priority }}
       messageformat: "Falco Alert : rule *{{`{{ .Rule }}`}}*"
     {{ end }}
+  {{- with .Values.images | dig "falco" "sidekick" "" }}
+  {{- with merge (include "container_uri.parse" . | fromJson) $global }}
+  image:
+    {{- with .registry }}
+    registry: {{ . }}
+    {{- end }}
+    {{- if or .repository .image }}
+    repository: {{ join "/" (compact (list .repository .image)) }}
+    {{- end }}
+    {{- if or .tag .digest }}
+    tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
+    {{- end }}
+  {{- end }}
+  {{- end }}
 
   resources:    {{- toYaml .Values.falco.falcoSidekick.resources | nindent 4  }}
   nodeSelector: {{- toYaml .Values.falco.falcoSidekick.nodeSelector | nindent 4  }}

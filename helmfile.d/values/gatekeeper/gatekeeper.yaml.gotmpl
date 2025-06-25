@@ -124,11 +124,54 @@ audit:
   tolerations: {{- toYaml .Values.opa.audit.tolerations | nindent 4  }}
   writeToRAMDisk: {{- toYaml .Values.opa.audit.writeToRAMDisk  | nindent 4  }}
 
-postInstall:
-  probeWebhook:
-    enabled: false
-
 psp:
   enabled: false
 
 enableGeneratorResourceExpansion: false
+
+{{- $global := dict
+  "registry" (ternary (dig "uri" "" .Values.images.global.registry) "" .Values.images.global.registry.enabled)
+  "repository" (ternary (dig "uri" "" .Values.images.global.repository) "" .Values.images.global.repository.enabled)
+}}
+{{- with .Values.images | dig "gatekeeper" "image" "" }}
+{{- with merge (include "container_uri.parse" . | fromJson) $global }}
+image:
+  {{- with include "gen.reg-rep-img" . }}
+  repository: {{ . }}
+  {{- end }}
+  {{- if or .tag .digest }}
+  release: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
+  {{- end }}
+{{- end }}
+{{- end }}
+
+{{/*Note: this will use the tag set by gatekeeper.image, if gatekeeper.crds */}}
+{{/*does not specify one.*/}}
+{{- with .Values.images | dig "gatekeeper" "preInstallCRDs" "" }}
+{{- with merge (include "container_uri.parse" . | fromJson) $global }}
+{{- $repository := include "gen.reg-rep-img" . }}
+{{- if or $repository .tag .digest }}
+preInstall:
+  crdRepository:
+    image:
+      repository: "{{ $repository }}{{- if or .tag .digest }}:{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}{{ end }}"
+      tag: ""
+{{- end }}
+{{- end }}
+{{- end }}
+
+postInstall:
+  probeWebhook:
+    enabled: false
+  {{- with .Values.images | dig "gatekeeper" "postInstallLabelNamespace" "" }}
+  {{- with merge (include "container_uri.parse" . | fromJson) $global }}
+  labelNamespace:
+    image:
+      {{- with include "gen.reg-rep-img" .}}
+      repository: {{ . }}
+      {{- end }}
+      {{- if or .tag .digest }}
+      tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
+      {{- end }}
+  {{- end }}
+  {{- end }}
