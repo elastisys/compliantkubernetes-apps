@@ -46,12 +46,10 @@ spec:
           port: 80
     {{- end }}
     - from:
-        {{- if not .Values.ingressNginx.externalTrafficPolicyLocal }}
         - podSelector:
             matchLabels:
               app.kubernetes.io/component: controller
               app.kubernetes.io/instance: ingress-nginx
-        {{- end }}
         - namespaceSelector:
             matchLabels:
               kubernetes.io/metadata.name: monitoring
