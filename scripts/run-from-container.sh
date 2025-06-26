@@ -174,8 +174,8 @@ fi
 if command -v git &>/dev/null; then
   declare gitdir
   if gitdir="$(git rev-parse --absolute-git-dir 2>/dev/null)"; then
-    # if the apps repo is a submodule in CK8S_CONFIG_PATH, we do not need to mount it here
-    if [[ "${gitdir%"/.git/"*}" != "${CK8S_CONFIG_PATH}" ]]; then
+    # if the apps repo is a submodule in CK8S_CONFIG_PATH we do not mount it here
+    if [[ "${gitdir%"/.git/"*}" != "${root}" ]] && [[ "${gitdir%"/.git/"*}" != "${CK8S_CONFIG_PATH}" ]]; then
       # Prepare container repo root
       args+=("--mount" "type=bind,src=${gitdir%"/.git/"*},dst=${gitdir%"/.git/"*}${relabel:-}")
     fi
