@@ -1,0 +1,35 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-root-nginx
+spec:
+  podSelector:
+    matchLabels:
+      app: root-nginx
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - {}
+  egress:
+    - {}
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: root-nginx
+  name: root-nginx
+spec:
+  restartPolicy: Never
+  containers:
+    - name: nginx
+      image: nginx:stable
+      resources:
+        requests:
+          memory: 64Mi
+          cpu: 250m
+        limits:
+          memory: 128Mi
+          cpu: 500m
