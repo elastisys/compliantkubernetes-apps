@@ -6,6 +6,7 @@ bases:
 ---
 bases:
   - stacks/calico.yaml.gotmpl
+  - stacks/cilium.yaml.gotmpl
   - stacks/cert-manager.yaml.gotmpl
   - stacks/dex.yaml.gotmpl
   - stacks/external-dns.yaml.gotmpl
@@ -119,6 +120,8 @@ releases:
   - inherit: [ template: calico-accountant ]
   - inherit: [ template: calico-default-deny ]
   - inherit: [ template: calico-felix-metrics ]
+
+  - inherit: [ template: cilium-default-deny ]
 
   - inherit: [ template: hnc-networkpolicy ]
   - inherit: [ template: hnc-resources ]

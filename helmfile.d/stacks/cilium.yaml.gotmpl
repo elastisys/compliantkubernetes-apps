@@ -1,0 +1,11 @@
+---
+templates:
+  cilium-default-deny:
+    condition: ck8sAnyCluster.enabled
+    installed: {{  and (.Values | get "networkPolicies.defaultDeny" false) (.Values | get "networkPlugin.type" | eq "cilium") }}
+    chart: charts/cilium-default-deny
+    version: 0.1.0
+    namespace: kube-system
+    name: cilium-default-deny
+    values:
+      - values/cilium-default-deny.yaml.gotmpl
