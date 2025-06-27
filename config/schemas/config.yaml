@@ -4687,6 +4687,56 @@ properties:
             items:
               title: S3 Bucket Name
               type: string
+          buckets:
+            title: S3 Bucket Specific Alerts
+            description: Definitions for specific S3 bucket alerts.
+            items:
+              title: S3 Bucket Specific Alert
+              description: S3 Bucket Alert configuration for specific bucket
+              additionalProperties: false
+              properties:
+                name:
+                  examples:
+                  - <cluster>-thanos
+                  type: string
+                objects:
+                  title: S3 Bucket Specific Alerts Objects
+                  description: Alert when the S3 bucket reaches the set percentage of the set number of objects.
+                  additionalProperties: false
+                  properties:
+                    enabled:
+                      title: S3 Bucket Alerts Objects Enabled
+                      type: boolean
+                      default: false
+                    percent:
+                      title: S3 Bucket Alerts Objects Percentage
+                      $ref: '#/$defs/percentage'
+                      default: 80
+                    count:
+                      title: S3 Bucket Alerts Objects Quota
+                      default: 1638400
+                      type: number
+                  type: object
+                size:
+                  title: S3 Bucket Specific Alerts Size
+                  description: Alert when the S3 bucket reaches the set percentage of the set size.
+                  additionalProperties: false
+                  properties:
+                    enabled:
+                      title: S3 Bucket Alerts Size Enabled
+                      type: boolean
+                      default: false
+                    percent:
+                      title: S3 Bucket Alerts Size Percentage
+                      $ref: '#/$defs/percentage'
+                      default: 80
+                    sizeQuotaGB:
+                      title: S3 Bucket Alerts Size Quota
+                      type: number
+                      default: 1000
+                  type: object
+              type: object
+            type: array
       autoscaledNodeGroupAlerts:
         title: Autoscaled NodeGroup Alerts
         description: Configure whether to split KubeletDownForXm alerts into autoscaled and non-autoscaled nodes groups.
@@ -4893,6 +4943,8 @@ properties:
             $ref: "#/properties/prometheus/$defs/s3BucketAlerts/properties/totalSize"
           exclude:
             $ref: "#/properties/prometheus/$defs/s3BucketAlerts/properties/exclude"
+          buckets:
+            $ref: "#/properties/prometheus/$defs/s3BucketAlerts/properties/buckets"
       webhookAlerts:
         title: Webhook Alerts
         description: Configure webhook alerts.
