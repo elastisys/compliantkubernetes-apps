@@ -16,6 +16,16 @@ RUN apt-get update && \
 
 ENV NODE_PATH="/usr/local/lib/node_modules"
 
+ARG CDXGEN_VERSION="11.2.5"
+RUN curl -LOs "https://github.com/CycloneDX/cdxgen/releases/download/v${CDXGEN_VERSION}/cdxgen" && \
+    install -Tm 755 "cdxgen" /usr/local/bin/cdxgen && \
+    rm "cdxgen"
+
+ARG CYCLONEDX_VERSION="0.27.2"
+RUN curl -LOs "https://github.com/CycloneDX/cyclonedx-cli/releases/download/v${CYCLONEDX_VERSION}/cyclonedx-linux-x64" && \
+    install -Tm 755 "cyclonedx-linux-x64" /usr/local/bin/cyclonedx && \
+    rm "cyclonedx-linux-x64"
+
 ARG GOMPLATE_VERSION="4.3.1"
 RUN curl -LOs "https://github.com/hairyhenderson/gomplate/releases/download/v${GOMPLATE_VERSION}/gomplate_linux-amd64" && \
     install -Tm 755 gomplate_linux-amd64 /usr/local/bin/gomplate && \

@@ -20,6 +20,7 @@ mapfile -t ck8s_k8s_installers < <(find "${root_path}/config/k8s-installers" -mi
 ck8s_k8s_installers+=("none")
 
 CK8S_AUTO_APPROVE=${CK8S_AUTO_APPROVE:-"false"}
+CK8S_SKIP_VALIDATION=${CK8S_SKIP_VALIDATION:-"false"}
 
 # Create CK8S_CONFIG_PATH if it does not exist and make it absolute
 mkdir -p "${CK8S_CONFIG_PATH}"
@@ -97,6 +98,14 @@ ask_abort() {
   read -r reply
   if [[ "${reply}" == "y" ]]; then
     exit 1
+  fi
+}
+
+ask_continue() {
+  log_warning_no_newline "Do you want to continue? (y/N): "
+  read -r reply
+  if [[ ! "${reply}" =~ ^[yY]$ ]]; then
+    exit 0
   fi
 }
 
@@ -506,7 +515,7 @@ validate_sops_config() {
 config_load() {
   load_config "$1"
 
-  if [[ "--skip-validation" != "${2:-''}" ]]; then
+  if [[ "--skip-validation" != "${2:-''}" && "${CK8S_SKIP_VALIDATION:-}" != "true" ]]; then
     validate_version "$1"
     validate_config "$1" "${2:-''}"
     validate_sops_config
