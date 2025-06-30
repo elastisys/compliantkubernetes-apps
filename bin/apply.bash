@@ -56,11 +56,11 @@ apps_apply() {
   if (with_kubeconfig "${config["kube_config_$1"]}" helmfile -f "${here}/../helmfile.d/" -e "$2" "${action}" "${concurrency}" "${suppress:-}"); then
     log_info "---"
     local current_version
-    current_version="$(get_apps_version "${2}" 2>/dev/null || true)"
+    current_version="$(get_apps_version "${1}" 2>/dev/null || true)"
     if [ -z "${current_version}" ]; then
       current_version="$(get_repo_version)"
       if [[ "${current_version}" == v* ]]; then
-        set_apps_version "${2}" "${current_version%.*}"
+        set_apps_version "${1}" "${current_version%.*}"
       fi
     fi
     log_info "Current version is ${current_version}"
