@@ -222,6 +222,7 @@ The following table lists the main configurable parameters of the Falcosidekick 
 | config.azure.podIdentityName | string | `""` | Azure Identity name |
 | config.azure.resourceGroupName | string | `""` | Azure Resource Group name |
 | config.azure.subscriptionID | string | `""` | Azure Subscription ID |
+| config.azure.workloadIdentityClientID | string | `""` | Azure Workload Identity Client ID |
 | config.bracketreplacer | string | `""` | if not empty, the brackets in keys of Output Fields are replaced |
 | config.cliq.icon | string | `""` | Cliq icon (avatar) |
 | config.cliq.messageformat | string | `""` | a Go template to format Google Chat Text above Attachment, displayed in addition to the output from `cliq.outputformat`. If empty, no Text is displayed before sections. |
@@ -233,6 +234,7 @@ The following table lists the main configurable parameters of the Falcosidekick 
 | config.cloudevents.extension | string | `""` | Extensions to add in the outbound Event, useful for routing |
 | config.cloudevents.minimumpriority | string | `""` | minimum priority of event to use this output, order is `emergency\|alert\|critical\|error\|warning\|notice\|informational\|debug or ""` |
 | config.customfields | string | `""` | a list of escaped comma separated custom fields to add to falco events, syntax is "key:value\,key:value" |
+| config.customtags | string | `""` | a list of escaped comma separated custom tags to add to falco events, syntax is "tag\,tag" |
 | config.datadog.apikey | string | `""` | Datadog API Key, if not `empty`, Datadog output is *enabled* |
 | config.datadog.host | string | `""` | Datadog host. Override if you are on the Datadog EU site. Defaults to american site with "<https://api.datadoghq.com>" |
 | config.datadog.minimumpriority | string | `""` | minimum priority of event to use this output, order is `emergency\|alert\|critical\|error\|warning\|notice\|informational\|debug or ""` |

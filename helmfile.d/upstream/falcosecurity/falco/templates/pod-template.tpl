@@ -73,11 +73,6 @@ spec:
       args:
         - /usr/bin/falco
         {{- include "falco.configSyscallSource" . | indent 8 }}
-        {{- with .Values.collectors }}
-        {{- if .enabled }}
-        - -pk
-        {{- end }}
-        {{- end }}
     {{- with .Values.extra.args }}
       {{- toYaml . | nindent 8 }}
     {{- end }}
@@ -123,6 +118,7 @@ spec:
           {{- end }}
       {{- end }}
       volumeMounts:
+      {{- include "falco.containerPluginVolumeMounts" . | nindent 8 -}}
       {{- if or .Values.falcoctl.artifact.install.enabled .Values.falcoctl.artifact.follow.enabled }}
       {{- if has "rulesfile" .Values.falcoctl.config.artifact.allowedTypes }}
         - mountPath: /etc/falco
@@ -167,22 +163,6 @@ spec:
         {{- if and .Values.driver.enabled (and (eq .Values.driver.kind "ebpf") (contains "falco-no-driver" .Values.image.repository)) }}
         - name: debugfs
           mountPath: /sys/kernel/debug
-        {{- end }}
-        {{- with .Values.collectors }}
-        {{- if .enabled }}
-        {{- if .docker.enabled }}
-        - mountPath: /host/var/run/
-          name: docker-socket
-        {{- end }}
-        {{- if .containerd.enabled }}
-        - mountPath: /host/run/containerd/
-          name: containerd-socket
-        {{- end }}
-        {{- if .crio.enabled }}
-        - mountPath: /host/run/crio/
-          name: crio-socket
-        {{- end }}
-        {{- end }}
         {{- end }}
         - mountPath: /etc/falco/falco.yaml
           name: falco-yaml
@@ -233,6 +213,7 @@ spec:
     {{- include "falcoctl.initContainer" . | nindent 4 }}
   {{- end }}
   volumes:
+    {{- include "falco.containerPluginVolumes" . | nindent 4 -}}
     {{- if eq (include "driverLoader.enabled" .) "true" }}
     - name: specialized-falco-configs
       emptyDir: {}
@@ -271,25 +252,6 @@ spec:
     - name: debugfs
       hostPath:
         path: /sys/kernel/debug
-    {{- end }}
-    {{- with .Values.collectors }}
-    {{- if .enabled }}
-    {{- if .docker.enabled }}
-    - name: docker-socket
-      hostPath:
-        path: {{ dir .docker.socket }}
-    {{- end }}
-    {{- if .containerd.enabled }}
-    - name: containerd-socket
-      hostPath:
-        path: {{ dir .containerd.socket }}
-    {{- end }}
-    {{- if .crio.enabled }}
-    - name: crio-socket
-      hostPath:
-        path: {{ dir .crio.socket }}
-    {{- end }}
-    {{- end }}
     {{- end }}
     - name: proc-fs
       hostPath:
