@@ -456,7 +456,7 @@ record_upgrade_prepare_done() {
     kubectl_do "${1}" create --filename -; then
 
     ts="${apps_config_timestamp}" \
-      yq_add common '.global.ck8sConfigSerial' 'strenv(ts)'
+      yq_add "${1}" '.global.ck8sConfigSerial' 'strenv(ts)'
     log_info "Cluster ${1} locked for upgrade"
     return 0
   else
