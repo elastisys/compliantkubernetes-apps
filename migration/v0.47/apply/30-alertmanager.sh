@@ -36,7 +36,7 @@ run() {
       kubectl_do wc get secret alertmanager-alertmanager -n alertmanager \
         -o jsonpath='{.data.alertmanager\.yaml}' 2>/dev/null | base64 -d >"$TMP_FILE" || true
 
-      if [[ ! -s "$TMP_FILE"  ]]; then
+      if [[ ! -s "$TMP_FILE" ]]; then
         log_warn "alertmanager.yaml is empty or missing — likely already migrated."
       fi
 
@@ -45,7 +45,7 @@ run() {
         log_info "Patching new kube-prometheus-stack Alertmanager secret..."
 
         kubectl_do wc patch secret alertmanager-kube-prometheus-stack-alertmanager -n alertmanager \
-          -p "{\"data\":{\"alertmanager.yaml\":\"$(base64 -w 0 < "$TMP_FILE")\"}}"
+          -p "{\"data\":{\"alertmanager.yaml\":\"$(base64 -w 0 <"$TMP_FILE")\"}}"
 
         patch_exit=$?
 
@@ -58,7 +58,7 @@ run() {
           log_info "Old secret deleted."
 
           # Cleanup
-           rm -f "$TMP_FILE"
+          rm -f "$TMP_FILE"
         else
           log_error "Failed to patch the kube-prometheus-stack secret. Skipping deletion of old secret."
         fi
