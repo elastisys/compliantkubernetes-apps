@@ -33,7 +33,6 @@ templates:
       - values/podsecuritypolicies/common/falco.yaml.gotmpl
 
   falco-main:
-    disableValidation: true
     inherit:
       - template: falco
       - template: falco-chart
