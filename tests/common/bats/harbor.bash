@@ -1,15 +1,18 @@
 #!/usr/bin/env bash
 
 # Helpers for interacting with Harbor:
+# - _harbor.curl [method] [resource/path] [json data] <args...>                 - curl helper function (not intended to be used outside of this file)
 # - harbor.load_env [slug]                                                      - setup variables to have unique names for each test suite
 # - harbor.setup_user_demo_image                                                - setup user demo image from the public docs repo
 # - harbor.setup_project                                                        - setup project and robot for test suites
 # - harbor.teardown_project                                                     - teardown project and robot for test suites
-# - harbor.get [resource/path] <args...>                                        - curl with args to do get requests
-# - harbor.post [resource/path] [json data] <args...>                           - curl with args to do post requests
-# - harbor.delete [resource/path] <args...>                                     - curl with args to do delete requests
+# - harbor.get [resource/path] <args...>                                        - do get requests with optional curl args
+# - harbor.post [resource/path] [json data] <args...>                           - do post requests with optional curl args
+# - harbor.put [resource/path] [json data] <args...>                            - do put requests with optional curl args
+# - harbor.delete [resource/path] <args...>                                     - do delete requests with optional curl args
 # - harbor.get_current_user                                                     - get current user information
 # - harbor.create_project [project]                                             - create new project
+# - harbor.update_project [project] [json data]                                 - update project
 # - harbor.delete_project [project]                                             - delete project, must not have repositories
 # - harbor.get_robots [project]                                                 - get robots within a project
 # - harbor.create_robot [project] [robot]                                       - create a robot within a project
@@ -20,6 +23,26 @@
 # - harbor.create_artefact_vulnerability_scan [project] [repository] [artefact] - create a vulnerability scan for an artefact
 # - harbor.create_pull_secret [cluster] [namespace]                             - create a pull secret for the robot set in the environment
 # - harbor.delete_pull_secret [cluster] [namespace]                             - delete a pull secret
+
+_harbor.curl() {
+  local method="${1}"
+  local path="${2}"
+  local data="${3}"
+  shift 3
+
+  local url="https://${harbor_endpoint}/api/v2.0/${path}"
+  local curl_args=(-s -u "${harbor_username}:${harbor_password}" -X "${method}" "${url}" -H "accept: application/json")
+
+  if [[ "${method}" == "POST" || "${method}" == "PUT" ]]; then
+    curl_args+=(-H "content-type: application/json" -d "${data}")
+  fi
+
+  if [[ "${harbor_secure}" != "true" ]]; then
+    curl_args=(-k "${curl_args[@]}")
+  fi
+
+  curl "${curl_args[@]}" "$@"
+}
 
 harbor.load_env() {
   if [[ -z "${1:-}" ]]; then
@@ -109,37 +132,28 @@ harbor.get() {
   if [[ "${#}" -lt 1 ]]; then
     log.fatal "usage: harbor.get [resource/path] <additional curl args...>"
   fi
-
-  if [[ "${harbor_secure}" == "true" ]]; then
-    curl -s -u "${harbor_username}:${harbor_password}" "https://${harbor_endpoint}/api/v2.0/${1}" -H "accept: application/json" "${@:2}"
-  else
-    curl -k -s -u "${harbor_username}:${harbor_password}" "https://${harbor_endpoint}/api/v2.0/${1}" -H "accept: application/json" "${@:2}"
-  fi
-
+  _harbor.curl "GET" "${1}" "" "${@:2}"
 }
 
 harbor.post() {
-  if [[ "${#}" -lt 1 ]]; then
+  if [[ "${#}" -lt 2 ]]; then
     log.fatal "usage: harbor.post [resource/path] [json data] <additional curl args...>"
   fi
+  _harbor.curl "POST" "${1}" "${2}" "${@:3}"
+}
 
-  if [[ "${harbor_secure}" == "true" ]]; then
-    curl -s -u "${harbor_username}:${harbor_password}" "https://${harbor_endpoint}/api/v2.0/${1}" -H "accept: application/json" -H "content-type: application/json" -d "${2}" "${@:3}"
-  else
-    curl -k -s -u "${harbor_username}:${harbor_password}" "https://${harbor_endpoint}/api/v2.0/${1}" -H "accept: application/json" -H "content-type: application/json" -d "${2}" "${@:3}"
+harbor.put() {
+  if [[ "${#}" -lt 2 ]]; then
+    log.fatal "usage: harbor.put [resource/path] [json data] <additional curl args...>"
   fi
+  _harbor.curl "PUT" "${1}" "${2}" "${@:3}"
 }
 
 harbor.delete() {
   if [[ "${#}" -lt 1 ]]; then
     log.fatal "usage: harbor.delete [resource/path] <additional curl args...>"
   fi
-
-  if [[ "${harbor_secure}" == "true" ]]; then
-    curl -s -u "${harbor_username}:${harbor_password}" -X DELETE "https://${harbor_endpoint}/api/v2.0/${1}" -H "accept: application/json" "${@:2}"
-  else
-    curl -k -s -u "${harbor_username}:${harbor_password}" -X DELETE "https://${harbor_endpoint}/api/v2.0/${1}" -H "accept: application/json" "${@:2}"
-  fi
+  _harbor.curl "DELETE" "${1}" "" "${@:2}"
 }
 
 harbor.get_current_user() {
@@ -158,6 +172,14 @@ harbor.create_project() {
   ')"
 
   harbor.post projects "${data}"
+}
+
+harbor.update_project() {
+  if [[ "${#}" -lt 2 ]]; then
+    log.fatal "usage: harbor.update_project [project] [json data]"
+  fi
+
+  harbor.put "projects/${1}" "${2}"
 }
 
 harbor.delete_project() {

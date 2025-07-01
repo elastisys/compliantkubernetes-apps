@@ -115,6 +115,50 @@ teardown_file() {
   refute_line --regexp ".*errors.*"
 }
 
+@test "harbor api can't pull vulnerable image with vulnerability prevention enabled" {
+  local dest
+  dest="$(mktemp -d)"
+
+  harbor.update_project "${harbor_project}" '{"metadata": {"prevent_vul": "true", "severity": "high"}}'
+
+  skopeo sync --src docker --dest docker docker.io/library/alpine:3.9 "${harbor_endpoint}/${harbor_project}"
+  harbor.create_artefact_vulnerability_scan "${harbor_project}" "alpine" "3.9"
+
+  local status
+  for _ in $(seq 5); do
+    status=$(harbor.get "projects/${harbor_project}/repositories/alpine/artifacts/3.9?with_scan_overview=true" |
+      jq -r '.scan_overview."application/vnd.security.vulnerability.report; version=1.1".scan_status')
+    if [ "$status" == "Success" ]; then
+      break
+    fi
+    sleep 5
+  done
+
+  [ "$status" == "Success" ] || return 1
+
+  run skopeo sync --src docker --dest dir "${harbor_endpoint}/${harbor_project}/alpine:3.9" "${dest}"
+
+  assert_line --regexp '.*vulnerabilities.*'
+
+  rm -r "${dest}"
+}
+
+@test "harbor api can pull vulnerable image with vulnerability prevention disabled" {
+  local dest
+
+  dest="$(mktemp -d)"
+
+  harbor.update_project "${harbor_project}" '{"metadata": {"prevent_vul": "false"}}'
+
+  run skopeo sync --src docker --dest dir "${harbor_endpoint}/${harbor_project}/alpine:3.9" "${dest}"
+
+  assert_success
+
+  harbor.delete_repository "${harbor_project}" "alpine"
+  rm -r "${dest}"
+
+}
+
 @test "harbor api can unauthenticate with robot account" {
   run skopeo logout "${harbor_endpoint}"
   assert_success
