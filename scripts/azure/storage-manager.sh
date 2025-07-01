@@ -5,6 +5,7 @@ set -euo pipefail
 : "${CK8S_CONFIG_PATH:?Missing CK8S_CONFIG_PATH}"
 : "${AZURE_LOCATION:?Missing AZURE_LOCATION}"
 
+readonly SET_ACTION="set"
 readonly CREATE_ACTION="create"
 readonly DELETE_ACTION="delete"
 readonly LIST_HARBOR_BACKUPS="list-harbor-backups"
@@ -52,10 +53,9 @@ CONTAINERS=$({
   echo "${buckets_wc:-}"
 } | sort | uniq | tr '\n' ' ' | sed s'/.$//')
 
-log_info "Operating on containers: ${CONTAINERS// /', '}"
-
 function usage() {
   echo "Usage:" 1>&2
+  echo " $0 set" 1>&2
   echo " $0 create" 1>&2
   echo " $0 delete" 1>&2
 }
@@ -66,6 +66,9 @@ if [ "${#}" -lt 1 ]; then
 fi
 
 case "$1" in
+set)
+  ACTION=$SET_ACTION
+  ;;
 create)
   ACTION=$CREATE_ACTION
   ;;
@@ -77,6 +80,56 @@ list-harbor-backups)
   ;;
 esac
 shift
+
+if [[ "$ACTION" == "$CREATE_ACTION" || "$ACTION" == "$DELETE_ACTION" ]]; then
+  log_info "Operating on containers: ${CONTAINERS// /', '}"
+fi
+
+function set_resource_group() {
+  log_info "Getting existing resource groups" >&2
+  EXISTING_GROUPS=$(az group list --query '[].name')
+  if [[ "${EXISTING_GROUPS}" == "[]" ]]; then
+    log_info "There are no existing resource groups."
+    log_info "Current resource group in config is ${RESOURCE_GROUP}."
+    log_info "Enter a new resource group name to override with, or press Enter to keep current: "
+    read -r name
+    if [[ -n "${name}" ]]; then
+      yq -i '.objectStorage.azure.resourceGroup = "'"${name}"'"' "${CK8S_CONFIG_PATH}/common-config.yaml"
+    fi
+  else
+    log_info "The following resource groups already exist:"
+    log_info "${EXISTING_GROUPS}"
+    log_info "Current resource group in config is ${RESOURCE_GROUP}."
+    log_info "Enter a resource group name to override with, or press Enter to keep current: "
+    read -r name
+    if [[ -n "${name}" ]]; then
+      yq -i '.objectStorage.azure.resourceGroup = "'"${name}"'"' "${CK8S_CONFIG_PATH}/common-config.yaml"
+    fi
+  fi
+}
+
+function set_storage_account() {
+  log_info "Getting existing storage accounts" >&2
+  EXISTING_ACCOUNTS=$(az storage account list --query '[].name')
+  if [[ "${EXISTING_ACCOUNTS}" == "[]" ]]; then
+    log_info "There are no existing storage accounts."
+    log_info "Current storage account in config is ${STORAGE_ACCOUNT}."
+    log_info "Enter a new storage account name to override with, or press Enter to keep current: "
+    read -r name
+    if [[ -n "${name}" ]]; then
+      yq -i '.objectStorage.azure.storageAccountName = "'"${name}"'"' "${CK8S_CONFIG_PATH}/common-config.yaml"
+    fi
+  else
+    log_info "The following storage accounts already exist:"
+    log_info "${EXISTING_ACCOUNTS}"
+    log_info "Current storage account in config is ${STORAGE_ACCOUNT}."
+    log_info "Enter a storage account name to override with, or press Enter to keep current: "
+    read -r name
+    if [[ -n "${name}" ]]; then
+      yq -i '.objectStorage.azure.storageAccountName = "'"${name}"'"' "${CK8S_CONFIG_PATH}/common-config.yaml"
+    fi
+  fi
+}
 
 function create_resource_group() {
 
@@ -159,7 +212,13 @@ function list_harbor_backups() {
   az storage blob list --account-name "${STORAGE_ACCOUNT}" --container-name "${CONTAINER}" --prefix "backups" -o table
 }
 
-if [[ "$ACTION" == "$CREATE_ACTION" ]]; then
+if [[ "$ACTION" == "$SET_ACTION" ]]; then
+  log_info "Setting Resource Group name" >&2
+  set_resource_group
+
+  log_info "Setting Storage Account name" >&2
+  set_storage_account
+elif [[ "$ACTION" == "$CREATE_ACTION" ]]; then
   log_info "Creating Resource Group" >&2
   create_resource_group
 
