@@ -50,7 +50,6 @@ releases:
   - inherit: [ template: monitoring-networkpolicy ]
   - inherit: [ template: monitoring-podsecuritypolicy ]
 
-  # Deploy kube-prometheus-stack after networkpolicy/psp to install CRDs
   - inherit: [ template: kube-prometheus-stack ]
   - inherit: [ template: kube-state-metrics-extra-resources ]
   - inherit: [ template: metrics-server ]
