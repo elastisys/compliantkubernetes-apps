@@ -34,8 +34,6 @@ templates:
       - monitoring/kube-prometheus-stack # creates servicemonitors
     values:
       - values/cert-manager.yaml.gotmpl
-    wait: true
-    timeout: 300
 
   cert-manager-issuers:
     disableValidation: true
@@ -49,5 +47,3 @@ templates:
       - cert-manager/cert-manager # creates issuers
     values:
       - values/letsencrypt.yaml.gotmpl
-    wait: true
-    timeout: 180
