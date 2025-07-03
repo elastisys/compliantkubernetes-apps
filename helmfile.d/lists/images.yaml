@@ -29,15 +29,15 @@ images:
     operator: nvcr.io/nvidia/gpu-operator:v24.9.2
     nodeFeatureDiscovery: registry.k8s.io/nfd/node-feature-discovery:v0.16.6
   harbor:
-    core: docker.io/goharbor/harbor-core:v2.12.1
-    exporter: docker.io/goharbor/harbor-exporter:v2.12.1
-    jobservice: docker.io/goharbor/harbor-jobservice:v2.12.1
-    portal: docker.io/goharbor/harbor-portal:v2.12.1
-    registry: docker.io/goharbor/registry-photon:v2.12.1
-    registryController: docker.io/goharbor/harbor-registryctl:v2.12.1
-    database: docker.io/goharbor/harbor-db:v2.12.1
-    redis: docker.io/goharbor/redis-photon:v2.12.1
-    trivyAdapter: docker.io/goharbor/trivy-adapter-photon:v2.12.1
+    core: docker.io/goharbor/harbor-core:v2.13.1
+    exporter: docker.io/goharbor/harbor-exporter:v2.13.1
+    jobservice: docker.io/goharbor/harbor-jobservice:v2.13.1
+    portal: docker.io/goharbor/harbor-portal:v2.13.1
+    registry: docker.io/goharbor/registry-photon:v2.13.1
+    registryController: docker.io/goharbor/harbor-registryctl:v2.13.1
+    database: docker.io/goharbor/harbor-db:v2.13.1
+    redis: docker.io/goharbor/redis-photon:v2.13.1
+    trivyAdapter: docker.io/goharbor/trivy-adapter-photon:v2.13.1
     initJob: ghcr.io/elastisys/curl-jq:1.0.0
     backupJob: ghcr.io/elastisys/backup-postgres:1.5.0
   hnc:
