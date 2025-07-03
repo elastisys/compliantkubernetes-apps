@@ -132,7 +132,7 @@ _apply_normalise() {
 
   assert_equal "$(mock_get_call_num "${mock_curl}")" 0
   assert_equal "$(mock_get_call_num "${mock_dig}")" 3
-  assert_equal "$(mock_get_call_num "${mock_kubectl}")" 16
+  assert_equal "$(mock_get_call_num "${mock_kubectl}")" 24
 }
 
 @test "ck8s update-ips skips ips in existing cidrs" {
@@ -149,7 +149,7 @@ _apply_normalise() {
 
   assert_equal "$(mock_get_call_num "${mock_curl}")" 0
   assert_equal "$(mock_get_call_num "${mock_dig}")" 3
-  assert_equal "$(mock_get_call_num "${mock_kubectl}")" 16
+  assert_equal "$(mock_get_call_num "${mock_kubectl}")" 24
 }
 
 @test "ck8s update-ips allows s3 region endpoint to be an ip" {
@@ -177,7 +177,7 @@ _apply_normalise() {
   assert_equal "$(yq.dig common '.networkPolicies.global.objectStorage.ips | . style="flow"')" "[10.244.0.0/16]"
 
   assert_equal "$(mock_get_call_num "${mock_dig}")" 2
-  assert_equal "$(mock_get_call_num "${mock_kubectl}")" 17
+  assert_equal "$(mock_get_call_num "${mock_kubectl}")" 25
 }
 
 @test "ck8s update-ips allows s3 region endpoint to be cluster local without kubeadm config" {
@@ -192,7 +192,7 @@ _apply_normalise() {
   assert_equal "$(yq.dig common '.networkPolicies.global.objectStorage.ips | . style="flow"')" "[0.0.0.0/0]"
 
   assert_equal "$(mock_get_call_num "${mock_dig}")" 2
-  assert_equal "$(mock_get_call_num "${mock_kubectl}")" 17
+  assert_equal "$(mock_get_call_num "${mock_kubectl}")" 25
 }
 
 # --- maximal ----------------------------------------------------------------------------------------------------------
