@@ -20,6 +20,7 @@ describe("harbor ui", function() {
         cy.contains("log out", opt)
           .click()
 
+        cy.contains("LOGIN VIA LOCAL DB", opt)
         cy.harborAdminLogin(this.ingress)
 
         cy.harborStaticDexPromote(this.ingress)
