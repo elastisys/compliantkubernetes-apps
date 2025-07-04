@@ -1,9 +1,12 @@
 dependencies:
 - name: falcosidekick
   repository: https://falcosecurity.github.io/charts
-  version: 0.9.8
+  version: 0.9.11
 - name: k8s-metacollector
   repository: https://falcosecurity.github.io/charts
   version: 0.1.10
-digest: sha256:5f84309574446ba7275de4b64bbadc8d3697782b076a5a08ced1f96befd6a22d
-generated: "2025-02-06T09:00:41.2665733Z"
+- name: falco-talon
+  repository: https://falcosecurity.github.io/charts
+  version: 0.3.0
+digest: sha256:77632b47ac4bf0867809f9f2ea422d00343af838ebef110899b09144cfc6f185
+generated: "2025-07-01T12:36:33.975808721Z"

@@ -27,6 +27,8 @@ namespaceOverride: ""
 podAnnotations: {}
 
 serviceAccount:
+  # -- Secrets containing credentials when pulling from private/secure registries.
+  imagePullSecrets: []
   # -- Specifies whether a service account should be created.
   create: true
   # -- Annotations to add to the service account.
@@ -360,23 +362,64 @@ collectors:
   # -- Enable/disable all the metadata collectors.
   enabled: true
 
+  # -- This collector is deprecated and will be removed in the future. Please use the containerEngine collector instead.
   docker:
     # -- Enable Docker support.
     enabled: true
     # -- The path of the Docker daemon socket.
     socket: /var/run/docker.sock
 
+  # -- This collector is deprecated and will be removed in the future. Please use the containerEngine collector instead.
   containerd:
     # -- Enable ContainerD support.
     enabled: true
     # -- The path of the ContainerD socket.
     socket: /run/containerd/containerd.sock
 
+  # -- This collector is deprecated and will be removed in the future. Please use the containerEngine collector instead.
   crio:
     # -- Enable CRI-O support.
     enabled: true
     # -- The path of the CRI-O socket.
     socket: /run/crio/crio.sock
+
+  # -- This collector is the new container engine collector that replaces the old docker, containerd, crio and podman collectors.
+  # It is designed to collect metadata from various container engines and provide a unified interface through the container plugin.
+  # When enabled, it will deploy the container plugin and use it to collect metadata from the container engines.
+  # Keep in mind that the old collectors (docker, containerd, crio, podman) will use the container plugin to collect metadata under the hood.
+  containerEngine:
+    # -- Enable Container Engine support.
+    enabled: false
+    # -- pluginRef is the OCI reference for the container plugin. It could be a full reference such as
+    # "ghcr.io/falcosecurity/plugins/plugin/container:0.3.1". Or just name + tag: container:0.3.1.
+    pluginRef: "ghcr.io/falcosecurity/plugins/plugin/container:0.3.1"
+    # -- labelMaxLen is the maximum length of the labels that can be used in the container plugin.
+    # container labels larger than this value won't be collected.
+    labelMaxLen: 100
+    # -- withSize specifies whether to enable container size inspection, which is inherently slow.
+    withSize: false
+    # -- hooks specify the hooks that will be used to collect metadata from the container engine.
+    # The available hooks are: create, start.
+    hooks: ["create"]
+    engines:
+      docker:
+        enabled: true
+        sockets: ["/var/run/docker.sock"]
+      podman:
+        enabled: true
+        sockets: ["/run/podman/podman.sock"]
+      containerd:
+        enabled: true
+        sockets: ["/run/containerd/containerd.sock"]
+      cri:
+        enabled: true
+        sockets: ["/run/crio/crio.sock"]
+      lxc:
+        enabled: true
+      libvirt_lxc:
+        enabled: true
+      bpm:
+        enabled: true
 
   # -- kubernetes holds the configuration for the kubernetes collector. Starting from version 0.37.0 of Falco, the legacy
   # kubernetes client has been removed. A new standalone component named k8s-metacollector and a Falco plugin have been developed
@@ -392,7 +435,7 @@ collectors:
     enabled: false
     # --pluginRef is the OCI reference for the k8smeta plugin. It could be a full reference such as:
     # "ghcr.io/falcosecurity/plugins/plugin/k8smeta:0.1.0". Or just name + tag: k8smeta:0.1.0.
-    pluginRef: "ghcr.io/falcosecurity/plugins/plugin/k8smeta:0.2.1"
+    pluginRef: "ghcr.io/falcosecurity/plugins/plugin/k8smeta:0.3.0"
     # -- collectorHostname is the address of the k8s-metacollector. When not specified it will be set to match
     # k8s-metacollector service. e.x: falco-k8smetacollecto.falco.svc. If for any reason you need to override
     # it, make sure to set here the address of the k8s-metacollector.
@@ -408,6 +451,7 @@ collectors:
     # In Falco usually we put the host '/proc' folder under '/host/proc' so
     # the default for this config is '/host'.
     # The path used here must not have a final '/'.
+    # Deprecated since falco 0.41.0 and k8smeta 0.3.0.
     hostProc: /host
 
 ###########################
@@ -469,6 +513,14 @@ falcosidekick:
   # -- Listen port. Default value: 2801
   listenPort: ""
 
+# -- Enable the response actions using Falco Talon.
+responseActions:
+  enabled: false
+
+# -- For configuration values, see https://github.com/falcosecurity/charts/blob/master/charts/falco-talon/values.yaml
+# -- It must be used in conjunction with the response_actions.enabled option.
+falco-talon: {}
+
 ####################
 # falcoctl config  #
 ####################
@@ -481,7 +533,7 @@ falcoctl:
     # -- The image repository to pull from.
     repository: falcosecurity/falcoctl
     # -- The image tag to pull.
-    tag: "0.11.0"
+    tag: "0.11.2"
   artifact:
     # -- Runs "falcoctl artifact install" command as an init container. It is used to install artfacts before
     # Falco starts. It provides them to Falco by using an emptyDir volume.
@@ -534,7 +586,7 @@ falcoctl:
         # -- Resolve the dependencies for artifacts.
         resolveDeps: true
         # -- List of artifacts to be installed by the falcoctl init container.
-        refs: [falco-rules:3]
+        refs: [falco-rules:4]
         # -- Directory where the rulesfiles are saved. The path is relative to the container, which in this case is an emptyDir
         # mounted also by the Falco pod.
         rulesfilesDir: /rulesfiles
@@ -542,7 +594,7 @@ falcoctl:
         pluginsDir: /plugins
       follow:
         # -- List of artifacts to be followed by the falcoctl sidecar container.
-        refs: [falco-rules:3]
+        refs: [falco-rules:4]
         # -- How often the tool checks for new versions of the followed artifacts.
         every: 6h
         # -- HTTP endpoint that serves the api versions of the Falco instance. It is used to check if the new versions are compatible
@@ -797,8 +849,30 @@ falco:
   # Also, nested include is not allowed, ie: included config files won't be able to include other config files.
   #
   # Like for 'rules_files', specifying a folder will load all the configs files present in it in a lexicographical order.
+  #
+  # 3 merge-strategies are available:
+  # `append` (default):
+  #   * existing sequence keys will be appended
+  #   * existing scalar keys will be overridden
+  #   * non-existing keys will be added
+  # `override`:
+  #   * existing keys will be overridden
+  #   * non-existing keys will be added
+  # `add-only`:
+  #   * existing keys will be ignored
+  #   * non-existing keys will be added
+  #
+  # Each item on the list can be either a yaml map or a simple string.
+  # The simple string will be interpreted as the config file path, and the `append` merge-strategy will be enforced.
+  # When the item is a yaml map instead, it will be of the form: `   path: foo\n   strategy: X`.
+  # When `strategy` is omitted, once again `append` is used.
+  #
+  # When a merge-strategy is enabled for a folder entry, all the included config files will use that merge-strategy.
   config_files:
     - /etc/falco/config.d
+  # Example of config file specified as yaml map with strategy made explicit.
+  # - path: $HOME/falco_local_configs/
+  #  strategy: add-only
 
   # [Stable] `watch_config_files`
   #
@@ -868,6 +942,13 @@ falco:
   # information.
   json_include_message_property: false
 
+  # [Incubating] `json_include_output_fields_property`
+  #
+  # When using JSON output in Falco, you have the option to include the individual
+  # output fields for easier access. To reduce the logging volume, it is recommended
+  # to turn it off if it's not necessary for your use case.
+  json_include_output_fields_property: true
+
   # [Stable] `buffered_outputs`
   #
   # -- Enabling buffering for the output queue can offer performance optimization,
@@ -901,6 +982,7 @@ falco:
   #             affect the regular Falco message in any way. These can be specified as a
   #             custom name with a custom format or as any supported field
   #             (see: https://falco.org/docs/reference/rules/supported-fields/)
+  #   `suggested_output`: enable the use of extractor plugins suggested fields for the matching source output.
   #
   # Example:
   #
@@ -916,7 +998,13 @@ falco:
   # at the end telling the CPU number. In addition, if `json_output` is true, in the "output_fields"
   # property you will find three new ones: "evt.cpu", "home_directory" which will contain the value of the
   # environment variable $HOME, and "evt.hostname" which will contain the hostname.
-  append_output: []
+
+  # By default, we enable suggested_output for any source.
+  # This means that any extractor plugin that indicates some of its fields
+  # as suggested output formats, will see these fields in the output
+  # in the form "foo_bar=$foo.bar"
+  append_output:
+    - suggested_output: true
 
   ##########################
   # Falco outputs channels #
@@ -981,6 +1069,8 @@ falco:
     compress_uploads: false
     # -- keep_alive whether to keep alive the connection.
     keep_alive: false
+    # Maximum consecutive timeouts of libcurl to ignore
+    max_consecutive_timeouts: 5
 
   # [Stable] `program_output`
   #
@@ -1143,8 +1233,8 @@ falco:
   # "alert", "critical", "error", "warning", "notice", "info", "debug". It is not
   # recommended for production use.
   libs_logger:
-    enabled: false
-    severity: debug
+    enabled: true
+    severity: info
 
   #################################################################################
   # Falco logging / alerting / metrics related to software functioning (advanced) #
@@ -1551,7 +1641,6 @@ falco:
   falco_libs:
     thread_table_size: 262144
 
-
   # [Incubating] `container_engines`
   #
   # This option allows you to explicitly enable or disable API lookups against container
@@ -1582,7 +1671,12 @@ falco:
       enabled: false
     cri:
       enabled: false
-      sockets: ["/run/containerd/containerd.sock", "/run/crio/crio.sock", "/run/k3s/containerd/containerd.sock"]
+      sockets:
+        [
+          "/run/containerd/containerd.sock",
+          "/run/crio/crio.sock",
+          "/run/k3s/containerd/containerd.sock",
+        ]
       disable_async: false
     podman:
       enabled: false
