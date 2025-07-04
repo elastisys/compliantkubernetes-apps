@@ -8,3 +8,12 @@ ndots:
   labelSelector:
     matchLabels:
       # labelkey: labelvalue
+
+serviceIPFamilyPolicy:
+  enabled: false
+  ipFamilyPolicy: "SingleStack"
+
+serviceIPFamilies:
+  enabled: false
+  ipFamilies:
+    - "IPv4"
