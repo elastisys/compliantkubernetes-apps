@@ -88,3 +88,18 @@ templates:
       - harbor/harbor
     values:
       - values/harbor/harbor-backup.yaml.gotmpl
+
+  harbor-mpu-cleaner:
+    inherit: [ template: harbor ]
+    installed: {{ and (.Values | get "harbor.enabled" false) (.Values | get "harbor.mpuCleaner.enabled" false) }}
+    chart: charts/harbor/harbor-mpu-cleaner
+    version: 0.1.0
+    name: harbor-mpu-cleaner
+    needs:
+      {{- if .Values | get "networkPolicies.harbor.enabled" false }}
+      - harbor/networkpolicy
+      {{- end }}
+      - harbor/podsecuritypolicy
+      - harbor/harbor
+    values:
+      - values/harbor/harbor-mpu-cleaner.yaml.gotmpl
