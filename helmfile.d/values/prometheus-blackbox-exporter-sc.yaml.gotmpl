@@ -57,6 +57,11 @@ config:
     tcp_connect:
       prober: tcp
     {{- end }}
+service:
+  ipDualStack:
+    enabled: true
+    ipFamilyPolicy: {{ .Values.global.ipFamilyPolicy }}
+    ipFamilies: {{ toYaml .Values.global.ipFamilies | nindent 6 }}
 serviceMonitor:
   enabled: true
   targets:

@@ -7,3 +7,7 @@ serviceMonitor:
   {{- else }}
     k8s-app: openstack-cloud-controller-manager
   {{- end }}
+
+service:
+  ipFamilyPolicy: {{ .Values.global.ipFamilyPolicy }}
+  ipFamilies: {{ toYaml .Values.global.ipFamilies | nindent 6 }}

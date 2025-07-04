@@ -1,0 +1,18 @@
+{{- if .Values.serviceIPFamilies.enabled }}
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: service-ip-families
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Services"]
+      versions: ["v1"]
+  location: "spec.ipFamilies"
+  parameters:
+    assign:
+      value: {{ toYaml .Values.serviceIPFamilies.ipFamilies | nindent 8 }}
+    pathTests:
+      - subPath: "spec.ipFamilies"
+        condition: MustNotExist
+{{- end }}

@@ -8,6 +8,12 @@ metadata:
     type: metrics
   name: {{ .Release.Name }}-controller
 spec:
+  {{- if .Values.controllerMetricsService.ipFamilyPolicy }}
+  ipFamilyPolicy: {{ .Values.controllerMetricsService.ipFamilyPolicy }}
+  {{- end }}
+  {{- if .Values.controllerMetricsService.ipFamily }}
+  ipFamilies: {{ toYaml .Values.controllerMetricsService.ipFamilies | nindent 4 }}
+  {{- end }}
   ports:
   - port: 8888
     name: metrics

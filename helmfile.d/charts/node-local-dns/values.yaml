@@ -9,6 +9,14 @@ resources:
     cpu: 25m
     memory: 40Mi
 
+service:
+  ipFamilyPolicy: ""
+  ipFamilies:
+
+metricsService:
+  ipFamilyPolicy: ""
+  ipFamilies: []
+
 hostZone:
   extraConfig: #|
     # template ANY ANY {

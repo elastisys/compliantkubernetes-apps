@@ -54,6 +54,20 @@ global:
   ## Supported values are 'docker', 'containerd'
   containerRuntime: containerd
 
+  ## Enable to install mutation webhook that sets `ipFamilyPolicy` on all services to what is specified in `.global.ipFamilyPolicy`
+  enforceIPFamilyPolicy: false
+  ## Enable to install mutation webhook that sets `ipFamilies` on all services to what is specified in `.global.ipFamilies`
+  enforceIPFamilies: false
+  ## Global setting for configuring all services `ipFamilyPolicy`
+  ## Note that not all services exposes this setting.
+  ## If you want to enforce this for all services, set `.global.enforceIPFamilyPolicy`
+  ipFamilyPolicy: "SingleStack"
+  ## Global setting for configuring all services `ipFamilies`
+  ## Note that not all services exposes this setting.
+  ## If you want to enforce this for all services, set `.global.enforceIPFamilies`
+  ipFamilies:
+    - "IPv4"
+
 clusterApi:
   ## Set to true if kubernetes is installed with cluster-api
   enabled: set-me

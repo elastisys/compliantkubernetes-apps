@@ -73,6 +73,8 @@ managerDeployment:
 managerService:
   annotations: {}
   port: 8080
+  ipFamilyPolicy: ""
+  ipFamilies: []
 
 webhook:
   annotations: {}
@@ -99,6 +101,8 @@ webhookDeployment:
 
 webhookService:
   port: 443
+  ipFamilyPolicy: ""
+  ipFamilies: []
 
 certificate:
   create: true

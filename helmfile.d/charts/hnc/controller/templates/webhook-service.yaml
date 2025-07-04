@@ -6,6 +6,12 @@ metadata:
   name: {{ include "hnc.fullname" . }}-webhook-service
 spec:
   type: ClusterIP
+  {{- if .Values.webhookService.ipFamilyPolicy }}
+  ipFamilyPolicy: {{ .Values.webhookService.ipFamilyPolicy }}
+  {{- end }}
+  {{- if .Values.webhookService.ipFamilies }}
+  ipFamilies: {{ toYaml .Values.webhookService.ipFamilies | nindent 4 }}
+  {{- end }}
   selector:
     {{- include "hnc.selectorLabels" . | nindent 4 }}
     {{- if .Values.webhookDeployment.create }}

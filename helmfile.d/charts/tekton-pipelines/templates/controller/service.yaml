@@ -14,6 +14,12 @@ metadata:
   {{- include "tekton-pipelines.labels" . | nindent 4 }}
 spec:
   type: ClusterIP
+  {{- if .Values.controller.service.ipFamilyPolicy }}
+  ipFamilyPolicy: {{ .Values.controller.service.ipFamilyPolicy }}
+  {{- end }}
+  {{- if .Values.controller.service.ipFamily }}
+  ipFamilies: {{ toYaml .Values.controller.service.ipFamilies | nindent 4 }}
+  {{- end }}
   selector:
     app.kubernetes.io/component: controller
     app.kubernetes.io/instance: default

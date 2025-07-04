@@ -1,6 +1,9 @@
 # admin username is "admin"
 serviceMonitor:
   enabled: true
+service:
+  ipFamilyPolicy: {{ .Values.global.ipFamilyPolicy }}
+  ipFamilies: {{ toYaml .Values.global.ipFamilies | nindent 4 }}
 ingress:
   annotations:
     ingress.kubernetes.io/rewrite-target: /

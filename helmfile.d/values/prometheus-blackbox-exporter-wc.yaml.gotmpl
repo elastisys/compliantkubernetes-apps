@@ -52,6 +52,11 @@ config:
           insecure_skip_verify: true
     tcp_connect:
       prober: tcp
+service:
+  ipDualStack:
+    enabled: true
+    ipFamilyPolicy: {{ .Values.global.ipFamilyPolicy }}
+    ipFamilies: {{ toYaml .Values.global.ipFamilies | nindent 6 }}
 serviceMonitor:
   enabled: true
   targets:

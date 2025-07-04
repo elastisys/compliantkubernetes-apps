@@ -4,6 +4,8 @@ fullnameOverride: ""
 service:
   type: ClusterIP
   port: 6443
+  ipFamilyPolicy: ""
+  ipFamilies: []
 
 ingress:
   enabled: false
