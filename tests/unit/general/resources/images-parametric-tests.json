@@ -217,6 +217,12 @@
       "template_file": "sc/harbor-backup/templates/harbor-backup-job.yaml"
     },
     {
+      "image_property": "harbor.mpuCleaner",
+      "helmfile_selector": "app=harbor",
+      "container_name": "mpu-cleaner",
+      "template_file": "sc/harbor-mpu-cleaner/templates/harbor-mpu-cleaner-job.yaml"
+    },
+    {
       "image_property": "hnc.image",
       "helmfile_selector": "app=hnc",
       "container_name": "hnc-controller-manager",
