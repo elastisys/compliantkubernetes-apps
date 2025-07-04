@@ -1,0 +1,43 @@
+{{ if not (or (eq .Values.objectStorage.type "s3") (eq .Values.objectStorage.type "gcs") (eq .Values.objectStorage.type "azure") ) }}
+{{ fail "\nERROR: Harbor Multipartupload cleanup requires s3, gcs or azure object storage, see Values.objectStorage.type" }}
+{{ end }}
+
+maxAge: {{ .Values.harbor.mpuCleaner.maxAge }}
+bucket: {{ .Values.objectStorage.buckets.harbor }}
+schedule: {{ .Values.harbor.mpuCleaner.schedule | quote }}
+{{ if eq .Values.objectStorage.type "s3" -}}
+s3:
+  enabled: true
+  accessKey: {{ .Values.objectStorage.s3.accessKey }}
+  secretKey: {{ .Values.objectStorage.s3.secretKey }}
+  endpoint: {{ .Values.objectStorage.s3.regionEndpoint }}
+{{ else if eq .Values.objectStorage.type "gcs" -}}
+gcs:
+  enabled: true
+  bucket: {{ .Values.objectStorage.buckets.harbor }}
+  keyfileData: |
+    {{ .Values.objectStorage.gcs.keyfileData | nindent 4 }}
+{{ else if eq .Values.objectStorage.type "azure" -}}
+azure:
+  enabled: true
+  storageAccountName: {{ .Values.objectStorage.azure.storageAccountName }}
+  storageAccountKey: {{ .Values.objectStorage.azure.storageAccountKey }}
+  containerName: {{ .Values.objectStorage.buckets.harbor }}
+  realm: core.windows.net
+{{- end }}
+
+{{- $global := dict
+  "registry" (ternary (dig "uri" "" .Values.images.global.registry) "" .Values.images.global.registry.enabled)
+  "repository" (ternary (dig "uri" "" .Values.images.global.repository) "" .Values.images.global.repository.enabled)
+}}
+{{- with .Values.images | dig "harbor" "mpuCleanerJob" "" }}
+{{- with merge (include "container_uri.parse" . | fromJson) $global }}
+image:
+  {{- with include "gen.reg-rep-img" . }}
+  repository: {{ . }}
+  {{- end }}
+  {{- if or .tag .digest }}
+  tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
+  {{- end }}
+{{- end }}
+{{- end }}

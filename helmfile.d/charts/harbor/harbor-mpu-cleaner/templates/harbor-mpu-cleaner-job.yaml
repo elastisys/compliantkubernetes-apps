@@ -1,0 +1,78 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ .Release.Name }}-cronjob
+spec:
+  schedule: {{ .Values.schedule }}
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            release: {{ .Release.Name }}
+            component: cleanup
+        spec:
+          restartPolicy: OnFailure
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            fsGroup: 1000
+          containers:
+            - name: mpu-cleaner
+              image: "{{ .Values.image.repository }}{{- with .Values.image.tag }}:{{ . }}{{ end }}"
+              command: ['python3', '/scripts/mpu-tool.py', 'cleanup', '--bucket-name', '{{ .Values.bucket }}', '--max-age', '{{ .Values.maxAge }}']
+              env:
+              {{- if .Values.s3.enabled }}
+                - name: AWS_ACCESS_KEY_ID
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ .Release.Name }}-secret
+                      key: aws-access-key-id
+                - name: AWS_SECRET_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ .Release.Name }}-secret
+                      key: aws-secret-access-key
+                - name: AWS_ENDPOINT_URL
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ .Release.Name }}-secret
+                      key: aws-endpoint-url
+                - name: AWS_ENDPOINT_NAME
+                  value: {{ .Values.s3.endpoint }}
+              {{- else if .Values.gcs.enabled }}
+                - name: GCS_BACKUP
+                  value: "true"
+                - name: GCS_KEYFILE
+                  value: /etc/gcs/gcs-credentials.json
+              {{- else if .Values.azure.enabled }}
+                - name: AZURE_BACKUP
+                  value: "true"
+                - name: AZURE_ACCOUNT_NAME
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ .Release.Name }}-secret
+                      key: azure-account-name
+                - name: AZURE_ACCOUNT_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ .Release.Name }}-secret
+                      key: azure-account-key
+              {{- end }}
+              volumeMounts:
+                - name: scripts
+                  mountPath: /scripts
+                {{ if .Values.gcs.enabled -}}
+                - name: gcs-credentials
+                  mountPath: /etc/gcs
+                {{- end }}
+          volumes:
+          - name: scripts
+            configMap:
+              name: {{ .Release.Name }}-cm
+              defaultMode: 0755
+          {{- if .Values.gcs.enabled }}
+          - name: gcs-credentials
+            secret:
+              secretName: {{ .Release.Name }}-secret
+          {{- end }}
