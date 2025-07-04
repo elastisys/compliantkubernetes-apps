@@ -285,7 +285,7 @@ prometheusOperator:
   prometheusConfigReloader:
     resources: {{- toYaml .Values.prometheusOperator.prometheusConfigReloader.resources | nindent 6 }}
     {{- with .Values.images | dig "monitoring" "configReloader" "" }}
-  {{- with merge (include "container_uri.parse" . | fromJson) $global }}
+    {{- with merge (include "container_uri.parse" . | fromJson) $global }}
     image:
       {{- with .registry }}
       registry: {{ . }}
