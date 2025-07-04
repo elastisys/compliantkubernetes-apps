@@ -67,12 +67,20 @@ managerDeployment:
   {{- toYaml . | nindent 2 }}
   {{- end }}
 
+managerService:
+  ipFamilyPolicy: {{ .Values.global.ipFamilyPolicy }}
+  ipFamilies: {{ toYaml .Values.global.ipFamilies | nindent 6 }}
+
 webhookDeployment:
   {{- with .Values.hnc.webhook -}}
   {{- toYaml . | nindent 2 }}
   {{- end }}
 
   create: {{ .Values.hnc.ha }}
+
+webhookService:
+  ipFamilyPolicy: {{ .Values.global.ipFamilyPolicy }}
+  ipFamilies: {{ toYaml .Values.global.ipFamilies | nindent 6 }}
 
 serviceMonitor:
   relabelings:

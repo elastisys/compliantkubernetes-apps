@@ -14,7 +14,7 @@ spec:
   {{- if .Values.managerService.ipFamilyPolicy }}
   ipFamilyPolicy: {{ .Values.managerService.ipFamilyPolicy }}
   {{- end }}
-  {{- if .Values.managerService.ipFamily }}
+  {{- if .Values.managerService.ipFamilies }}
   ipFamilies: {{ toYaml .Values.managerService.ipFamilies | nindent 4 }}
   {{- end }}
   selector:

@@ -34,7 +34,7 @@ spec:
   {{- if .Values.service.ipFamilyPolicy }}
   ipFamilyPolicy: {{ .Values.service.ipFamilyPolicy }}
   {{- end }}
-  {{- if .Values.service.ipFamily }}
+  {{- if .Values.service.ipFamilies }}
   ipFamilies: {{ toYaml .Values.service.ipFamilies | nindent 4 }}
   {{- end }}
   ports:
@@ -214,7 +214,7 @@ spec:
   {{- if .Values.metricsService.ipFamilyPolicy }}
   ipFamilyPolicy: {{ .Values.metricsService.ipFamilyPolicy }}
   {{- end }}
-  {{- if .Values.metricsService.ipFamily }}
+  {{- if .Values.metricsService.ipFamilies }}
   ipFamilies: {{ toYaml .Values.metricsService.ipFamilies | nindent 4 }}
   {{- end }}
   clusterIP: None

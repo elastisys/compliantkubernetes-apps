@@ -9,3 +9,10 @@ ndots:
     matchLabels: {{ range $key, $val := .Values.opa.mutations.ndots.labelSelector.matchLabels }}
       {{ $key }}: {{ $val }}
       {{- end }}
+
+serviceIPFamilies:
+  enabled: {{ .Values.global.enforceIPFamilies }}
+  ipFamilies: {{ toYaml .Values.global.ipFamilies | nindent 4 }}
+serviceIPFamilyPolicy:
+  enabled: {{ .Values.global.enforceIPFamilyPolicy }}
+  ipFamilyPolicy: {{ .Values.global.ipFamilyPolicy }}

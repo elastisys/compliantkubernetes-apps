@@ -9,7 +9,7 @@ spec:
   {{- if .Values.webhookService.ipFamilyPolicy }}
   ipFamilyPolicy: {{ .Values.webhookService.ipFamilyPolicy }}
   {{- end }}
-  {{- if .Values.webhookService.ipFamily }}
+  {{- if .Values.webhookService.ipFamilies }}
   ipFamilies: {{ toYaml .Values.webhookService.ipFamilies | nindent 4 }}
   {{- end }}
   selector:
