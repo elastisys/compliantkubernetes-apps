@@ -39,6 +39,7 @@ templates:
     installed: {{ .Values | get "falco.enabled" false }}
     name: falco
     needs:
+      - monitoring/kube-prometheus-stack # creates servicemonitors
       {{- if .Values | get "networkPolicies.falco.enabled" false }}
       - falco/networkpolicy
       {{- end }}
@@ -48,7 +49,6 @@ templates:
       {{- else if .Values | get "ck8sWorkloadCluster.enabled" false }}
       - kube-system/workload-cluster-np
       {{- end }}
-      - monitoring/kube-prometheus-stack # creates servicemonitors
     values:
       - values/falco/falco-common.yaml.gotmpl
       {{- if .Values | get "ck8sManagementCluster.enabled" false }}

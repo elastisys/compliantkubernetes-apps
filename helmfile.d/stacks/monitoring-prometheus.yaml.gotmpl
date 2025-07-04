@@ -29,6 +29,7 @@ templates:
       - values/kube-prometheus-stack-wc.yaml.gotmpl
       {{- end }}
     wait: true
+    timeout: 600
 
   prometheus-blackbox-exporter:
     disableValidationOnInstall: true
