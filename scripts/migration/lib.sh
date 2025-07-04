@@ -456,7 +456,7 @@ record_upgrade_prepare_done() {
     kubectl_do "${1}" create --filename -; then
 
     ts="${apps_config_timestamp}" \
-      yq_add common '.global.ck8sConfigSerial' 'strenv(ts)'
+      yq_add "${1}" '.global.ck8sConfigSerial' 'strenv(ts)'
     log_info "Cluster ${1} locked for upgrade"
     return 0
   else
@@ -483,7 +483,7 @@ ensure_upgrade_prepared() {
   fi
 
   apps_config_timestamp="$(yq '.data.timestamp' <<<"${apps_upgrade}")"
-  apps_cluster_timestamp="$(yq_dig common '.global.ck8sConfigSerial')"
+  apps_cluster_timestamp="$(yq_dig "${1}" '.global.ck8sConfigSerial')"
   if [[ "${apps_config_timestamp}" != "${apps_cluster_timestamp}" ]]; then
     log_fatal "Config timestamp mismatch, ${apps_cluster_timestamp} in ${1} but ${apps_config_timestamp} in config"
   fi
