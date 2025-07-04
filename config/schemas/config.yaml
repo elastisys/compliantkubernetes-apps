@@ -1960,6 +1960,30 @@ properties:
             default: "30 0 * * *"
             $ref: '#/$defs/cronSchedule'
         type: object
+      mpuCleaner:
+        title: MultipartUpload cleaner job configuration
+        description: |-
+          Configuration options for MultipartUpload cleaner job
+        additionalProperties: false
+        properties:
+          enabled:
+            title: Enable Harbor MultipartUpload cleaner
+            default: true
+            type: boolean
+          maxAgeDays:
+            title: Max age
+            description: |-
+              `maxAgeDays` defines how old an unfinished multipartupload is allowed to be before deleting it.
+            default: 7
+            type: number
+          schedule:
+            title: Schedule for MultipartUpload cleaner job
+            description: |-
+              `schedule` defines when the cleaner job for Harbor will run.
+              Uses the Cron format, see https://en.wikipedia.org/wiki/Cron.
+            default: "30 2 * * *"
+            $ref: '#/$defs/cronSchedule'
+        type: object
       core:
         title: Core Config
         description: |-
@@ -8358,6 +8382,8 @@ properties:
           initJob:
             $ref: '#/$defs/containerImage'
           backupJob:
+            $ref: '#/$defs/containerImage'
+          mpuCleaner:
             $ref: '#/$defs/containerImage'
       hnc:
         title: hnc stack image configuration

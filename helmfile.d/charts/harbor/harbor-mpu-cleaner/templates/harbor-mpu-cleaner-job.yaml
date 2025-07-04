@@ -1,0 +1,55 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ .Release.Name }}-cronjob
+spec:
+  schedule: {{ .Values.schedule }}
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      template:
+        metadata:
+          labels:
+            release: {{ .Release.Name }}
+            component: cleanup
+        spec:
+          restartPolicy: Never
+          securityContext:
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+            runAsUser: 1000
+            runAsGroup: 1000
+            fsGroup: 1000
+          containers:
+            - name: mpu-cleaner
+              image: "{{ .Values.image.repository }}{{- with .Values.image.tag }}:{{ . }}{{ end }}"
+              command: ['python3', '/scripts/mpu-tool.py', 'cleanup', '--bucket-name', '{{ .Values.bucket }}', '--max-age', '{{ .Values.maxAgeDays }}']
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop: ["ALL"]
+              env:
+                - name: AWS_ACCESS_KEY_ID
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ .Release.Name }}-secret
+                      key: aws-access-key-id
+                - name: AWS_SECRET_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ .Release.Name }}-secret
+                      key: aws-secret-access-key
+                - name: AWS_ENDPOINT_URL
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ .Release.Name }}-secret
+                      key: aws-endpoint-url
+              volumeMounts:
+                - name: scripts
+                  mountPath: /scripts
+          volumes:
+          - name: scripts
+            configMap:
+              name: {{ .Release.Name }}-cm
+              defaultMode: 0755

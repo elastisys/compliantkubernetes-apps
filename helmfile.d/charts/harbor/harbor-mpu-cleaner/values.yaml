@@ -1,0 +1,10 @@
+maxAgeDays: 7
+bucket: ""
+schedule: "30 2 * * *"
+s3:
+  accessKey: ""
+  secretKey: ""
+  endpoint: ""
+image:
+  repository: ghcr.io/elastisys/python-boto3
+  tag: 0.1.1

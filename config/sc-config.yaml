@@ -431,6 +431,10 @@ harbor:
     # Alert if values are above the below threshold
     maxTotalStorageUsedGB: 1500
     maxTotalArtifacts: 3000
+  mpuCleaner:
+    enabled: true
+    maxAgeDays: 7
+    schedule: "30 2 * * *"
 
 grafanaLabelEnforcer:
   resources:
