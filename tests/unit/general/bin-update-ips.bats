@@ -101,6 +101,29 @@ _apply_normalise() {
   update_ips.assert_minimal_v6
 }
 
+@test "ck8s update-ips includes cilium internal IPs" {
+  update_ips.mock_minimal
+
+  mock_set_output "${mock_kubectl}" "107.0.1.21 107.0.2.21 107.0.3.21" 6  # .networkPolicies.global.scApiserver.ips cilium internal
+  mock_set_output "${mock_kubectl}" "107.1.1.21 107.1.2.21 107.1.3.21" 12 # .networkPolicies.global.scNodes.ips cilium internal
+  mock_set_output "${mock_kubectl}" "107.2.1.21 107.2.2.21 107.2.3.21" 18 # .networkPolicies.global.wcApiserver.ips cilium internal
+  mock_set_output "${mock_kubectl}" "107.3.1.21 107.3.2.21 107.3.3.21" 24 # .networkPolicies.global.wcNodes.ips cilium internal
+
+  run ck8s update-ips both apply
+
+  run yq.dig sc '.networkPolicies.global.scApiserver.ips | . style="flow"'
+  assert_output --partial "107.0.1.21/32, 107.0.2.21/32, 107.0.3.21/32"
+
+  run yq.dig sc '.networkPolicies.global.scNodes.ips | . style="flow"'
+  assert_output --partial "107.1.1.21/32, 107.1.2.21/32, 107.1.3.21/32"
+
+  run yq.dig wc '.networkPolicies.global.wcApiserver.ips | . style="flow"'
+  assert_output --partial "107.2.1.21/32, 107.2.2.21/32, 107.2.3.21/32"
+
+  run yq.dig wc '.networkPolicies.global.wcNodes.ips | . style="flow"'
+  assert_output --partial "107.3.1.21/32, 107.3.2.21/32, 107.3.3.21/32"
+}
+
 @test "ck8s update-ips blocks all without domain records" {
   run ck8s update-ips both apply
 
