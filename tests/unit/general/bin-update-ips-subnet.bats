@@ -59,24 +59,24 @@ update_ips.mock_minimal_with_subnet() {
   mock_set_output "${mock_kubectl}" "127.0.1.8 127.0.2.8 127.0.3.8" 14       # .networkPolicies.global.scNodes.ips calico ipip
   mock_set_output "${mock_kubectl}" "127.0.1.81 127.0.2.81 127.0.3.81" 15    # .networkPolicies.global.scNodes.ips calico vxlan
   mock_set_output "${mock_kubectl}" "127.0.1.9 127.0.2.9 127.0.3.9" 16       # .networkPolicies.global.scNodes.ips calico wireguard
-  mock_set_output "${mock_kubectl}" "" 17                                    # .networkPolicies.global.scApiserver.ips cilium crds
-  mock_set_output "${mock_kubectl}" "" 18                                    # .networkPolicies.global.scApiserver.ips cilium internal
+  mock_set_output "${mock_kubectl}" "" 17                                    # .networkPolicies.global.scNodes.ips cilium crds
+  mock_set_output "${mock_kubectl}" "" 18                                    # .networkPolicies.global.scNodes.ips cilium internal
   mock_set_output "${mock_kubectl}" "" 19                                    # check if cluster with name <environment>-<cluster> exists
   mock_set_output "${mock_kubectl}" "[1]" 20                                 # check number of subnets in cluster
   mock_set_output "${mock_kubectl}" "10.0.1.0/24" 21                         # .networkPolicies.global.wcApiserver.ips cluster subnet
   mock_set_output "${mock_kubectl}" "127.0.1.5 127.0.2.5 127.0.3.5" 22       # .networkPolicies.global.wcApiserver.ips calico ipip
   mock_set_output "${mock_kubectl}" "127.0.1.51 127.0.2.51 127.0.3.51" 23    # .networkPolicies.global.wcApiserver.ips calico vxlan
   mock_set_output "${mock_kubectl}" "127.0.1.6 127.0.2.6 127.0.3.6" 24       # .networkPolicies.global.wcApiserver.ips calico wireguard
-  mock_set_output "${mock_kubectl}" "" 25                                    # .networkPolicies.global.scApiserver.ips cilium crds
-  mock_set_output "${mock_kubectl}" "" 26                                    # .networkPolicies.global.scApiserver.ips cilium internal
+  mock_set_output "${mock_kubectl}" "" 25                                    # .networkPolicies.global.wcApiserver.ips cilium crds
+  mock_set_output "${mock_kubectl}" "" 26                                    # .networkPolicies.global.wcApiserver.ips cilium internal
   mock_set_output "${mock_kubectl}" "" 27                                    # check if cluster with name <environment>-<cluster> exists
   mock_set_output "${mock_kubectl}" "[1]" 28                                 # check number of subnets in cluster
   mock_set_output "${mock_kubectl}" "10.0.1.0/24" 29                         # .networkPolicies.global.wcNodes.ips cluster subnet
   mock_set_output "${mock_kubectl}" "127.0.1.11 127.0.2.11 127.0.3.11" 30    # .networkPolicies.global.wcNodes.ips calico ipip
   mock_set_output "${mock_kubectl}" "127.0.1.111 127.0.2.111 127.0.3.111" 31 # .networkPolicies.global.wcNodes.ips calico vxlan
   mock_set_output "${mock_kubectl}" "127.0.1.12 127.0.2.12 127.0.3.12" 32    # .networkPolicies.global.wcNodes.ips calico wireguard
-  mock_set_output "${mock_kubectl}" "" 33                                    # .networkPolicies.global.scApiserver.ips cilium crds
-  mock_set_output "${mock_kubectl}" "" 34                                    # .networkPolicies.global.scApiserver.ips cilium internal
+  mock_set_output "${mock_kubectl}" "" 33                                    # .networkPolicies.global.wcNodes.ips cilium crds
+  mock_set_output "${mock_kubectl}" "" 34                                    # .networkPolicies.global.wcNodes.ips cilium internal
 }
 
 @test "ck8s update-ips can allow subnet" {
