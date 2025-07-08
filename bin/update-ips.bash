@@ -119,7 +119,7 @@ rclone_enabled() {
   return 1
 }
 
-# Fetch the Calico tunnel IP and Wireguard IP of Kubernetes
+# Fetch the Calico tunnel IP, Wireguard IP and Cilium internal IP of Kubernetes
 # nodes using a label selector.
 #
 # If the label selector isn't specified, all nodes will be returned.
@@ -139,6 +139,8 @@ get_tunnel_ips() {
   local -a ips6_calico_ipip
   local -a ips6_calico_vxlan
   local -a ips_wireguard
+  local -a ips_cilium_internal
+
   mapfile -t ips_calico_vxlan < <("${here}/ops.bash" kubectl "${cluster}" get node "${label_argument}" -o jsonpath='{.items[*].metadata.annotations.projectcalico\.org/IPv4VXLANTunnelAddr}')
   mapfile -t ips_calico_ipip < <("${here}/ops.bash" kubectl "${cluster}" get node "${label_argument}" -o jsonpath='{.items[*].metadata.annotations.projectcalico\.org/IPv4IPIPTunnelAddr}')
   mapfile -t ips_wireguard < <("${here}/ops.bash" kubectl "${cluster}" get node "${label_argument}" -o jsonpath='{.items[*].metadata.annotations.projectcalico\.org/IPv4WireguardInterfaceAddr}')
@@ -148,8 +150,10 @@ get_tunnel_ips() {
     mapfile -t ips6_calico_ipip < <("${here}/ops.bash" kubectl "${cluster}" get node "${label_argument}" -o jsonpath='{.items[*].metadata.annotations.projectcalico\.org/IPv6IPIPTunnelAddr}')
   fi
 
+  mapfile -t ips_cilium_internal < <("${here}/ops.bash" kubectl "${cluster}" get node "${label_argument}" -o jsonpath='{.items[*].metadata.annotations.network\.cilium\.io/ipv4-cilium-host}')
+
   local -a ips
-  read -r -a ips <<<"${ips_calico_vxlan[*]} ${ips_calico_ipip[*]} ${ips6_calico_vxlan[*]} ${ips6_calico_ipip[*]} ${ips_wireguard[*]}"
+  read -r -a ips <<<"${ips_calico_vxlan[*]} ${ips_calico_ipip[*]} ${ips6_calico_vxlan[*]} ${ips6_calico_ipip[*]} ${ips_wireguard[*]} ${ips_cilium_internal[*]}"
 
   if [ ${#ips[@]} -eq 0 ]; then
     log_error "No IPs for ${cluster} nodes with label ${label} was found"

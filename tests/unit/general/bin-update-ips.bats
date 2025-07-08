@@ -101,6 +101,29 @@ _apply_normalise() {
   update_ips.assert_minimal_v6
 }
 
+@test "ck8s update-ips includes cilium internal IPs" {
+  update_ips.mock_minimal
+
+  mock_set_output "${mock_kubectl}" "107.0.1.21 107.0.2.21 107.0.3.21" 5  # .networkPolicies.global.scApiserver.ips cilium internal
+  mock_set_output "${mock_kubectl}" "107.1.1.21 107.1.2.21 107.1.3.21" 10 # .networkPolicies.global.scNodes.ips cilium internal
+  mock_set_output "${mock_kubectl}" "107.2.1.21 107.2.2.21 107.2.3.21" 15 # .networkPolicies.global.wcApiserver.ips cilium internal
+  mock_set_output "${mock_kubectl}" "107.3.1.21 107.3.2.21 107.3.3.21" 20 # .networkPolicies.global.wcNodes.ips cilium internal
+
+  run ck8s update-ips both apply
+
+  run yq.dig sc '.networkPolicies.global.scApiserver.ips | . style="flow"'
+  assert_output --partial "107.0.1.21/32, 107.0.2.21/32, 107.0.3.21/32"
+
+  run yq.dig sc '.networkPolicies.global.scNodes.ips | . style="flow"'
+  assert_output --partial "107.1.1.21/32, 107.1.2.21/32, 107.1.3.21/32"
+
+  run yq.dig wc '.networkPolicies.global.wcApiserver.ips | . style="flow"'
+  assert_output --partial "107.2.1.21/32, 107.2.2.21/32, 107.2.3.21/32"
+
+  run yq.dig wc '.networkPolicies.global.wcNodes.ips | . style="flow"'
+  assert_output --partial "107.3.1.21/32, 107.3.2.21/32, 107.3.3.21/32"
+}
+
 @test "ck8s update-ips blocks all without domain records" {
   run ck8s update-ips both apply
 
@@ -132,7 +155,7 @@ _apply_normalise() {
 
   assert_equal "$(mock_get_call_num "${mock_curl}")" 0
   assert_equal "$(mock_get_call_num "${mock_dig}")" 3
-  assert_equal "$(mock_get_call_num "${mock_kubectl}")" 16
+  assert_equal "$(mock_get_call_num "${mock_kubectl}")" 20
 }
 
 @test "ck8s update-ips skips ips in existing cidrs" {
@@ -149,7 +172,7 @@ _apply_normalise() {
 
   assert_equal "$(mock_get_call_num "${mock_curl}")" 0
   assert_equal "$(mock_get_call_num "${mock_dig}")" 3
-  assert_equal "$(mock_get_call_num "${mock_kubectl}")" 16
+  assert_equal "$(mock_get_call_num "${mock_kubectl}")" 20
 }
 
 @test "ck8s update-ips allows s3 region endpoint to be an ip" {
@@ -177,7 +200,7 @@ _apply_normalise() {
   assert_equal "$(yq.dig common '.networkPolicies.global.objectStorage.ips | . style="flow"')" "[10.244.0.0/16]"
 
   assert_equal "$(mock_get_call_num "${mock_dig}")" 2
-  assert_equal "$(mock_get_call_num "${mock_kubectl}")" 17
+  assert_equal "$(mock_get_call_num "${mock_kubectl}")" 21
 }
 
 @test "ck8s update-ips allows s3 region endpoint to be cluster local without kubeadm config" {
@@ -192,7 +215,7 @@ _apply_normalise() {
   assert_equal "$(yq.dig common '.networkPolicies.global.objectStorage.ips | . style="flow"')" "[0.0.0.0/0]"
 
   assert_equal "$(mock_get_call_num "${mock_dig}")" 2
-  assert_equal "$(mock_get_call_num "${mock_kubectl}")" 17
+  assert_equal "$(mock_get_call_num "${mock_kubectl}")" 21
 }
 
 # --- maximal ----------------------------------------------------------------------------------------------------------
