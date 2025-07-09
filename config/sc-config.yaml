@@ -1370,3 +1370,9 @@ tektonPipelines:
         memory: 128Mi
 
   customConfigDefaults: {}
+
+trivy:
+  scanner:
+    resources:
+      limits:
+        memory: 850Mi
