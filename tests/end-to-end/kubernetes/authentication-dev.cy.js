@@ -3,13 +3,11 @@ describe('kubernetes authentication', function () {
     cy.withTestKubeconfig({ cluster: 'wc', user: 'static-dev', refresh: 'true' })
   })
 
-  it('can login via extra static dex user', function () {
-    cy.yqDig('sc', '.dex.enableStaticLogin').then((staticLoginEnabled) => {
-      if (staticLoginEnabled !== 'true') {
-        this.skip('dex static login is not enabled')
-      }
-    })
+  after(function () {
+    cy.deleteTestKubeconfig({ cluster: 'wc', user: 'static-dev' })
+  })
 
+  it('can login via extra static dex user', function () {
     cy.task('kubectlLogin', Cypress.env('KUBECONFIG'))
     cy.visit(`http://localhost:8000`)
 
