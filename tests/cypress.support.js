@@ -181,8 +181,8 @@ Cypress.Commands.add("dexExtraStaticLogin", function(email) {
     })
 })
 
-Cypress.Commands.add("visitProxied", function(cluster, user, refresh, url) {
-  cy.withTestKubeconfig(cluster, user, refresh, url).then(() => {
+Cypress.Commands.add("visitProxied", function({cluster, user, refresh, url}) {
+  cy.withTestKubeconfig({cluster, user, refresh, url}).then(() => {
     cy.task('wrapProxy', Cypress.env("KUBECONFIG")).then((redir_url) => {
       cy.visit(`${redir_url}`)
       cy.dexExtraStaticLogin("dev@example.com")
@@ -190,12 +190,12 @@ Cypress.Commands.add("visitProxied", function(cluster, user, refresh, url) {
   })
 })
 
-Cypress.Commands.add("cleanupProxy", function(cluster, user) {
+Cypress.Commands.add("cleanupProxy", function({cluster, user}) {
   cy.task("pKill", "kubeproxy-wrapper.sh")
-  cy.deleteTestKubeconfig(cluster, user)
+  cy.deleteTestKubeconfig({cluster, user})
 })
 
-Cypress.Commands.add("withTestKubeconfig", function(cluster, user, refresh, url=null) {
+Cypress.Commands.add("withTestKubeconfig", function({cluster, user, refresh, url=null}) {
   const config_base = Cypress.env("CK8S_CONFIG_PATH") + "/.state/kube_config"
   const base_kubeconfig = `${config_base}_${cluster}.yaml`
   const user_kubeconfig = `${config_base}_${cluster}_${user}.yaml`
@@ -224,8 +224,7 @@ Cypress.Commands.add("withTestKubeconfig", function(cluster, user, refresh, url=
   }
 })
 
-Cypress.Commands.add("deleteTestKubeconfig", function(cluster, user) {
-
+Cypress.Commands.add("deleteTestKubeconfig", function({cluster, user}) {
   const test_kubeconfig = Cypress.env("CK8S_CONFIG_PATH") + `/.state/kube_config_${cluster}_${user}.yaml`
   cy.exec(`rm ${test_kubeconfig}`)
 })

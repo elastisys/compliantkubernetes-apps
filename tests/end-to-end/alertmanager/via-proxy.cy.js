@@ -3,16 +3,15 @@ describe("alertmanager", function() {
     cy.intercept("/api/**")
       .as("api")
 
-    cy.visitProxied(
-      "wc",
-      "static-dev",
-      "true",
-      "http://127.0.0.1:8001/api/v1/namespaces/alertmanager/services/alertmanager-operated:9093/proxy/"
-    )
+    cy.visitProxied({
+      cluster: "wc",
+      user: "static-dev",
+      refresh: "true",
+      url: "http://127.0.0.1:8001/api/v1/namespaces/alertmanager/services/alertmanager-operated:9093/proxy/"
+    })
 
     cy.origin("http://127.0.0.1:8001", () => {
-      cy.contains("span", 'alertname="Watchdog"')
-        .should("exist")
+      cy.contains("span", 'alertname="Watchdog"').should("exist")
 
       cy.visit("http://127.0.0.1:8001/api/v1/namespaces/alertmanager/services/alertmanager-operated:9093/proxy/#/status")
 
@@ -23,6 +22,6 @@ describe("alertmanager", function() {
   })
 
   after(() => {
-    cy.cleanupProxy("wc", "static-dev")
+    cy.cleanupProxy({cluster: "wc", user: "static-dev"})
   })
 })
