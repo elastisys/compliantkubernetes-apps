@@ -16,7 +16,7 @@ setup() {
 
 @test "Developers can create subnamespaces" {
   with_test_kubeconfig wc static-dev
-  echo "# If cypress auth tests were run previously, test should continue automatically. Otherwise, go to http://localhost:8000 and log in with static email user dev@example.com" >&3
+  echo "# If the test stops here go to http://localhost:8000 and log in with static email user dev@example.com" >&3
   run kubectl auth whoami
   assert_output --partial "dev@example.com"
   run kubectl apply -f - <<EOF
