@@ -166,16 +166,23 @@ Cypress.Commands.add('dexExtraStaticLogin', (email) => {
   )
 })
 
-Cypress.Commands.add('withTestKubeconfig', function (cluster, user, refresh) {
-  const base_kubeconfig = Cypress.env('CK8S_CONFIG_PATH') + `/.state/kube_config_${cluster}.yaml`
-  Cypress.env(
-    'KUBECONFIG',
-    Cypress.env('CK8S_CONFIG_PATH') + `/.state/kube_config_${cluster}_${user}.yaml`
-  )
-  const kubeconfig = Cypress.env('KUBECONFIG')
-  const homedir = Cypress.env('HOME')
+Cypress.Commands.add('withTestKubeconfig', function (cluster, user, refresh, url = null) {
+  const config_base = Cypress.env('CK8S_CONFIG_PATH') + '/.state/kube_config'
+  const base_kubeconfig = `${config_base}_${cluster}.yaml`
+  const user_kubeconfig = `${config_base}_${cluster}_${user}.yaml`
+  Cypress.env('KUBECONFIG', user_kubeconfig)
+
+  let userArgs = [
+    `--token-cache-dir=~/.kube/cache/oidc-login/test-${user}`,
+    '--skip-open-browser',
+    '--force-refresh',
+  ]
+  if (url !== null) {
+    userArgs.push(`--open-url-after-authentication=${url}`)
+  }
+
   cy.exec(
-    `yq '.users[0].user.exec.args += "'"--token-cache-dir=~/.kube/cache/oidc-login/test-${user}"'"' < "${base_kubeconfig}" > ${kubeconfig}`
+    `yq '.users[0].user.exec.args += ${JSON.stringify(userArgs)}' < "${base_kubeconfig}" > ${user_kubeconfig}`
   ).then((result) => {
     if (result.stderr !== '') {
       cy.fail(`yq: error in exec: ${result.stderr}`)
@@ -183,6 +190,7 @@ Cypress.Commands.add('withTestKubeconfig', function (cluster, user, refresh) {
       return result.stdout
     }
   })
+
   if (refresh === 'true') {
     cy.exec(`rm -rf ~/.kube/cache/oidc-login/test-${user}`)
   }
