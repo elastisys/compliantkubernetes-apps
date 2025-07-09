@@ -1,5 +1,7 @@
 const { defineConfig } = require("cypress");
 
+const PROXY_READY_MARKER = '%%PROXY_READY%%'
+
 module.exports = defineConfig({
   env: process.env,
   e2e: {
@@ -28,6 +30,8 @@ module.exports = defineConfig({
         },
         wrapProxy(kubeconfig) {
           process.env.KUBECONFIG = kubeconfig
+
+          // Put apps scripts in the path of the current process
           const path = require('path')
           const scriptPath = path.resolve(path.dirname(process.env.BATS_TEST_FILENAME) + '/../../../scripts')
           if (! process.env.PATH.includes(`:${scriptPath}`)) {
@@ -40,8 +44,9 @@ module.exports = defineConfig({
           })
           return new Promise((resolve) => {
             proxy.stdout.on('data', (data) => {
-              if (data.includes('%%PROXY_READY%%')) {
-                resolve(data.toString().split(" ")[1])
+              if (data.includes(PROXY_READY_MARKER)) {
+                const redirectUrl = data.toString().split(" ")[1]
+                resolve(redirectUrl)
               }
             })
           })
