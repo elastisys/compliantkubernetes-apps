@@ -103,6 +103,18 @@ driver:
         value: {{ . }}
       {{- end }}
 
+{{- if .Values.falco.useContainerEngine }}
+collectors:
+  docker:
+    enabled: false
+  containerd:
+    enabled: false
+  crio:
+    enabled: false
+  containerEngine:
+    enabled: true
+{{- end }}
+
 resources: {{- toYaml .Values.falco.resources | nindent 2  }}
 nodeSelector: {{- toYaml .Values.falco.nodeSelector | nindent 2  }}
 affinity: {{- toYaml .Values.falco.affinity | nindent 2  }}

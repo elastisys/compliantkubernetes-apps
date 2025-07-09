@@ -182,6 +182,9 @@ falco:
       # override the URL used for downloading driver modules, e.g. to use a self hosted file server in an air-gapped environment
       repoURL: ""
 
+  # use the new container engine collector that replaces the old docker, containerd, crio and podman collectors
+  useContainerEngine: true
+
   # use custom indexes for falcoctl downloads
   # ref: https://github.com/falcosecurity/charts/blob/falco-3.8.3/charts/falco/values.yaml#L390-L395
   customIndexes: []
