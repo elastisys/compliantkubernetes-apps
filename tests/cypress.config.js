@@ -12,12 +12,11 @@ module.exports = defineConfig({
           return null
         },
         kubectlLogin(kubeconfig) {
-          return new Promise((resolve, reject) => {
+          return new Promise((resolve) => {
             process.env.KUBECONFIG = kubeconfig
-            var child = spawn('kubectl', ['auth', 'whoami'], {
-              stdio: 'ignore',
-              detached: true,
-            }).unref()
+            const child = spawn('kubectl', ['auth', 'whoami'], { stdio: 'ignore', detached: true })
+
+            child.unref()
 
             resolve(null)
           })
