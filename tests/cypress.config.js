@@ -26,16 +26,12 @@ module.exports = defineConfig({
         wrapProxy(kubeconfig) {
           process.env.KUBECONFIG = kubeconfig
 
-          // Put apps scripts in the path of the current process
           const path = require('path')
-          const scriptPath = path.resolve(
-            path.dirname(process.env.BATS_TEST_FILENAME) + '/../../../scripts'
+          const wrapperPath = path.resolve(
+            path.dirname(process.env.BATS_TEST_FILENAME) + '/../../../scripts/kubeproxy-wrapper.sh'
           )
-          if (!process.env.PATH.includes(`:${scriptPath}`)) {
-            process.env.PATH += `:${scriptPath}`
-          }
 
-          const proxy = spawn('kubeproxy-wrapper.sh', [], {
+          const proxy = spawn(wrapperPath, [], {
             detached: true,
             stdio: ['ignore', 'pipe', 'pipe'],
           })
