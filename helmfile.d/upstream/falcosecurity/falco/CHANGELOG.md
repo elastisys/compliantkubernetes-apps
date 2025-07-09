@@ -3,6 +3,62 @@
 This file documents all notable changes to Falco Helm Chart. The release
 numbering uses [semantic versioning](http://semver.org).
 
+## v6.0.2
+
+* Bump Falco to 0.41.3
+* Bump container plugin to 0.3.1
+
+## v6.0.1
+
+* Bump Falco to 0.41.2
+* Bump container plugin to 0.3.0
+
+## v6.0.0
+
+* Rename Falco Talon configuration keys naming
+
+## v5.0.3
+
+* Bump container plugin to 0.2.6
+
+## v5.0.2
+
+* Bump container plugin to 0.2.5
+* Bump Falco to 0.41.1
+
+## v5.0.1
+
+* Correct installation issue when both artifact installation and follow are enabled
+
+## v5.0.0
+* Bump falcoctl to 0.11.2
+* Use default falco image flavor (wolfi) by default
+
+## v4.22.0
+* Bump Falco to 0.41.0;
+* Bump falco rules to 4.0.0;
+* Deprecate old container engines in favor of the new container plugin;
+* Add support for the new container plugin;
+* Update k8smeta plugin to 0.3.0;
+* Update falco configuration;
+
+## v4.21.2
+
+* add falco-talon as falco subchart
+
+## v4.21.1
+
+* removed falco-expoter (now deprecated) references from the readme 
+
+## v4.21.0
+
+* feat(falco): adding imagePullSecrets at the service account level
+
+## v4.20.1
+
+* correctly mount the volumes based on socket path
+* unit tests for container engines socket paths
+
 ## v4.20.0
 
 * bump falcoctl to 0.11.0
