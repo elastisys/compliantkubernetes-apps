@@ -20,7 +20,9 @@ constraints:
         - pathPrefix: /var/run/
         - pathPrefix: /run/containerd/
         - pathPrefix: /run/crio/
+        {{- if .Values.falco.useContainerEngine }}
         - pathPrefix: /run/podman/
+        {{- end }}
         - pathPrefix: /proc
         - pathPrefix: /var/run/falco
         volumes:
