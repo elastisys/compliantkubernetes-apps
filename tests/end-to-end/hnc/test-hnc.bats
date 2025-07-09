@@ -10,11 +10,10 @@ setup_file() {
 setup() {
   load "../../bats.lib.bash"
   load_assert
-  load_file
   with_namespace staging
 }
 
-@test "Developers can create subnamespaces" {
+@test "hnc dev can create subnamespace" {
   with_test_kubeconfig wc static-dev
   echo "# If the test stops here go to http://localhost:8000 and log in with static email user dev@example.com" >&3
   run kubectl auth whoami
@@ -30,12 +29,12 @@ EOF
   assert_success
 }
 
-@test "Check if test namespace exists" {
+@test "hnc subnamespace can create namespace" {
   with_test_kubeconfig wc static-dev
-  echo "# If cypress auth tests were run previously, test should continue automatically. Otherwise, go to http://localhost:8000 and log in with static email user dev@example.com" >&3
+  echo "# If the test stops here go to http://localhost:8000 and log in with static email user dev@example.com" >&3
   run kubectl auth whoami
   assert_output --partial "dev@example.com"
-  run kubectl get subns "${NAMESPACE}"-qa-test --namespace "${NAMESPACE}"
+  run kubectl get subns "${NAMESPACE}"-tests-end-to-end --namespace "${NAMESPACE}"
   assert_success
 }
 
@@ -47,12 +46,12 @@ check_resources_exist() {
   local target_list
 
   base_list=$(kubectl get "$resource" -n "${NAMESPACE}" -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' | sort)
-  target_list=$(kubectl get "$resource" -n "${NAMESPACE}"-qa-test -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' | sort)
+  target_list=$(kubectl get "$resource" -n "${NAMESPACE}"-tests-end-to-end -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' | sort)
 
   missing=$(comm -23 <(echo "$base_list") <(echo "$target_list") || true)
 
   if [[ -n "$missing" ]]; then
-    echo "Missing $resource in ${NAMESPACE}-qa-test:"
+    echo "Missing $resource in ${NAMESPACE}-tests-end-to-end:"
     echo "$missing"
     return 1
   fi
@@ -60,17 +59,32 @@ check_resources_exist() {
   return 0
 }
 
-@test "All Roles exist in target namespace" {
+@test "hnc subnamespace can propagate roles" {
   run check_resources_exist roles
   assert_success
 }
 
-@test "All RoleBindings exist in target namespace" {
+@test "hnc subnamespace can propagate rolebindings" {
   run check_resources_exist rolebindings
   assert_success
 }
 
-@test "All NetworkPolicies exist in target namespace" {
+@test "hnc subnamespace can propagate networkpolicies" {
   run check_resources_exist netpol
   assert_success
+}
+
+@test "hnc dev can delete subnamespace" {
+  with_test_kubeconfig wc static-dev
+  echo "# If the test stops here go to http://localhost:8000 and log in with static email user dev@example.com" >&3
+  run kubectl delete subns "${NAMESPACE}"-tests-end-to-end --namespace "${NAMESPACE}"
+  assert_success
+}
+
+@test "hnc subnamespace can delete namespace" {
+  with_test_kubeconfig wc static-dev
+  echo "# If the test stops here go to http://localhost:8000 and log in with static email user dev@example.com" >&3
+  # Check if the namespace still exists (it should NOT)
+  run kubectl get ns "${NAMESPACE}"-tests-end-to-end
+  [ "$status" -ne 0 ]
 }
