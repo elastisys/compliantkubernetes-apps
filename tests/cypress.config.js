@@ -21,6 +21,34 @@ module.exports = defineConfig({
             resolve(null)
           })
         },
+        wrapProxy(kubeconfig) {
+          process.env.KUBECONFIG = kubeconfig
+          const path = require('path')
+          const scriptPath = path.resolve(
+            path.dirname(process.env.BATS_TEST_FILENAME) + '/../../../scripts'
+          )
+          if (!process.env.PATH.includes(`:${scriptPath}`)) {
+            process.env.PATH += `:${scriptPath}`
+          }
+
+          const proxy = spawn('kubeproxy-wrapper.sh', [], {
+            detached: true,
+            stdio: ['ignore', 'pipe', 'pipe'],
+          })
+          return new Promise((resolve) => {
+            proxy.stdout.on('data', (data) => {
+              if (data.includes('%%PROXY_READY%%')) {
+                resolve(data.toString().split(' ')[1])
+              }
+            })
+          })
+        },
+        pKill(name) {
+          return new Promise((resolve) => {
+            spawn('pkill', ['-f', name], { detached: true, stdio: 'ignore' })
+            resolve(null)
+          })
+        },
       })
       config.env = { ...process.env, ...config.env }
       return config

@@ -166,6 +166,20 @@ Cypress.Commands.add('dexExtraStaticLogin', (email) => {
   )
 })
 
+Cypress.Commands.add('visitProxied', function (cluster, user, refresh, url) {
+  cy.withTestKubeconfig(cluster, user, refresh, url).then(() => {
+    cy.task('wrapProxy', Cypress.env('KUBECONFIG')).then((redir_url) => {
+      cy.visit(`${redir_url}`)
+      cy.dexExtraStaticLogin('dev@example.com')
+    })
+  })
+})
+
+Cypress.Commands.add('cleanupProxy', function (cluster, user) {
+  cy.task('pKill', 'kubeproxy-wrapper.sh')
+  cy.deleteTestKubeconfig(cluster, user)
+})
+
 Cypress.Commands.add('withTestKubeconfig', function (cluster, user, refresh, url = null) {
   const config_base = Cypress.env('CK8S_CONFIG_PATH') + '/.state/kube_config'
   const base_kubeconfig = `${config_base}_${cluster}.yaml`
