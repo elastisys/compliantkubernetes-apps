@@ -23,7 +23,7 @@ setup() {
 apiVersion: hnc.x-k8s.io/v1alpha2
 kind: SubnamespaceAnchor
 metadata:
-  name: "${NAMESPACE}-qa-test"
+  name: "${NAMESPACE}-tests-end-to-end"
   namespace: "${NAMESPACE}"
 EOF
 
