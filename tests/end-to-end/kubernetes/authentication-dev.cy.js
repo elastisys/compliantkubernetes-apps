@@ -3,6 +3,10 @@ describe("kubernetes authentication", function() {
     cy.withTestKubeconfig({cluster: "wc", user: "static-dev", refresh: "true"})
   })
 
+  after(function() {
+    cy.deleteTestKubeconfig({cluster: "wc", user: "static-dev"})
+  })
+
   it("can login via extra static dex user", function() {
 
     cy.yqDig("sc", ".dex.enableStaticLogin")
