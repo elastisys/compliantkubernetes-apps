@@ -3309,6 +3309,11 @@ properties:
             $ref: '#/$defs/kubernetesNodeSelector'
           affinity:
             $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+      useContainerEngine:
+        title: Use the new containerEngine collector
+        description: Use the new container engine collector that replaces the old docker, containerd, crio and podman collectors.
+        type: boolean
+        default: true
       resources:
         $ref: '#/$defs/kubernetesResourceRequirements'
       tolerations:

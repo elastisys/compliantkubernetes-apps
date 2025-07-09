@@ -12,9 +12,9 @@ images:
   externalDns:
     image: registry.k8s.io/external-dns/external-dns:v0.14.2
   falco:
-    image: docker.io/falcosecurity/falco:0.40.0-debian
-    driverLoaderInit: docker.io/falcosecurity/falco-driver-loader:0.40.0
-    falcoctl: docker.io/falcosecurity/falcoctl:0.11.0
+    image: docker.io/falcosecurity/falco:0.41.3-debian
+    driverLoaderInit: docker.io/falcosecurity/falco-driver-loader:0.41.3
+    falcoctl: docker.io/falcosecurity/falcoctl:0.11.2
     sidekick: docker.io/falcosecurity/falcosidekick:2.31.1
   fluentd:
     aggregator: ghcr.io/elastisys/fluentd-aggregator:v7.1.1-ck8s2
