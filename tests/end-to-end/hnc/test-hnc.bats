@@ -34,7 +34,7 @@ EOF
   echo "# If the test stops here go to http://localhost:8000 and log in with static email user dev@example.com" >&3
   run kubectl auth whoami
   assert_output --partial "dev@example.com"
-  run kubectl get subns "${NAMESPACE}"-tests-end-to-end --namespace "${NAMESPACE}"
+  run kubectl get ns "${NAMESPACE}"-tests-end-to-end
   assert_success
 }
 
