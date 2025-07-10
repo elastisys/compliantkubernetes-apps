@@ -154,6 +154,13 @@ controller:
 
     serviceMonitor:
       enabled: true
+      honorLabels: true
+      metricRelabelings:
+      # The exported_namespace label is deprecated for these metrics and will be removed in three minor releases, likely v0.52
+      - action: replace
+        sourceLabels:
+        - namespace
+        targetLabel: exported_namespace
 
 {{- $global := dict
   "registry" (ternary (dig "uri" "" .Values.images.global.registry) "" .Values.images.global.registry.enabled)
