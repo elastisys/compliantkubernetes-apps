@@ -8,6 +8,17 @@ metadata:
 spec:
   endpoints:
   - port: metrics
+    honorLabels: false
+    metricRelabelings:
+    - action: replace
+      sourceLabels:
+      - pod_namespace
+      targetLabel: namespace
+    relabelings:
+    - action: replace
+      sourceLabels:
+      - __meta_kubernetes_namespace
+      targetLabel: exporter_namespace
   selector:
     matchLabels:
       app: "calico-accountant"
