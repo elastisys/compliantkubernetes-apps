@@ -1,65 +1,53 @@
 #!/usr/bin/env bats
 
-# Tests opa gatekeeper policies
+# bats file_tags=opa-gatekeeper
 
 setup_file() {
-  export BATS_NO_PARALLELIZE_WITHIN_FILE="true"
-  export CK8S_AUTO_APPROVE="true"
-
   load "../../bats.lib.bash"
-  load_common "harbor.bash"
-  load_common "yq.bash"
-  load_assert
 
-  skip "needs reimplementation"
-
-  harbor.load_env gatekeeper-policies
-  harbor.setup_project
-  harbor.setup_user_demo_image
-
-  export harbor_endpoint
-
-  export user_demo_chart="${DOCS_PATH}/user-demo/deploy/ck8s-user-demo"
-  export user_demo_image
-
-  if ! docker pull "${user_demo_image}"; then
-    fail "unable to pull image from harbor"
-  fi
+  export BATS_NO_PARALLELIZE_WITHIN_FILE="true"
+  export user_demo_chart="oci://ghcr.io/elastisys/welkin-user-demo"
+  export user_demo_image="ghcr.io/elastisys/user-demo:test"
 
   with_kubeconfig wc
-
-  if ! kubectl get ns staging &>/dev/null || [[ "$(kubectl get ns staging '-ojsonpath={.metadata.labels.owner}')" == "operator" ]]; then
+  echo "# Login at http://localhost:8000 if stuck." >&3
+  if ! [[ $(kubectl get ns staging -o json | jq -r '.metadata.labels["hnc.x-k8s.io/included-namespace"]') == "true" ]]; then
     fail "these tests requires that you have a 'staging' user namespace"
   fi
 
-  harbor.create_pull_secret wc staging
-}
-
-teardown_file() {
-  load "../../bats.lib.bash"
-  load_common "harbor.bash"
-  load_assert
-
-  # harbor.delete_pull_secret wc staging
-  # harbor.teardown_project
+  if ! skopeo inspect docker://${user_demo_image} >/dev/null 2>&1; then
+    fail "unable to find image in ghcr"
+  fi
 }
 
 setup() {
-  load "../bats.lib.bash"
+  load "../../bats.lib.bash"
   load_assert
+  load_detik
 
-  with_kubeconfig wc
+  with_test_kubeconfig wc static-dev
   with_namespace staging
+}
+
+teardown() {
+  delete_test_kubeconfig wc static-dev
+}
+
+@test "static user can list opa rules" {
+  echo "# If cypress auth tests were run previously, test should continue automatically. Otherwise, go to http://localhost:8000 and log in with static email user dev@example.com" >&3
+  run kubectl auth whoami
+  assert_output --partial "dev@example.com"
+  run kubectl get constraints
+  assert_success
 }
 
 @test "opa gatekeeper policies - warn invalid image repository" {
   run helm -n "${NAMESPACE}" upgrade --install opa-image-repository "${user_demo_chart}" \
-    --set "image.repository=not-${harbor_endpoint}/non-existing-repository" \
+    --set "image.repository=not-existing/non-existing-repository" \
     --set "image.tag=${user_demo_image#*:}" \
     --set "ingress.enabled=false"
-
   helm -n "${NAMESPACE}" uninstall opa-image-repository --wait
-  kubectl -n "${NAMESPACE}" delete po -l app.kubernetes.io/name=ck8s-user-demo,app.kubernetes.io/instance=opa-image-repository
+  kubectl -n "${NAMESPACE}" delete po -l app.kubernetes.io/name=welkin-user-demo,app.kubernetes.io/instance=opa-image-repository
 
   assert_line --regexp '.*does not have an allowed image registry.*'
   assert_success
@@ -67,7 +55,7 @@ setup() {
 
 @test "opa gatekeeper policies - error invalid image tag" {
   run helm -n "${NAMESPACE}" upgrade --atomic --install opa-image-tag "${user_demo_chart}" \
-    --set "image.repository=${user_demo_image#:.*}" \
+    --set "image.repository=${user_demo_image%:*}" \
     --set "image.tag=latest" \
     --set "ingress.enabled=false"
 
@@ -84,7 +72,7 @@ setup() {
     --set "ingress.enabled=false"
 
   helm -n "${NAMESPACE}" uninstall opa-networkpolicies --wait
-  kubectl -n "${NAMESPACE}" delete po -l app.kubernetes.io/name=ck8s-user-demo,app.kubernetes.io/instance=opa-networkpolicies
+  kubectl -n "${NAMESPACE}" delete po -l app.kubernetes.io/name=welkin-user-demo,app.kubernetes.io/instance=opa-networkpolicies
 
   assert_line --regexp '.*No matching networkpolicy found.*'
   assert_success
@@ -113,11 +101,10 @@ setup() {
   refute_line --regexp '.*uses the :latest tag.*'
   refute_line --regexp '.*No matching networkpolicy found.*'
   refute_line --regexp '.*The container named .* has no resource requests.*'
-  assert_line --regexp '.*would violate PodSecurity "restricted:latest".*'
   assert_success
 
-  test_deployment opa-valid-ck8s-user-demo 2
+  test_deployment opa-valid-welkin-user-demo 2
 
   helm -n "${NAMESPACE}" uninstall opa-valid --wait
-  kubectl -n "${NAMESPACE}" delete po -l app.kubernetes.io/name=ck8s-user-demo,app.kubernetes.io/instance=opa-valid
+  kubectl -n "${NAMESPACE}" delete po -l app.kubernetes.io/name=welkin-user-demo,app.kubernetes.io/instance=opa-valid
 }

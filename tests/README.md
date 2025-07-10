@@ -54,6 +54,9 @@ make run-integration
 > The container might struggle to prompt for kube-login and gpg-agent, but if those are activated before by accessing the clusters and using gpg then the session can be reused.
 > This is applicable for regression, integration, and end-to-end tests.
 
+> [!note]
+> For the end-to-end/opa-gatekeeper tests to work, you need to add `ghcr.io/elastisys` as trusted registry.
+
 You must have `make` and either rootful `docker` or rootless `podman` installed!
 Check the [DEVELOPMENT](../DEVELOPMENT.md) docs additional requirements to run local-clusters for integration and regression tests.
 
@@ -156,7 +159,7 @@ setup() {
 
 One can define setup / teardown functions for each test suite, each test file, and each test.
 For each test suite create a `setup_suite.bash` file in that suite and implement the functions `setup_suite` / `teardown_suite`.
-For each test file implement the functions `setup_file` / `teardown_suite`.
+For each test file implement the functions `setup_file` / `teardown_file`.
 For each test implement the functions `setup` / `teardown`.
 
 Exported environment variables will have the following scope:
