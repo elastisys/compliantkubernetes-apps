@@ -1,5 +1,7 @@
 const { defineConfig } = require("cypress");
 
+const PROXY_READY_MARKER = '%%PROXY_READY%%'
+
 module.exports = defineConfig({
   env: process.env,
   e2e: {
@@ -12,14 +14,46 @@ module.exports = defineConfig({
           return null
         },
         kubectlLogin(kubeconfig) {
-          return new Promise((resolve, reject) => {
+          return new Promise((resolve) => {
             process.env.KUBECONFIG = kubeconfig
-            var child = spawn("kubectl", ["auth", "whoami"],
+            const child = spawn("kubectl", ["auth", "whoami"],
               {
                 stdio: "ignore",
                 detached: true
               }
-            ).unref();
+            )
+
+            child.unref();
+
+            resolve(null)
+          })
+        },
+        wrapProxy(kubeconfig) {
+          process.env.KUBECONFIG = kubeconfig
+
+          // Put apps scripts in the path of the current process
+          const path = require('path')
+          const scriptPath = path.resolve(path.dirname(process.env.BATS_TEST_FILENAME) + '/../../../scripts')
+          if (! process.env.PATH.includes(`:${scriptPath}`)) {
+            process.env.PATH += `:${scriptPath}`
+          }
+
+          const proxy = spawn('kubeproxy-wrapper.sh', [], {
+            detached: true,
+            stdio: ['ignore', 'pipe', 'pipe']
+          })
+          return new Promise((resolve) => {
+            proxy.stdout.on('data', (data) => {
+              if (data.includes(PROXY_READY_MARKER)) {
+                const redirectUrl = data.toString().split(" ")[1]
+                resolve(redirectUrl)
+              }
+            })
+          })
+        },
+        pKill(name) {
+          return new Promise((resolve) => {
+            spawn("pkill", ["-f", name], {detached: true, stdio: 'ignore'})
             resolve(null)
           })
         }
