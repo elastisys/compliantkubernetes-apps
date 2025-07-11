@@ -33,7 +33,7 @@ templates:
     disableValidationOnInstall: true
     condition: ck8sManagementCluster.enabled
     inherit: [ template: tekton ]
-    chart: charts/tekton-pipelines
+    chart: upstream/tekton/tekton-pipeline
     version: 0.1.0
     name: tekton-pipelines
     needs:

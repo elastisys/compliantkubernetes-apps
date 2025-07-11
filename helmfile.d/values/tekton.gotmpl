@@ -52,3 +52,6 @@ alerts:
   evaluateThanos: {{ .Values.thanos.enabled }}
 
 customConfigDefaults: {{- toYaml .Values.tektonPipelines.customConfigDefaults | nindent 2 }}
+
+namespace:
+  create: false
