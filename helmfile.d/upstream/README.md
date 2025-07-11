@@ -40,6 +40,9 @@ Pull the chart:
 > 1. the state file contains `./bases/upstream.yaml` as a base to include the upstream index, and
 > 2. the release spec contains `inherit: [ template: <chart-name> ]` to include the chart template.
 
+> [!NOTE]
+> Images needs to be updated separately in the [images.yaml list file](../lists/images.yaml).
+
 ## Updating charts
 
 Update the chart in the index:
@@ -83,4 +86,3 @@ Check for chart verification:
 
 1. All rules are split between alerts and records, modified to preserve the cluster label in aggregations, and maintained separately in [prometheus-alerts chart](../charts/prometheus-alerts/)
 1. The user Grafana needs to be updated separately in [grafana chart](./grafana)
-1. The user AlertManager needs to be updated separately in [user-alertmanager chart](../charts/user-alertmanager)

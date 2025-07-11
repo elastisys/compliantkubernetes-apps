@@ -37,18 +37,27 @@ disabledDashboards:
   - k8s-resources-multicluster-dashboard
   - controller-manager-dashboard
   - scheduler-dashboard
+  {{- if ne .Values.networkPlugin.type "cilium" }}
+  - cilium-metrics-dashboard
+  - cilium-operator-dashboard
+  {{- end }}
+  {{- if ne .Values.networkPlugin.type "calico" }}
+  - calicofelix-dashboard
+  {{- end }}
 notDeveloperVisible:
-  - hnc-dashboard
-  - uptime-dashboard
-  - velero-dashboard
-  - daily-dashboard
+  - calicofelix-dashboard
   - cephcluster-dashboard
   - cephosdsingle-dashboard
   - cephpools-dashboard
-  - calicofelix-dashboard
-  - prometheus-timeseries-dashboard
-  - cluster-api-dashboard
+  - cilium-metrics-dashboard
+  - cilium-operator-dashboard
   - cluster-api-autoscaling-dashboard
+  - cluster-api-dashboard
+  - daily-dashboard
+  - hnc-dashboard
+  - prometheus-timeseries-dashboard
+  - uptime-dashboard
+  - velero-dashboard
 
 {{- if .Values.objectStorage.sync.enabled }}
 sync:
