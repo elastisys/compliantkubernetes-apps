@@ -21,7 +21,7 @@ RUN curl -LOs "https://github.com/hairyhenderson/gomplate/releases/download/v${G
     install -Tm 755 gomplate_linux-amd64 /usr/local/bin/gomplate && \
     rm gomplate_linux-amd64
 
-ARG HELM_VERSION="3.17.2"
+ARG HELM_VERSION="3.18.4"
 ENV HELM_DATA_HOME="/usr/local/share/helm"
 RUN curl -LOs "https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz" && \
     tar -zxvf "helm-v${HELM_VERSION}-linux-amd64.tar.gz" linux-amd64/helm && \
@@ -31,7 +31,7 @@ RUN curl -LOs "https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz" && 
 ARG HELM_DIFF_VERSION="3.10.0"
 RUN helm plugin install https://github.com/databus23/helm-diff --version "v${HELM_DIFF_VERSION}" > /dev/null
 
-ARG HELM_SECRETS_VERSION="4.6.3"
+ARG HELM_SECRETS_VERSION="4.6.5"
 RUN helm plugin install https://github.com/jkroepke/helm-secrets --version "v${HELM_SECRETS_VERSION}" > /dev/null
 
 ARG HELMFILE_VERSION="0.171.0"
