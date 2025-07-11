@@ -83,4 +83,3 @@ Check for chart verification:
 
 1. All rules are split between alerts and records, modified to preserve the cluster label in aggregations, and maintained separately in [prometheus-alerts chart](../charts/prometheus-alerts/)
 1. The user Grafana needs to be updated separately in [grafana chart](./grafana)
-1. The user AlertManager needs to be updated separately in [user-alertmanager chart](../charts/user-alertmanager)
