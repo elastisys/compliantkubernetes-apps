@@ -128,10 +128,10 @@ grafana:
     resources:
       requests:
         cpu: 50m
-        memory: 80Mi
+        memory: 150Mi
       limits:
         cpu: 100m
-        memory: 160Mi
+        memory: 300Mi
     tolerations: []
     affinity: {}
     nodeSelector: {}
