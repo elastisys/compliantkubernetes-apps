@@ -83,8 +83,8 @@ persistence:
       region: {{ .Values.objectStorage.s3.region }}
       regionendpoint: {{ .Values.objectStorage.s3.regionEndpoint }}
       secure: {{ .Values.objectStorage.s3.regionEndpoint | hasPrefix "https://" }}
-      secretkey: {{ .Values.objectStorage.s3.secretKey }}
-      accesskey: {{ .Values.objectStorage.s3.accessKey }}
+      accesskey: {{ include "objectStorage.accessKey" . }}
+      secretkey: {{ include "objectStorage.secretKey" . }}
       forcepathstyle: {{ .Values.objectStorage.s3.forcePathStyle }}
       multipartcopythresholdsize: {{ int64 .Values.harbor.s3.multipartcopythresholdsize | quote }}
       multipartcopychunksize: {{ int64 .Values.harbor.s3.multipartcopychunksize | quote }}

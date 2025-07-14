@@ -90,3 +90,11 @@ after the separator.
 {{- define "gen.container_uri" -}}
 {{ with include "gen.reg-rep-img" . }}{{ . }}{{ end }}{{ if or .tag .digest }}:{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}{{ end }}
 {{- end }}
+
+{{- define "objectStorage.accessKey" -}}
+{{- dig "harbor" "objectStorage" "s3" "accessKey" .Values | default .Values.objectStorage.s3.accessKey | quote }}
+{{- end }}
+
+{{- define "objectStorage.secretKey" -}}
+{{- dig "harbor" "objectStorage" "s3" "secretKey" .Values | default .Values.objectStorage.s3.secretKey | quote }}
+{{- end }}
