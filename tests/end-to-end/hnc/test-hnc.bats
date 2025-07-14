@@ -86,5 +86,5 @@ check_resources_exist() {
   echo "# If the test stops here go to http://localhost:8000 and log in with static email user dev@example.com" >&3
   # Check if the namespace still exists (it should NOT)
   run kubectl get ns "${NAMESPACE}"-tests-end-to-end
-  [ "$status" -ne 0 ]
+  assert_failure
 }
