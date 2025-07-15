@@ -12,7 +12,7 @@ setup() {
 }
 
 teardown_file() {
-  cypress_teardown "${ROOT}/tests/end-to-end/opensearch/authentication.cy.js"
+  cypress_teardown
 }
 
 @test "opensearch admin authentication can login via static dex user" {

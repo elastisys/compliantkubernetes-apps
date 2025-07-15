@@ -12,7 +12,7 @@ setup() {
 }
 
 teardown_file() {
-  cypress_teardown "${ROOT}/tests/end-to-end/grafana/authentication.cy.js"
+  cypress_teardown
 }
 
 @test "grafana admin authentication can login via static admin user" {

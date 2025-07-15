@@ -12,7 +12,7 @@ setup() {
 }
 
 teardown_file() {
-  cypress_teardown "${ROOT}/tests/end-to-end/grafana/dashboards-dev.cy.js"
+  cypress_teardown
 }
 
 @test "grafana dev dashboards //open the Backup status dashboard" {

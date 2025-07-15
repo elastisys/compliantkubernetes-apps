@@ -16,7 +16,7 @@ setup() {
 
 teardown_file() {
   teardown_harbor
-  cypress_teardown "${ROOT}/tests/integration/harbor/use-ui.cy.js"
+  cypress_teardown
 }
 
 @test "harbor ui can create project" {
