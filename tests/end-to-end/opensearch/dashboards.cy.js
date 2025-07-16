@@ -18,8 +18,8 @@ function opensearchDexStaticLogin(cy, ingress) {
   //
   // TODO: Narrow this down to the specific request OR investigate if a user
   //       actually should have this permission.
-  cy.on("uncaught:exception", (err, runnable) => {
-    if (err.message.includes("Forbidden")) {
+  cy.on('uncaught:exception', (err, runnable) => {
+    if (err.message.includes('Forbidden')) {
       return false
     }
   })
@@ -29,58 +29,44 @@ function opensearchDexStaticLogin(cy, ingress) {
 
     cy.dexStaticLogin()
 
-    cy.contains("loading opensearch dashboards", opt)
-      .should("not.exist")
+    cy.contains('loading opensearch dashboards', opt).should('not.exist')
 
-    cy.contains("Welcome to Welkin")
-      .should("be.visible")
+    cy.contains('Welcome to Welkin').should('be.visible')
   })
 
   cy.visit(`https://${ingress}`)
 
-  cy.contains("loading opensearch dashboards", opt)
-  .should("not.exist")
+  cy.contains('loading opensearch dashboards', opt).should('not.exist')
 
-  cy.contains("Welcome to Welkin")
-    .should("be.visible")
+  cy.contains('Welcome to Welkin').should('be.visible')
 }
 
 function opensearchTestIndexPattern(cy, indexPattern) {
   // open sidebar menu
-  cy.contains("title", "menu", opt)
-    .parents("button")
-    .click()
+  cy.contains('title', 'menu', opt).parents('button').click()
 
   // navigate to discover
-  cy.get("nav")
-    .contains("li", "discover", opt)
-    .click()
+  cy.get('nav').contains('li', 'discover', opt).click()
 
   // select index pattern
-  cy.contains("div", "kubeaudit*")
-    .click()
-  cy.contains("button", indexPattern)
-    .click()
+  cy.contains('div', 'kubeaudit*').click()
+  cy.contains('button', indexPattern).click()
 
-  cy.contains("no results match your search criteria", opt)
-    .should("not.exist")
+  cy.contains('no results match your search criteria', opt).should('not.exist')
 
-  cy.contains("hits", opt)
-    .should("be.visible")
+  cy.contains('hits', opt).should('be.visible')
 }
 
-describe("opensearch dashboards", function() {
-  before(function() {
-    cy.yq("sc", ".opensearch.dashboards.subdomain + \".\" + .global.baseDomain")
-      .should("not.be.empty")
-      .as("ingress")
+describe('opensearch dashboards', () => {
+  before(() => {
+    cy.yq('sc', '.opensearch.dashboards.subdomain + "." + .global.baseDomain')
+      .should('not.be.empty')
+      .as('ingress')
 
-    cy.yqDig("sc", ".opensearch.indexPerNamespace")
-      .should("not.be.empty")
-      .as('indexPerNamespace')
+    cy.yqDig('sc', '.opensearch.indexPerNamespace').should('not.be.empty').as('indexPerNamespace')
   })
 
-  beforeEach(function() {
+  beforeEach(() => {
     opensearchDexStaticLogin(cy, this.ingress)
 
     cy.on('uncaught:exception', (err, runnable) => {
@@ -92,58 +78,45 @@ describe("opensearch dashboards", function() {
     })
   })
 
-  after(function() {
+  after(() => {
     Cypress.session.clearAllSavedSessions()
   })
 
-  it("open the audit user dashboard", function() {
+  it('open the audit user dashboard', () => {
     // open sidebar menu
-    cy.contains("title", "menu", opt)
-      .parents("button")
-      .click()
+    cy.contains('title', 'menu', opt).parents('button').click()
 
     // navigate to dashboards
-    cy.get("nav")
-      .contains("li", "dashboard", opt)
-      .click()
+    cy.get('nav').contains('li', 'dashboard', opt).click()
 
-    cy.contains("loading opensearch dashboards", opt)
-      .should("not.exist")
+    cy.contains('loading opensearch dashboards', opt).should('not.exist')
 
     // navigate to audit user dashboard
-    cy.contains("a", "audit user", opt)
-      .click()
+    cy.contains('a', 'audit user', opt).click()
 
-    cy.contains("loading opensearch dashboards", opt)
-      .should("not.exist")
+    cy.contains('loading opensearch dashboards', opt).should('not.exist')
 
     // assert contains dashboard elements
 
-    cy.contains("audit counter", opt)
-      .should("be.visible")
+    cy.contains('audit counter', opt).should('be.visible')
 
-    cy.contains("resource selector", opt)
-      .should("be.visible")
-    cy.contains("user selector", opt)
-      .should("be.visible")
-    cy.contains("verb selector", opt)
-      .should("be.visible")
+    cy.contains('resource selector', opt).should('be.visible')
+    cy.contains('user selector', opt).should('be.visible')
+    cy.contains('verb selector', opt).should('be.visible')
 
-    cy.contains("api-requests", opt)
-      .should("be.visible")
-    cy.contains("audit logs - all", opt)
-      .should("be.visible")
+    cy.contains('api-requests', opt).should('be.visible')
+    cy.contains('audit logs - all', opt).should('be.visible')
   })
 
-  it('test kubeaudit index', function () {
-    opensearchTestIndexPattern(cy, "kubeaudit")
+  it('test kubeaudit index', () => {
+    opensearchTestIndexPattern(cy, 'kubeaudit')
   })
 
-  it('test kubernetes index', function () {
-    if (this.indexPerNamespace === "true") {
+  it('test kubernetes index', () => {
+    if (this.indexPerNamespace === 'true') {
       this.skip()
     }
 
-    opensearchTestIndexPattern(cy, "kubernetes")
+    opensearchTestIndexPattern(cy, 'kubernetes')
   })
 })
