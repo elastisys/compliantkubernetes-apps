@@ -11,8 +11,8 @@ import '../../common/cypress/harbor.js'
 const opt = { matchCase: false }
 const slug = 'integration-tests-harbor-manage-resources'
 
-describe('harbor ui', () => {
-  before(() => {
+describe('harbor ui', function () {
+  before(function () {
     cy.yq('sc', '.harbor.subdomain + "." + .global.baseDomain')
       .should('not.be.empty')
       .as('ingress')
@@ -29,7 +29,7 @@ describe('harbor ui', () => {
       })
   })
 
-  beforeEach(() => {
+  beforeEach(function () {
     cy.session([this.ingress], () => {
       cy.harborStaticDexLogin(this.ingress)
     })

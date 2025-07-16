@@ -68,7 +68,7 @@ describe('grafana admin dashboards', () => {
 })
 
 describe('grafana dev dashboards', () => {
-  before(() => {
+  before(function () {
     cy.yq('sc', '.grafana.user.subdomain + "." + .global.baseDomain')
       .should('not.contain.empty')
       .as('ingress')
@@ -95,13 +95,13 @@ describe('grafana dev dashboards', () => {
   //     .should('exist')
   // })
 
-  it('open the Trivy Operator Dashboard', () => {
+  it('open the Trivy Operator Dashboard', function () {
     cy.testGrafanaDashboard(this.ingress, 'Trivy Operator Dashboard', false, 20)
 
     cy.get('[data-testid="data-testid Panel menu Security Overview"]').should('exist')
   })
 
-  it('open the NetworkPolicy Dashboard', () => {
+  it('open the NetworkPolicy Dashboard', function () {
     cy.testGrafanaDashboard(this.ingress, 'NetworkPolicy Dashboard', false, 14)
 
     cy.get(
@@ -109,25 +109,25 @@ describe('grafana dev dashboards', () => {
     ).should('exist')
   })
 
-  it('open the Kubernetes cluster status dashboard', () => {
+  it('open the Kubernetes cluster status dashboard', function () {
     cy.testGrafanaDashboard(this.ingress, 'Kubernetes cluster status', false, 30)
 
     cy.get('[data-testid="data-testid Panel menu Running pods not ready"]').should('exist')
   })
 
-  it('open the Gatekeeper dashboard', () => {
+  it('open the Gatekeeper dashboard', function () {
     cy.testGrafanaDashboard(this.ingress, 'Gatekeeper', 18)
 
     cy.get('[data-testid="data-testid Panel header Gatekeeper logs"]').should('exist')
   })
 
-  it('open the NGINX Ingress controller dashboard', () => {
+  it('open the NGINX Ingress controller dashboard', function () {
     cy.testGrafanaDashboard(this.ingress, 'NGINX Ingress controller', false, 26)
 
     cy.get('[data-testid="data-testid Panel header Controller Request Volume"]').should('exist')
   })
 
-  it('open the Falco dashboard', () => {
+  it('open the Falco dashboard', function () {
     cy.testGrafanaDashboard(this.ingress, 'Falco', false, 21)
 
     cy.get('[data-testid="data-testid Panel header Falco logs"]').should('exist')

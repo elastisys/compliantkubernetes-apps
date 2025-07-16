@@ -1,11 +1,11 @@
 describe('opensearch admin authentication', () => {
-  before(() => {
+  before(function () {
     cy.yq('sc', '.opensearch.dashboards.subdomain + "." + .global.baseDomain')
       .should('not.contain.empty')
       .as('ingress')
   })
 
-  it('can login via static dex user', () => {
+  it('can login via static dex user', function () {
     // Need to ignore error response from GET /api/dataconnections for non-authorized user.
     //
     // {
