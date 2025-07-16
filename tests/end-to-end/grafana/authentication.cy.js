@@ -1,5 +1,5 @@
 describe('grafana admin authentication', () => {
-  before(() => {
+  before(function () {
     cy.yq('sc', '.grafana.ops.subdomain + "." + .global.opsDomain')
       .should('not.contain.empty')
       .as('ingress')
@@ -10,7 +10,7 @@ describe('grafana admin authentication', () => {
     )
   })
 
-  it('can login via static admin user', () => {
+  it('can login via static admin user', function () {
     cy.visit(`https://${this.ingress}`)
 
     cy.yqSecrets('.grafana.password').then((password) => {
@@ -26,7 +26,7 @@ describe('grafana admin authentication', () => {
     cy.contains('Welcome to Grafana').should('exist')
   })
 
-  it('can login via static dex user', () => {
+  it('can login via static dex user', function () {
     cy.yqDig('sc', '.dex.enableStaticLogin').then((staticLoginEnabled) => {
       if (staticLoginEnabled !== 'true') {
         this.skip('dex static login is not enabled')
@@ -51,8 +51,8 @@ describe('grafana admin authentication', () => {
   })
 })
 
-describe('grafana dev authentication', () => {
-  before(() => {
+describe('grafana dev authentication', function () {
+  before(function () {
     cy.yq('sc', '.grafana.user.subdomain + "." + .global.baseDomain')
       .should('not.contain.empty')
       .as('ingress')
@@ -63,7 +63,7 @@ describe('grafana dev authentication', () => {
     )
   })
 
-  it('can login via static admin user', () => {
+  it('can login via static admin user', function () {
     cy.visit(`https://${this.ingress}`)
 
     cy.yqSecrets('.user.grafanaPassword').then((password) => {
@@ -79,7 +79,7 @@ describe('grafana dev authentication', () => {
     cy.contains('Welcome to Welkin').should('exist')
   })
 
-  it('can login via static dex user', () => {
+  it('can login via static dex user', function () {
     cy.yqDig('sc', '.dex.enableStaticLogin').then((staticLoginEnabled) => {
       if (staticLoginEnabled !== 'true') {
         this.skip('dex static login is not enabled')

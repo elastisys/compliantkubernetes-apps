@@ -3,7 +3,7 @@ describe('kubernetes authentication', function () {
     cy.withTestKubeconfig('wc', 'static-dev', 'true')
   })
 
-  it('can login via extra static dex user', () => {
+  it('can login via extra static dex user', function () {
     cy.yqDig('sc', '.dex.enableStaticLogin').then((staticLoginEnabled) => {
       if (staticLoginEnabled !== 'true') {
         this.skip('dex static login is not enabled')

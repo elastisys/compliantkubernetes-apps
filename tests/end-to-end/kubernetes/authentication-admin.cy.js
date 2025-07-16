@@ -7,7 +7,7 @@ describe('kubernetes authentication', function () {
     cy.deleteTestKubeconfig('wc', 'static-admin')
   })
 
-  it('can login via static dex user', () => {
+  it('can login via static dex user', function () {
     cy.yqDig('sc', '.dex.enableStaticLogin').then((staticLoginEnabled) => {
       if (staticLoginEnabled !== 'true') {
         this.skip('dex static login is not enabled')
