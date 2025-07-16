@@ -57,8 +57,8 @@ function opensearchTestIndexPattern(cy, indexPattern) {
   cy.contains('hits', opt).should('be.visible')
 }
 
-describe('opensearch dashboards', () => {
-  before(() => {
+describe('opensearch dashboards', function () {
+  before(function () {
     cy.yq('sc', '.opensearch.dashboards.subdomain + "." + .global.baseDomain')
       .should('not.be.empty')
       .as('ingress')
@@ -66,7 +66,7 @@ describe('opensearch dashboards', () => {
     cy.yqDig('sc', '.opensearch.indexPerNamespace').should('not.be.empty').as('indexPerNamespace')
   })
 
-  beforeEach(() => {
+  beforeEach(function () {
     opensearchDexStaticLogin(cy, this.ingress)
 
     cy.on('uncaught:exception', (err, runnable) => {
@@ -82,7 +82,7 @@ describe('opensearch dashboards', () => {
     Cypress.session.clearAllSavedSessions()
   })
 
-  it('open the audit user dashboard', () => {
+  it('open the audit user dashboard', function () {
     // open sidebar menu
     cy.contains('title', 'menu', opt).parents('button').click()
 

@@ -35,7 +35,7 @@ function loginNavigate(cy, ingress, passwordKey) {
 }
 
 describe('grafana admin datasources', () => {
-  before(() => {
+  before(function () {
     cy.yq('sc', '.grafana.ops.subdomain + "." + .global.opsDomain')
       .should('not.contain.empty')
       .as('ingress')
@@ -81,7 +81,7 @@ describe('grafana admin datasources', () => {
 })
 
 describe('grafana dev datasources', () => {
-  before(() => {
+  before(function () {
     cy.yq('sc', '.grafana.user.subdomain + "." + .global.baseDomain')
       .should('not.contain.empty')
       .as('ingress')

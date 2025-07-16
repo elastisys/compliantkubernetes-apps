@@ -7,7 +7,7 @@ const opt = { matchCase: false }
 const slug = 'end-to-end-tests-harbor-manage-resources'
 
 describe('harbor ui', () => {
-  before(() => {
+  before(function () {
     cy.yq('sc', '.harbor.subdomain + "." + .global.baseDomain')
       .should('not.be.empty')
       .as('ingress')

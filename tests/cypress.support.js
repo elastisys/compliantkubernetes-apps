@@ -112,7 +112,7 @@ Cypress.Commands.add('yqSecrets', (expression) => {
 })
 
 // Available as cy.continueOn("sc|wc", "expression") expression should evaluate to true to continue
-Cypress.Commands.add('continueOn', (cluster, expression) => {
+Cypress.Commands.add('continueOn', function (cluster, expression) {
   cy.yqDig(cluster, expression).then((result) => {
     if (result !== 'true') {
       this.skip(`${cluster}/${expression} is disabled`)
