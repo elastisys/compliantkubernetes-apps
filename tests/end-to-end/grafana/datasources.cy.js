@@ -29,7 +29,7 @@ function loginNavigate(cy, ingress, passwordKey) {
 
   cy.get('button[aria-label="Open menu"]').click()
 
-  cy.get('button[aria-label="Expand section Connections"]').click()
+  cy.get('button[aria-label="Expand section: Connections"]').click()
 
   cy.contains('Data sources').click()
 }
