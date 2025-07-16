@@ -1,32 +1,28 @@
-describe("kubernetes authentication", function() {
-  before(function() {
-    cy.withTestKubeconfig("wc", "static-admin", "true")
+describe('kubernetes authentication', function () {
+  before(function () {
+    cy.withTestKubeconfig('wc', 'static-admin', 'true')
   })
 
-  after(function() {
-    cy.deleteTestKubeconfig("wc", "static-admin")
+  after(function () {
+    cy.deleteTestKubeconfig('wc', 'static-admin')
   })
 
-  it("can login via static dex user", function() {
+  it('can login via static dex user', () => {
+    cy.yqDig('sc', '.dex.enableStaticLogin').then((staticLoginEnabled) => {
+      if (staticLoginEnabled !== 'true') {
+        this.skip('dex static login is not enabled')
+      }
+    })
 
-    cy.yqDig("sc", ".dex.enableStaticLogin")
-      .then(staticLoginEnabled => {
-        if (staticLoginEnabled !== "true") {
-          this.skip("dex static login is not enabled")
-        }
-      })
-
-    cy.task('kubectlLogin', Cypress.env("KUBECONFIG"))
+    cy.task('kubectlLogin', Cypress.env('KUBECONFIG'))
     cy.visit(`http://localhost:8000`)
 
     cy.dexStaticLogin()
 
     cy.origin('http://localhost:8000', () => {
-      cy.contains("Authenticated")
-        .should("exist")
+      cy.contains('Authenticated').should('exist')
 
-      cy.contains("You have logged in to the cluster. You can close this window.")
-        .should("exist")
+      cy.contains('You have logged in to the cluster. You can close this window.').should('exist')
     })
   })
 })

@@ -1,11 +1,11 @@
-describe("opensearch admin authentication", function() {
-  before(function() {
-    cy.yq("sc", ".opensearch.dashboards.subdomain + \".\" + .global.baseDomain")
-      .should("not.contain.empty")
-      .as("ingress")
+describe('opensearch admin authentication', () => {
+  before(() => {
+    cy.yq('sc', '.opensearch.dashboards.subdomain + "." + .global.baseDomain')
+      .should('not.contain.empty')
+      .as('ingress')
   })
 
-  it("can login via static dex user", function() {
+  it('can login via static dex user', () => {
     // Need to ignore error response from GET /api/dataconnections for non-authorized user.
     //
     // {
@@ -23,27 +23,24 @@ describe("opensearch admin authentication", function() {
     //
     // TODO: Narrow this down to the specific request OR investigate if a user
     //       actually should have this permission.
-    cy.on("uncaught:exception", (err, runnable) => {
-      if (err.message.includes("Forbidden")) {
+    cy.on('uncaught:exception', (err, runnable) => {
+      if (err.message.includes('Forbidden')) {
         return false
       }
     })
 
-    cy.yqDig("sc", ".dex.enableStaticLogin")
-      .then(staticLoginEnabled => {
-        if (staticLoginEnabled !== "true") {
-          this.skip("dex static login is not enabled")
-        }
-      })
+    cy.yqDig('sc', '.dex.enableStaticLogin').then((staticLoginEnabled) => {
+      if (staticLoginEnabled !== 'true') {
+        this.skip('dex static login is not enabled')
+      }
+    })
 
     cy.visit(`https://${this.ingress}`)
 
     cy.dexStaticLogin()
 
-    cy.contains("Loading OpenSearch Dashboards")
-      .should("not.exist")
+    cy.contains('Loading OpenSearch Dashboards').should('not.exist')
 
-    cy.contains("Welcome to Welkin")
-      .should("exist")
+    cy.contains('Welcome to Welkin').should('exist')
   })
 })
