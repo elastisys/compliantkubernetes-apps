@@ -251,6 +251,13 @@ cypress_setup() {
     log.fatal "invalid or missing file argument"
   fi
 
+  declare -a cypress_args
+  if [[ "${CK8S_HEADED_CYPRESS:-false}" == "true" ]]; then
+    cypress_args=("--runner-ui" "--headed")
+  else
+    cypress_args=("--no-runner-ui")
+  fi
+
   CYPRESS_REPORT="$(mktemp)"
 
   pushd "${ROOT}/tests" || exit 1
@@ -259,7 +266,7 @@ cypress_setup() {
   for seq in $(seq 3); do
     [[ "${seq}" == "1" ]] || log.trace "cypress run: try ${seq}/3"
 
-    cypress run --no-runner-ui --spec "$1" --reporter json-stream --quiet >"${CYPRESS_REPORT}" || true
+    cypress run "${cypress_args[@]}" --spec "$1" --reporter json-stream --quiet >"${CYPRESS_REPORT}" || true
 
     # This happen seemingly at random
     if ! grep "Fatal JavaScript out of memory" "${CYPRESS_REPORT}" &>/dev/null; then
