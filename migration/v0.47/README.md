@@ -143,7 +143,7 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 1. User-Alertmanager chart has been replaced with kube-prometheus-stack chart. This will remove the existing user-alertmanager chart from wc.
 
    ```bash
-   ./migration/v0.47/apply/30-alertmanager.sh
+   ./migration/v0.47/apply/30-alertmanager.sh execute
     ```
 
 1. Upgrade applications:
