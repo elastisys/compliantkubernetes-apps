@@ -168,6 +168,7 @@ if [[ "${FORWARD_ENVIRONMENT:-false}" == "true" ]]; then
   # Prepare container env
   args+=("--env" "CK8S_CONFIG_PATH")
   args+=("--mount" "type=bind,src=${CK8S_CONFIG_PATH},dst=${CK8S_CONFIG_PATH}")
+  args+=("--env" "CK8S_HEADED_CYPRESS")
 fi
 
 # Check if we are in a work tree
