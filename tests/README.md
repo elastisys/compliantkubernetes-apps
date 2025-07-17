@@ -134,6 +134,12 @@ cypress open
 
 It will auto-reload and auto-execute as tests are updated, use `it.only` instead of `it` to run only selected tests.
 
+> [!note]
+> Set the `CK8S_HEADED_CYPRESS=true` environment variable to
+> force `cypress` to show its testing interface alongside the testing browser.
+>
+> This works when running tests through `make` or `bats`, but not when invoking `cypress` directly.
+
 ## Writing
 
 Currently it is possible to write three types of tests, bats tests, cypress tests, and template tests.
