@@ -13,6 +13,6 @@ spec:
         kinds: ["Deployment", "StatefulSet", "ReplicaSet"]
       - apiGroups: ["policy"]
         kinds: ["PodDisruptionBudget"]
-    excludedNamespaces: ["kube-system", "kube-public", "kube-node-lease", "calico-system"]
+    excludedNamespaces: ["kube-system", "kube-public", "kube-node-lease", "calico-system", "rook-ceph"]
     # Note that this does not exclude all namespaces with label owner=operator
 {{- end }}
