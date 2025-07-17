@@ -76,7 +76,7 @@ cypress_gen() {
       echo "  ${step}"
     fi
   done
-  echo "  cypress_teardown \"${file}\""
+  echo "  cypress_teardown"
   if [[ -n "${cluster:-}" ]] && [[ -n "${helmfile:-}" ]]; then
     echo "  auto_teardown"
   fi
