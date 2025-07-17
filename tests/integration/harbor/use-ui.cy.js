@@ -39,9 +39,7 @@ describe('harbor ui', function () {
     cy.viewport(1280, 720)
   })
 
-  after(() => {
-    Cypress.session.clearAllSavedSessions()
-  })
+  after(Cypress.session.clearAllSavedSessions)
 
   it('can create project', () => {
     cy.contains('button', 'new project', opt).click()

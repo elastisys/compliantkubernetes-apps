@@ -78,9 +78,7 @@ describe('opensearch dashboards', function () {
     })
   })
 
-  after(() => {
-    Cypress.session.clearAllSavedSessions()
-  })
+  after(Cypress.session.clearAllSavedSessions)
 
   it('open the audit user dashboard', function () {
     // open sidebar menu
