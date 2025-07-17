@@ -12,7 +12,7 @@ setup() {
 }
 
 teardown_file() {
-  cypress_teardown "${ROOT}/tests/end-to-end/harbor/dex-auth.cy.js"
+  cypress_teardown
 }
 
 @test "harbor dex auth can login via static admin user" {

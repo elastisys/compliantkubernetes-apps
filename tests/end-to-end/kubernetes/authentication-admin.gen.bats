@@ -12,7 +12,7 @@ setup() {
 }
 
 teardown_file() {
-  cypress_teardown "${ROOT}/tests/end-to-end/kubernetes/authentication-admin.cy.js"
+  cypress_teardown
 }
 
 @test "kubernetes authentication can login via static dex user" {

@@ -12,7 +12,7 @@ setup() {
 }
 
 teardown_file() {
-  cypress_teardown "${ROOT}/tests/end-to-end/alertmanager/via-proxy.cy.js"
+  cypress_teardown
 }
 
 @test "alertmanager can be accessed via kubectl proxy" {
