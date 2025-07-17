@@ -12,7 +12,7 @@ setup() {
 }
 
 teardown_file() {
-  cypress_teardown "${ROOT}/tests/end-to-end/grafana/datasources.cy.js"
+  cypress_teardown
 }
 
 @test "grafana admin datasources has prometheus" {

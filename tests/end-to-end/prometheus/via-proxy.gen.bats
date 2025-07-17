@@ -12,7 +12,7 @@ setup() {
 }
 
 teardown_file() {
-  cypress_teardown "${ROOT}/tests/end-to-end/prometheus/via-proxy.cy.js"
+  cypress_teardown
 }
 
 @test "prometheus can be accessed via kubectl proxy" {
