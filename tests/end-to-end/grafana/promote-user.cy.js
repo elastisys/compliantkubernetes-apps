@@ -1,4 +1,5 @@
-const apiTimeout = 30000
+const apiTimeout = 60000
+const staticUser = 'dev@example.com'
 
 describe('grafana user promotion', function () {
   before(function () {
@@ -25,7 +26,7 @@ describe('grafana user promotion', function () {
       }
     })
 
-    cy.intercept('/api/**').as('api')
+    cy.intercept('/api/user/orgs').as('userOrgs')
 
     const ingress = this.ingress
 
@@ -34,21 +35,25 @@ describe('grafana user promotion', function () {
 
       cy.contains('Sign in with dex').click()
 
-      cy.dexExtraStaticLogin('dev@example.com')
+      cy.dexExtraStaticLogin(staticUser)
 
-      cy.wait(Array(12).fill('@api'), { timeout: apiTimeout })
+      cy.wait(['@userOrgs'], { timeout: apiTimeout })
+    }
+
+    const cyGet = function (selector) {
+      return cy.get(selector, { timeout: apiTimeout })
     }
 
     // static user should be 'Viewer'
     devLogin()
 
-    cy.get('[data-testid="data-testid-user-orgs-table"]').then(($userInfo) => {
+    cyGet('[data-testid="data-testid-user-orgs-table"]').then(($userInfo) => {
       if ($userInfo.text().includes('Admin')) {
         this.skip('user is already an admin')
       }
     })
 
-    cy.get('[data-testid="data-testid-user-orgs-table"]').contains('Viewer').should('exist')
+    cyGet('[data-testid="data-testid-user-orgs-table"]').contains('Viewer').should('exist')
 
     cy.visit(`https://${ingress}/logout`)
 
@@ -56,24 +61,27 @@ describe('grafana user promotion', function () {
     cy.visit(`https://${ingress}/admin/users`)
 
     cy.yqSecrets('.user.grafanaPassword').then((password) => {
-      cy.get('input[placeholder*="username"]').type('admin', { log: false })
+      cyGet('input[placeholder*="username"]').type('admin', { log: false })
 
-      cy.get('input[placeholder*="password"]').type(password, { log: false })
+      cyGet('input[placeholder*="password"]').type(password, { log: false })
 
-      cy.get('button').contains('Log in').click()
+      cyGet('button').contains('Log in').click()
     })
 
-    cy.get('[aria-label="Edit user dev"]', { timeout: apiTimeout }).should('exist').click()
+    cy.contains('Organization users', { timeout: apiTimeout }).should('be.visible').click()
+    cyGet('input[placeholder*="Search user by login"]')
+      .type(staticUser.substring(0, staticUser.lastIndexOf('.')))
+      .type('{enter}')
 
-    cy.contains('Change role', { timeout: apiTimeout }).should('be.visible').click()
-    cy.get('[aria-haspopup="true"]').click().type('Admin{enter}')
-    cy.get('span').contains('Save').click()
+    cyGet('[aria-label="Role"]').type('Admin{enter}')
+
+    cy.contains('Organization user updated').should('be.visible')
 
     cy.visit(`https://${ingress}/logout`)
 
     // Re-login => should be admin
     devLogin()
 
-    cy.get('[data-testid="data-testid-user-orgs-table"]').contains('Admin').should('exist')
+    cyGet('[data-testid="data-testid-user-orgs-table"]').contains('Admin').should('exist')
   })
 })
