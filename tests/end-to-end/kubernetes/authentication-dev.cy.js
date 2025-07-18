@@ -1,6 +1,6 @@
 describe('kubernetes authentication', function () {
   before(function () {
-    cy.withTestKubeconfig({ cluster: 'wc', user: 'static-dev', refresh: 'true' })
+    cy.withTestKubeconfig({ cluster: 'wc', user: 'static-dev', refresh: true })
   })
 
   after(function () {

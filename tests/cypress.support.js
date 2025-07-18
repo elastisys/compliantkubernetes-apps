@@ -219,7 +219,7 @@ Cypress.Commands.add('withTestKubeconfig', function ({ cluster, user, refresh, u
     }
   })
 
-  if (refresh === 'true') {
+  if (refresh) {
     cy.exec(`rm -rf ~/.kube/cache/oidc-login/test-${user}`)
   }
 })
