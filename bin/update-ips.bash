@@ -265,6 +265,10 @@ get_swift_url() {
     exit 1
   fi
 
+  if [[ "$(tail -n1 <<<"${response}" | jq '.token')" == null ]]; then
+    log_fatal "Could not get OpenStack token, check that the Swift configuration is correct"
+  fi
+
   {
 
     while read -rd $'\r\n' header value; do
