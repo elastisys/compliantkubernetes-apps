@@ -8,11 +8,7 @@ describe('kubernetes authentication', function () {
   })
 
   it('can login via static dex user', function () {
-    cy.yqDig('sc', '.dex.enableStaticLogin').then((staticLoginEnabled) => {
-      if (staticLoginEnabled !== 'true') {
-        this.skip('dex static login is not enabled')
-      }
-    })
+    cy.continueOn('sc', '.dex.enableStaticLogin')
 
     cy.task('kubectlLogin', Cypress.env('KUBECONFIG'))
     cy.visit(`http://localhost:8000`)

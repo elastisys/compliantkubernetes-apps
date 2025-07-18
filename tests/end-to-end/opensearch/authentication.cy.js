@@ -29,11 +29,7 @@ describe('opensearch admin authentication', () => {
       }
     })
 
-    cy.yqDig('sc', '.dex.enableStaticLogin').then((staticLoginEnabled) => {
-      if (staticLoginEnabled !== 'true') {
-        this.skip('dex static login is not enabled')
-      }
-    })
+    cy.continueOn('sc', '.dex.enableStaticLogin')
 
     cy.visit(`https://${this.ingress}`)
 
