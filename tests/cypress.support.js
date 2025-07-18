@@ -1,6 +1,4 @@
-// Available as cy.yq("sc|wc", "expression") merge first then expression
-// More correct than yqDig for complex data such as maps that can be merged
-Cypress.Commands.add('yq', (cluster, expression) => {
+const yqArgsToConfigFiles = function (cluster, expression) {
   const configPath = Cypress.env('CK8S_CONFIG_PATH')
   if (typeof configPath === 'undefined') {
     cy.fail('yq: CK8S_CONFIG_PATH is unset')
@@ -11,82 +9,44 @@ Cypress.Commands.add('yq', (cluster, expression) => {
   } else if (cluster !== 'sc' && cluster !== 'wc') {
     cy.fail('yq: cluster argument is invalid')
   }
-  const configFiles = `${configPath}/defaults/common-config.yaml ${configPath}/defaults/${cluster}-config.yaml ${configPath}/common-config.yaml ${configPath}/${cluster}-config.yaml`
 
   if (typeof expression === 'undefined') {
     cy.fail('yq: expression argument is missing')
   }
 
+  return `${configPath}/defaults/common-config.yaml ${configPath}/defaults/${cluster}-config.yaml ${configPath}/common-config.yaml ${configPath}/${cluster}-config.yaml`
+}
+
+// Available as cy.yq("sc|wc", "expression") merge first then expression
+// More correct than yqDig for complex data such as maps that can be merged
+Cypress.Commands.add('yq', (cluster, expression) => {
+  const configFiles = yqArgsToConfigFiles(cluster, expression)
+
   cy.exec(
     `yq ea 'explode(.) as $item ireduce ({}; . * $item) | ${expression} | ...comments=""' ${configFiles}`
-  ).then((result) => {
-    if (result.stderr !== '') {
-      cy.fail(`yq: error in exec: ${result.stderr}`)
-    } else {
-      return result.stdout
-    }
-  })
+  ).its('stdout')
 })
 
 // Available as cy.yqDig("sc|wc", "expression") expression first then merge
 // More efficient than yq for simple data such as scalars that cannot be merged
 Cypress.Commands.add('yqDig', (cluster, expression) => {
-  const configPath = Cypress.env('CK8S_CONFIG_PATH')
-  if (typeof configPath === 'undefined') {
-    cy.fail('yq: CK8S_CONFIG_PATH is unset')
-  }
-
-  if (typeof cluster === 'undefined') {
-    cy.fail('yq: cluster argument is missing')
-  } else if (cluster !== 'sc' && cluster !== 'wc') {
-    cy.fail('yq: cluster argument is invalid')
-  }
-  const configFiles = `${configPath}/defaults/common-config.yaml ${configPath}/defaults/${cluster}-config.yaml ${configPath}/common-config.yaml ${configPath}/${cluster}-config.yaml`
-
-  if (typeof expression === 'undefined') {
-    cy.fail('yq: expression argument is missing')
-  }
+  const configFiles = yqArgsToConfigFiles(cluster, expression)
 
   cy.exec(
     `yq ea 'explode(.) | ${expression} | select(. != null) | {"wrapper": .} as $item ireduce ({}; . *$item) | .wrapper | ... comments=""' ${configFiles}`
-  ).then((result) => {
-    if (result.stderr !== '') {
-      cy.fail(`yq: error in exec: ${result.stderr}`)
-    } else {
-      return result.stdout
-    }
-  })
+  ).its('stdout')
 })
 
 // Available as cy.yqDigParse("sc|wc", "expression") expression first then merge
 // More efficient for simple data such as scalars that cannot be merged
 Cypress.Commands.add('yqDigParse', (cluster, expression) => {
-  if (typeof cluster === 'undefined') {
-    cy.fail('yqDigParse: cluster argument is missing')
-  } else if (typeof expression === 'undefined') {
-    cy.fail('yqDigParse: expression argument is missing')
-  }
+  const configFiles = yqArgsToConfigFiles(cluster, expression)
 
-  const configPath = Cypress.env('CK8S_CONFIG_PATH')
-  if (typeof configPath === 'undefined') {
-    cy.fail('yqDigParse: CK8S_CONFIG_PATH is unset')
-  }
-
-  if (cluster === 'sc') {
-    cy.exec(
-      `yq -oj ea 'explode(.) | ${expression} | select(. != null) | {"wrapper": .} as $item ireduce ({}; . *$item) | .wrapper | ... comments=""' ${configPath}/defaults/common-config.yaml ${configPath}/defaults/sc-config.yaml ${configPath}/common-config.yaml ${configPath}/sc-config.yaml`
-    )
-      .its('stdout')
-      .then(JSON.parse)
-  } else if (cluster === 'wc') {
-    cy.exec(
-      `yq -oj ea 'explode(.) | ${expression} | select(. != null) | {"wrapper": .} as $item ireduce ({}; . *$item) | .wrapper | ... comments=""' ${configPath}/defaults/common-config.yaml ${configPath}/defaults/wc-config.yaml ${configPath}/common-config.yaml ${configPath}/wc-config.yaml`
-    )
-      .its('stdout')
-      .then(JSON.parse)
-  } else {
-    cy.fail('yqDigParse: cluster argument is invalid')
-  }
+  cy.exec(
+    `yq -oj ea 'explode(.) | ${expression} | select(. != null) | {"wrapper": .} as $item ireduce ({}; . *$item) | .wrapper | ... comments=""' ${configFiles}`
+  )
+    .its('stdout')
+    .then(JSON.parse)
 })
 
 // Available as cy.yqSecrets("expression") sops decrypt into yq expression
