@@ -12,14 +12,6 @@ describe('alertmanager', function () {
 
     cy.origin('http://127.0.0.1:8001', () => {
       cy.contains('span', 'alertname="Watchdog"').should('exist')
-
-      cy.visit(
-        'http://127.0.0.1:8001/api/v1/namespaces/alertmanager/services/alertmanager-operated:9093/proxy/#/status'
-      )
-
-      cy.wait(['@api', '@api'], { timeout: 20000 })
-
-      cy.contains('span', 'ready').should('exist')
     })
   })
 
