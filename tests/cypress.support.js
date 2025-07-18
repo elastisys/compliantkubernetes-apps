@@ -60,14 +60,8 @@ Cypress.Commands.add('yqSecrets', (expression) => {
     cy.fail('yqSecrets: expression argument is missing')
   }
 
-  cy.exec(`sops -d ${configPath}/secrets.yaml | yq e '${expression} | ... comments=""'`).then(
-    (result) => {
-      if (result.stderr !== '') {
-        cy.fail(`yq: error in exec: ${result.stderr}`)
-      } else {
-        return result.stdout
-      }
-    }
+  cy.exec(`sops -d ${configPath}/secrets.yaml | yq e '${expression} | ... comments=""'`).its(
+    'stdout'
   )
 })
 
@@ -171,13 +165,7 @@ Cypress.Commands.add('withTestKubeconfig', function ({ cluster, user, refresh, u
 
   cy.exec(
     `yq '.users[0].user.exec.args += ${JSON.stringify(userArgs)}' < "${base_kubeconfig}" > ${user_kubeconfig}`
-  ).then((result) => {
-    if (result.stderr !== '') {
-      cy.fail(`yq: error in exec: ${result.stderr}`)
-    } else {
-      return result.stdout
-    }
-  })
+  ).its('stdout')
 
   if (refresh) {
     cy.exec(`rm -rf ~/.kube/cache/oidc-login/test-${user}`)
