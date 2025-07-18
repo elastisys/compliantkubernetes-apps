@@ -12,7 +12,7 @@ setup() {
 }
 
 teardown_file() {
-  cypress_teardown "${ROOT}/tests/end-to-end/opensearch/dashboards.cy.js"
+  cypress_teardown
 }
 
 @test "opensearch dashboards open the audit user dashboard" {
