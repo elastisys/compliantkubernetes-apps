@@ -1,6 +1,6 @@
 import '../../common/cypress/grafana.js'
 
-describe('grafana admin dashboards', () => {
+describe('grafana admin dashboards', function () {
   before(() => {
     cy.yq('sc', '.grafana.ops.subdomain + "." + .global.opsDomain')
       .should('not.contain.empty')
@@ -10,7 +10,7 @@ describe('grafana admin dashboards', () => {
     cy.yqDig('sc', '.grafana.ops.trailingDots').should('not.equal', 'true')
   })
 
-  beforeEach(() => {
+  beforeEach(function () {
     cy.grafanaDexStaticLogin(this.ingress)
 
     cy.contains('Welcome to Grafana').should('exist')
@@ -67,7 +67,7 @@ describe('grafana admin dashboards', () => {
   })
 })
 
-describe('grafana dev dashboards', () => {
+describe('grafana dev dashboards', function () {
   before(function () {
     cy.yq('sc', '.grafana.user.subdomain + "." + .global.baseDomain')
       .should('not.contain.empty')
@@ -77,7 +77,7 @@ describe('grafana dev dashboards', () => {
     cy.yqDig('sc', '.grafana.user.trailingDots').should('not.equal', 'true')
   })
 
-  beforeEach(() => {
+  beforeEach(function () {
     cy.grafanaDexStaticLogin(this.ingress)
 
     cy.contains('Welcome to Welkin').should('exist')

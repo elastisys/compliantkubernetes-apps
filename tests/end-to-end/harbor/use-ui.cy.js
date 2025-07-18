@@ -25,7 +25,7 @@ describe('harbor ui', () => {
       })
   })
 
-  beforeEach(() => {
+  beforeEach(function () {
     cy.session([this.ingress], () => {
       cy.harborStaticDexLogin(this.ingress)
     })
