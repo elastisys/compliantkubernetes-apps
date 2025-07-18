@@ -5,8 +5,8 @@ describe('alertmanager', function () {
     cy.visitProxied({
       cluster: 'wc',
       user: 'static-dev',
-      refresh: 'true',
       url: 'http://127.0.0.1:8001/api/v1/namespaces/alertmanager/services/alertmanager-operated:9093/proxy/',
+      refresh: true,
       checkAdmin: true,
     })
 
