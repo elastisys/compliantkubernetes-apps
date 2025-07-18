@@ -166,14 +166,28 @@ Cypress.Commands.add('dexExtraStaticLogin', (email) => {
   )
 })
 
-Cypress.Commands.add('visitProxied', function ({ cluster, user, refresh, url }) {
-  cy.withTestKubeconfig({ cluster, user, refresh, url }).then(() => {
-    cy.task('wrapProxy', Cypress.env('KUBECONFIG')).then((redir_url) => {
-      cy.visit(`${redir_url}`)
-      cy.dexExtraStaticLogin('dev@example.com')
+Cypress.Commands.add(
+  'visitProxied',
+  function ({ cluster, user, refresh, url, checkAdmin = false }) {
+    if (checkAdmin) {
+      cy.yqDigParse(cluster, '.user.adminUsers').then((adminUsers) => {
+        if (!adminUsers.includes('dev@example.com')) {
+          cy.fail(
+            'dev@example.com not found in .user.adminUsers\n' +
+              `Please add it and run 'ck8s ops helmfile ${cluster} -lapp=dev-rbac apply' to update the RBAC rules.`
+          )
+        }
+      })
+    }
+
+    cy.withTestKubeconfig({ cluster, user, refresh, url }).then(() => {
+      cy.task('wrapProxy', Cypress.env('KUBECONFIG')).then((redir_url) => {
+        cy.visit(`${redir_url}`)
+        cy.dexExtraStaticLogin('dev@example.com')
+      })
     })
-  })
-})
+  }
+)
 
 Cypress.Commands.add('cleanupProxy', function ({ cluster, user }) {
   cy.task('pKill', 'kubeproxy-wrapper.sh')
