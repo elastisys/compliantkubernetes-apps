@@ -265,7 +265,7 @@ get_swift_url() {
     exit 1
   fi
 
-  if [[ "$(echo "${response}" | tail -n1 | jq '.token')" == null ]]; then
+  if [[ "$(tail -n1 <<<"${response}" | jq '.token')" == null ]]; then
     log_fatal "Could not get OpenStack token, check that the Swift configuration is correct"
   fi
 
