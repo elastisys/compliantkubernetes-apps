@@ -108,11 +108,11 @@ describe('opensearch dashboards', function () {
     cy.contains('audit logs - all', opt).should('be.visible')
   })
 
-  it('test kubeaudit index', () => {
+  it('test kubeaudit index', function () {
     opensearchTestIndexPattern(cy, 'kubeaudit')
   })
 
-  it('test kubernetes index', () => {
+  it('test kubernetes index', function () {
     if (this.indexPerNamespace === 'true') {
       this.skip()
     }

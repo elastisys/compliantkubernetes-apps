@@ -27,11 +27,7 @@ describe('grafana admin authentication', () => {
   })
 
   it('can login via static dex user', function () {
-    cy.yqDig('sc', '.dex.enableStaticLogin').then((staticLoginEnabled) => {
-      if (staticLoginEnabled !== 'true') {
-        this.skip('dex static login is not enabled')
-      }
-    })
+    cy.continueOn('sc', '.dex.enableStaticLogin')
 
     cy.yqDigParse('sc', '.grafana.ops.oidc.allowedDomains').then((domains) => {
       if (!domains.includes('example.com')) {
@@ -80,11 +76,7 @@ describe('grafana dev authentication', function () {
   })
 
   it('can login via static dex user', function () {
-    cy.yqDig('sc', '.dex.enableStaticLogin').then((staticLoginEnabled) => {
-      if (staticLoginEnabled !== 'true') {
-        this.skip('dex static login is not enabled')
-      }
-    })
+    cy.continueOn('sc', '.dex.enableStaticLogin')
 
     cy.yqDigParse('sc', '.grafana.user.oidc.allowedDomains').then((domains) => {
       if (!domains.includes('example.com')) {

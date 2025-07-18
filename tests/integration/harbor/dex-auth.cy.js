@@ -18,21 +18,13 @@ describe('harbor dex auth', function () {
   })
 
   it('can login via static dex user', function () {
-    cy.yqDig('sc', '.dex.enableStaticLogin').then((staticLoginEnabled) => {
-      if (staticLoginEnabled !== 'true') {
-        this.skip('dex static login is not enabled')
-      }
-    })
+    cy.continueOn('sc', '.dex.enableStaticLogin')
 
     cy.harborStaticDexLogin(this.ingress)
   })
 
   it('can promote static dex user to admin', function () {
-    cy.yqDig('sc', '.dex.enableStaticLogin').then((staticLoginEnabled) => {
-      if (staticLoginEnabled !== 'true') {
-        this.skip('dex static login is not enabled')
-      }
-    })
+    cy.continueOn('sc', '.dex.enableStaticLogin')
 
     cy.harborAdminLogin(this.ingress)
 
