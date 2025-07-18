@@ -34,7 +34,7 @@ function loginNavigate(cy, ingress, passwordKey) {
   cy.contains('Data sources').click()
 }
 
-describe('grafana admin datasources', () => {
+describe('grafana admin datasources', function () {
   before(function () {
     cy.yq('sc', '.grafana.ops.subdomain + "." + .global.opsDomain')
       .should('not.contain.empty')
@@ -46,7 +46,7 @@ describe('grafana admin datasources', () => {
     )
   })
 
-  beforeEach(() => {
+  beforeEach(function () {
     loginNavigate(cy, this.ingress, '.grafana.password')
   })
 
@@ -92,7 +92,7 @@ describe('grafana dev datasources', () => {
     )
   })
 
-  beforeEach(() => {
+  beforeEach(function () {
     loginNavigate(cy, this.ingress, '.user.grafanaPassword')
   })
 
