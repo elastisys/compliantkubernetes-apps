@@ -124,6 +124,7 @@ grafana.ini:
     api_url: http://dex.dex.svc.cluster.local{{ $trailingDot }}:5556/api
     allowed_domains: {{ join " " .Values.grafana.ops.oidc.allowedDomains }}
     allow_sign_up: true
+    skip_org_role_sync: {{ .Values.grafana.ops.oidc.skipRoleSync }}
     tls_skip_verify_insecure: {{ not .Values.global.verifyTls }}
     role_attribute_path: contains(groups[*], '{{ .Values.grafana.ops.oidc.userGroups.grafanaAdmin }}') && 'Admin' || contains(groups[*], '{{ .Values.grafana.ops.oidc.userGroups.grafanaEditor }}') && 'Editor' || contains(groups[*], '{{ .Values.grafana.ops.oidc.userGroups.grafanaViewer }}') && 'Viewer'
     {{- end }}
