@@ -92,9 +92,13 @@ after the separator.
 {{- end }}
 
 {{- define "objectStorage.accessKey" -}}
-{{- dig "harbor" "objectStorage" "s3" "accessKey" .Values | default .Values.objectStorage.s3.accessKey | quote }}
+{{- $component := .component -}}
+{{- $ctx := .ctx -}}
+{{- dig $component "objectStorage" "s3" "accessKey" $ctx.Values | default (dig "objectStorage" "s3" "accessKey" $ctx.Values) | quote }}
 {{- end }}
 
 {{- define "objectStorage.secretKey" -}}
-{{- dig "harbor" "objectStorage" "s3" "secretKey" .Values | default .Values.objectStorage.s3.secretKey | quote }}
+{{- $component := .component -}}
+{{- $ctx := .ctx -}}
+{{- dig $component "objectStorage" "s3" "secretKey" $ctx.Values | default (dig "objectStorage" "s3" "secretKey" $ctx.Values) | quote }}
 {{- end }}
