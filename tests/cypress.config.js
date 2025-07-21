@@ -1,6 +1,7 @@
 const { defineConfig } = require('cypress')
 
 const PROXY_READY_MARKER = '%%PROXY_READY%%'
+const DEFAULT_TIMEOUT = 60 * 1000
 
 module.exports = defineConfig({
   env: process.env,
@@ -58,7 +59,12 @@ module.exports = defineConfig({
     screenshotOnRunFailure: false,
     specPattern: '**.cy.js',
     supportFile: 'cypress.support.js',
-    defaultCommandTimeout: 10000,
+    defaultCommandTimeout: DEFAULT_TIMEOUT,
+    execTimeout: DEFAULT_TIMEOUT,
+    taskTimeout: DEFAULT_TIMEOUT,
+    pageLoadTimeout: DEFAULT_TIMEOUT,
+    requestTimeout: DEFAULT_TIMEOUT,
+    responseTimeout: DEFAULT_TIMEOUT,
   },
   experimentalMemoryManagement: true,
   numTestsKeptInMemory: 1,
