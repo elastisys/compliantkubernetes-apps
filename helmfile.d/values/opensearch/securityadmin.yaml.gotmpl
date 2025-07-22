@@ -100,8 +100,12 @@ securityConfig:
         - cluster:admin/opensearch/notifications/*
       index_permissions:
         - index_patterns:
+            {{- if .Values.opensearch.indexPerNamespace }}
+            - '/^(?!kube-system|gatekeeper-system|other|authlog|\.).*/'
+            {{- else }}
             - kubernetes-*
             - kubeaudit-*
+            {{- end }}
           allowed_actions:
             - indices_monitor
             - indices:admin/aliases/get
