@@ -11,7 +11,11 @@ describe('grafana dev dashboards', function () {
   })
 
   beforeEach(function () {
-    cy.grafanaDexStaticLogin(`${this.ingress}/dashboards`)
+    cy.session([`${this.ingress}/dashboards`], () => {
+      cy.grafanaDexExtraStaticLogin(`${this.ingress}/dashboards`, 'dev@example.com')
+    })
+
+    cy.visit(`https://${this.ingress}/dashboards`)
   })
 
   after(() => {
