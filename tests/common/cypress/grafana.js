@@ -15,6 +15,8 @@ Cypress.Commands.add('testGrafanaDashboard', (ingress, dashboardName, expandRows
   // Navigate to the dashboard
   cy.contains(dashboardName).click()
 
+  cy.intercept('POST', '/api/ds/query**').as('query')
+
   // Wait for the dashboard to load
   cy.contains(dashboardName)
 
@@ -31,16 +33,18 @@ Cypress.Commands.add('testGrafanaDashboard', (ingress, dashboardName, expandRows
 
   // Expand all dashboard rows
   if (expandRows === true) {
-    cy.get('[data-testid="dashboard-row-container"] > [aria-expanded="false"]').each((element) => {
-      cy.wrap(element).click()
+    cy.get('[aria-label="Expand row"]').each((element) => {
+      cy.wrap(element).click({ force: true })
     })
   }
 
-  // Wait for dashboards to load: loading indicators should appear, but then begone
-  cy.get('[aria-label="Refresh"]').should('exist').as('refresh')
-  cy.get('@refresh').click()
-  cy.get('[aria-label="Panel loading bar"]').should('exist')
-  cy.get('[aria-label="Panel loading bar"]').should('not.exist')
+  // Wait for the first Datasource query to complete just to be on the safe side
+  cy.wait('@query').its('response.statusCode').should('eq', 200)
+
+  // Wait for panels to load - all panel divs should have descendants
+  cy.get('[data-testid~="panel"][data-testid~="content"]').each(($div) => {
+    cy.wrap($div).find('>div').should('exist')
+  })
 
   // After all graphs have loaded, search for text
   // Some dashboards will contain "No data" because an overwrite for NaN or Null doesn't exist
