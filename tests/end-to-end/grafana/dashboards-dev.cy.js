@@ -31,7 +31,7 @@ describe('grafana dev dashboards', function () {
   // })
 
   it('open the Trivy Operator Dashboard', function () {
-    cy.testGrafanaDashboard(this.ingress, 'Trivy Operator Dashboard', false)
+    cy.testGrafanaDashboard(this.ingress, 'Trivy Operator Dashboard', true)
 
     cy.get('[data-testid="data-testid Panel menu Security Overview"]').should('exist')
   })
