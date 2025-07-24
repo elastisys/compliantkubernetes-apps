@@ -2356,6 +2356,15 @@ properties:
             type: number
           resources:
             $ref: '#/$defs/kubernetesResourceRequirements'
+          extraEnvVars:
+            type: array
+            items:
+              type: object
+              properties:
+                name:
+                  type: string
+                value:
+                  type: string
         type: object
       exporter:
         title: Exporter Config

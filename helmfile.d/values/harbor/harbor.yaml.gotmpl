@@ -235,6 +235,7 @@ trivy:
   nodeSelector: {{- toYaml .Values.harbor.nodeSelector | nindent 4 }}
   affinity:     {{- toYaml .Values.harbor.trivy.affinity | nindent 4 }}
   tolerations:  {{- toYaml .Values.harbor.tolerations | nindent 4 }}
+  extraEnvVars: {{- toYaml .Values.harbor.trivy.extraEnvVars | nindent 4 }}
   {{- with .Values.images | dig "harbor" "trivyAdapter" "" }}
   {{- with merge (include "container_uri.parse" . | fromJson) $global }}
   image:
