@@ -36,7 +36,7 @@ Cypress.Commands.add('harborStaticDexLogin', (ingress) => {
   cy.contains('dex-static-user').should('exist')
 })
 
-Cypress.Commands.add('harborStaticDexPromote', (ingress) => {
+Cypress.Commands.add('harborStaticDexPromote', () => {
   cy.contains('Users').click()
 
   cy.contains('admin@example.com')

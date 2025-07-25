@@ -21,7 +21,7 @@ describe('harbor ui', () => {
         cy.contains('LOGIN VIA LOCAL DB', opt)
         cy.harborAdminLogin(this.ingress)
 
-        cy.harborStaticDexPromote(this.ingress)
+        cy.harborStaticDexPromote()
       })
   })
 
