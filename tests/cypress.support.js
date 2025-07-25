@@ -17,6 +17,10 @@ const yqArgsToConfigFiles = function (cluster, expression) {
   return `${configPath}/defaults/common-config.yaml ${configPath}/defaults/${cluster}-config.yaml ${configPath}/common-config.yaml ${configPath}/${cluster}-config.yaml`
 }
 
+const userToSession = function (user) {
+  return user.replace(/[^a-zA-Z]+/g, '-').replace(/^-+|-+$/g, '')
+}
+
 // Available as cy.yq("sc|wc", "expression") merge first then expression
 // More correct than yqDig for complex data such as maps that can be merged
 Cypress.Commands.add('yq', (cluster, expression) => {
@@ -125,19 +129,19 @@ Cypress.Commands.add(
   function ({ cluster, user, url, refresh = true, checkAdmin = true }) {
     if (checkAdmin) {
       cy.yqDigParse(cluster, '.user.adminUsers').then((adminUsers) => {
-        if (!adminUsers.includes('dev@example.com')) {
+        if (!adminUsers.includes(user)) {
           cy.fail(
-            'dev@example.com not found in .user.adminUsers\n' +
+            `${user} not found in .user.adminUsers\n` +
               `Please add it and run 'ck8s ops helmfile ${cluster} -lapp=dev-rbac apply' to update the RBAC rules.`
           )
         }
       })
     }
 
-    cy.withTestKubeconfig({ cluster, user, url, refresh }).then(() => {
+    cy.withTestKubeconfig({ cluster, session: userToSession(user), url, refresh }).then(() => {
       cy.task('wrapProxy', Cypress.env('KUBECONFIG')).then((dex_url) => {
         cy.visit(`${dex_url}`)
-        cy.dexExtraStaticLogin('dev@example.com')
+        cy.dexExtraStaticLogin(user)
       })
     })
   }
@@ -145,17 +149,17 @@ Cypress.Commands.add(
 
 Cypress.Commands.add('cleanupProxy', function ({ cluster, user }) {
   cy.task('pKill', 'kubeproxy-wrapper.sh')
-  cy.deleteTestKubeconfig({ cluster, user })
+  cy.deleteTestKubeconfig({ cluster, session: userToSession(user) })
 })
 
-Cypress.Commands.add('withTestKubeconfig', function ({ cluster, user, url = null, refresh }) {
+Cypress.Commands.add('withTestKubeconfig', function ({ cluster, session, url = null, refresh }) {
   const config_base = Cypress.env('CK8S_CONFIG_PATH') + '/.state/kube_config'
   const base_kubeconfig = `${config_base}_${cluster}.yaml`
-  const user_kubeconfig = `${config_base}_${cluster}_${user}.yaml`
+  const user_kubeconfig = `${config_base}_${cluster}_${session}.yaml`
   Cypress.env('KUBECONFIG', user_kubeconfig)
 
   let userArgs = [
-    `--token-cache-dir=~/.kube/cache/oidc-login/test-${user}`,
+    `--token-cache-dir=~/.kube/cache/oidc-login/test-${session}`,
     '--skip-open-browser',
     '--force-refresh',
   ]
@@ -168,12 +172,12 @@ Cypress.Commands.add('withTestKubeconfig', function ({ cluster, user, url = null
   ).its('stdout')
 
   if (refresh) {
-    cy.exec(`rm -rf ~/.kube/cache/oidc-login/test-${user}`)
+    cy.exec(`rm -rf ~/.kube/cache/oidc-login/test-${session}`)
   }
 })
 
-Cypress.Commands.add('deleteTestKubeconfig', function ({ cluster, user }) {
+Cypress.Commands.add('deleteTestKubeconfig', function ({ cluster, session }) {
   const test_kubeconfig =
-    Cypress.env('CK8S_CONFIG_PATH') + `/.state/kube_config_${cluster}_${user}.yaml`
+    Cypress.env('CK8S_CONFIG_PATH') + `/.state/kube_config_${cluster}_${session}.yaml`
   cy.exec(`rm ${test_kubeconfig}`)
 })
