@@ -1,5 +1,5 @@
 // Available as cy.testGrafanaDashboard("grafana.example.com", "the names of the Grafana dashboard", "to look for and expandRows rows", "the no of completed api req to wait")
-Cypress.Commands.add('testGrafanaDashboard', (ingress, dashboardName, expandRows) => {
+Cypress.Commands.add('testGrafanaDashboard', (dashboardName, expandRows) => {
   // View and load as much of the dashboard as possible
   cy.viewport(1920, 2560)
 
