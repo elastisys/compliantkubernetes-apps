@@ -15,8 +15,8 @@ teardown_file() {
   cypress_teardown
 }
 
-@test "grafana dev dashboards   //open the Backup status dashboard" {
-  cypress_test "grafana dev dashboards   //open the Backup status dashboard"
+@test "grafana dev dashboards open the Backup status dashboard" {
+  cypress_test "grafana dev dashboards open the Backup status dashboard"
 }
 
 @test "grafana dev dashboards open the Trivy Operator Dashboard" {
