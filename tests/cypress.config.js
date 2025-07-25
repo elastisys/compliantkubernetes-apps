@@ -58,7 +58,7 @@ module.exports = defineConfig({
     fixturesFolder: false,
     screenshotOnRunFailure: false,
     specPattern: '**.cy.js',
-    supportFile: 'cypress.support.js',
+    supportFile: 'common/cypress/support.js',
     defaultCommandTimeout: DEFAULT_TIMEOUT,
     execTimeout: DEFAULT_TIMEOUT,
     taskTimeout: DEFAULT_TIMEOUT,
