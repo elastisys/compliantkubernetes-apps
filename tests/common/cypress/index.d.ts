@@ -51,7 +51,7 @@ declare namespace Cypress {
      * @example
      * cy.visitProxied({
      *   cluster: 'wc',
-     *   user: 'static-dev',
+     *   user: 'dev@example.com',
      *   url: 'http://127.0.0.1:8001/api/v1/namespaces/monitoring/services/kube-prometheus-stack-prometheus:9090/proxy/targets?pool=serviceMonitor%2Fmonitoring%2Fkube-prometheus-stack-apiserver%2F0',
      *   refresh: true,
      *   checkAdmin: true,
@@ -67,26 +67,26 @@ declare namespace Cypress {
 
     /**
      * @example
-     * cy.cleanupProxy({ cluster: 'sc', user: 'static-admin' })
+     * cy.cleanupProxy({ cluster: 'sc', user: 'dev@example.com' })
      */
     cleanupProxy(args: { cluster: Cluster; user: string }): Chainable<any>
 
     /**
      * @example
-     * cy.withTestKubeconfig('sc', 'static-admin', true)
+     * cy.withTestKubeconfig({ cluster: 'sc', session: 'static-admin', refresh: true })
      */
     withTestKubeconfig(args: {
       cluster: Cluster
-      user: string
+      session: string
       url?: string
       refresh: boolean
     }): Chainable<string>
 
     /**
      * @example
-     * cy.deleteTestKubeconfig({ cluster: 'sc', user: 'static-admin' })
+     * cy.deleteTestKubeconfig({ cluster: 'sc', session: 'static-admin' })
      */
-    deleteTestKubeconfig(args: { cluster: Cluster; user: string }): Chainable<any>
+    deleteTestKubeconfig(args: { cluster: Cluster; session: string }): Chainable<any>
 
     /**
      * @example
