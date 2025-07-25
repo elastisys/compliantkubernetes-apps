@@ -25,7 +25,7 @@ describe('harbor ui', function () {
 
         cy.harborAdminLogin(this.ingress)
 
-        cy.harborStaticDexPromote(this.ingress)
+        cy.harborStaticDexPromote()
       })
   })
 
