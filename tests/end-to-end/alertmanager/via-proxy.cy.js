@@ -1,7 +1,5 @@
 describe('alertmanager', function () {
   it('can be accessed via kubectl proxy', () => {
-    cy.intercept('/api/**').as('api')
-
     cy.visitProxied({
       cluster: 'wc',
       user: 'dev@example.com',
