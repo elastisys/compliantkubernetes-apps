@@ -91,14 +91,10 @@ after the separator.
 {{ with include "gen.reg-rep-img" . }}{{ . }}{{ end }}{{ if or .tag .digest }}:{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}{{ end }}
 {{- end }}
 
-{{- define "objectStorage.accessKey" -}}
-{{- $component := .component -}}
-{{- $ctx := .ctx -}}
-{{- dig $component "objectStorage" "s3" "accessKey" $ctx.Values | default (dig "objectStorage" "s3" "accessKey" $ctx.Values) | quote }}
-{{- end }}
-
-{{- define "objectStorage.secretKey" -}}
-{{- $component := .component -}}
-{{- $ctx := .ctx -}}
-{{- dig $component "objectStorage" "s3" "secretKey" $ctx.Values | default (dig "objectStorage" "s3" "secretKey" $ctx.Values) | quote }}
+{{- define "componentObjectStorage" -}}
+{{- $component := index . 0 -}}
+{{- $key := index . 1 -}}
+{{- $ctx := index . 2 -}}
+{{- $default := $ctx.Values | dig "objectStorage" "s3" $key "" -}}
+{{- $ctx.Values | dig $component "objectStorage" "s3" $key $default | quote }}
 {{- end }}
