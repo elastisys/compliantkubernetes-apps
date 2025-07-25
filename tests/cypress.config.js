@@ -39,8 +39,8 @@ module.exports = defineConfig({
           return new Promise((resolve) => {
             proxy.stdout.on('data', (data) => {
               if (data.includes(PROXY_READY_MARKER)) {
-                const redirectUrl = data.toString().split(' ')[1]
-                resolve(redirectUrl)
+                const dexUrl = data.toString().split(' ')[1]
+                resolve(dexUrl)
               }
             })
           })

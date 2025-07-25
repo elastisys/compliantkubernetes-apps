@@ -34,8 +34,8 @@ curl_pid=$!
 # wait until port 8000 is open
 for _ in $(seq 1 30); do
   if nc -z 127.0.0.1 8000; then
-    redir_url="$(curl --silent -i http://127.0.0.1:8000/ | grep --only-matching --perl-regexp 'Location: \K.+')"
-    echo "$PROXY_READY_MARKER $redir_url"
+    dex_url="$(curl --silent -i http://127.0.0.1:8000/ | grep --only-matching --perl-regexp 'Location: \K.+')"
+    echo "$PROXY_READY_MARKER $dex_url"
     break
   fi
   sleep 1
