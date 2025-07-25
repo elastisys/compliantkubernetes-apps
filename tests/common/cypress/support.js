@@ -122,7 +122,7 @@ Cypress.Commands.add('dexExtraStaticLogin', (email) => {
 
 Cypress.Commands.add(
   'visitProxied',
-  function ({ cluster, user, url, refresh, checkAdmin = false }) {
+  function ({ cluster, user, url, refresh = true, checkAdmin = true }) {
     if (checkAdmin) {
       cy.yqDigParse(cluster, '.user.adminUsers').then((adminUsers) => {
         if (!adminUsers.includes('dev@example.com')) {
