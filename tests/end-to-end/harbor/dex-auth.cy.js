@@ -23,6 +23,6 @@ describe('harbor dex auth', function () {
 
     cy.harborAdminLogin(this.ingress)
 
-    cy.harborStaticDexPromote(this.ingress)
+    cy.harborStaticDexPromote()
   })
 })

@@ -19,7 +19,7 @@ describe('grafana admin dashboards', function () {
   })
 
   it('open the Backup status dashboard', function () {
-    cy.testGrafanaDashboard(this.ingress, 'Backup status', false)
+    cy.testGrafanaDashboard('Backup status', false)
 
     cy.get(
       '[data-testid="data-testid dashboard-row-title-Time since last successful backup"]'
@@ -27,13 +27,13 @@ describe('grafana admin dashboards', function () {
   })
 
   it('open the Trivy Operator Dashboard', function () {
-    cy.testGrafanaDashboard(this.ingress, 'Trivy Operator Dashboard', false)
+    cy.testGrafanaDashboard('Trivy Operator Dashboard', false)
 
     cy.get('[data-testid="data-testid Panel menu Security Overview"]').should('exist')
   })
 
   it('open the NetworkPolicy Dashboard', function () {
-    cy.testGrafanaDashboard(this.ingress, 'NetworkPolicy Dashboard', false)
+    cy.testGrafanaDashboard('NetworkPolicy Dashboard', false)
 
     cy.get(
       '[data-testid="data-testid Panel menu Packets allowed by NetworkPolicy going from pod"]'
@@ -41,25 +41,25 @@ describe('grafana admin dashboards', function () {
   })
 
   it('open the Kubernetes cluster status dashboard', function () {
-    cy.testGrafanaDashboard(this.ingress, 'Kubernetes cluster status', false)
+    cy.testGrafanaDashboard('Kubernetes cluster status', false)
 
     cy.get('[data-testid="data-testid Panel menu Running pods not ready"]').should('exist')
   })
 
   it('open the Gatekeeper dashboard', function () {
-    cy.testGrafanaDashboard(this.ingress, 'Gatekeeper', false)
+    cy.testGrafanaDashboard('Gatekeeper', false)
 
     cy.get('[data-testid="data-testid Panel header Gatekeeper logs"]').should('exist')
   })
 
   it('open the NGINX Ingress controller dashboard', function () {
-    cy.testGrafanaDashboard(this.ingress, 'NGINX Ingress controller', false)
+    cy.testGrafanaDashboard('NGINX Ingress controller', false)
 
     cy.get('[data-testid="data-testid Panel header Controller Request Volume"]').should('exist')
   })
 
   it('open the Falco dashboard', function () {
-    cy.testGrafanaDashboard(this.ingress, 'Falco', false)
+    cy.testGrafanaDashboard('Falco', false)
 
     cy.get('[data-testid="data-testid Panel header Falco logs"]').should('exist')
   })
