@@ -188,6 +188,7 @@ The following template can be used to define tests, except for the test definiti
 
 Cypress have an extensive [documentation](https://docs.cypress.io) for writing tests.
 We currently import our own [`support.js`](common/cypress/support.js) support file that provides helper functions available using the `cy` object from within tests.
+IDE type checking for support functions is provided by adding stubs to the [`index.d.ts`](common/cypress/index.d.ts) file.
 
 The makefile will generate bats files to run the cypress to integrate both into the same test harness.
 
