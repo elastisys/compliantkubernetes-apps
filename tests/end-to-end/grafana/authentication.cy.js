@@ -29,7 +29,7 @@ describe('grafana admin authentication', () => {
   it('can login via static dex user', function () {
     cy.continueOn('sc', '.dex.enableStaticLogin')
 
-    cy.yqDigParse('sc', '.grafana.ops.oidc.allowedDomains').then((domains) => {
+    cy.yqDigParse('sc', '.grafana.ops.oidc.allowedDomains').then(function (domains) {
       if (!domains.includes('example.com')) {
         this.skip('example.com not set in .grafana.ops.oidc.allowedDomains')
       }
@@ -78,7 +78,7 @@ describe('grafana dev authentication', function () {
   it('can login via static dex user', function () {
     cy.continueOn('sc', '.dex.enableStaticLogin')
 
-    cy.yqDigParse('sc', '.grafana.user.oidc.allowedDomains').then((domains) => {
+    cy.yqDigParse('sc', '.grafana.user.oidc.allowedDomains').then(function (domains) {
       if (!domains.includes('example.com')) {
         this.skip('example.com not set in .grafana.user.oidc.allowedDomains')
       }
