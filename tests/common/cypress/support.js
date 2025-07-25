@@ -135,8 +135,8 @@ Cypress.Commands.add(
     }
 
     cy.withTestKubeconfig({ cluster, user, url, refresh }).then(() => {
-      cy.task('wrapProxy', Cypress.env('KUBECONFIG')).then((redir_url) => {
-        cy.visit(`${redir_url}`)
+      cy.task('wrapProxy', Cypress.env('KUBECONFIG')).then((dex_url) => {
+        cy.visit(`${dex_url}`)
         cy.dexExtraStaticLogin('dev@example.com')
       })
     })
