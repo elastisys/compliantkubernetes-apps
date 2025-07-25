@@ -1,24 +1,27 @@
 /// <reference types="cypress" />
 
 declare namespace Cypress {
+  type Cluster = 'sc' | 'wc'
+  type GrafanaRole = 'Admin' | 'Editor' | 'Viewer'
+
   interface Chainable<Subject> {
     /**
      * @example
      *  cy.yq('sc', '.harbor.subdomain')
      */
-    yq(cluster: string, expression: string): Chainable<string>
+    yq(cluster: Cluster, expression: string): Chainable<string>
 
     /**
      * @example
      *  cy.yqDig('sc', '.grafana.ops.trailingDots')
      */
-    yqDig(cluster: string, expression: string): Chainable<string>
+    yqDig(cluster: Cluster, expression: string): Chainable<string>
 
     /**
      * @example
      * cy.yqDigParse('sc', '.grafana.user.oidc.allowedDomains')
      */
-    yqDigParse(cluster: string, expression: string): Chainable<any>
+    yqDigParse(cluster: Cluster, expression: string): Chainable<any>
 
     /**
      * @example
@@ -30,7 +33,7 @@ declare namespace Cypress {
      * @example
      * cy.continueOn('sc', '.harbor.enabled')
      */
-    continueOn(cluster: string, expression: string): Chainable<any>
+    continueOn(cluster: Cluster, expression: string): Chainable<any>
 
     /**
      * @example
@@ -55,7 +58,7 @@ declare namespace Cypress {
      * })
      */
     visitProxied(args: {
-      cluster: string
+      cluster: Cluster
       user: string
       url: string
       refresh: boolean
@@ -66,14 +69,14 @@ declare namespace Cypress {
      * @example
      * cy.cleanupProxy({ cluster: 'sc', user: 'static-admin' })
      */
-    cleanupProxy(args: { cluster: string; user: string }): Chainable<any>
+    cleanupProxy(args: { cluster: Cluster; user: string }): Chainable<any>
 
     /**
      * @example
      * cy.withTestKubeconfig('sc', 'static-admin', true)
      */
     withTestKubeconfig(args: {
-      cluster: string
+      cluster: Cluster
       user: string
       url?: string
       refresh: boolean
@@ -83,6 +86,59 @@ declare namespace Cypress {
      * @example
      * cy.deleteTestKubeconfig({ cluster: 'sc', user: 'static-admin' })
      */
-    deleteTestKubeconfig(args: { cluster: string; user: string }): Chainable<any>
+    deleteTestKubeconfig(args: { cluster: Cluster; user: string }): Chainable<any>
+
+    /**
+     * @example
+     * cy.testGrafanaDashboard('Kubernetes cluster status', false)
+     */
+    testGrafanaDashboard(dashboardName: string, expandRows: boolean): Chainable<any>
+
+    /**
+     * @example
+     * cy.grafanaDexStaticLogin('https://grafana.domain')
+     */
+    grafanaDexStaticLogin(ingress: string, cacheSession?: boolean): Chainable<any>
+
+    /**
+     * @example
+     * cy.grafanaDexExtraStaticLogin('https://grafana.domain', 'dev@example.com')
+     */
+    grafanaDexExtraStaticLogin(ingress: string, staticUser: string): Chainable<any>
+
+    /**
+     * @example
+     * cy.grafanaSetRole('https://grafana.domain', '.user.grafanaPassword', 'dev@example.com', 'Admin')
+     */
+    grafanaSetRole(
+      ingress: string,
+      adminPasswordKey: string,
+      user: string,
+      role: GrafanaRole
+    ): Chainable<any>
+
+    /**
+     * @example
+     * cy.grafanaCheckRole('https://grafana.domain', 'dev@example.com', 'Admin')
+     */
+    grafanaCheckRole(ingress: string, user: string, role: GrafanaRole): Chainable<any>
+
+    /**
+     * @example
+     * cy.harborAdminLogin('https://harbor.domain')
+     */
+    harborAdminLogin(ingress: string): Chainable<any>
+
+    /**
+     * @example
+     * cy.harborStaticDexLogin('https://harbor.domain')
+     */
+    harborStaticDexLogin(ingress: string): Chainable<any>
+
+    /**
+     * @example
+     * cy.harborStaticDexPromote()
+     */
+    harborStaticDexPromote(): Chainable<any>
   }
 }
