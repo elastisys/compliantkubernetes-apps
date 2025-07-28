@@ -12,3 +12,6 @@ rules:
 - apiGroups: ["monitoring.coreos.com"]
   resources: ["servicemonitors", "podmonitors", "prometheusrules", "probes"]
   verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: [""]
+  resources: ["pods/ephemeralcontainers"]
+  verbs: ["patch"]

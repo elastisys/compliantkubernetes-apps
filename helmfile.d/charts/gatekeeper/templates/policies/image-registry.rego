@@ -73,3 +73,18 @@ get_init_containers = res {
     input.review.object.kind == "CronJob"
     res := input.review.object.spec.jobTemplate.spec.template.spec.initContainers
 }
+
+# Ephemeral containers
+violation[{"msg": msg}] {
+  container := get_ephemeral_containers[_]
+
+  satisfied := [good | repo = input.parameters.repos[_]; good = startswith(container.image, repo)]
+  not any(satisfied)
+
+  msg := sprintf("The ephemeral container named <%v> does not have an allowed image registry <%v>, allowed registries are <%v>. Elastisys Welkin® requires that all images come from trusted registries. Read more at https://elastisys.io/welkin/user-guide/safeguards/enforce-trusted-registries/", [container.name, container.image, input.parameters.repos])
+}
+
+get_ephemeral_containers = res {
+  input.review.object.kind == "Pod"
+  res := input.review.object.spec.ephemeralContainers
+}
