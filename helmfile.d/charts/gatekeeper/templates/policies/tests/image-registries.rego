@@ -128,6 +128,23 @@ generate_cronJob_with_initContainer(repos, containers, initContainers) = obj {
     }
 }
 
+generate_pod_with_ephemeralContainer(repos, containers, ephemeralContainers) = obj {
+    obj := {
+        "parameters": {
+            "repos": repos
+        },
+        "review": {
+            "object": {
+                "kind": "Pod",
+                "spec": {
+                    "containers": containers,
+                    "ephemeralContainers": ephemeralContainers
+                }
+            }
+        }
+    }
+}
+
 #
 # Tests
 #
@@ -557,5 +574,29 @@ test_cronJob_multiple_containers_and_initContainers_deny {
                 "image": "harbor.bad.com/test/ubuntu"
             }
         ],
+    )
+}
+
+test_pod_bad_ephemeralContainer_deny {
+    count(k8sallowedrepos.violation) == 1 with input as generate_pod_with_ephemeralContainer(
+        ["harbor.example.com"],
+        [
+            { "name": "main", "image": "harbor.example.com/app:latest" }
+        ],
+        [
+            { "name": "debug", "image": "bad.registry.com/debug:latest" }
+        ]
+    )
+}
+
+test_pod_good_ephemeralContainer_allow {
+    count(k8sallowedrepos.violation) == 0 with input as generate_pod_with_ephemeralContainer(
+        ["harbor.example.com"],
+        [
+            { "name": "main", "image": "harbor.example.com/app:latest" }
+        ],
+        [
+            { "name": "debug", "image": "harbor.example.com/debug-tool:latest" }
+        ]
     )
 }
