@@ -12,6 +12,8 @@ set -euo pipefail
 declare tests
 tests="$(dirname "$(dirname "$(readlink -f "$0")")")"
 
+declare linked="0"
+
 cleanup() {
   if [[ "$linked" == "1" ]]; then
     rm -f "${tests}/node_modules"
@@ -19,11 +21,18 @@ cleanup() {
 }
 trap cleanup EXIT INT TERM
 
+is_jammy() {
+  [[ -f /etc/os-release ]] && [[ "$(grep -oP 'VERSION_ID="\K[^"]+' /etc/os-release)" == "22.04" ]]
+}
+
 checker=""
 command -v tsc >/dev/null 2>&1 && checker="tsc"
-command -v tsgo >/dev/null 2>&1 && checker="tsgo"
 
-linked="0"
+# Ubuntu 22.04 doesn't like native typescript, so just use 'tsc'
+if ! is_jammy; then
+  command -v tsgo >/dev/null 2>&1 && checker="tsgo"
+fi
+
 if [[ ! -e "${tests}/node_modules" ]]; then
   ln -sf "$(dirname "$(which $checker)")/../lib/node_modules" "${tests}/node_modules"
   linked="1"
