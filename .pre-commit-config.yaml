@@ -95,7 +95,6 @@ repos:
         files: '.*\.cy.js'
         language: node
         require_serial: true
-        additional_dependencies: ["typescript@5.8.3", "@typescript/native-preview@7.0.0-dev.20250724.1", "cypress@13.14.1" ]
         entry: tests/common/typecheck.bash
 
   - repo: https://github.com/codespell-project/codespell
@@ -103,7 +102,7 @@ repos:
     hooks:
       - id: codespell
         name: check spelling
-        exclude: ^helmfile\.d/charts/hnc/config-and-crds/crds/|^helmfile\.d/upstream/
+        exclude: ^helmfile\.d/charts/hnc/config-and-crds/crds/|^helmfile\.d/upstream/|tests/package-lock.json
         args:
           - -I
           - .codespellignore
