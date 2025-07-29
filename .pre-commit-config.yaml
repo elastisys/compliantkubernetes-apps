@@ -19,6 +19,20 @@ repos:
         language: pygrep
         types: [text]
 
+      - id: main-migration-snippet-version-target
+        name: Either suffix migration snippets with "-all-versions.sh" or "-one-version.sh"
+        entry: |-
+          If the migration suffix is "-all-versions.sh" then it should be applicable to all versions of Welkin.
+          Then it will also be retained once a new version of Welkin is cut.
+
+          If the migration suffix is "-one-version.sh" then it should only be applicable to the next version of Welkin.
+          Then it will also be pruned once a new version of Welkin is cut.
+
+          See the migration/README.md for more detailed instructions on how to write migrations.
+        language: fail
+        files: '^migration/main/(apply|prepare)/.*\.sh$'
+        exclude: '^migration/main/(apply|prepare)/(00-template|.*-all-versions|.*-one-version)\.sh$'
+
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.6.0
     hooks:
