@@ -83,10 +83,10 @@ const assertNoDrops = (res, metricType, direction) => {
 
   const result = res.body.data.result
 
-  const toWorkloadDrops = result.filter(filterDrops(metricType)).map(mapDrops)
+  const drops = result.filter(filterDrops(metricType)).map(mapDrops)
 
-  if (toWorkloadDrops.length > 0) {
-    cy.fail(formatError(toWorkloadDrops, direction))
+  if (drops.length > 0) {
+    cy.fail(formatError(drops, direction))
   }
 }
 
