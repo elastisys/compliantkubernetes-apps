@@ -98,17 +98,12 @@ RUN git clone --depth 1 https://github.com/elastisys/welkin.git "${DOCS_PATH}" &
 FROM unit AS main
 
 RUN apt-get update && \
-    apt-get install -y buildah docker.io flatpak-xdg-utils libasound2t64 libatk1.0-0 libatk-bridge2.0-0 libcanberra-gtk-module libcanberra-gtk3-module libcups2 libgbm-dev libgbm1 libglib2.0-0 libgtk2.0-0 libgtk2.0-0t64 libgtk-3-0 libgtk-3-0t64 libnotify-dev libnss3 libxss1 libxtst6 podman-remote skopeo xauth xvfb && \
+    apt-get install -y buildah docker.io npm flatpak-xdg-utils libasound2t64 libatk1.0-0 libatk-bridge2.0-0 libcanberra-gtk-module libcanberra-gtk3-module libcups2 libgbm-dev libgbm1 libglib2.0-0 libgtk2.0-0 libgtk2.0-0t64 libgtk-3-0 libgtk-3-0t64 libnotify-dev libnss3 libxss1 libxtst6 podman-remote skopeo xauth xvfb && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
     ln -s /usr/bin/podman-remote /usr/bin/podman && \
     mv /usr/bin/xdg-open /usr/bin/xdg-open-backup && \
     ln -s /usr/libexec/flatpak-xdg-utils/xdg-open /usr/bin/xdg-open
-
-ARG CYPRESS_VERSION="13.14.1"
-ENV CYPRESS_CACHE_FOLDER="/usr/local/lib/cypress"
-RUN npm install --global "cypress@${CYPRESS_VERSION}" && \
-    chmod --recursive a+w "${CYPRESS_CACHE_FOLDER}"
 
 ARG KIND_VERSION="0.27.0"
 RUN curl -LOs "https://github.com/kubernetes-sigs/kind/releases/download/v${KIND_VERSION}/kind-linux-amd64" && \
@@ -120,3 +115,10 @@ RUN curl -LOs "https://github.com/vmware-tanzu/velero/releases/download/v${VELER
     tar -zxvf "velero-v${VELERO_VERSION}-linux-amd64.tar.gz" "velero-v${VELERO_VERSION}-linux-amd64" && \
     install -Tm 755 "velero-v${VELERO_VERSION}-linux-amd64/velero" /usr/local/bin/velero && \
     rm -r "velero-v${VELERO_VERSION}-linux-amd64.tar.gz" "velero-v${VELERO_VERSION}-linux-amd64"
+
+WORKDIR /welkin-test
+COPY ./tests/package.json ./tests/package-lock.json ./
+RUN npm install -g --omit dev
+ENV PATH="$PATH:/usr/local/lib/node_modules/welkin-test/node_modules/.bin"
+ENV CYPRESS_CACHE_FOLDER=/usr/local/lib/cypress
+RUN cypress install && cypress verify
