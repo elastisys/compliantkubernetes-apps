@@ -190,6 +190,12 @@ Cypress have an extensive [documentation](https://docs.cypress.io) for writing t
 We currently import our own [`support.js`](common/cypress/support.js) support file that provides helper functions available using the `cy` object from within tests.
 IDE type checking for support functions is provided by adding stubs to the [`index.d.ts`](common/cypress/index.d.ts) file.
 
+When developing cypress tests you should install the dependencies to make sure that everyone is using the same version of the development tools:
+
+```bash
+npm install
+```
+
 The makefile will generate bats files to run the cypress to integrate both into the same test harness.
 
 ### Writing template tests
