@@ -95,7 +95,7 @@ repos:
         files: '.*\.cy.js'
         language: node
         require_serial: true
-        additional_dependencies: [ "@typescript/native-preview@7.0.0-dev.20250724.1", "cypress@13.14.1" ]
+        additional_dependencies: ["typescript@5.8.3", "@typescript/native-preview@7.0.0-dev.20250724.1", "cypress@13.14.1" ]
         entry: tests/common/typecheck.bash
 
   - repo: https://github.com/codespell-project/codespell
