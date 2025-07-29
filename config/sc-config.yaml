@@ -379,6 +379,13 @@ harbor:
       limits:
         cpu: 400m
         memory: 512Mi
+    # Can be used to add mirrors from where trivy updates its' vulnerability DB
+    # example:
+    # extraEnvVars:
+    #   - name: SCANNER_TRIVY_DB_REPOSITORY
+    #     value: public.ecr.aws/aquasecurity/trivy-db,mirror.gcr.io/aquasec/trivy-db
+    #   - name: SCANNER_TRIVY_JAVA_DB_REPOSITORY
+    #     value: public.ecr.aws/aquasecurity/trivy-java-db,mirror.gcr.io/aquasec/trivy-db
     extraEnvVars: []
     affinity:
       podAntiAffinity:
