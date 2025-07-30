@@ -94,6 +94,14 @@ ENV DOCS_PATH="/usr/local/share/docs"
 RUN git clone --depth 1 https://github.com/elastisys/welkin.git "${DOCS_PATH}" && \
     chmod --recursive a+w "${DOCS_PATH}"
 
+FROM ubuntu:24.04 as node-deps
+
+RUN apt-get update && apt-get install -y npm && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /welkin-test
+COPY ./tests/package.json ./tests/package-lock.json ./
+RUN npm install --global --omit dev
+
 # Container to run integration and end-to-end tests
 FROM unit AS main
 
@@ -116,9 +124,7 @@ RUN curl -LOs "https://github.com/vmware-tanzu/velero/releases/download/v${VELER
     install -Tm 755 "velero-v${VELERO_VERSION}-linux-amd64/velero" /usr/local/bin/velero && \
     rm -r "velero-v${VELERO_VERSION}-linux-amd64.tar.gz" "velero-v${VELERO_VERSION}-linux-amd64"
 
-WORKDIR /welkin-test
-COPY ./tests/package.json ./tests/package-lock.json ./
-RUN npm install --global --omit dev
-ENV PATH="$PATH:/usr/local/lib/node_modules/welkin-test/node_modules/.bin"
+COPY --from=node-deps /usr/local/lib/node_modules/welkin-test/node_modules /usr/local/lib/node_modules
+ENV PATH="$PATH:/usr/local/lib/node_modules/.bin"
 ENV CYPRESS_CACHE_FOLDER=/usr/local/lib/cypress
 RUN cypress install && cypress verify
