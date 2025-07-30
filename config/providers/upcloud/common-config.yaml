@@ -7,7 +7,7 @@ networkPolicies:
   ingressNginx:
     ingressOverride:
       enabled: true
-      # Set private IP with listen = false frim terraform.tfstate
+      # Set private IP with listen = false from terraform.tfstate
       # include public LB IPs if e.g. the following annotations are used:
       # - nginx.ingress.kubernetes.io/auth-signin
       # - nginx.ingress.kubernetes.io/auth-url
