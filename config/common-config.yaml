@@ -884,7 +884,7 @@ opa:
         memory: 150Mi
       limits:
         cpu: 400m
-        memory: 400Mi
+        memory: 500Mi
     affinity: {}
     tolerations: []
     nodeSelector: {kubernetes.io/os: linux}
@@ -897,7 +897,7 @@ opa:
         memory: 150Mi
       limits:
         cpu: 750m
-        memory: 500Mi
+        memory: 600Mi
     affinity: {}
     tolerations: []
     nodeSelector: {kubernetes.io/os: linux}
