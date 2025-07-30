@@ -118,7 +118,7 @@ RUN curl -LOs "https://github.com/vmware-tanzu/velero/releases/download/v${VELER
 
 WORKDIR /welkin-test
 COPY ./tests/package.json ./tests/package-lock.json ./
-RUN npm install -g --omit dev
+RUN npm install --global --omit dev
 ENV PATH="$PATH:/usr/local/lib/node_modules/welkin-test/node_modules/.bin"
 ENV CYPRESS_CACHE_FOLDER=/usr/local/lib/cypress
 RUN cypress install && cypress verify
