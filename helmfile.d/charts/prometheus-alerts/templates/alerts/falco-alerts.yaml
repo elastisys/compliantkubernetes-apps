@@ -22,7 +22,34 @@ spec:
         message: 'Pod: {{`{{ $labels.pod }}`}}, Rule: {{`{{ $labels.rule }}`}}'
         runbook_url: {{ .Values.runbookUrls.falco.FalcoAlert }}
       expr: |-
-        falcosecurity_falcosidekick_falco_events_total != 0
+        falcosecurity_falcosidekick_falco_events_total{priority_raw="critical"} > 0
+      labels:
+        severity: critical
+
+    - alert: FalcoAlert
+      annotations:
+        message: 'Pod: {{`{{ $labels.pod }}`}}, Rule: {{`{{ $labels.rule }}`}}'
+        runbook_url: {{ .Values.runbookUrls.falco.FalcoAlert }}
+      expr: |-
+        falcosecurity_falcosidekick_falco_events_total{priority_raw="warning"} > 0 
       labels:
         severity: warning
+    
+    - alert: FalcoAlert
+      annotations:
+        message: 'Pod: {{`{{ $labels.pod }}`}}, Rule: {{`{{ $labels.rule }}`}}'
+        runbook_url: {{ .Values.runbookUrls.falco.FalcoAlert }}
+      expr: |-
+        falcosecurity_falcosidekick_falco_events_total{priority_raw="notice"} > 0 
+      labels:
+        severity: medium
+
+    - alert: FalcoAlert
+      annotations:
+        message: 'Pod: {{`{{ $labels.pod }}`}}, Rule: {{`{{ $labels.rule }}`}}'
+        runbook_url: {{ .Values.runbookUrls.falco.FalcoAlert }}
+      expr: |-
+        falcosecurity_falcosidekick_falco_events_total{priority_raw="informational"} > 0 
+      labels:
+        severity: low
 {{- end }}
