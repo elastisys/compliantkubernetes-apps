@@ -2356,6 +2356,21 @@ properties:
             type: number
           resources:
             $ref: '#/$defs/kubernetesResourceRequirements'
+          extraEnvVars:
+            type: array
+            title: Trivy extra environment variables
+            description: |-
+                Array of additional environment variables to pass to Trivy
+            items:
+              type: object
+              title: Settings to pass to Trivy
+              description: |-
+                name/value combination
+              properties:
+                name:
+                  type: string
+                value:
+                  type: string
         type: object
       exporter:
         title: Exporter Config
