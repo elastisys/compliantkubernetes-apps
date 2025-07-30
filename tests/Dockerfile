@@ -94,7 +94,7 @@ ENV DOCS_PATH="/usr/local/share/docs"
 RUN git clone --depth 1 https://github.com/elastisys/welkin.git "${DOCS_PATH}" && \
     chmod --recursive a+w "${DOCS_PATH}"
 
-FROM ubuntu:24.04 as node-deps
+FROM ubuntu:24.04 AS node-deps
 
 RUN apt-get update && apt-get install -y npm && apt-get clean && rm -rf /var/lib/apt/lists/*
 
