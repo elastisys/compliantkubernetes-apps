@@ -29,5 +29,5 @@ if [[ -z "${checker}" ]]; then
 fi
 
 pushd "${tests}" >/dev/null 2>&1 || exit 1
-$checker
+$checker --noEmit
 popd >/dev/null 2>&1
