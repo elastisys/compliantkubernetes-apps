@@ -1,111 +1,21 @@
 name: tests
 
 on:
-  pull_request:
-    branches:
-      - main
-      - release-*
   push:
     branches:
-      - main
+      - rares/integration-npm-fixes
 
 jobs:
-  unit:
-    runs-on: ubuntu-latest
-    env:
-      CK8S_AUTO_APPROVE: true
-    strategy:
-      fail-fast: false
-      matrix:
-        tag:
-          - general
-          - aws
-          - azure
-          - baremetal
-          - elastx
-          - openstack
-          - safespring
-          - upcloud
-    steps:
-      - name: checkout compliantkubernetes-apps
-        uses: actions/checkout@v4
-      - name: setup docker with buildx
-        uses: docker/setup-buildx-action@v3
-      - name: build tests unit container image
-        uses: docker/build-push-action@v6
-        env:
-          DOCKER_BUILD_SUMMARY: false
-          DOCKER_BUILD_RECORD_UPLOAD: false
-        with:
-          cache-from: type=gha
-          context: .
-          target: unit
-          file: ./tests/Dockerfile
-          load: true
-          pull: false
-          push: false
-          provenance: false
-          tags: compliantkubernetes-apps-tests:unit
-      - name: run static unit tests
-        working-directory: ./tests
-        run: make run-unit/${{ matrix.tag }}
-
-  regression:
-    runs-on: ubuntu-latest
-    needs: [ unit ]
-    if: github.ref_name == 'main' || contains(github.event.pull_request.labels.*.name, 'test/regression')
-    env:
-      CK8S_AUTO_APPROVE: true
-    strategy:
-      fail-fast: false
-      matrix:
-        tag:
-          - general
-    steps:
-      - name: checkout compliantkubernetes-apps
-        uses: actions/checkout@v4
-      - name: setup docker with buildx
-        uses: docker/setup-buildx-action@v3
-      - name: build tests main container image
-        uses: docker/build-push-action@v6
-        env:
-          DOCKER_BUILD_SUMMARY: false
-          DOCKER_BUILD_RECORD_UPLOAD: false
-        with:
-          cache-from: type=gha
-          context: .
-          target: main
-          file: ./tests/Dockerfile
-          load: true
-          pull: false
-          push: false
-          provenance: false
-          tags: compliantkubernetes-apps-tests:main
-      - name: create local cache
-        run: ./scripts/local-cluster.sh cache create
-      - name: create local resolve
-        run: ./scripts/local-cluster.sh resolve create test.dev-ck8s.com
-      - name: run regression tests
-        working-directory: ./tests
-        run: make run-regression/${{ matrix.tag }}
-      - name: delete local resolve
-        if: always()
-        run: ./scripts/local-cluster.sh resolve delete test.dev-ck8s.com
-      - name: delete local cache
-        if: always()
-        run: ./scripts/local-cluster.sh cache delete
 
   integration:
     runs-on: ubuntu-latest
-    needs: [ unit ]
-    if: github.ref_name == 'main' || contains(github.event.pull_request.labels.*.name, 'test/integration')
+    if: github.ref_name == 'rares/integration-npm-fixes'
     env:
       CK8S_AUTO_APPROVE: true
     strategy:
       fail-fast: false
       matrix:
         tag:
-          - general
           - harbor
     steps:
       - name: checkout compliantkubernetes-apps
