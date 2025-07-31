@@ -1,5 +1,7 @@
 import '../../common/cypress/grafana.js'
 
+const DEV_USER = 'dev@example.com'
+
 describe('user grafana user promotion', function () {
   before(function () {
     cy.yq('sc', '.grafana.user.subdomain + "." + .global.baseDomain')
@@ -36,18 +38,18 @@ describe('user grafana user promotion', function () {
   })
 
   it('admin demotes dev@example.com to Viewer', function () {
-    cy.grafanaSetRole(this.ingress, '.user.grafanaPassword', 'dev@example.com', 'Viewer')
+    cy.grafanaSetRole(this.ingress, '.user.grafanaPassword', DEV_USER, 'Viewer')
 
     cy.visit(`https://${this.ingress}/logout`)
 
-    cy.grafanaCheckRole(this.ingress, 'dev@example.com', 'Viewer')
+    cy.grafanaCheckRole(this.ingress, DEV_USER, 'Viewer')
   })
 
   it('admin promotes dev@example.com to Admin', function () {
-    cy.grafanaSetRole(this.ingress, '.user.grafanaPassword', 'dev@example.com', 'Admin')
+    cy.grafanaSetRole(this.ingress, '.user.grafanaPassword', DEV_USER, 'Admin')
 
     cy.visit(`https://${this.ingress}/logout`)
 
-    cy.grafanaCheckRole(this.ingress, 'dev@example.com', 'Admin')
+    cy.grafanaCheckRole(this.ingress, DEV_USER, 'Admin')
   })
 })
