@@ -10,8 +10,8 @@ echo "Testing endpoints"
 echo "=================="
 
 base_domain=$(yq -e '.global.baseDomain' "${CONFIG_FILE}")
-enable_user_alertmanager_ingress=$(yq -e '.user.alertmanager.ingress.enabled' "${CONFIG_FILE}")
-enable_user_alertmanager=$(yq -e '.user.alertmanager.enabled' "${CONFIG_FILE}")
+enable_user_alertmanager_ingress=$(yq -e '.prometheus.devAlertmanager.ingressEnabled' "${CONFIG_FILE}" 2>/dev/null)
+enable_user_alertmanager=$(yq -e '.prometheus.devAlertmanager.enabled' "${CONFIG_FILE}" 2>/dev/null)
 
 if [[ "${enable_user_alertmanager_ingress}" == "true" && "${enable_user_alertmanager}" == "true" ]]; then
   testEndpoint Alertmanager-user "https://alertmanager.${base_domain}/"
