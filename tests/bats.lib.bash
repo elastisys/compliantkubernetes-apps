@@ -209,9 +209,10 @@ test_statefulset() {
 # note: expects with_kubeconfig and with_namespace to be set
 # usage: test_logs_contains <resource-type/name> <container> <regex>...
 test_logs_contains() {
-  run kubectl -n "${NAMESPACE}" logs "$1" grafana-sc-dashboard
+  run kubectl -n "${NAMESPACE}" logs "${1}/${2}"
+  assert_success
 
-  for arg in "${@:2}"; do
+  for arg in "${@:3}"; do
     assert_line --regexp "${arg}"
   done
 }
