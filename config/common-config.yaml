@@ -1151,10 +1151,6 @@ networkPolicies:
 
   ingressNginx:
     enabled: true
-    ingressOverride:
-      enabled: set-me
-      ips:
-        - set-me-if-(.networkPolicies.ingressNginx.ingressOverride.enabled)
 
   falco:
     enabled: true
