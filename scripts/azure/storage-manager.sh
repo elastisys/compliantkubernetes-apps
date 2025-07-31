@@ -114,19 +114,27 @@ function set_storage_account() {
   if [[ "${EXISTING_ACCOUNTS}" == "[]" ]]; then
     log_info "There are no existing storage accounts."
     log_info "Current storage account in config is ${STORAGE_ACCOUNT}."
-    log_info "Enter a new storage account name to override with, or press Enter to keep current: "
+    log_info "Enter a new storage account name to override with (lowercase letters and numbers only), or press Enter to keep current: "
     read -r name
     if [[ -n "${name}" ]]; then
-      yq -i '.objectStorage.azure.storageAccountName = "'"${name}"'"' "${CK8S_CONFIG_PATH}/common-config.yaml"
+      if [[ "${name}" =~ ^[0-9a-z]*$ ]]; then
+        yq -i '.objectStorage.azure.storageAccountName = "'"${name}"'"' "${CK8S_CONFIG_PATH}/common-config.yaml"
+      else
+        log_error "Invalid storage account name (only lowercase letters and numbers allowed), aborting"
+      fi
     fi
   else
     log_info "The following storage accounts already exist:"
     log_info "${EXISTING_ACCOUNTS}"
     log_info "Current storage account in config is ${STORAGE_ACCOUNT}."
-    log_info "Enter a storage account name to override with, or press Enter to keep current: "
+    log_info "Enter a storage account name to override with (lowercase letters and numbers only), or press Enter to keep current: "
     read -r name
     if [[ -n "${name}" ]]; then
-      yq -i '.objectStorage.azure.storageAccountName = "'"${name}"'"' "${CK8S_CONFIG_PATH}/common-config.yaml"
+      if [[ "${name}" =~ ^[0-9a-z]*$ ]]; then
+        yq -i '.objectStorage.azure.storageAccountName = "'"${name}"'"' "${CK8S_CONFIG_PATH}/common-config.yaml"
+      else
+        log_error "Invalid storage account name (only lowercase letters and numbers allowed), aborting"
+      fi
     fi
   fi
 }
