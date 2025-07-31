@@ -38,6 +38,9 @@ describe('user grafana user promotion', function () {
   })
 
   it('admin demotes dev@example.com to Viewer', function () {
+    cy.grafanaDexExtraStaticLogin(`${this.ingress}/profile`, DEV_USER)
+    cy.visit(`https://${this.ingress}/logout`)
+
     cy.grafanaSetRole(this.ingress, '.user.grafanaPassword', DEV_USER, 'Viewer')
 
     cy.visit(`https://${this.ingress}/logout`)
