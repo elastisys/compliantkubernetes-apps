@@ -17,6 +17,9 @@ export CLUSTER="ServiceCluster"
 # shellcheck source=pipeline/test/services/service-cluster/testPodsReady.sh
 source "${SCRIPTS_PATH}"/service-cluster/testPodsReady.sh
 
+# shellcheck source=pipeline/test/services/service-cluster/testHarbor.sh
+source "${SCRIPTS_PATH}"/service-cluster/testHarbor.sh
+
 # shellcheck source=pipeline/test/services/common/testPersistentVolumeClaims.sh
 source "${SCRIPTS_PATH}"/common/testPersistentVolumeClaims.sh
 
