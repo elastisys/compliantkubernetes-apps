@@ -100,7 +100,7 @@ statefulsets=(
 )
 
 if "${enable_user_alertmanager}"; then
-  statefulsets+=("alertmanager alertmanager-alertmanager")
+  statefulsets+=("alertmanager alertmanager-kube-prometheus-stack-alertmanager")
 fi
 if "${enable_fluentd}" && "${enable_fluentd_audit}"; then
   statefulsets+=("fluentd-system fluentd-aggregator")
