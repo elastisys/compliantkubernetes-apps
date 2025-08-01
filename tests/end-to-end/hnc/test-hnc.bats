@@ -15,7 +15,6 @@ setup() {
 
 @test "hnc dev can create subnamespace" {
   with_test_kubeconfig wc static-dev
-  echo "# If the test stops here go to http://localhost:8000 and log in with static email user dev@example.com" >&3
   run kubectl auth whoami
   assert_output --partial "dev@example.com"
   run kubectl apply -f - <<EOF
@@ -31,7 +30,6 @@ EOF
 
 @test "hnc subnamespace can create namespace" {
   with_test_kubeconfig wc static-dev
-  echo "# If the test stops here go to http://localhost:8000 and log in with static email user dev@example.com" >&3
   run kubectl auth whoami
   assert_output --partial "dev@example.com"
   run kubectl get ns "${NAMESPACE}"-tests-end-to-end
@@ -76,14 +74,12 @@ check_resources_exist() {
 
 @test "hnc dev can delete subnamespace" {
   with_test_kubeconfig wc static-dev
-  echo "# If the test stops here go to http://localhost:8000 and log in with static email user dev@example.com" >&3
   run kubectl delete subns "${NAMESPACE}"-tests-end-to-end --namespace "${NAMESPACE}"
   assert_success
 }
 
 @test "hnc subnamespace can delete namespace" {
   with_test_kubeconfig wc static-dev
-  echo "# If the test stops here go to http://localhost:8000 and log in with static email user dev@example.com" >&3
   # Check if the namespace still exists (it should NOT)
   run kubectl get ns "${NAMESPACE}"-tests-end-to-end
   assert_failure

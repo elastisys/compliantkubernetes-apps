@@ -148,15 +148,7 @@ Cypress.Commands.add('visitProxiedWC', function (url, user = DEV_USER) {
 Cypress.Commands.add('visitProxiedSC', function (url) {
   Cypress.env('KUBECONFIG', Cypress.env('CK8S_CONFIG_PATH') + '/.state/kube_config_sc.yaml')
   cy.task('wrapProxy', Cypress.env('KUBECONFIG')).then((dex_url) => {
-    if (dex_url === null) {
-      // pre-authenticated, attempt to visit
-      cy.visit(url)
-    } else {
-      cy.log(
-        'If this test gets stuck here for too long, visit "http://localhost:8000" in your browser in case you need to authenticate'
-      )
-      cy.visit(url, { retryOnStatusCodeFailure: true })
-    }
+    cy.visit(url, { retryOnStatusCodeFailure: dex_url !== null })
   })
 })
 

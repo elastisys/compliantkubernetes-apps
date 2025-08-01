@@ -21,7 +21,6 @@ setup() {
 }
 
 @test "ck8s diagnostics creates diagnostics file" {
-  echo "If this test gets stuck here for too long, visit \"http://localhost:8000\" in your browser in case you need to authenticate" >&3
   run ck8s diagnostics sc
   assert_success
 
@@ -43,7 +42,6 @@ setup() {
 }
 
 @test "ck8s diagnostics namespaced creates diagnostics file" {
-  echo "If this test gets stuck here for too long, visit \"http://localhost:8000\" in your browser in case you need to authenticate" >&3
   run ck8s diagnostics sc namespace ingress-nginx
   assert_success
 

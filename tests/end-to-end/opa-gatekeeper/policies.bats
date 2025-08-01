@@ -10,7 +10,6 @@ setup_file() {
   export user_demo_image="ghcr.io/elastisys/user-demo:test"
 
   with_kubeconfig wc
-  echo "# Login at http://localhost:8000 if stuck." >&3
   if ! [[ $(kubectl get ns staging -o json | jq -r '.metadata.labels["hnc.x-k8s.io/included-namespace"]') == "true" ]]; then
     fail "these tests requires that you have a 'staging' user namespace"
   fi
