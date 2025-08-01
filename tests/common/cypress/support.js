@@ -138,7 +138,7 @@ Cypress.Commands.add(
       })
     }
 
-    cy.withTestKubeconfig({ cluster, session: userToSession(user), url, refresh }).then(() => {
+    cy.withTestKubeconfig({ session: userToSession(user), url, refresh }).then(() => {
       cy.task('wrapProxy', Cypress.env('KUBECONFIG')).then((dex_url) => {
         cy.visit(`${dex_url}`)
         cy.dexExtraStaticLogin(user)
@@ -149,13 +149,15 @@ Cypress.Commands.add(
 
 Cypress.Commands.add('cleanupProxy', function ({ cluster, user }) {
   cy.task('pKill', 'kubeproxy-wrapper.sh')
-  cy.deleteTestKubeconfig({ cluster, session: userToSession(user) })
+  if (cluster === 'wc') {
+    cy.deleteTestKubeconfig(userToSession(user))
+  }
 })
 
-Cypress.Commands.add('withTestKubeconfig', function ({ cluster, session, url = null, refresh }) {
+Cypress.Commands.add('withTestKubeconfig', function ({ session, url = null, refresh }) {
   const config_base = Cypress.env('CK8S_CONFIG_PATH') + '/.state/kube_config'
-  const base_kubeconfig = `${config_base}_${cluster}.yaml`
-  const user_kubeconfig = `${config_base}_${cluster}_${session}.yaml`
+  const base_kubeconfig = `${config_base}_wc.yaml`
+  const user_kubeconfig = `${config_base}_wc_${session}.yaml`
   Cypress.env('KUBECONFIG', user_kubeconfig)
 
   let userArgs = [
@@ -176,8 +178,7 @@ Cypress.Commands.add('withTestKubeconfig', function ({ cluster, session, url = n
   }
 })
 
-Cypress.Commands.add('deleteTestKubeconfig', function ({ cluster, session }) {
-  const test_kubeconfig =
-    Cypress.env('CK8S_CONFIG_PATH') + `/.state/kube_config_${cluster}_${session}.yaml`
-  cy.exec(`rm ${test_kubeconfig}`)
+Cypress.Commands.add('deleteTestKubeconfig', function (session) {
+  const test_kubeconfig = Cypress.env('CK8S_CONFIG_PATH') + `/.state/kube_config_wc_${session}.yaml`
+  cy.exec(`rm -f ${test_kubeconfig}`)
 })

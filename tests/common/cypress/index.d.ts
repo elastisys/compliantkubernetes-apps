@@ -73,20 +73,15 @@ declare namespace Cypress {
 
     /**
      * @example
-     * cy.withTestKubeconfig({ cluster: 'sc', session: 'static-admin', refresh: true })
+     * cy.withTestKubeconfig({ session: 'static-admin', refresh: true })
      */
-    withTestKubeconfig(args: {
-      cluster: Cluster
-      session: string
-      url?: string
-      refresh: boolean
-    }): Chainable<string>
+    withTestKubeconfig(args: { session: string; url?: string; refresh: boolean }): Chainable<string>
 
     /**
      * @example
-     * cy.deleteTestKubeconfig({ cluster: 'sc', session: 'static-admin' })
+     * cy.deleteTestKubeconfig('static-admin' )
      */
-    deleteTestKubeconfig(args: { cluster: Cluster; session: string }): Chainable<any>
+    deleteTestKubeconfig(session: string): Chainable<any>
 
     /**
      * @example

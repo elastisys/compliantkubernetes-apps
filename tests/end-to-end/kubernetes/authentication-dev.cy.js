@@ -1,10 +1,10 @@
 describe('kubernetes authentication', function () {
   before(function () {
-    cy.withTestKubeconfig({ cluster: 'wc', session: 'static-dev', refresh: true })
+    cy.withTestKubeconfig({ session: 'static-dev', refresh: true })
   })
 
   after(function () {
-    cy.deleteTestKubeconfig({ cluster: 'wc', session: 'static-dev' })
+    cy.deleteTestKubeconfig('static-dev')
   })
 
   it('can login via extra static dex user', function () {
