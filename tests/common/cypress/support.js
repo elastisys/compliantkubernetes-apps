@@ -1,3 +1,5 @@
+const fs = require('fs')
+
 const DEV_USER = 'dev@example.com'
 
 const yqArgsToConfigFiles = (cluster, expression) => {
@@ -126,7 +128,7 @@ Cypress.Commands.add('dexExtraStaticLogin', (email) => {
   )
 })
 
-Cypress.Commands.add('visitProxiedWc', function (url, user = DEV_USER) {
+Cypress.Commands.add('visitProxiedWC', function (url, user = DEV_USER) {
   cy.yqDigParse('wc', '.user.adminUsers').then((adminUsers) => {
     if (!adminUsers.includes(user)) {
       cy.fail(
@@ -145,7 +147,7 @@ Cypress.Commands.add('visitProxiedWc', function (url, user = DEV_USER) {
   })
 })
 
-Cypress.Commands.add('visitProxiedSc', function (url) {
+Cypress.Commands.add('visitProxiedSC', function (url) {
   Cypress.env('KUBECONFIG', Cypress.env('CK8S_CONFIG_PATH') + '/.state/kube_config_sc.yaml')
   cy.task('wrapProxy', Cypress.env('KUBECONFIG')).then((dex_url) => {
     if (dex_url === null) {

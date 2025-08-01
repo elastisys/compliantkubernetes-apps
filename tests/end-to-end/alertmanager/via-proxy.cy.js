@@ -1,6 +1,6 @@
 describe('workload cluster alertmanager', function () {
   it('can be accessed via kubectl proxy', () => {
-    cy.visitProxiedWc(
+    cy.visitProxiedWC(
       'http://127.0.0.1:8001/api/v1/namespaces/alertmanager/services/alertmanager-operated:9093/proxy/'
     )
 
@@ -17,7 +17,7 @@ describe('workload cluster alertmanager', function () {
 
 describe('service cluster alertmanager', function () {
   it('can be accessed via kubectl proxy', () => {
-    cy.visitProxiedSc(
+    cy.visitProxiedSC(
       'http://127.0.0.1:8001/api/v1/namespaces/monitoring/services/alertmanager-operated:9093/proxy/'
     )
 
