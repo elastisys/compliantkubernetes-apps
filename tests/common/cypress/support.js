@@ -1,4 +1,4 @@
-const yqArgsToConfigFiles = function (cluster, expression) {
+const yqArgsToConfigFiles = (cluster, expression) => {
   const configPath = Cypress.env('CK8S_CONFIG_PATH')
   if (typeof configPath === 'undefined') {
     cy.fail('yq: CK8S_CONFIG_PATH is unset')
@@ -71,7 +71,7 @@ Cypress.Commands.add('yqSecrets', (expression) => {
 
 // Available as cy.continueOn("sc|wc", "expression") expression should evaluate to true to continue
 Cypress.Commands.add('continueOn', function (cluster, expression) {
-  cy.yqDig(cluster, expression).then((result) => {
+  cy.yqDig(cluster, expression).then(function (result) {
     if (result !== 'true') {
       this.skip(`${cluster}/${expression} is disabled`)
     }

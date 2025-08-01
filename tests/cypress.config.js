@@ -28,8 +28,9 @@ module.exports = defineConfig({
           process.env.KUBECONFIG = kubeconfig
 
           const path = require('path')
+          const batsFile = /** @type {string} */ (process.env.BATS_TEST_FILENAME)
           const wrapperPath = path.resolve(
-            path.dirname(process.env.BATS_TEST_FILENAME) + '/../../../scripts/kubeproxy-wrapper.sh'
+            path.dirname(batsFile) + '/../../../scripts/kubeproxy-wrapper.sh'
           )
 
           const proxy = spawn(wrapperPath, [], {

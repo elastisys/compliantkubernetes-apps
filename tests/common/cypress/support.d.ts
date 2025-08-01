@@ -1,10 +1,18 @@
+type Cluster = 'sc' | 'wc'
+type GrafanaRole = 'Admin' | 'Editor' | 'Viewer'
+
+declare const yqArgsToConfigFiles: (cluster: Cluster, expression: string) => string
+declare const userToSession: (user: string) => string
+
 /// <reference types="cypress" />
 
 declare namespace Cypress {
-  type Cluster = 'sc' | 'wc'
-  type GrafanaRole = 'Admin' | 'Editor' | 'Viewer'
-
   interface Chainable<Subject> {
+    /**
+     * Apparently this was removed in Cypress v10...
+     */
+    fail(message: string): void
+
     /**
      * @example
      *  cy.yq('sc', '.harbor.subdomain')
