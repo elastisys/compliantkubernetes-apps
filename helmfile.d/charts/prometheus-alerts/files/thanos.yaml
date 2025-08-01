@@ -289,9 +289,9 @@ groups:
         to avg. 12-hr ingestion rate.
     expr: |
       (
-        avg_over_time(rate(http_requests_total{job=~".*thanos-receiver-receive.*", code=~"2..", handler="receive"}[5m])[1h:5m])
+        avg_over_time(sum by (tenant) (rate(http_requests_total{job=~".*thanos-receiver-receive.*", code=~"2..", handler="receive"}[5m]))[1h:5m])
       /
-        avg_over_time(rate(http_requests_total{job=~".*thanos-receiver-receive.*", code=~"2..", handler="receive"}[5m])[12h:5m])
+        avg_over_time(sum by (tenant) (rate(http_requests_total{job=~".*thanos-receiver-receive.*", code=~"2..", handler="receive"}[5m]))[12h:5m])
       ) * 100 < 50
     for: 1h
     labels:
