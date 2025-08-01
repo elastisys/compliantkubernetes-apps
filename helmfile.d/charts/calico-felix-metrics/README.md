@@ -8,9 +8,9 @@ This chart assumes that [calico metrics are enabled](https://docs.projectcalico.
 Use the below commands to check if the metrics are enabled:
 
 ```bash
-kubectl get po --selector=k8s-app=calico-node -o=jsonpath='{range .items[*]}{.metadata.annotations.prometheus\.io/scrape=="true"}{.metadata.name}{"\n"}{end}' -n kube-system
+kubectl get po --selector=k8s-app=calico-node -o=jsonpath='{range .items[*]}{.metadata.annotations.prometheus\.io/scrape=="true"}{.metadata.name}{"\n"}{end}' -n calico-system
 
-kubectl port-forward service/calico-felix-metrics-svc -n kube-system 9091:9091
+kubectl port-forward service/calico-felix-metrics-svc -n calico-system 9091:9091
 ```
 
 ## Deployment
