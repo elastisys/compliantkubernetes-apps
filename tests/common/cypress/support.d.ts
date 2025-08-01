@@ -141,5 +141,18 @@ declare namespace Cypress {
      * cy.harborStaticDexPromote()
      */
     harborStaticDexPromote(): Chainable<any>
+
+    /**
+     * @example
+     * cy.opensearchDexStaticLogin('https://opensearch.domain')
+     */
+    opensearchDexStaticLogin(ingress: string): Chainable<any>
+
+    /**
+     * @example
+     * cy.opensearchTestIndexPattern('indexPattern')
+     */
+    opensearchTestIndexPattern(indexPattern:  string):  Chainable<any>
+
   }
 }
