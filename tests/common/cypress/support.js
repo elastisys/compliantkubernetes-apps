@@ -1,3 +1,5 @@
+const DEV_USER = 'dev@example.com'
+
 const yqArgsToConfigFiles = (cluster, expression) => {
   const configPath = Cypress.env('CK8S_CONFIG_PATH')
   if (typeof configPath === 'undefined') {
@@ -124,7 +126,7 @@ Cypress.Commands.add('dexExtraStaticLogin', (email) => {
   )
 })
 
-Cypress.Commands.add('visitProxiedWc', function (url, user = 'dev@example.com') {
+Cypress.Commands.add('visitProxiedWc', function (url, user = DEV_USER) {
   cy.yqDigParse('wc', '.user.adminUsers').then((adminUsers) => {
     if (!adminUsers.includes(user)) {
       cy.fail(
@@ -159,7 +161,7 @@ Cypress.Commands.add('visitProxiedSc', function (url) {
   })
 })
 
-Cypress.Commands.add('cleanupProxy', function (cluster, user = 'dev@example.com') {
+Cypress.Commands.add('cleanupProxy', function (cluster, user = DEV_USER) {
   cy.task('pKill', 'kubeproxy-wrapper.sh')
   if (cluster === 'wc' && user !== null) {
     cy.deleteTestKubeconfig(userToSession(user))
