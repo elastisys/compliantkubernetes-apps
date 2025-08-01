@@ -123,9 +123,34 @@ preflight.end_to_end() {
     failure="true"
   fi
 
+  end_to_end.socat_up
+
   if [[ "${failure}" == "true" ]]; then
     echo "error: preflight checks failure for end-to-end tests" >&2
     exit 1
+  fi
+}
+end_to_end.socat_up() {
+  local socat_sha="71c81cb46dd1903f12f3aef844b0fc559f31e2f613a8ae91ffb5630bc7011ef5"
+  local -r socat_path="${tests}/end-to-end/.bin/socat-static"
+  local -r pid_file="${tests}/end-to-end/.run/socat.pid"
+
+  if [[ ! -f "${socat_path}" ]]; then
+    mkdir -p "$(dirname "${socat_path}")"
+    curl -fsSL -o "${socat_path}" https://github.com/andrew-d/static-binaries/raw/0be803093b7d4b627b4d4eddd732e54ac4184b67/binaries/linux/x86_64/socat
+    if [[ "$(sha256sum "${socat_path}" | cut -d' ' -f1)" != "${socat_sha}" ]]; then
+      echo "error: failed checksum for '${socat_path}'" >&2
+      exit 1
+    fi
+    chmod +x "${socat_path}"
+  fi
+
+  mkdir -p "${tests}/end-to-end/.run"
+  if [[ ! -f "${pid_file}" ]] || ! kill -0 "$(cat "${pid_file}")" 2>/dev/null; then
+    local -r sock_file="${tests}/end-to-end/.run/open-browser.sock"
+    rm -f "${sock_file}"
+    "${socat_path}" unix-listen:"${sock_file}",fork system:'xargs xdg-open' &
+    echo "$!" >"${pid_file}"
   fi
 }
 

@@ -169,6 +169,15 @@ if [[ "${FORWARD_ENVIRONMENT:-false}" == "true" ]]; then
   args+=("--env" "CK8S_CONFIG_PATH")
   args+=("--mount" "type=bind,src=${CK8S_CONFIG_PATH},dst=${CK8S_CONFIG_PATH}")
   args+=("--env" "CK8S_HEADED_CYPRESS")
+
+  # Auto-open localhost:8000 for auth
+  socat_run="${root}/tests/end-to-end/.run"
+  socat_bin="${root}/tests/end-to-end/.bin"
+  if [[ -f "${socat_run}/socat.pid" ]] && kill -0 "$(cat "${socat_run}/socat.pid")" 2>/dev/null; then
+    args+=("-v" "${socat_run}/open-browser.sock:/run/user/$(id -u)/open-browser.sock")
+    args+=("-v" "${socat_bin}/socat-static:/usr/bin/socat:ro")
+    args+=("-v" "${socat_bin}/x-www-browser:/usr/bin/x-www-browser:ro")
+  fi
 fi
 
 # Check if we are in a work tree

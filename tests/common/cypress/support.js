@@ -155,7 +155,6 @@ Cypress.Commands.add('visitProxiedSC', function (url) {
       cy.log(
         'If this test gets stuck here for too long, visit "http://localhost:8000" in your browser in case you need to authenticate'
       )
-      cy.exec(`xdg-open "${dex_url}"`, { failOnNonZeroExit: false })
       cy.visit(url, { retryOnStatusCodeFailure: true })
     }
   })
