@@ -15,6 +15,10 @@ teardown_file() {
   cypress_teardown
 }
 
-@test "prometheus can be accessed via kubectl proxy" {
-  cypress_test "prometheus can be accessed via kubectl proxy"
+@test "workload cluster prometheus can be accessed via kubectl proxy" {
+  cypress_test "workload cluster prometheus can be accessed via kubectl proxy"
+}
+
+@test "service cluster prometheus can be accessed via kubectl proxy" {
+  cypress_test "service cluster prometheus can be accessed via kubectl proxy"
 }
