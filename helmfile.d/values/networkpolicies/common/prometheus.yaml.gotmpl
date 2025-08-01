@@ -29,10 +29,10 @@ policies:
           peers:
             - namespaceSelectorLabels: {}
       ingress:
-        {{- if eq .Environment.Name "workload_cluster" }}
         - rule: ingress-rule-apiserver
           ports:
             - tcp: 9090
+        {{- if eq .Environment.Name "workload_cluster" }}
         {{- if and .Values.networkPolicies.prometheus.internalAccess.enabled .Values.networkPolicies.prometheus.internalAccess.namespaces }}
         - name: ingress-rule-internal-prometheus
           peers:
