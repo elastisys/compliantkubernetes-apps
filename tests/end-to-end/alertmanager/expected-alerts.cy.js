@@ -40,6 +40,7 @@ const assertExpectedAlerts = (response) => {
   const extraAlerts = Array.from(
     new Set(
       response.body
+        .filter((item) => item.status.state === 'active')
         .map((item) => item.labels.alertname)
         .filter((item) => !EXPECTED_ALERTS.has(item))
     )
