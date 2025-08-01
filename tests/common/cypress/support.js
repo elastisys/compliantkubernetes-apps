@@ -1,4 +1,8 @@
-const yqArgsToConfigFiles = function (cluster, expression) {
+const fs = require('fs')
+
+const DEV_USER = 'dev@example.com'
+
+const yqArgsToConfigFiles = (cluster, expression) => {
   const configPath = Cypress.env('CK8S_CONFIG_PATH')
   if (typeof configPath === 'undefined') {
     cy.fail('yq: CK8S_CONFIG_PATH is unset')
@@ -71,7 +75,7 @@ Cypress.Commands.add('yqSecrets', (expression) => {
 
 // Available as cy.continueOn("sc|wc", "expression") expression should evaluate to true to continue
 Cypress.Commands.add('continueOn', function (cluster, expression) {
-  cy.yqDig(cluster, expression).then((result) => {
+  cy.yqDig(cluster, expression).then(function (result) {
     if (result !== 'true') {
       this.skip(`${cluster}/${expression} is disabled`)
     }
@@ -124,38 +128,52 @@ Cypress.Commands.add('dexExtraStaticLogin', (email) => {
   )
 })
 
-Cypress.Commands.add(
-  'visitProxied',
-  function ({ cluster, user, url, refresh = true, checkAdmin = true }) {
-    if (checkAdmin) {
-      cy.yqDigParse(cluster, '.user.adminUsers').then((adminUsers) => {
-        if (!adminUsers.includes(user)) {
-          cy.fail(
-            `${user} not found in .user.adminUsers\n` +
-              `Please add it and run 'ck8s ops helmfile ${cluster} -lapp=dev-rbac apply' to update the RBAC rules.`
-          )
-        }
-      })
+Cypress.Commands.add('visitProxiedWC', function (url, user = DEV_USER) {
+  cy.yqDigParse('wc', '.user.adminUsers').then((adminUsers) => {
+    if (!adminUsers.includes(user)) {
+      cy.fail(
+        `${user} not found in .user.adminUsers\n` +
+          `Please add it and run 'ck8s ops helmfile wc -lapp=dev-rbac apply' to update the RBAC rules.`
+      )
     }
+  })
 
-    cy.withTestKubeconfig({ cluster, session: userToSession(user), url, refresh }).then(() => {
-      cy.task('wrapProxy', Cypress.env('KUBECONFIG')).then((dex_url) => {
-        cy.visit(`${dex_url}`)
-        cy.dexExtraStaticLogin(user)
-      })
+  cy.withTestKubeconfig({ session: userToSession(user), url, refresh: true }).then(() => {
+    cy.task('wrapProxy', Cypress.env('KUBECONFIG')).then((dex_url) => {
+      assert(dex_url, 'could not extract Dex URL from kube proxy')
+      cy.visit(`${dex_url}`)
+      cy.dexExtraStaticLogin(user)
     })
-  }
-)
-
-Cypress.Commands.add('cleanupProxy', function ({ cluster, user }) {
-  cy.task('pKill', 'kubeproxy-wrapper.sh')
-  cy.deleteTestKubeconfig({ cluster, session: userToSession(user) })
+  })
 })
 
-Cypress.Commands.add('withTestKubeconfig', function ({ cluster, session, url = null, refresh }) {
+Cypress.Commands.add('visitProxiedSC', function (url) {
+  Cypress.env('KUBECONFIG', Cypress.env('CK8S_CONFIG_PATH') + '/.state/kube_config_sc.yaml')
+  cy.task('wrapProxy', Cypress.env('KUBECONFIG')).then((dex_url) => {
+    if (dex_url === null) {
+      // pre-authenticated, attempt to visit
+      cy.visit(url)
+    } else {
+      cy.log(
+        'If this test gets stuck here for too long, visit "http://localhost:8000" in your browser in case you need to authenticate'
+      )
+      cy.exec(`xdg-open "${dex_url}"`, { failOnNonZeroExit: false })
+      cy.visit(url, { retryOnStatusCodeFailure: true })
+    }
+  })
+})
+
+Cypress.Commands.add('cleanupProxy', function (cluster, user = DEV_USER) {
+  cy.task('pKill', 'kubeproxy-wrapper.sh')
+  if (cluster === 'wc' && user !== null) {
+    cy.deleteTestKubeconfig(userToSession(user))
+  }
+})
+
+Cypress.Commands.add('withTestKubeconfig', function ({ session, url = null, refresh }) {
   const config_base = Cypress.env('CK8S_CONFIG_PATH') + '/.state/kube_config'
-  const base_kubeconfig = `${config_base}_${cluster}.yaml`
-  const user_kubeconfig = `${config_base}_${cluster}_${session}.yaml`
+  const base_kubeconfig = `${config_base}_wc.yaml`
+  const user_kubeconfig = `${config_base}_wc_${session}.yaml`
   Cypress.env('KUBECONFIG', user_kubeconfig)
 
   let userArgs = [
@@ -176,8 +194,7 @@ Cypress.Commands.add('withTestKubeconfig', function ({ cluster, session, url = n
   }
 })
 
-Cypress.Commands.add('deleteTestKubeconfig', function ({ cluster, session }) {
-  const test_kubeconfig =
-    Cypress.env('CK8S_CONFIG_PATH') + `/.state/kube_config_${cluster}_${session}.yaml`
-  cy.exec(`rm ${test_kubeconfig}`)
+Cypress.Commands.add('deleteTestKubeconfig', function (session) {
+  const test_kubeconfig = Cypress.env('CK8S_CONFIG_PATH') + `/.state/kube_config_wc_${session}.yaml`
+  cy.exec(`rm -f ${test_kubeconfig}`)
 })

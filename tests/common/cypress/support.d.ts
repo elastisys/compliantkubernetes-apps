@@ -1,10 +1,18 @@
+type Cluster = 'sc' | 'wc'
+type GrafanaRole = 'Admin' | 'Editor' | 'Viewer'
+
+declare const yqArgsToConfigFiles: (cluster: Cluster, expression: string) => string
+declare const userToSession: (user: string) => string
+
 /// <reference types="cypress" />
 
 declare namespace Cypress {
-  type Cluster = 'sc' | 'wc'
-  type GrafanaRole = 'Admin' | 'Editor' | 'Viewer'
-
   interface Chainable<Subject> {
+    /**
+     * Apparently this was removed in Cypress v10...
+     */
+    fail(message: string): void
+
     /**
      * @example
      *  cy.yq('sc', '.harbor.subdomain')
@@ -49,44 +57,37 @@ declare namespace Cypress {
 
     /**
      * @example
-     * cy.visitProxied({
-     *   cluster: 'wc',
-     *   user: 'dev@example.com',
-     *   url: 'http://127.0.0.1:8001/api/v1/namespaces/monitoring/services/kube-prometheus-stack-prometheus:9090/proxy/targets?pool=serviceMonitor%2Fmonitoring%2Fkube-prometheus-stack-apiserver%2F0',
-     *   refresh: true,
-     *   checkAdmin: true,
-     * })
+     * cy.visitProxiedWC(
+     *   'http://127.0.0.1:8001/api/v1/namespaces/monitoring/services/kube-prometheus-stack-prometheus:9090/proxy/targets?pool=serviceMonitor%2Fmonitoring%2Fkube-prometheus-stack-apiserver%2F0',
+     *   'dev@example.com'
+     * )
      */
-    visitProxied(args: {
-      cluster: Cluster
-      user: string
-      url: string
-      refresh?: boolean
-      checkAdmin?: boolean
-    }): Chainable<any>
+    visitProxiedWC(url: string, user?: string): Chainable<any>
 
     /**
      * @example
-     * cy.cleanupProxy({ cluster: 'sc', user: 'dev@example.com' })
+     * cy.visitProxiedSC('http://127.0.0.1:8001/api/v1/namespaces/monitoring/services/kube-prometheus-stack-prometheus:9090/proxy/targets?pool=serviceMonitor%2Fmonitoring%2Fkube-prometheus-stack-apiserver%2F0')
      */
-    cleanupProxy(args: { cluster: Cluster; user: string }): Chainable<any>
+    visitProxiedSC(url: string): Chainable<any>
 
     /**
      * @example
-     * cy.withTestKubeconfig({ cluster: 'sc', session: 'static-admin', refresh: true })
+     * cy.cleanupProxy('wc', 'dev@example.com')
+     * cy.cleanupProxy('sc')
      */
-    withTestKubeconfig(args: {
-      cluster: Cluster
-      session: string
-      url?: string
-      refresh: boolean
-    }): Chainable<string>
+    cleanupProxy(cluster: Cluster, user?: string): Chainable<any>
 
     /**
      * @example
-     * cy.deleteTestKubeconfig({ cluster: 'sc', session: 'static-admin' })
+     * cy.withTestKubeconfig({ session: 'static-admin', refresh: true })
      */
-    deleteTestKubeconfig(args: { cluster: Cluster; session: string }): Chainable<any>
+    withTestKubeconfig(args: { session: string; url?: string; refresh: boolean }): Chainable<string>
+
+    /**
+     * @example
+     * cy.deleteTestKubeconfig('static-admin' )
+     */
+    deleteTestKubeconfig(session: string): Chainable<any>
 
     /**
      * @example
