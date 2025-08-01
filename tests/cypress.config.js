@@ -1,6 +1,7 @@
 const { defineConfig } = require('cypress')
 
 const PROXY_READY_MARKER = '%%PROXY_READY%%'
+const PROXY_WAITING_FOR_DEX_MARKER = '%%PROXY_WAITING_FOR_DEX%%'
 const DEFAULT_TIMEOUT = 60 * 1000
 
 module.exports = defineConfig({
@@ -39,9 +40,10 @@ module.exports = defineConfig({
           })
           return new Promise((resolve) => {
             proxy.stdout.on('data', (data) => {
-              if (data.includes(PROXY_READY_MARKER)) {
-                const dexUrl = data.toString().split(' ')[1]
-                resolve(dexUrl)
+              if (data.includes(PROXY_WAITING_FOR_DEX_MARKER)) {
+                resolve(data.toString().split(' ')[1])
+              } else if (data.includes(PROXY_READY_MARKER)) {
+                resolve(null)
               }
             })
           })

@@ -140,6 +140,7 @@ Cypress.Commands.add(
 
     cy.withTestKubeconfig({ session: userToSession(user), url, refresh }).then(() => {
       cy.task('wrapProxy', Cypress.env('KUBECONFIG')).then((dex_url) => {
+        assert(dex_url, 'could not extract Dex URL from kube proxy')
         cy.visit(`${dex_url}`)
         cy.dexExtraStaticLogin(user)
       })
