@@ -46,7 +46,7 @@ const assertExpectedAlerts = (response) => {
     )
   ).toSorted()
 
-  expect(extraAlerts, `Unexpected alerts in WC alertmanager: ${extraAlerts.join(', ')}`).to.be.an(
+  expect(extraAlerts, `Unexpected alerts in alertmanager: ${extraAlerts.join(', ')}`).to.be.an(
     'array'
   ).that.is.empty
 }
