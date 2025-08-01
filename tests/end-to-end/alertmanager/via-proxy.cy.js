@@ -11,6 +11,6 @@ describe('workload cluster alertmanager', function () {
   })
 
   after(() => {
-    cy.cleanupProxy({ cluster: 'wc', user: 'dev@example.com' })
+    cy.cleanupProxy('wc')
   })
 })

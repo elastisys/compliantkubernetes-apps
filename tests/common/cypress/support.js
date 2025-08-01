@@ -143,9 +143,9 @@ Cypress.Commands.add('visitProxiedWc', function (url, user = 'dev@example.com') 
   })
 })
 
-Cypress.Commands.add('cleanupProxy', function ({ cluster, user }) {
+Cypress.Commands.add('cleanupProxy', function (cluster, user = 'dev@example.com') {
   cy.task('pKill', 'kubeproxy-wrapper.sh')
-  if (cluster === 'wc') {
+  if (cluster === 'wc' && user !== null) {
     cy.deleteTestKubeconfig(userToSession(user))
   }
 })

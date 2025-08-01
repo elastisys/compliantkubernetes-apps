@@ -66,9 +66,10 @@ declare namespace Cypress {
 
     /**
      * @example
-     * cy.cleanupProxy({ cluster: 'sc', user: 'dev@example.com' })
+     * cy.cleanupProxy('wc', 'dev@example.com')
+     * cy.cleanupProxy('sc')
      */
-    cleanupProxy(args: { cluster: Cluster; user: string }): Chainable<any>
+    cleanupProxy(cluster: Cluster, user?: string): Chainable<any>
 
     /**
      * @example

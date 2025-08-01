@@ -12,6 +12,6 @@ describe('workload cluster prometheus', function () {
   })
 
   after(() => {
-    cy.cleanupProxy({ cluster: 'wc', user: 'dev@example.com' })
+    cy.cleanupProxy('wc')
   })
 })
