@@ -20,6 +20,7 @@ policies:
           {{ template "old-style.rule.gen" . }}
         {{- end }}
       ingress:
+        - rule: ingress-rule-apiserver
         - name: ingress-rule-alertmanager
           peers:
             - podSelectorLabels:
