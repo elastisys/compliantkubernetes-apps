@@ -124,29 +124,24 @@ Cypress.Commands.add('dexExtraStaticLogin', (email) => {
   )
 })
 
-Cypress.Commands.add(
-  'visitProxied',
-  function ({ cluster, user, url, refresh = true, checkAdmin = true }) {
-    if (checkAdmin) {
-      cy.yqDigParse(cluster, '.user.adminUsers').then((adminUsers) => {
-        if (!adminUsers.includes(user)) {
-          cy.fail(
-            `${user} not found in .user.adminUsers\n` +
-              `Please add it and run 'ck8s ops helmfile ${cluster} -lapp=dev-rbac apply' to update the RBAC rules.`
-          )
-        }
-      })
+Cypress.Commands.add('visitProxiedWc', function (url, user = 'dev@example.com') {
+  cy.yqDigParse('wc', '.user.adminUsers').then((adminUsers) => {
+    if (!adminUsers.includes(user)) {
+      cy.fail(
+        `${user} not found in .user.adminUsers\n` +
+          `Please add it and run 'ck8s ops helmfile wc -lapp=dev-rbac apply' to update the RBAC rules.`
+      )
     }
+  })
 
-    cy.withTestKubeconfig({ session: userToSession(user), url, refresh }).then(() => {
-      cy.task('wrapProxy', Cypress.env('KUBECONFIG')).then((dex_url) => {
-        assert(dex_url, 'could not extract Dex URL from kube proxy')
-        cy.visit(`${dex_url}`)
-        cy.dexExtraStaticLogin(user)
-      })
+  cy.withTestKubeconfig({ session: userToSession(user), url, refresh: true }).then(() => {
+    cy.task('wrapProxy', Cypress.env('KUBECONFIG')).then((dex_url) => {
+      assert(dex_url, 'could not extract Dex URL from kube proxy')
+      cy.visit(`${dex_url}`)
+      cy.dexExtraStaticLogin(user)
     })
-  }
-)
+  })
+})
 
 Cypress.Commands.add('cleanupProxy', function ({ cluster, user }) {
   cy.task('pKill', 'kubeproxy-wrapper.sh')

@@ -15,6 +15,6 @@ teardown_file() {
   cypress_teardown
 }
 
-@test "alertmanager can be accessed via kubectl proxy" {
-  cypress_test "alertmanager can be accessed via kubectl proxy"
+@test "workload cluster alertmanager can be accessed via kubectl proxy" {
+  cypress_test "workload cluster alertmanager can be accessed via kubectl proxy"
 }
