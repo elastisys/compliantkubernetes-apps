@@ -127,11 +127,11 @@ grafana:
     # subdomain moved to common-config
     resources:
       requests:
-        cpu: 50m
-        memory: 150Mi
+        cpu: 150m
+        memory: 250Mi
       limits:
-        cpu: 100m
-        memory: 300Mi
+        cpu: 300m
+        memory: 600Mi
     tolerations: []
     affinity: {}
     nodeSelector: {}
