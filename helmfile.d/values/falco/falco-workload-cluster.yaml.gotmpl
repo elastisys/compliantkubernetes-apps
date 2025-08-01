@@ -4,4 +4,5 @@ falcosidekick:
     alertmanager:
       hostport: {{ .Values.falco.alerts.hostPort }}
       minimumpriority: {{ .Values.falco.alerts.priority }}
+      endpoint: "/api/v2/alerts"
 {{ end }}
