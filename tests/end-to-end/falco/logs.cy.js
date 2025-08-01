@@ -1,44 +1,4 @@
-function opensearchDexStaticLogin(cy, ingress) {
-  // Need to ignore error response from GET /api/dataconnections for non-authorized user.
-  //
-  // {
-  //     "statusCode": 403,
-  //     "error": "Forbidden",
-  //     "message": "{
-  //         "status": 403,
-  //       "error": {
-  //           "type": "OpenSearchSecurityException",
-  //         "reason": "There was internal problem at backend",
-  //         "details": "no permissions for [cluster:admin/opensearch/ql/datasources/read] and User [name=admin@example.com, backend_roles=[], requestedTenant=null]"
-  //       }
-  //   }"
-  // }
-  //
-  // TODO: Narrow this down to the specific request OR investigate if a user
-  //       actually should have this permission.
-  // TODO: This is copied from opensearch tests. Move it to cypress/opensearch.js for modularity
-  cy.on('uncaught:exception', (err, runnable) => {
-    if (err.message.includes('Forbidden')) {
-      return false
-    }
-  })
-
-  cy.session([ingress], () => {
-    cy.visit(`https://${ingress}`)
-
-    cy.dexStaticLogin()
-
-    cy.contains('loading opensearch dashboards', { matchCase: false }).should('not.exist')
-
-    cy.contains('Welcome to Welkin').should('be.visible')
-  })
-
-  cy.visit(`https://${ingress}`)
-
-  cy.contains('loading opensearch dashboards', { matchCase: false }).should('not.exist')
-
-  cy.contains('Welcome to Welkin').should('be.visible')
-}
+import '../../common/cypress/opensearch.js'
 
 describe('falco', function () {
   before(function () {
@@ -52,7 +12,7 @@ describe('falco', function () {
   })
 
   beforeEach(function () {
-    opensearchDexStaticLogin(cy, this.ingress)
+    cy.opensearchDexStaticLogin(this.ingress)
     cy.on('uncaught:exception', (err, runnable) => {
       if (err.message.includes("Cannot read properties of undefined (reading 'split')")) {
         return false
