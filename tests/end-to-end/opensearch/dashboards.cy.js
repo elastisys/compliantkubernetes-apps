@@ -241,6 +241,6 @@ describe('Create a manual snapshot', function () {
     cy.wait(1000) //wait for the page to re-render
     cy.contains('th', 'Time last updated').click()
     // Wait for snapshot name to show up in the table
-    cy.contains('td', snapshotName, opt, { timeout: 10000 }).should('be.visible')
+    cy.contains('td', snapshotName, { timeout: 10000 }).should('be.visible')
   })
 })
