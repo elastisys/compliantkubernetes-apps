@@ -293,6 +293,13 @@ policies:
         - rule: egress-rule-harbor-database
         - rule: egress-rule-object-storage
 
+    cleanup:
+      podSelectorLabels:
+        component: cleanup
+      egress:
+        - rule: egress-rule-dns
+        - rule: egress-rule-object-storage
+
     init:
       podSelectorLabels:
         job-name: init-harbor-job
