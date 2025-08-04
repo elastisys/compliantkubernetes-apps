@@ -106,10 +106,23 @@ COPY --from=node-deps /usr/local/lib/node_modules/welkin-test/node_modules /usr/
 # Container to run integration and end-to-end tests
 FROM unit AS main
 
+ENV DIST="noble"
+
+RUN mkdir -p /etc/apt/keyrings && \
+    curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor | tee /etc/apt/keyrings/microsoft.gpg > /dev/null && \
+    chmod go+r /etc/apt/keyrings/microsoft.gpg && \
+    echo "Types: deb \n\
+URIs: https://packages.microsoft.com/repos/azure-cli/ \n\
+Suites: ${DIST} \n\
+Components: main \n\
+Architectures: $(dpkg --print-architecture) \n\
+Signed-by: /etc/apt/keyrings/microsoft.gpg" | tee /etc/apt/sources.list.d/azure-cli.sources
+
+ARG AZ_VERSION=2.63.0
 RUN apt-get update && \
-    apt-get install -y buildah docker.io libasound2t64 libatk1.0-0 libatk-bridge2.0-0 libcanberra-gtk-module \
+    apt-get install -y azure-cli=${AZ_VERSION}-1~${DIST} buildah docker.io libasound2t64 libatk1.0-0 libatk-bridge2.0-0 libcanberra-gtk-module \
     libcanberra-gtk3-module libcups2 libgbm-dev libgbm1 libglib2.0-0 libgtk2.0-0 libgtk2.0-0t64 libgtk-3-0 \
-    libgtk-3-0t64 libnotify-dev libnss3 libxss1 libxtst6 podman-remote skopeo socat xauth xvfb && \
+    libgtk-3-0t64 libnotify-dev libnss3 libxss1 libxtst6 podman-remote skopeo socat xauth xvfb zstd && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
     ln -s /usr/bin/podman-remote /usr/bin/podman
