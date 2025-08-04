@@ -55,7 +55,7 @@ module.exports = defineConfig({
       config.env = { ...process.env, ...config.env }
       return config
     },
-    fixturesFolder: false,
+    fixturesFolder: 'cypress/fixtures',
     screenshotOnRunFailure: false,
     specPattern: '**.cy.js',
     supportFile: 'common/cypress/support.js',
