@@ -97,8 +97,7 @@ RUN git clone --depth 1 https://github.com/grayhemp/bats-mock.git /usr/local/lib
 RUN git clone --depth 1 https://github.com/bats-core/bats-support.git /usr/local/lib/bats/support
 
 ENV DOCS_PATH="/usr/local/share/docs"
-# TODO - remove this once welkin PR is merged: https://github.com/elastisys/welkin/pull/1151/files
-RUN git clone --depth 1 -b rares/call-jsonschema2md-directly https://github.com/elastisys/welkin.git "${DOCS_PATH}" && \
+RUN git clone --depth 1 https://github.com/elastisys/welkin.git "${DOCS_PATH}" && \
     chmod --recursive a+w "${DOCS_PATH}"
 
 ENV PATH="$PATH:/usr/local/lib/node_modules/.bin"
