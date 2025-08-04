@@ -38,8 +38,13 @@ disabledDashboards:
   - controller-manager-dashboard
   - scheduler-dashboard
   {{- if ne .Values.networkPlugin.type "cilium" }}
-  - cilium-metrics-dashboard
+  - cilium-dashboard
   - cilium-operator-dashboard
+  - cilium-networkpolicy-dashboard
+  - hubble-dashboard
+  - hubble-dns-namespace
+  - hubble-l7-metrics-by-workload
+  - hubble-network-overview-namespace
   {{- end }}
   {{- if ne .Values.networkPlugin.type "calico" }}
   - calicofelix-dashboard
@@ -49,8 +54,12 @@ notDeveloperVisible:
   - cephcluster-dashboard
   - cephosdsingle-dashboard
   - cephpools-dashboard
-  - cilium-metrics-dashboard
+  - cilium-dashboard
   - cilium-operator-dashboard
+  - hubble-dashboard
+  - hubble-dns-namespace
+  - hubble-l7-metrics-by-workload
+  - hubble-network-overview-namespace
   - cluster-api-autoscaling-dashboard
   - cluster-api-dashboard
   - daily-dashboard
