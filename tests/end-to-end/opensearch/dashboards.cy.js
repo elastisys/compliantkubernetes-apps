@@ -119,4 +119,128 @@ describe('opensearch dashboards', function () {
 
     opensearchTestIndexPattern(cy, 'kubernetes')
   })
+
+  it('test other index', function () {
+    if (this.indexPerNamespace === 'true') {
+      this.skip()
+    }
+
+    opensearchTestIndexPattern(cy, 'other')
+  })
+
+  it('test authlog index', function () {
+    if (this.indexPerNamespace === 'true') {
+      this.skip()
+    }
+
+    opensearchTestIndexPattern(cy, 'authlog')
+  })
+})
+
+describe('Verify indices are managed in ISM UI', function () {
+  const opt = { matchCase: false }
+  const managedIndices = ['authlog', 'kubeaudit', 'kubernetes', 'other']
+
+  before(function () {
+    cy.yq('sc', '.opensearch.dashboards.subdomain + "." + .global.baseDomain')
+      .should('not.be.empty')
+      .as('ingress')
+  })
+
+  beforeEach(function () {
+    opensearchDexStaticLogin(cy, this.ingress)
+  })
+
+  managedIndices.forEach((index) => {
+    it(`should confirm index "${index}" is listed in ISM managed indices UI`, function () {
+      // Open sidebar
+      cy.contains('title', 'menu', opt).parents('button').click()
+
+      // Go to Management > Index Management
+      cy.get('nav').contains('li', 'Management', opt).click()
+      cy.contains('a', 'index management', opt).click()
+
+      // Clicks on Managed Indices tab
+      cy.contains('a', 'state management policies', opt).click()
+
+      // Searches for the index
+      cy.get('input[placeholder*="Search"]').clear().type(index)
+
+      // Confirms that index appears in the results
+      cy.contains('td', index, opt).should('be.visible')
+    })
+  })
+})
+
+describe('Verify snapshot policy exists via search', function () {
+  const opt = { matchCase: false }
+  const policyName = 'snapshot_management_policy'
+
+  before(function () {
+    cy.yq('sc', '.opensearch.dashboards.subdomain + "." + .global.baseDomain')
+      .should('not.be.empty')
+      .as('ingress')
+  })
+
+  beforeEach(function () {
+    cy.viewport(1600, 900) // Ensure layout is wide enough to avoid text wrapping
+    opensearchDexStaticLogin(cy, this.ingress)
+  })
+
+  it(`should find snapshot policy "${policyName}" via search`, function () {
+    cy.contains('title', 'menu', opt).parents('button').click()
+    // Go to Management > Snapshot Management
+    cy.get('nav').contains('li', 'Management', opt).click()
+    cy.contains('a', 'snapshot management', opt).click()
+    // Click on Managed Indices tab
+    cy.contains('a', 'snapshot policies', opt).click()
+    // Assert snapshot policy row is visible
+    cy.contains('td', 'snapshot_management_policy', opt).should('be.visible')
+  })
+})
+
+describe('Create a manual snapshot', function () {
+  const opt = { matchCase: false }
+  const snapshotName = `cypress-snapshot-${Date.now()}`
+  const snapshotPrefix = 'cypress-snapshot-'
+  const indices = `*`
+  const indexPattern = '*'
+
+  before(function () {
+    cy.yq('sc', '.opensearch.dashboards.subdomain + "." + .global.baseDomain')
+      .should('not.be.empty')
+      .as('ingress')
+  })
+
+  beforeEach(function () {
+    cy.viewport(1600, 900)
+    opensearchDexStaticLogin(cy, this.ingress)
+  })
+
+  it('should take a snapshot successfully', function () {
+    cy.contains('title', 'menu', opt).parents('button').click()
+    cy.get('nav').contains('li', 'Management', opt).click()
+    cy.contains('a', 'snapshot management', opt).click()
+    cy.contains('a', 'snapshots', opt).click()
+    cy.contains('button', 'Take snapshot', opt).click()
+
+    // Type the snapshot name
+    cy.get('input[placeholder="Enter snapshot name"]').clear().type(snapshotName)
+
+    // Open the index pattern dropdown
+    cy.get('div[role="combobox"]').first().click()
+
+    cy.get('div[role="combobox"] input').first().type('*{enter}', { force: true })
+
+    cy.get('div[role="combobox"]').first().should('contain.text', '*')
+
+    // After clicking "Add"
+    cy.contains('button', 'Add', opt).should('not.be.disabled').click()
+
+    cy.contains('th', 'Time last updated').click()
+    cy.wait(1000) //wait for the page to re-render
+    cy.contains('th', 'Time last updated').click()
+    // Wait for snapshot name to show up in the table
+    cy.contains('td', snapshotName, opt, { timeout: 10000 }).should('be.visible')
+  })
 })

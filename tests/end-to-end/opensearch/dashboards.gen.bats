@@ -26,3 +26,23 @@ teardown_file() {
 @test "opensearch dashboards test kubernetes index" {
   cypress_test "opensearch dashboards test kubernetes index"
 }
+
+@test "opensearch dashboards test other index" {
+  cypress_test "opensearch dashboards test other index"
+}
+
+@test "opensearch dashboards test authlog index" {
+  cypress_test "opensearch dashboards test authlog index"
+}
+
+@test "Verify indices are managed in ISM UI " {
+  cypress_test "Verify indices are managed in ISM UI "
+}
+
+@test "Verify snapshot policy exists via search " {
+  cypress_test "Verify snapshot policy exists via search "
+}
+
+@test "Create a manual snapshot should take a snapshot successfully" {
+  cypress_test "Create a manual snapshot should take a snapshot successfully"
+}
