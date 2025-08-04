@@ -46,8 +46,6 @@ spec:
                     secretKeyRef:
                       name: {{ .Release.Name }}-secret
                       key: aws-endpoint-url
-                - name: AWS_ENDPOINT_NAME
-                  value: {{ .Values.s3.endpoint }}
               {{- else if .Values.gcs.enabled }}
                 - name: GCS_BACKUP
                   value: "true"
