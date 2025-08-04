@@ -2,6 +2,7 @@ const PROMETHEUS_URL =
   'http://127.0.0.1:8001/api/v1/namespaces/monitoring/services' +
   '/kube-prometheus-stack-prometheus:9090/proxy'
 const DROP_QUERY = 'round(increase(no_policy_drop_counter[15m]))'
+const ACCEPT_QUERY = 'sum by (type) (round(increase(policy_accept_counter[15m])))'
 
 describe('workload cluster network policies', function () {
   before(function () {
@@ -21,6 +22,10 @@ describe('workload cluster network policies', function () {
     cy.request('GET', makeQueryURL(DROP_QUERY, this.serverTime)).then((res) => {
       assertNoDrops(res, 'tw', 'to')
     })
+  })
+
+  it('are accepting allowed traffic', function () {
+    cy.request('GET', makeQueryURL(ACCEPT_QUERY, this.serverTime)).then(assertAccepts)
   })
 
   after(() => {
@@ -46,6 +51,10 @@ describe('service cluster network policies', function () {
     cy.request('GET', makeQueryURL(DROP_QUERY, this.serverTime)).then((res) => {
       assertNoDrops(res, 'tw', 'to')
     })
+  })
+
+  it('are accepting allowed traffic', function () {
+    cy.request('GET', makeQueryURL(ACCEPT_QUERY, this.serverTime)).then(assertAccepts)
   })
 
   after(() => {
@@ -79,6 +88,27 @@ const assertNoDrops = (res, metricType, direction) => {
   if (drops.length > 0) {
     cy.fail(formatError(drops, direction))
   }
+}
+
+const assertAccepts = (res) => {
+  expect(res.status).to.eq(200)
+  expect(res.body.data.result).to.be.a('array')
+
+  const result = res.body.data.result
+
+  const innerAssert = (values) => {
+    cy.wrap(values)
+      .should('be.an', 'array')
+      .its('[0]')
+      .should('be.a', 'number')
+      .should('be.greaterThan', 0)
+  }
+
+  const fwAccept = result.filter(filterNonZero('fw')).map((item) => parseInt(item.value[1]))
+  innerAssert(fwAccept)
+
+  const twAccept = result.filter(filterNonZero('tw')).map((item) => parseInt(item.value[1]))
+  innerAssert(twAccept)
 }
 
 const filterNonZero = (metricType) => {
