@@ -1,10 +1,10 @@
-const proxyBaseUrl =
+const PROMETHEUS_URL =
   'http://127.0.0.1:8001/api/v1/namespaces/monitoring/services' +
   '/kube-prometheus-stack-prometheus:9090/proxy'
 
 describe('workload cluster network policies', function () {
   before(function () {
-    cy.visitProxiedWC(proxyBaseUrl)
+    cy.visitProxiedWC(PROMETHEUS_URL)
   })
 
   it('are not dropping any packets from workloads', function () {
@@ -34,7 +34,7 @@ describe('workload cluster network policies', function () {
 
 describe('service cluster network policies', function () {
   before(function () {
-    cy.visitProxiedSC(proxyBaseUrl)
+    cy.visitProxiedSC(PROMETHEUS_URL)
   })
 
   it('are not dropping any packets from workloads', function () {
@@ -74,7 +74,7 @@ const assertServerTime = (res) => {
 
 const makeQueryURL = (serverTime) => {
   const metric = encodeURI('round(increase(no_policy_drop_counter[15m]))')
-  return `${proxyBaseUrl}/api/v1/query?query=${metric}&${new URLSearchParams({ time: serverTime })}`
+  return `${PROMETHEUS_URL}/api/v1/query?query=${metric}&${new URLSearchParams({ time: serverTime })}`
 }
 
 const assertNoDrops = (res, metricType, direction) => {
