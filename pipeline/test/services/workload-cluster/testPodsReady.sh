@@ -8,7 +8,7 @@ enable_falco_alerts=$(yq -e '.falco.alerts.enabled' "${CONFIG_FILE}" 2>/dev/null
 enable_falco=$(yq -e '.falco.enabled' "${CONFIG_FILE}" 2>/dev/null)
 enable_hnc=$(yq -e '.hnc.enabled' "${CONFIG_FILE}" 2>/dev/null)
 enable_hnc_ha=$(yq -e '.hnc.ha' "${CONFIG_FILE}" 2>/dev/null)
-enable_user_alertmanager=$(yq -e '.user.alertmanager.enabled' "${CONFIG_FILE}" 2>/dev/null)
+enable_user_alertmanager=$(yq -e '.prometheus.devAlertmanager.enabled' "${CONFIG_FILE}" 2>/dev/null)
 enable_velero=$(yq -e '.velero.enabled' "${CONFIG_FILE}" 2>/dev/null)
 enable_kured=$(yq -e '.kured.enabled' "${CONFIG_FILE}" 2>/dev/null)
 enable_fluentd=$(yq '.fluentd.enabled' "${CONFIG_FILE}" 2>/dev/null)
@@ -100,7 +100,7 @@ statefulsets=(
 )
 
 if "${enable_user_alertmanager}"; then
-  statefulsets+=("alertmanager alertmanager-alertmanager")
+  statefulsets+=("alertmanager alertmanager-kube-prometheus-stack-alertmanager")
 fi
 if "${enable_fluentd}" && "${enable_fluentd_audit}"; then
   statefulsets+=("fluentd-system fluentd-aggregator")

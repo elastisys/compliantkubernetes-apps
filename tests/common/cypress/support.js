@@ -1,5 +1,3 @@
-const fs = require('fs')
-
 const DEV_USER = 'dev@example.com'
 
 const yqArgsToConfigFiles = (cluster, expression) => {

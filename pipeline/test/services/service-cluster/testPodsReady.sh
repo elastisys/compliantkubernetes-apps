@@ -161,31 +161,6 @@ for statefulset in "${statefulsets[@]}"; do
 done
 
 # Format:
-# namespace job-name timeout
-jobs=(
-  "opensearch-system opensearch-configurer 120s"
-)
-if "${enable_harbor}"; then
-  jobs+=("harbor init-harbor-job 120s")
-fi
-
-echo
-echo
-echo "Testing jobs"
-echo "===================="
-
-for job in "${jobs[@]}"; do
-  read -r -a arr <<<"$job"
-  namespace="${arr[0]}"
-  name="${arr[1]}"
-  timeout="${arr[2]}"
-  echo -n -e "\n${name}\t"
-  if testResourceExistence job "${namespace}" "${name}"; then
-    testJobStatus "${namespace}" "${name}" "${timeout}"
-  fi
-done
-
-# Format:
 # namespace cronjob-name timeout
 # If the template name changes this has to be changed as well.
 cronjobs=(

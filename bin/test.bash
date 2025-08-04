@@ -59,9 +59,7 @@ function wc_help() {
 
 function sc() {
   if [[ ${#} == 0 ]] || [[ ${#} == 1 && ${1} == "--logging-enabled" ]]; then
-    set +e
     test_apps_sc "${@:1}"
-    set -e
     log_info "Testing opensearch\n"
     sc_opensearch_checks
     echo
@@ -99,9 +97,7 @@ function sc() {
 
 function wc() {
   if [[ ${#} == 0 ]] || [[ ${#} == 1 && ${1} == "--logging-enabled" ]]; then
-    set +e
     test_apps_wc "${@:1}"
-    set -e
     log_info "Testing cert-manager\n"
     wc_cert_manager_checks
     echo
