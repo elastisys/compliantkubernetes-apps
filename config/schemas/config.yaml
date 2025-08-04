@@ -1924,10 +1924,10 @@ properties:
             title: Enable Harbor MultipartUpload cleaner
             default: true
             type: boolean
-          maxAge:
+          maxAgeDays:
             title: Max age
             description: |-
-              `maxAge` defines how old an unfinished multipartupload is allowed to be before deleting it.
+              `maxAgeDays` defines how old an unfinished multipartupload is allowed to be before deleting it.
             default: 7
             type: number
           schedule:

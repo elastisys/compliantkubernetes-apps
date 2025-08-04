@@ -24,7 +24,7 @@ spec:
           containers:
             - name: mpu-cleaner
               image: "{{ .Values.image.repository }}{{- with .Values.image.tag }}:{{ . }}{{ end }}"
-              command: ['python3', '/scripts/mpu-tool.py', 'cleanup', '--bucket-name', '{{ .Values.bucket }}', '--max-age', '{{ .Values.maxAge }}']
+              command: ['python3', '/scripts/mpu-tool.py', 'cleanup', '--bucket-name', '{{ .Values.bucket }}', '--max-age', '{{ .Values.maxAgeDays }}']
               securityContext:
                 allowPrivilegeEscalation: false
                 capabilities:

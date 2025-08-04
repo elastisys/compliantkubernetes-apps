@@ -2,7 +2,7 @@
 {{ fail "\nERROR: Harbor Multipartupload cleanup requires s3, gcs or azure object storage, see Values.objectStorage.type" }}
 {{ end }}
 
-maxAge: {{ .Values.harbor.mpuCleaner.maxAge }}
+maxAgeDays: {{ .Values.harbor.mpuCleaner.maxAgeDays }}
 bucket: {{ .Values.objectStorage.buckets.harbor }}
 schedule: {{ .Values.harbor.mpuCleaner.schedule | quote }}
 {{ if eq .Values.objectStorage.type "s3" -}}

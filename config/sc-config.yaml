@@ -425,7 +425,7 @@ harbor:
     maxTotalArtifacts: 3000
   mpuCleaner:
     enabled: true
-    maxAge: 7
+    maxAgeDays: 7
     schedule: "30 2 * * *"
 
 grafanaLabelEnforcer:
