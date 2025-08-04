@@ -5,25 +5,20 @@ const PROMETHEUS_URL =
 describe('workload cluster network policies', function () {
   before(function () {
     cy.visitProxiedWC(PROMETHEUS_URL)
+    cy.request('GET', `${PROMETHEUS_URL}/api/v1/status/runtimeinfo`)
+      .then(assertServerTime)
+      .as('serverTime')
   })
 
   it('are not dropping any packets from workloads', function () {
-    cy.request('GET', `${proxyBaseUrl}/api/v1/status/runtimeinfo`).then((res) => {
-      const serverTime = assertServerTime(res)
-
-      cy.request('GET', makeQueryURL(serverTime)).then((res) => {
-        assertNoDrops(res, 'fw', 'from')
-      })
+    cy.request('GET', makeQueryURL(this.serverTime)).then((res) => {
+      assertNoDrops(res, 'fw', 'from')
     })
   })
 
   it('are not dropping any packets to workloads', function () {
-    cy.request('GET', `${proxyBaseUrl}/api/v1/status/runtimeinfo`).then((res) => {
-      const serverTime = assertServerTime(res)
-
-      cy.request('GET', makeQueryURL(serverTime)).then((res) => {
-        assertNoDrops(res, 'tw', 'to')
-      })
+    cy.request('GET', makeQueryURL(this.serverTime)).then((res) => {
+      assertNoDrops(res, 'tw', 'to')
     })
   })
 
@@ -35,25 +30,20 @@ describe('workload cluster network policies', function () {
 describe('service cluster network policies', function () {
   before(function () {
     cy.visitProxiedSC(PROMETHEUS_URL)
+    cy.request('GET', `${PROMETHEUS_URL}/api/v1/status/runtimeinfo`)
+      .then(assertServerTime)
+      .as('serverTime')
   })
 
   it('are not dropping any packets from workloads', function () {
-    cy.request('GET', `${proxyBaseUrl}/api/v1/status/runtimeinfo`).then((res) => {
-      const serverTime = assertServerTime(res)
-
-      cy.request('GET', makeQueryURL(serverTime)).then((res) => {
-        assertNoDrops(res, 'fw', 'from')
-      })
+    cy.request('GET', makeQueryURL(this.serverTime)).then((res) => {
+      assertNoDrops(res, 'fw', 'from')
     })
   })
 
   it('are not dropping any packets to workloads', function () {
-    cy.request('GET', `${proxyBaseUrl}/api/v1/status/runtimeinfo`).then((res) => {
-      const serverTime = assertServerTime(res)
-
-      cy.request('GET', makeQueryURL(serverTime)).then((res) => {
-        assertNoDrops(res, 'tw', 'to')
-      })
+    cy.request('GET', makeQueryURL(this.serverTime)).then((res) => {
+      assertNoDrops(res, 'tw', 'to')
     })
   })
 
