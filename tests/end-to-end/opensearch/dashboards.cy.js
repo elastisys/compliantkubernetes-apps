@@ -174,7 +174,6 @@ describe('Verify indices are managed in ISM UI', function () {
 
 describe('Verify snapshot policy exists via search', function () {
   const opt = { matchCase: false }
-  const policyName = 'snapshot_management_policy'
 
   before(function () {
     cy.yq('sc', '.opensearch.dashboards.subdomain + "." + .global.baseDomain')
@@ -187,7 +186,7 @@ describe('Verify snapshot policy exists via search', function () {
     opensearchDexStaticLogin(cy, this.ingress)
   })
 
-  it(`should find snapshot policy "${policyName}" via search`, function () {
+  it(`should find snapshot policy snapshot_management_policy via search`, function () {
     cy.contains('title', 'menu', opt).parents('button').click()
     // Go to Management > Snapshot Management
     cy.get('nav').contains('li', 'Management', opt).click()
@@ -241,6 +240,6 @@ describe('Create a manual snapshot', function () {
     cy.wait(1000) //wait for the page to re-render
     cy.contains('th', 'Time last updated').click()
     // Wait for snapshot name to show up in the table
-    cy.contains('td', snapshotName, { timeout: 10000 }).should('be.visible')
+    cy.contains('td', snapshotName).should('be.visible')
   })
 })
