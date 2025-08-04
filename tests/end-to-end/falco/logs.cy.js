@@ -75,16 +75,12 @@ describe('falco', function () {
 
     // Assert contains falco logs
     const panelTitle = 'Falco logs'
-    cy.contains('.embPanel__title .embPanel__titleText', panelTitle, { timeout: 20000 })
+    cy.contains('.embPanel__title .embPanel__titleText', panelTitle)
       .should('be.visible')
       .closest('.embPanel') //Locate the panel
       .within(() => {
-        cy.get('.embPanel__content', { timeout: 20000 }).should(
-          'not.have.attr',
-          'data-loading',
-          'true'
-        )
-        cy.contains('No results found', { timeout: 20000, matchCase: false }).should('not.exist')
+        cy.get('.embPanel__content').should('not.have.attr', 'data-loading', 'true')
+        cy.contains('No results found', { matchCase: false }).should('not.exist')
       })
   })
 })
