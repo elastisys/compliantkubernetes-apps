@@ -74,14 +74,14 @@ const assertNoDrops = (res, metricType, direction) => {
 
   const result = res.body.data.result
 
-  const drops = result.filter(filterDrops(metricType)).map(mapDrops)
+  const drops = result.filter(filterNonZero(metricType)).map(mapDrops)
 
   if (drops.length > 0) {
     cy.fail(formatError(drops, direction))
   }
 }
 
-const filterDrops = (metricType) => {
+const filterNonZero = (metricType) => {
   return (item) => item.metric.type === metricType && item.value && item.value[1] !== '0'
 }
 
