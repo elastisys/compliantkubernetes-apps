@@ -1,13 +1,13 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
     "module": "commonjs",
     "strict": true,
     "noEmit": true,
     "allowJs": true,
     "checkJs": true,
     "skipLibCheck": true,
-    "noImplicitAny": false
+    "noImplicitAny": false,
+    "lib": ["ES2023"]
   },
   "include": ["**/*.cy.js", "**/*.d.ts"]
 }

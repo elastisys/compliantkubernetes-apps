@@ -26,12 +26,11 @@ describe('falco', function () {
               .map((alert) => alert.labels.rule)
               .filter((alert) => !normalizedExpectedAlertRules.has(normalize(alert)))
           )
-        )
-
+        ).toSorted()
         //Assert all received falco alerts are triggered by even-generator syscalls
         expect(
           unexpectedFalcoAlertRules,
-          `Received unexpected falco alerts in alertmanager: ${unexpectedFalcoAlertRules.join(', ')}`
+          `Received unexpected falco alerts: ${unexpectedFalcoAlertRules.join(', ')}`
         ).to.be.an('array').that.is.empty
       })
     })
