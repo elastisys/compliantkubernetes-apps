@@ -1,6 +1,7 @@
 const PROMETHEUS_URL =
   'http://127.0.0.1:8001/api/v1/namespaces/monitoring/services' +
   '/kube-prometheus-stack-prometheus:9090/proxy'
+const DROP_QUERY = 'round(increase(no_policy_drop_counter[15m]))'
 
 describe('workload cluster network policies', function () {
   before(function () {
@@ -11,13 +12,13 @@ describe('workload cluster network policies', function () {
   })
 
   it('are not dropping any packets from workloads', function () {
-    cy.request('GET', makeQueryURL(this.serverTime)).then((res) => {
+    cy.request('GET', makeQueryURL(DROP_QUERY, this.serverTime)).then((res) => {
       assertNoDrops(res, 'fw', 'from')
     })
   })
 
   it('are not dropping any packets to workloads', function () {
-    cy.request('GET', makeQueryURL(this.serverTime)).then((res) => {
+    cy.request('GET', makeQueryURL(DROP_QUERY, this.serverTime)).then((res) => {
       assertNoDrops(res, 'tw', 'to')
     })
   })
@@ -36,13 +37,13 @@ describe('service cluster network policies', function () {
   })
 
   it('are not dropping any packets from workloads', function () {
-    cy.request('GET', makeQueryURL(this.serverTime)).then((res) => {
+    cy.request('GET', makeQueryURL(DROP_QUERY, this.serverTime)).then((res) => {
       assertNoDrops(res, 'fw', 'from')
     })
   })
 
   it('are not dropping any packets to workloads', function () {
-    cy.request('GET', makeQueryURL(this.serverTime)).then((res) => {
+    cy.request('GET', makeQueryURL(DROP_QUERY, this.serverTime)).then((res) => {
       assertNoDrops(res, 'tw', 'to')
     })
   })
@@ -62,8 +63,8 @@ const assertServerTime = (res) => {
   return runtimeInfo.data.serverTime
 }
 
-const makeQueryURL = (serverTime) => {
-  const metric = encodeURI('round(increase(no_policy_drop_counter[15m]))')
+const makeQueryURL = (query, serverTime) => {
+  const metric = encodeURI(query)
   return `${PROMETHEUS_URL}/api/v1/query?query=${metric}&${new URLSearchParams({ time: serverTime })}`
 }
 
