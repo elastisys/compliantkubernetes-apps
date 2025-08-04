@@ -162,6 +162,18 @@ with_namespace() {
 }
 
 # note: expects with_kubeconfig and with_namespace to be set
+# usage: create_namespace
+create_namespace() {
+  kubectl create namespace "${NAMESPACE}" >/dev/null
+}
+
+# note: expects with_kubeconfig and with_namespace to be set
+# usage: delete_namespace
+delete_namespace() {
+  kubectl delete namespace "${NAMESPACE}" >/dev/null
+}
+
+# note: expects with_kubeconfig and with_namespace to be set
 # usage: test_cronjob <name>
 test_cronjob() {
   if [[ -z "${1:-}" ]]; then
@@ -215,6 +227,15 @@ test_logs_contains() {
   for arg in "${@:3}"; do
     assert_line --regexp "${arg}"
   done
+}
+
+# note: expects with_kubeconfig and with_namespace to be set
+# usage: test_job_complete <name>
+test_job_complete() {
+  # TODO: Would be nice to use DETIK here but it only supports looking at
+  #       "status.phase" which jobs don't have.
+  run kubectl -n "${NAMESPACE}" wait --for=condition=complete "job/${1}" --timeout=30s
+  assert_success
 }
 
 auto_setup() {
@@ -331,4 +352,65 @@ cypress_teardown() {
   if [[ -f "${CYPRESS_REPORT:-}" ]]; then
     rm "${CYPRESS_REPORT}"
   fi
+}
+
+# example: skip_time_gt $configValue 20m "this will take too long"
+# usage: skip_time_gt <input-time> <max-time> <skip-reason>
+skip_time_gt() {
+  local input_time="${1}"
+  local max_time="${2}"
+  local skip_reason="${3}"
+
+  run _kubernetes_time_to_seconds "${input_time}"
+  assert_success
+  # shellcheck disable=SC2154
+  local input_time_seconds="${output}"
+
+  run _kubernetes_time_to_seconds "${max_time}"
+  assert_success
+  # shellcheck disable=SC2154
+  local max_time_seconds="${output}"
+
+  [ "${input_time_seconds}" -le "${max_time_seconds}" ] ||
+    skip "${skip_reason} (${input_time} > ${max_time})"
+}
+
+_kubernetes_time_to_seconds() {
+  local input="${1}"
+
+  if [ -z "${input}" ]; then
+    echo "empty input" >&2
+    return 1
+  fi
+
+  local total=0
+
+  while [[ "${input}" =~ ([0-9]+)([a-z]+) ]]; do
+    local value="${BASH_REMATCH[1]}"
+    local unit="${BASH_REMATCH[2]}"
+
+    local seconds
+
+    case "${unit}" in
+    s) seconds=$((value)) ;;
+    m) seconds=$((value * 60)) ;;
+    h) seconds=$((value * 3600)) ;;
+    d) seconds=$((value * 86400)) ;;
+    *)
+      echo "unknown Kubernetes time unit '${unit}' in '${1}'" >&2
+      return 1
+      ;;
+    esac
+
+    total=$((total + seconds))
+
+    input="${input#*"${BASH_REMATCH[0]}"}"
+  done
+
+  if [ -n "${input}" ]; then
+    echo "after parsing '${1}' as Kubernetes time format this remained: '${input}'" >&2
+    return 1
+  fi
+
+  echo "${total}"
 }
