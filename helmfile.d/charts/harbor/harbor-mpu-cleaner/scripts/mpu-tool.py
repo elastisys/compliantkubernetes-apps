@@ -3,6 +3,7 @@ from datetime import datetime, timezone, timedelta
 import os
 import random
 import string
+import sys
 import logging
 
 import boto3
@@ -65,7 +66,7 @@ def handle_trigger(s3: BaseClient, args: argparse.Namespace) -> None:
 
     except Exception as e:
         logging.critical(f"An error occurred during trigger: {e}", exc_info=True)
-
+        sys.exit(1)
 
 def handle_cleanup(s3: BaseClient, args: argparse.Namespace) -> None:
     """
@@ -102,9 +103,11 @@ def cleanup_incomplete_uploads(s3: BaseClient, bucket: str, max_age: int) -> int
                             aborted_count += 1
                         except Exception:
                             logging.error(f"Failed to abort upload for key '{upload['Key']}'", exc_info=True)
+                            sys.exit(1)
 
     except Exception:
         logging.critical("An error occurred while listing multipart uploads.", exc_info=True)
+        sys.exit(1)
 
     return aborted_count
 
