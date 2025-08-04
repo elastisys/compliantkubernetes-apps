@@ -3,6 +3,9 @@
 # bats file_tags=hnc
 
 setup_file() {
+  load "../../bats.lib.bash"
+  with_static_wc_kubeconfig
+
   export BATS_NO_PARALLELIZE_WITHIN_FILE=true
   export CK8S_AUTO_APPROVE="true"
 }
@@ -13,8 +16,11 @@ setup() {
   with_namespace staging
 }
 
+teardown_file() {
+  delete_static_wc_kubeconfig
+}
+
 @test "hnc dev can create subnamespace" {
-  with_test_kubeconfig wc static-dev
   run kubectl auth whoami
   assert_output --partial "dev@example.com"
   run kubectl apply -f - <<EOF
@@ -29,7 +35,6 @@ EOF
 }
 
 @test "hnc subnamespace can create namespace" {
-  with_test_kubeconfig wc static-dev
   run kubectl auth whoami
   assert_output --partial "dev@example.com"
   run kubectl get ns "${NAMESPACE}"-tests-end-to-end
@@ -73,13 +78,11 @@ check_resources_exist() {
 }
 
 @test "hnc dev can delete subnamespace" {
-  with_test_kubeconfig wc static-dev
   run kubectl delete subns "${NAMESPACE}"-tests-end-to-end --namespace "${NAMESPACE}"
   assert_success
 }
 
 @test "hnc subnamespace can delete namespace" {
-  with_test_kubeconfig wc static-dev
   # Check if the namespace still exists (it should NOT)
   run kubectl get ns "${NAMESPACE}"-tests-end-to-end
   assert_failure

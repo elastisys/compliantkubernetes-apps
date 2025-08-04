@@ -9,7 +9,7 @@ setup_file() {
   export user_demo_chart="oci://ghcr.io/elastisys/welkin-user-demo"
   export user_demo_image="ghcr.io/elastisys/user-demo:test"
 
-  with_kubeconfig wc
+  with_static_wc_kubeconfig
   if ! [[ $(kubectl get ns staging -o json | jq -r '.metadata.labels["hnc.x-k8s.io/included-namespace"]') == "true" ]]; then
     fail "these tests requires that you have a 'staging' user namespace"
   fi
@@ -24,16 +24,14 @@ setup() {
   load_assert
   load_detik
 
-  with_test_kubeconfig wc static-dev
   with_namespace staging
 }
 
-teardown() {
-  delete_test_kubeconfig wc static-dev
+teardown_file() {
+  delete_static_wc_kubeconfig
 }
 
 @test "static user can list opa rules" {
-  echo "# If cypress auth tests were run previously, test should continue automatically. Otherwise, go to http://localhost:8000 and log in with static email user dev@example.com" >&3
   run kubectl auth whoami
   assert_output --partial "dev@example.com"
   run kubectl get constraints
