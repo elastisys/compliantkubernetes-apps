@@ -7,7 +7,7 @@ falco_event_generator_chart="${falco_event_generator_name}"
 
 # Usage: create_test_namespace <namespace>
 create_test_namespace() {
-  kubectl create ns "${1}"
+  kubectl create ns "${1}" --dry-run=client -o yaml | kubectl apply -f -
 }
 
 # Usage: wait_test_namespace <namespace>
