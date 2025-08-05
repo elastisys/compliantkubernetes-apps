@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+falco_event_generator_name="event-generator"
+falco_event_generator_namespace="${falco_event_generator_name}"
+falco_event_generator_repo="https://falcosecurity.github.io/charts"
+falco_event_generator_chart="${falco_event_generator_name}"
+
 # Usage: create_test_namespace <namespace>
 create_test_namespace() {
   kubectl create ns "${1}"
@@ -34,18 +39,13 @@ delete_test_application() {
 setup_suite() {
   load "../../bats.lib.bash"
 
-  export EVENT_GENERATOR_NAME="event-generator"
-  export EVENT_GENERATOR_NAMESPACE="event-generator"
-  export EVENT_GENERATOR_REPO="https://falcosecurity.github.io/charts"
-  export EVENT_GENERATOR_CHART="event-generator"
-
   echo -e "\033[1m[Deploy event-generator on wc]\033[0m Visit \"http://localhost:8000\" to authenticate into wc if the test gets stuck here for too long" >&3
   with_kubeconfig wc
 
-  create_test_namespace "${EVENT_GENERATOR_NAMESPACE}"
-  wait_test_namespace "${EVENT_GENERATOR_NAMESPACE}"
+  create_test_namespace "${falco_event_generator_namespace}"
+  wait_test_namespace "${falco_event_generator_namespace}"
 
-  create_test_application "${EVENT_GENERATOR_NAMESPACE}" "${EVENT_GENERATOR_REPO}" "${EVENT_GENERATOR_CHART}" "${EVENT_GENERATOR_NAME}"
+  create_test_application "${falco_event_generator_namespace}" "${falco_event_generator_repo}" "${falco_event_generator_chart}" "${falco_event_generator_name}"
 
   echo -e "\033[1m[Setup kube proxy on sc]\033[0m Visit \"http://localhost:8000\" to authenticate into sc if the test gets stuck here for too long" >&3
   with_kubeconfig sc
@@ -55,8 +55,8 @@ setup_suite() {
 teardown_suite() {
   with_kubeconfig wc
 
-  delete_test_application "${EVENT_GENERATOR_NAMESPACE}" "${EVENT_GENERATOR_NAME}"
-  delete_test_namespace "${EVENT_GENERATOR_NAMESPACE}"
+  delete_test_application "${falco_event_generator_namespace}" "${falco_event_generator_name}"
+  delete_test_namespace "${falco_event_generator_namespace}"
 
   pkill -f "bash ../scripts/kubeproxy-wrapper.sh"
 }
