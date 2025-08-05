@@ -84,6 +84,7 @@ securityConfig:
         - cluster:admin/opendistro/alerting/destination/get
         - cluster:admin/opendistro/alerting/monitor/get
         - cluster:admin/opendistro/alerting/monitor/search
+        - cluster:admin/opensearch/ql/datasources/read
 
     # Allows users to view and acknowledge alerts
     alerting_ack_alerts:
@@ -98,6 +99,7 @@ securityConfig:
         - cluster_monitor
         - cluster:admin/opendistro/alerting/*
         - cluster:admin/opensearch/notifications/*
+        - cluster:admin/opensearch/ql/datasources/read
       index_permissions:
         - index_patterns:
             {{- if .Values.opensearch.indexPerNamespace }}
