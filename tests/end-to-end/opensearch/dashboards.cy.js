@@ -157,9 +157,6 @@ describe('Verify snapshot policy exists via search', function () {
 describe('Create a manual snapshot', function () {
   const opt = { matchCase: false }
   const snapshotName = `cypress-snapshot-${Date.now()}`
-  const snapshotPrefix = 'cypress-snapshot-'
-  const indices = `*`
-  const indexPattern = '*'
 
   before(function () {
     cy.yq('sc', '.opensearch.dashboards.subdomain + "." + .global.baseDomain')

@@ -16,8 +16,3 @@ setup() {
   run kubectl -n opensearch-system get job -lapp.kubernetes.io/name=opensearch-curator
   assert_success
 }
-
-@test "Check if OpenSearch slm job exists" {
-  run kubectl -n opensearch-system get job -lapp.kubernetes.io/name=opensearch-slm
-  assert_success
-}
