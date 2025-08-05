@@ -628,11 +628,11 @@ allow_ingress() {
     local -a sc_array
     local -a wc_array
 
-    sc_private_address=$(jq '.resources[].instances[].attributes.nodes | select( . != null) | .[].networks[].ip_addresses[] | select( .listen == false) | .address' "${CK8S_CONFIG_PATH}"/sc-config/terraform.tfstate)
-    wc_private_address=$(jq '.resources[].instances[].attributes.nodes | select( . != null) | .[].networks[].ip_addresses[] | select( .listen == false) | .address' "${CK8S_CONFIG_PATH}"/wc-config/terraform.tfstate)
+    sc_private_address=$(jq -r '.resources[].instances[].attributes.nodes | select( . != null) | .[].networks[].ip_addresses[] | select( .listen == false) | .address' "${CK8S_CONFIG_PATH}"/sc-config/terraform.tfstate)
+    wc_private_address=$(jq -r '.resources[].instances[].attributes.nodes | select( . != null) | .[].networks[].ip_addresses[] | select( .listen == false) | .address' "${CK8S_CONFIG_PATH}"/wc-config/terraform.tfstate)
 
-    readarray -t sc_array <<<"$(echo "${sc_private_address[@]}" | tr -d '"')"
-    readarray -t wc_array <<<"$(echo "${wc_private_address[@]}" | tr -d '"')"
+    readarray -t sc_array <<<"${sc_private_address[@]}"
+    readarray -t wc_array <<<"${wc_private_address[@]}"
 
     append_ips "${config["override_common"]}" '.networkPolicies.global.scIngress.ips' "${sc_array[@]}"
     append_ips "${config["override_common"]}" '.networkPolicies.global.wcIngress.ips' "${wc_array[@]}"
