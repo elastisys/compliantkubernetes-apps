@@ -39,8 +39,8 @@ teardown_file() {
   cypress_test "Verify indices are managed in ISM UI "
 }
 
-@test "Verify snapshot policy exists via search " {
-  cypress_test "Verify snapshot policy exists via search "
+@test "Verify snapshot policy exists via search should find snapshot policy snapshot_management_policy via search" {
+  cypress_test "Verify snapshot policy exists via search should find snapshot policy snapshot_management_policy via search"
 }
 
 @test "Create a manual snapshot should take a snapshot successfully" {

@@ -9,6 +9,16 @@ describe('opensearch dashboards', function () {
       .as('ingress')
 
     cy.yqDig('sc', '.opensearch.indexPerNamespace').should('not.be.empty').as('indexPerNamespace')
+    // 'admin@example.com' must have all_access permissions
+    cy.yqDigParse(
+      'sc',
+      '.opensearch.extraRoleMappings[] | select(.mapping_name == "all_access") | .definition.users'
+    ).then((users) => {
+      assert(
+        users.includes('admin@example.com'),
+        'admin@example.com is not in the list of users with all_access permissions'
+      )
+    })
   })
 
   beforeEach(function () {
@@ -131,7 +141,7 @@ describe('Verify snapshot policy exists via search', function () {
     cy.opensearchDexStaticLogin(this.ingress)
   })
 
-  it(`should find snapshot policy snapshot_management_policy via search`, function () {
+  it('should find snapshot policy snapshot_management_policy via search', function () {
     cy.contains('title', 'menu', opt).parents('button').click()
     // Go to Management > Snapshot Management
     cy.get('nav').contains('li', 'Management', opt).click()
@@ -178,11 +188,12 @@ describe('Create a manual snapshot', function () {
 
     cy.get('div[role="combobox"]').first().should('contain.text', '*')
 
+    cy.intercept('PUT', '/api/ism/_snapshots/**').as('takeSnapshot')
     // After clicking "Add"
     cy.contains('button', 'Add', opt).should('not.be.disabled').click()
 
     cy.contains('th', 'Time last updated').click()
-    cy.wait(1000) //wait for the page to re-render
+    cy.wait('@takeSnapshot') // Wait for snapshot request to complete
     cy.contains('th', 'Time last updated').click()
     // Wait for snapshot name to show up in the table
     cy.contains('td', snapshotName).should('be.visible')
