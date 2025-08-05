@@ -18,7 +18,7 @@ wait_test_namespace() {
 
 # Usage: delete_test_namespace <namespace>
 delete_test_namespace() {
-  kubectl delete ns "${1}"
+  kubectl delete ns "${1}" --wait=true
 }
 
 # Usage: create_test_application <namespace> <applicationRepo> <applicationChart> <applicationName>
