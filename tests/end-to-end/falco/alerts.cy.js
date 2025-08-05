@@ -16,7 +16,7 @@ describe('falco', function () {
 
         // Extract just the falco rules in firing alerts from the response body
         const receivedFalcoAlerts = response.body.filter(
-          (alert) => alert.labels.alertname == 'FalcoAlert'
+          (alert) => alert.labels.alertname === 'FalcoAlert'
         )
         expect(receivedFalcoAlerts).to.not.be.empty
 
