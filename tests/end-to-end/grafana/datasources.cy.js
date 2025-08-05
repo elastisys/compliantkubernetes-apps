@@ -21,7 +21,7 @@ function loginNavigate(cy, ingress, passwordKey) {
 
   cy.contains('Home').should('exist')
 
-  cy.on('uncaught:exception', (err, runnable) => {
+  cy.on('uncaught:exception', (err, _runnable) => {
     if (err.statusText.includes('Request was aborted')) {
       return false
     }

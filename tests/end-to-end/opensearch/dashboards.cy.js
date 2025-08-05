@@ -24,10 +24,11 @@ describe('opensearch dashboards', function () {
   beforeEach(function () {
     cy.opensearchDexStaticLogin(this.ingress)
 
-    cy.on('uncaught:exception', (err, runnable) => {
-      if (err.message.includes("Cannot read properties of undefined (reading 'split')")) {
-        return false
-      } else if (err.message.includes('location.href.split(...)[1] is undefined')) {
+    cy.on('uncaught:exception', (err, _runnable) => {
+      if (
+        err.message.includes("Cannot read properties of undefined (reading 'split')") ||
+        err.message.includes('location.href.split(...)[1] is undefined')
+      ) {
         return false
       }
     })
