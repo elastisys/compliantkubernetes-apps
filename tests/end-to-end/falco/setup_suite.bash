@@ -32,7 +32,6 @@ delete_test_application() {
 }
 
 setup_suite() {
-
   load "../../bats.lib.bash"
 
   export EVENT_GENERATOR_NAME="event-generator"
@@ -51,11 +50,9 @@ setup_suite() {
   echo -e "\033[1m[Setup kube proxy on sc]\033[0m Visit \"http://localhost:8000\" to authenticate into sc if the test gets stuck here for too long" >&3
   with_kubeconfig sc
   "../scripts/kubeproxy-wrapper.sh" >/dev/null 2>&1 &
-
 }
 
 teardown_suite() {
-
   with_kubeconfig wc
 
   delete_test_application "${EVENT_GENERATOR_NAMESPACE}" "${EVENT_GENERATOR_NAME}"

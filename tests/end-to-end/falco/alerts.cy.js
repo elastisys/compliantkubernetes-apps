@@ -27,7 +27,8 @@ describe('falco', function () {
               .filter((alert) => !normalizedExpectedAlertRules.has(normalize(alert)))
           )
         ).toSorted()
-        //Assert all received falco alerts are triggered by even-generator syscalls
+
+        // Assert all received falco alerts are triggered by event-generator syscalls
         expect(
           unexpectedFalcoAlertRules,
           `Received unexpected falco alerts: ${unexpectedFalcoAlertRules.join(', ')}`
