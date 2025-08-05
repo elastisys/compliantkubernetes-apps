@@ -97,6 +97,24 @@ describe('Verify indices are managed in ISM UI', function () {
   const opt = { matchCase: false }
   const managedIndices = ['authlog', 'kubeaudit', 'kubernetes', 'other']
 
+  const checkIndex = function (index) {
+    // Open sidebar
+    cy.contains('title', 'menu', opt).parents('button').click()
+
+    // Go to Management > Index Management
+    cy.get('nav').contains('li', 'Management', opt).click()
+    cy.contains('a', 'index management', opt).click()
+
+    // Clicks on Managed Indices tab
+    cy.contains('a', 'state management policies', opt).click()
+
+    // Searches for the index
+    cy.get('input[placeholder*="Search"]').clear().type(index)
+
+    // Confirms that index appears in the results
+    cy.contains('td', index, opt).should('be.visible')
+  }
+
   before(function () {
     cy.yq('sc', '.opensearch.dashboards.subdomain + "." + .global.baseDomain')
       .should('not.be.empty')
@@ -107,24 +125,20 @@ describe('Verify indices are managed in ISM UI', function () {
     cy.opensearchDexStaticLogin(this.ingress)
   })
 
-  managedIndices.forEach((index) => {
-    it(`should confirm index "${index}" is listed in ISM managed indices UI`, function () {
-      // Open sidebar
-      cy.contains('title', 'menu', opt).parents('button').click()
+  it('should confirm index authlog is listed in ISM managed indices UI', function () {
+    checkIndex('authlog')
+  })
 
-      // Go to Management > Index Management
-      cy.get('nav').contains('li', 'Management', opt).click()
-      cy.contains('a', 'index management', opt).click()
+  it('should confirm index kubeaudit is listed in ISM managed indices UI', function () {
+    checkIndex('kubeaudit')
+  })
 
-      // Clicks on Managed Indices tab
-      cy.contains('a', 'state management policies', opt).click()
+  it('should confirm index kubernetes is listed in ISM managed indices UI', function () {
+    checkIndex('kubernetes')
+  })
 
-      // Searches for the index
-      cy.get('input[placeholder*="Search"]').clear().type(index)
-
-      // Confirms that index appears in the results
-      cy.contains('td', index, opt).should('be.visible')
-    })
+  it('should confirm index other is listed in ISM managed indices UI', function () {
+    checkIndex('other')
   })
 })
 
