@@ -49,7 +49,7 @@ setup_suite() {
 
   echo -e "\033[1m[Setup kube proxy on sc]\033[0m Visit \"http://localhost:8000\" to authenticate into sc if the test gets stuck here for too long" >&3
   with_kubeconfig sc
-  "../scripts/kubeproxy-wrapper.sh" >/dev/null 2>&1 &
+  "../scripts/kubeproxy-wrapper.sh" >/dev/null 2>&1 3>&- &
 }
 
 teardown_suite() {
