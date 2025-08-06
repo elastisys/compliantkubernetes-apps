@@ -72,7 +72,7 @@ setup() {
   run kubectl -n "${NAMESPACE}" create job "${job_name}" --image=busybox:1.37.0 -- /bin/sh -c 'echo '"${log_message}"
   assert_success
 
-  test_job_complete "${job_name}"
+  test_job_complete "${job_name}" 30
 
   test_logs_contains job "${job_name}" "${log_message}"
 
