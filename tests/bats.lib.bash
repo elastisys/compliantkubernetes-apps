@@ -230,12 +230,26 @@ test_logs_contains() {
 }
 
 # note: expects with_kubeconfig and with_namespace to be set
-# usage: test_job_complete <name>
+# usage: test_job_complete <name> <timeout>
 test_job_complete() {
   # TODO: Would be nice to use DETIK here but it only supports looking at
   #       "status.phase" which jobs don't have.
-  run kubectl -n "${NAMESPACE}" wait --for=condition=complete "job/${1}" --timeout=30s
+  run kubectl -n "${NAMESPACE}" wait --for=condition=complete "job/${1}" --timeout="${2}s"
   assert_success
+}
+
+# note: expects with_kubeconfig and with_namespace to be set
+# usage: test_run_cronjob <name> <timeout>
+test_run_cronjob() {
+  local job_name
+  job_name="$(echo "${1}-$(uuid)" | head -c 63)"
+
+  test_cronjob "${1}"
+
+  run kubectl -n "${NAMESPACE}" create job --from "cronjob/${1}" "${job_name}"
+  assert_success
+
+  test_job_complete "${job_name}" "${2}"
 }
 
 auto_setup() {

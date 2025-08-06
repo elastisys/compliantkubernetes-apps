@@ -2,9 +2,15 @@
 
 # Helpers for interacting with object storage:
 # - object_storage.load_env                                     - setup necessary variables for the object storage helper functions
+# - object_storage.has [bucket] [prefix]                        - checks that at least one object exists
+# - object_storage.has_none [bucket] [prefix]                   - checks that no object exists
 # - object_storage.wait [bucket] [prefix] [timeout in seconds]  - wait for at least one object to exists
 # - object_storage.download [bucket] [prefix] [destination]     - download objects recursively
 # - object_storage.download_one [bucket] [prefix] [destination] - download the first object found
+# - object_storage.upload [bucket] [name] [file]                - upload a file to object storage
+# - object_storage.delete [bucket] [prefix]                     - delete objects recursively
+# - object_storage.is_compacted [bucket] [prefix]               - asserts that only one object exists per "directory"
+# - object_storage.is_not_compacted [bucket] [prefix]           - asserts that there exists at least one "directory" with more than one object
 
 object_storage.load_env() {
   local object_storage_type
@@ -24,6 +30,24 @@ object_storage.load_env() {
     fail "Unsupported object storage type: ${object_storage_type}"
     ;;
   esac
+}
+
+object_storage.has() {
+  local bucket="${1}"
+  local prefix="${2}"
+
+  run _object_storage_list_one "${bucket}" "${prefix}"
+  assert_success
+  assert_output --partial "${prefix}"
+}
+
+object_storage.has_none() {
+  local bucket="${1}"
+  local prefix="${2}"
+
+  run _object_storage_list_one "${bucket}" "${prefix}"
+  assert_success
+  refute_output
 }
 
 object_storage.wait() {
@@ -76,6 +100,99 @@ object_storage.download_one() {
 
   # shellcheck disable=SC2154
   object_storage.download "${bucket}" "${output}" "${destination}"
+}
+
+object_storage.upload() {
+  local bucket="${1}"
+  local name="${2}"
+  local file="${3}"
+
+  local object_storage_type
+  object_storage_type="$(yq.get sc '.objectStorage.type')"
+  case "${object_storage_type}" in
+  "s3")
+    run ck8s s3cmd put "${file}" "s3://${bucket}/${name}"
+    assert_success
+    ;;
+  "azure")
+    run az storage blob upload --file "${file}" --container-name "${bucket}" --name "${name}"
+    assert_success
+    ;;
+  *)
+    fail "Unsupported object storage type: ${object_storage_type}"
+    ;;
+  esac
+}
+
+object_storage.delete() {
+  local bucket="${1}"
+  local prefix="${2}"
+
+  local object_storage_type
+  object_storage_type="$(yq.get sc '.objectStorage.type')"
+  case "${object_storage_type}" in
+  "s3")
+    run ck8s s3cmd del --recursive "s3://${bucket}/${prefix}"
+    assert_success
+    ;;
+  "azure")
+    run az storage blob delete-batch --source "${bucket}" --pattern "${prefix}*"
+    assert_success
+    ;;
+  *)
+    fail "Unsupported object storage type: ${object_storage_type}"
+    ;;
+  esac
+}
+
+object_storage.is_compacted() {
+  local bucket="${1}"
+  local prefix="${2}"
+
+  local object_storage_type
+  object_storage_type="$(yq.get sc '.objectStorage.type')"
+  case "${object_storage_type}" in
+  "s3")
+    # For some reason it doesn't like the single quotes for the awk input, likely because of the escaped pipes.
+    # shellcheck disable=SC2016
+    run bats_pipe ck8s s3cmd ls --recursive "s3://${bucket}/${prefix}" \| awk '{print $4}' \| sed "s|s3://${bucket}/||" \| sed 's|\(.*\)/.*|\1|' \| sort \| uniq -d
+    assert_success
+    refute_output
+    ;;
+  "azure")
+    run bats_pipe az storage blob list --container-name "${bucket}" --prefix "${prefix}" --query '[].name' \| jq -r '.[]' \| sed 's|\(.*\)/.*|\1|' \| sort \| uniq -d
+    assert_success
+    refute_output
+    ;;
+  *)
+    fail "Unsupported object storage type: ${object_storage_type}"
+    ;;
+  esac
+}
+
+object_storage.is_not_compacted() {
+  local bucket="${1}"
+  local prefix="${2}"
+
+  local object_storage_type
+  object_storage_type="$(yq.get sc '.objectStorage.type')"
+  case "${object_storage_type}" in
+  "s3")
+    # For some reason it doesn't like the single quotes for the awk input, likely because of the escaped pipes.
+    # shellcheck disable=SC2016
+    run bats_pipe ck8s s3cmd ls --recursive "s3://${bucket}/${prefix}" \| awk '{print $4}' \| sed "s|s3://${bucket}/||" \| sed 's|\(.*\)/.*|\1|' \| sort \| uniq -d
+    assert_success
+    assert_output --partial "${prefix}"
+    ;;
+  "azure")
+    run bats_pipe az storage blob list --container-name "${bucket}" --prefix "${prefix}" --query '[].name' \| jq -r '.[]' \| sed 's|\(.*\)/.*|\1|' \| sort \| uniq -d
+    assert_success
+    assert_output --partial "${prefix}"
+    ;;
+  *)
+    fail "Unsupported object storage type: ${object_storage_type}"
+    ;;
+  esac
 }
 
 _object_storage_list_one() {
