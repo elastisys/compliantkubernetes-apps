@@ -5,7 +5,7 @@ set -euo pipefail
 : "${CK8S_CONFIG_PATH:?Missing CK8S_CONFIG_PATH}"
 : "${AZURE_LOCATION:?Missing AZURE_LOCATION}"
 
-readonly SET_ACTION="set"
+readonly SETUP_ACTION="setup"
 readonly CREATE_ACTION="create"
 readonly DELETE_ACTION="delete"
 readonly LIST_HARBOR_BACKUPS="list-harbor-backups"
@@ -55,9 +55,9 @@ CONTAINERS=$({
 
 function usage() {
   echo "Usage:" 1>&2
-  echo " $0 set" 1>&2
-  echo " $0 create" 1>&2
-  echo " $0 delete" 1>&2
+  echo " $0 setup  - set resource group and storage account name in config" 1>&2
+  echo " $0 create - create storage containers" 1>&2
+  echo " $0 delete - delete storage containers" 1>&2
 }
 
 if [ "${#}" -lt 1 ]; then
@@ -66,8 +66,8 @@ if [ "${#}" -lt 1 ]; then
 fi
 
 case "$1" in
-set)
-  ACTION=$SET_ACTION
+setup)
+  ACTION=$SETUP_ACTION
   ;;
 create)
   ACTION=$CREATE_ACTION
@@ -220,7 +220,7 @@ function list_harbor_backups() {
   az storage blob list --account-name "${STORAGE_ACCOUNT}" --container-name "${CONTAINER}" --prefix "backups" -o table
 }
 
-if [[ "$ACTION" == "$SET_ACTION" ]]; then
+if [[ "$ACTION" == "$SETUP_ACTION" ]]; then
   log_info "Setting Resource Group name" >&2
   set_resource_group
 
