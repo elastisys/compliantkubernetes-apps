@@ -157,7 +157,12 @@ postflight.integration() {
   return
 }
 postflight.end_to_end() {
-  return
+  local -r pid_file="${tests}/end-to-end/.run/socat.pid"
+
+  # we've got a pid file and there's a running socat with that pid => clean it up
+  if [[ -f "${pid_file}" ]] && kill -0 "$(cat "${pid_file}")" 2>/dev/null; then
+    kill "$(cat "${pid_file}")"
+  fi
 }
 
 # Runs the setup for a given test suite.
