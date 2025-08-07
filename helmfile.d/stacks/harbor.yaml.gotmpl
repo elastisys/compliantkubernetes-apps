@@ -91,7 +91,7 @@ templates:
 
   harbor-mpu-cleaner:
     inherit: [ template: harbor ]
-    installed: {{ and (.Values | get "harbor.enabled" false) (.Values | get "harbor.mpuCleaner.enabled" false) }}
+    installed: {{ and (.Values | get "harbor.enabled" false) (.Values | get "harbor.mpuCleaner.enabled" false) (eq .Values.objectStorage.type "s3") }}
     chart: charts/harbor/harbor-mpu-cleaner
     version: 0.1.0
     name: harbor-mpu-cleaner
