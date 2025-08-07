@@ -142,7 +142,7 @@ end_to_end.socat_up() {
   if [[ ! -f "${pid_file}" ]] || ! kill -0 "$(cat "${pid_file}")" 2>/dev/null; then
     local -r sock_file="${tests}/end-to-end/.run/open-browser.sock"
     rm -f "${sock_file}"
-    socat unix-listen:"${sock_file}",fork system:'xargs xdg-open' &
+    socat -lf "${tests}/end-to-end/.run/socat.log" unix-listen:"${sock_file}",fork system:'xargs xdg-open' &
     echo "$!" >"${pid_file}"
   fi
 }
