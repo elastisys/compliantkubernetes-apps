@@ -9,6 +9,7 @@ describe('opensearch dashboards', function () {
       .as('ingress')
 
     cy.yqDig('sc', '.opensearch.indexPerNamespace').should('not.be.empty').as('indexPerNamespace')
+
     // 'admin@example.com' must have all_access permissions
     cy.yqDigParse(
       'sc',
@@ -25,12 +26,11 @@ describe('opensearch dashboards', function () {
     cy.opensearchDexStaticLogin(this.ingress)
 
     cy.on('uncaught:exception', (error) => {
-      if (
-        error.message.includes("Cannot read properties of undefined (reading 'split')") ||
-        error.message.includes('location.href.split(...)[1] is undefined')
-      ) {
-        return false
-      }
+      return (
+        !error.message.includes("Cannot read properties of undefined (reading 'split')") &&
+        !error.message.includes('location.href.split(...)[1] is undefined') &&
+        ignoreResizeObserver(error)
+      )
     })
   })
 
@@ -53,7 +53,6 @@ describe('opensearch dashboards', function () {
     cy.contains('loading opensearch dashboards', opt).should('not.exist')
 
     // assert contains dashboard elements
-
     cy.contains('audit counter', opt).should('be.visible')
 
     cy.contains('resource selector', opt).should('be.visible')
@@ -123,6 +122,8 @@ describe('Verify indices are managed in ISM UI', function () {
 
   beforeEach(function () {
     cy.opensearchDexStaticLogin(this.ingress)
+
+    cy.on('uncaught:exception', ignoreResizeObserver)
   })
 
   it('should confirm index authlog is listed in ISM managed indices UI', function () {
@@ -154,6 +155,8 @@ describe('Verify snapshot policy exists via search', function () {
   beforeEach(function () {
     cy.viewport(1600, 900) // Ensure layout is wide enough to avoid text wrapping
     cy.opensearchDexStaticLogin(this.ingress)
+
+    cy.on('uncaught:exception', ignoreResizeObserver)
   })
 
   it('should find snapshot policy snapshot_management_policy via search', function () {
@@ -181,6 +184,8 @@ describe('Create a manual snapshot', function () {
   beforeEach(function () {
     cy.viewport(1600, 900)
     cy.opensearchDexStaticLogin(this.ingress)
+
+    cy.on('uncaught:exception', ignoreResizeObserver)
   })
 
   it('should take a snapshot successfully', function () {
@@ -212,3 +217,7 @@ describe('Create a manual snapshot', function () {
     cy.contains('td', snapshotName).should('be.visible')
   })
 })
+
+function ignoreResizeObserver(error) {
+  return !error.message.includes('ResizeObserver loop completed with undelivered notifications')
+}
