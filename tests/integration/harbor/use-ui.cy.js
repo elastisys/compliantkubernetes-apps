@@ -46,11 +46,8 @@ describe('harbor ui', function () {
   it('can create project', () => {
     cy.contains('button', 'new project', opt).click()
 
-    cy.contains('label', 'project name', opt)
-      .siblings()
-      .find('input')
-      .clear()
-      .type(`${slug}-project`)
+    cy.contains('label', 'project name', opt).siblings().find('input').as('projectName').clear()
+    cy.get('@projectName').type(`${slug}-project`)
 
     cy.contains('button', 'ok', opt).click()
 
@@ -64,7 +61,8 @@ describe('harbor ui', function () {
 
     cy.contains('button', 'new robot account', opt).click()
 
-    cy.contains('label', 'name', opt).siblings().find('input').clear().type(`${slug}-robot`)
+    cy.contains('label', 'name', opt).siblings().find('input').as('robotName').clear()
+    cy.get('@robotName').type(`${slug}-robot`)
 
     cy.contains('button', 'next', opt).click()
 
@@ -104,13 +102,15 @@ describe('harbor ui', function () {
 
     cy.contains('button', 'new robot account', opt).click()
 
-    cy.contains('label', 'name', opt).siblings().find('input').clear().type(`${slug}-robot`)
+    cy.contains('label', 'name', opt).siblings().find('input').as('robotName').clear()
+    cy.get('@robotName').type(`${slug}-robot`)
 
     cy.contains('label', 'expiration time', opt)
       .siblings()
       .find('input[type=text]')
+      .as('expirationTime')
       .clear()
-      .type('30')
+    cy.get('@expirationTime').type('30')
 
     cy.contains('button', 'next', opt).click()
 
