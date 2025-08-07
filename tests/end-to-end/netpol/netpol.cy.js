@@ -13,14 +13,14 @@ describe('workload cluster network policies', function () {
   })
 
   it('are not dropping any packets from workloads', function () {
-    cy.request('GET', makeQueryURL(DROP_QUERY, this.serverTime)).then((res) => {
-      assertNoDrops(res, 'fw', 'from')
+    cy.request('GET', makeQueryURL(DROP_QUERY, this.serverTime)).then((response) => {
+      assertNoDrops(response, 'fw', 'from')
     })
   })
 
   it('are not dropping any packets to workloads', function () {
-    cy.request('GET', makeQueryURL(DROP_QUERY, this.serverTime)).then((res) => {
-      assertNoDrops(res, 'tw', 'to')
+    cy.request('GET', makeQueryURL(DROP_QUERY, this.serverTime)).then((response) => {
+      assertNoDrops(response, 'tw', 'to')
     })
   })
 
@@ -42,14 +42,14 @@ describe('service cluster network policies', function () {
   })
 
   it('are not dropping any packets from workloads', function () {
-    cy.request('GET', makeQueryURL(DROP_QUERY, this.serverTime)).then((res) => {
-      assertNoDrops(res, 'fw', 'from')
+    cy.request('GET', makeQueryURL(DROP_QUERY, this.serverTime)).then((response) => {
+      assertNoDrops(response, 'fw', 'from')
     })
   })
 
   it('are not dropping any packets to workloads', function () {
-    cy.request('GET', makeQueryURL(DROP_QUERY, this.serverTime)).then((res) => {
-      assertNoDrops(res, 'tw', 'to')
+    cy.request('GET', makeQueryURL(DROP_QUERY, this.serverTime)).then((response) => {
+      assertNoDrops(response, 'tw', 'to')
     })
   })
 
@@ -62,10 +62,10 @@ describe('service cluster network policies', function () {
   })
 })
 
-const assertServerTime = (res) => {
-  expect(res.status).to.eq(200)
+const assertServerTime = (response) => {
+  expect(response.status).to.eq(200)
 
-  const runtimeInfo = res.body
+  const runtimeInfo = response.body
   expect(runtimeInfo.status).to.eq('success')
   expect(runtimeInfo.data.serverTime).to.be.a('string')
 
@@ -77,24 +77,24 @@ const makeQueryURL = (query, serverTime) => {
   return `${PROMETHEUS_URL}/api/v1/query?query=${metric}&${new URLSearchParams({ time: serverTime })}`
 }
 
-const assertNoDrops = (res, metricType, direction) => {
-  expect(res.status).to.eq(200)
-  expect(res.body.data.result).to.be.a('array')
+const assertNoDrops = (response, metricType, direction) => {
+  expect(response.status).to.eq(200)
+  expect(response.body.data.result).to.be.a('array')
 
-  const result = res.body.data.result
+  const result = response.body.data.result
 
-  const drops = result.filter(filterNonZero(metricType)).map(mapDrops)
+  const drops = result.filter(filterNonZero(metricType)).map((element) => mapDrops(element))
 
   if (drops.length > 0) {
     cy.fail(formatError(drops, direction))
   }
 }
 
-const assertAccepts = (res) => {
-  expect(res.status).to.eq(200)
-  expect(res.body.data.result).to.be.a('array')
+const assertAccepts = (response) => {
+  expect(response.status).to.eq(200)
+  expect(response.body.data.result).to.be.a('array')
 
-  const result = res.body.data.result
+  const result = response.body.data.result
 
   const innerAssert = (values) => {
     cy.wrap(values)
@@ -104,10 +104,10 @@ const assertAccepts = (res) => {
       .should('be.greaterThan', 0)
   }
 
-  const fwAccept = result.filter(filterNonZero('fw')).map((item) => parseInt(item.value[1]))
+  const fwAccept = result.filter(filterNonZero('fw')).map((item) => Number.parseInt(item.value[1]))
   innerAssert(fwAccept)
 
-  const twAccept = result.filter(filterNonZero('tw')).map((item) => parseInt(item.value[1]))
+  const twAccept = result.filter(filterNonZero('tw')).map((item) => Number.parseInt(item.value[1]))
   innerAssert(twAccept)
 }
 
@@ -119,7 +119,7 @@ const mapDrops = (item) => {
   return {
     podName: item.metric.exported_pod,
     podNamespace: item.metric.pod_namespace,
-    drops: parseInt(item.value[1]),
+    drops: Number.parseInt(item.value[1]),
   }
 }
 

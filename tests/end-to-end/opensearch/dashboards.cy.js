@@ -24,10 +24,10 @@ describe('opensearch dashboards', function () {
   beforeEach(function () {
     cy.opensearchDexStaticLogin(this.ingress)
 
-    cy.on('uncaught:exception', (err, _runnable) => {
+    cy.on('uncaught:exception', (error) => {
       if (
-        err.message.includes("Cannot read properties of undefined (reading 'split')") ||
-        err.message.includes('location.href.split(...)[1] is undefined')
+        error.message.includes("Cannot read properties of undefined (reading 'split')") ||
+        error.message.includes('location.href.split(...)[1] is undefined')
       ) {
         return false
       }
@@ -95,7 +95,6 @@ describe('opensearch dashboards', function () {
 
 describe('Verify indices are managed in ISM UI', function () {
   const opt = { matchCase: false }
-  const managedIndices = ['authlog', 'kubeaudit', 'kubernetes', 'other']
 
   const checkIndex = function (index) {
     // Open sidebar
@@ -109,7 +108,8 @@ describe('Verify indices are managed in ISM UI', function () {
     cy.contains('a', 'state management policies', opt).click()
 
     // Searches for the index
-    cy.get('input[placeholder*="Search"]').clear().type(index)
+    cy.get('input[placeholder*="Search"]').as('search').clear()
+    cy.get('@search').type(index)
 
     // Confirms that index appears in the results
     cy.contains('td', index, opt).should('be.visible')
@@ -191,7 +191,8 @@ describe('Create a manual snapshot', function () {
     cy.contains('button', 'Take snapshot', opt).click()
 
     // Type the snapshot name
-    cy.get('input[placeholder="Enter snapshot name"]').clear().type(snapshotName)
+    cy.get('input[placeholder="Enter snapshot name"]').as('snapshotName').clear()
+    cy.get('@snapshotName').type(snapshotName)
 
     // Open the index pattern dropdown
     cy.get('div[role="combobox"]').first().click()

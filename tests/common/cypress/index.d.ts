@@ -1,7 +1,7 @@
 type Cluster = 'sc' | 'wc'
 type GrafanaRole = 'Admin' | 'Editor' | 'Viewer'
 
-declare const yqArgsToConfigFiles: (cluster: Cluster, expression: string) => string
+declare const yqArgumentsToConfigFiles: (cluster: Cluster, expression: string) => string
 declare const userToSession: (user: string) => string
 
 /// <reference types="cypress" />
@@ -81,7 +81,11 @@ declare namespace Cypress {
      * @example
      * cy.withTestKubeconfig({ session: 'static-admin', refresh: true })
      */
-    withTestKubeconfig(args: { session: string; url?: string; refresh: boolean }): Chainable<string>
+    withTestKubeconfig(arguments_: {
+      session: string
+      url?: string
+      refresh: boolean
+    }): Chainable<string>
 
     /**
      * @example
@@ -152,7 +156,6 @@ declare namespace Cypress {
      * @example
      * cy.opensearchTestIndexPattern('indexPattern')
      */
-    opensearchTestIndexPattern(indexPattern:  string):  Chainable<any>
-
+    opensearchTestIndexPattern(indexPattern: string): Chainable<any>
   }
 }

@@ -1,19 +1,20 @@
-const { defineConfig } = require('cypress')
+import { defineConfig } from 'cypress'
+
+import { spawn } from 'node:child_process'
+
+import path from 'node:path'
 
 const PROXY_READY_MARKER = '%%PROXY_READY%%'
 const PROXY_WAITING_FOR_DEX_MARKER = '%%PROXY_WAITING_FOR_DEX%%'
 const DEFAULT_TIMEOUT = 60 * 1000
 
-module.exports = defineConfig({
+export default defineConfig({
   env: process.env,
   e2e: {
     setupNodeEvents(on, config) {
-      const { spawn } = require('child_process')
-
       on('task', {
         log(message) {
           console.log(message)
-          return null
         },
         kubectlLogin(kubeconfig) {
           return new Promise((resolve) => {
@@ -22,13 +23,11 @@ module.exports = defineConfig({
 
             child.unref()
 
-            resolve(null)
+            resolve(-1)
           })
         },
         wrapProxy(kubeconfig) {
           process.env.KUBECONFIG = kubeconfig
-
-          const path = require('path')
           const batsFile = /** @type {string} */ (process.env.BATS_TEST_FILENAME)
           const wrapperPath = path.resolve(
             path.dirname(batsFile) + '/../../../scripts/kubeproxy-wrapper.sh'
@@ -43,7 +42,7 @@ module.exports = defineConfig({
               if (data.includes(PROXY_WAITING_FOR_DEX_MARKER)) {
                 resolve(data.toString().split(' ')[1])
               } else if (data.includes(PROXY_READY_MARKER)) {
-                resolve(null)
+                resolve(-1)
               }
             })
           })
@@ -51,7 +50,7 @@ module.exports = defineConfig({
         pKill(name) {
           return new Promise((resolve) => {
             spawn('pkill', ['-f', name], { detached: true, stdio: 'ignore' })
-            resolve(null)
+            resolve(-1)
           })
         },
       })
