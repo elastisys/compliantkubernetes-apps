@@ -32,27 +32,16 @@ describe('user grafana user promotion', function () {
     })
   })
 
-  after(() => {
-    cy.clearAllCookies()
+  after(function () {
     Cypress.session.clearAllSavedSessions()
   })
 
-  it('admin demotes dev@example.com to Viewer', function () {
+  it('admin demotes + promotes dev@example.com to Admin', function () {
     cy.grafanaDexExtraStaticLogin(`${this.ingress}/profile`, DEV_USER)
-    cy.visit(`https://${this.ingress}/logout`)
-
-    cy.grafanaSetRole(this.ingress, '.user.grafanaPassword', DEV_USER, 'Viewer')
-
-    cy.visit(`https://${this.ingress}/logout`)
-
-    cy.grafanaCheckRole(this.ingress, DEV_USER, 'Viewer')
-  })
-
-  it('admin promotes dev@example.com to Admin', function () {
-    cy.grafanaSetRole(this.ingress, '.user.grafanaPassword', DEV_USER, 'Admin')
-
-    cy.visit(`https://${this.ingress}/logout`)
-
-    cy.grafanaCheckRole(this.ingress, DEV_USER, 'Admin')
+      .visit(`https://${this.ingress}/logout`)
+      .grafanaSetRole(this.ingress, '.user.grafanaPassword', DEV_USER, 'Viewer')
+      .grafanaSetRole(this.ingress, '.user.grafanaPassword', DEV_USER, 'Admin')
+      .visit(`https://${this.ingress}/logout`)
+      .grafanaCheckRole(this.ingress, DEV_USER, 'Admin')
   })
 })
