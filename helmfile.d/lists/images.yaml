@@ -40,7 +40,7 @@ images:
     trivyAdapter: docker.io/goharbor/trivy-adapter-photon:v2.13.1
     initJob: ghcr.io/elastisys/curl-jq:1.0.0
     backupJob: ghcr.io/elastisys/backup-postgres:1.5.0
-    mpuCleanerJob: ghcr.io/elastisys/ghcr.io/elastisys/python-boto3:0.1.1
+    mpuCleaner: ghcr.io/elastisys/ghcr.io/elastisys/python-boto3:0.1.1
   hnc:
     image: ghcr.io/elastisys/hnc-manager:v1.1.0
   ingressNginx:

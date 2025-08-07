@@ -20,6 +20,7 @@ setup_file() {
   yq.set sc .fluentd.enabled 'true'
   yq.set sc .gpu.enabled 'true'
   yq.set sc .harbor.backup.enabled 'true'
+  yq.set sc .harbor.mpuCleaner.enabled 'true'
   yq.set sc .kured.enabled 'true'
   yq.set sc .kyverno.enabled 'true'
   yq.set sc .kyverno.policies.verifyImageSignature.enabled 'false'
