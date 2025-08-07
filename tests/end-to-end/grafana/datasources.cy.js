@@ -41,7 +41,7 @@ describe('grafana admin datasources', function () {
       .as('ingress')
 
     // Cypress does not like trailing dots
-    cy.yqDig('sc', '.grafana.ops.trailingDots').should((value) =>
+    cy.yqDig('sc', '.grafana.ops.trailingDots').then((value) =>
       assert(value !== 'true', ".grafana.ops.trailingDots in sc config must not be 'true'")
     )
   })

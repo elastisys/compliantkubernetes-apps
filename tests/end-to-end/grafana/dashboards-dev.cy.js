@@ -7,7 +7,9 @@ describe('grafana dev dashboards', function () {
       .as('ingress')
 
     // Cypress does not like trailing dots
-    cy.yqDig('sc', '.grafana.user.trailingDots').should('not.equal', 'true')
+    cy.yqDig('sc', '.grafana.user.trailingDots').then((value) =>
+      assert(value !== 'true', ".grafana.user.trailingDots in sc config must not be 'true'")
+    )
   })
 
   beforeEach(function () {

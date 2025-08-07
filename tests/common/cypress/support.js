@@ -94,7 +94,9 @@ Cypress.Commands.add('retryRequest', (options) => {
 // Available as cy.dexStaticLogin()
 Cypress.Commands.add('dexStaticLogin', () => {
   // Requires dex static login to be enabled
-  cy.yqDig('sc', '.dex.enableStaticLogin').should('equal', 'true')
+  cy.yqDig('sc', '.dex.enableStaticLogin').then((value) => {
+    assert(value === 'true', ".dex.enableStaticLogin in sc config must be 'true'")
+  })
 
   // Conditionally skip connector selection
   cy.yqSecrets('.dex.connectors | length').then((connectors) => {
