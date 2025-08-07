@@ -90,12 +90,12 @@ repos:
           - docker.io/mvdan/shfmt:v3.10.0@sha256:d19cc37644449fe9a488f234d2c0cf0b770eaf6a5a40e30103e8099013ef8f9e
           - -w
 
-      - id: tsc-cypress
-        name: typecheck cypress tests
-        files: '.*\.cy.js'
+      - id: check-js
+        name: check js test code
+        files: ^tests/.*\.(js|d\.ts)$
         language: node
         require_serial: true
-        entry: tests/common/typecheck.bash
+        entry: tests/common/check-js.bash
 
   - repo: https://github.com/codespell-project/codespell
     rev: v2.3.0
