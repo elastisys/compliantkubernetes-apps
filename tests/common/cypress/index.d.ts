@@ -45,6 +45,29 @@ declare namespace Cypress {
 
     /**
      * @example
+     * cy.retryRequest({
+     *   request: {
+     *     url: 'http://example.com',
+     *     headers: { Accept: 'application/json' },
+     *     failOnStatusCode: false,
+     *   },
+     *   condition: (response) => response.status === 200,
+     *   body: (response) => {
+     *     expect(response.body).to.be.an('array')
+     *   },
+     *   attempts: 12,
+     * })
+     */
+    retryRequest(arguments_: {
+      request: Partial<RequestOptions>
+      condition: (Response) => bool
+      body: (Response) => void
+      attempts?: number
+      waitTime?: number
+    }): Chainable<any>
+
+    /**
+     * @example
      * cy.dexStaticLogin()
      */
     dexStaticLogin(): Chainable<any>

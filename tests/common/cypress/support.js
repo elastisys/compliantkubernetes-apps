@@ -80,6 +80,23 @@ Cypress.Commands.add('continueOn', function (cluster, expression) {
   })
 })
 
+Cypress.Commands.add('retryRequest', (options) => {
+  const { request, condition, body, attempts = 10, waitTime = 5000 } = options
+
+  cy.request(request).then((response) => {
+    if (condition(response)) {
+      body(response)
+    } else {
+      if (attempts > 0) {
+        cy.wait(waitTime)
+        cy.retryRequest({ ...options, attempts: attempts - 1 })
+      } else {
+        throw new Error('retryRequest failed')
+      }
+    }
+  })
+})
+
 // Available as cy.dexStaticLogin()
 Cypress.Commands.add('dexStaticLogin', () => {
   // Requires dex static login to be enabled
