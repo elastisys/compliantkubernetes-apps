@@ -34,7 +34,7 @@ describe('opensearch dashboards', function () {
     })
   })
 
-  after(() => {
+  after(function () {
     Cypress.session.clearAllSavedSessions()
   })
 

@@ -50,7 +50,7 @@ describe('grafana admin datasources', function () {
     loginNavigate(cy, this.ingress, '.grafana.password')
   })
 
-  after(() => {
+  after(function () {
     Cypress.session.clearAllSavedSessions()
   })
 
@@ -96,7 +96,7 @@ describe('grafana dev datasources', () => {
     loginNavigate(cy, this.ingress, '.user.grafanaPassword')
   })
 
-  after(() => {
+  after(function () {
     Cypress.session.clearAllSavedSessions()
   })
 
