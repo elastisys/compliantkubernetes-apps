@@ -59,6 +59,9 @@ $(template_files:.bats.gotmpl=.gen.bats): %.gen.bats: %.bats.gotmpl common/gen.b
 $(foreach type,$(types),preflight-$(type)): preflight-%:
 	@$(tests)/common/exec.bash preflight $*
 
+$(foreach type,$(types),postflight-$(type)): postflight-%:
+	@$(tests)/common/exec.bash postflight $*
+
 run-all:
 	@FORWARD_ENVIRONMENT=true FORWARD_RUNTIME=true $(launcher) $(image):main make --no-print-directory -C tests container-all
 # run-<target/suite/file> wild card

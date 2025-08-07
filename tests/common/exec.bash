@@ -147,6 +147,19 @@ end_to_end.socat_up() {
   fi
 }
 
+postflight.unit() {
+  return
+}
+postflight.regression() {
+  return
+}
+postflight.integration() {
+  return
+}
+postflight.end_to_end() {
+  return
+}
+
 # Runs the setup for a given test suite.
 # - Environment variables set during setup will be store into the file suite.env.
 suite.setup() {
@@ -242,22 +255,23 @@ suite.teardown() {
 
 main() {
   case "${1:-}" in
-  preflight)
+  preflight | postflight)
+    local -r phase="${1}"
     case "${2:-}" in
     unit)
-      preflight.unit
+      "${phase}.unit"
       ;;
     regression)
-      preflight.regression
+      "${phase}.regression"
       ;;
     integration)
-      preflight.integration
+      "${phase}.integration"
       ;;
     end-to-end)
-      preflight.end_to_end
+      "${phase}.end_to_end"
       ;;
     *)
-      echo "error: invalid argument for preflight" >&2
+      echo "error: invalid argument for ${phase}" >&2
       exit 1
       ;;
     esac
