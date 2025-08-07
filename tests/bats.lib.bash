@@ -107,7 +107,7 @@ with_kubeconfig() {
 }
 
 # sets the kubeconfig to use
-# usage: with_static_wc_kubeconfig
+# usage: with_static_wc_kubeconfig <dev|...?>
 with_static_wc_kubeconfig() {
   local -r scope="${1:-dev}"
 
