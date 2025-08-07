@@ -15,6 +15,7 @@
     kubectl_version: "{{ requirements['kubectl'].version | regex_replace('^v', '') }}"
     pwgen_version: "{{ requirements['pwgen'].version }}"
     s3cmd_version: "{{ requirements['s3cmd'].version }}"
+    socat_version: "{{ requirements['socat'].version }}"
     sops_version: "{{ requirements['getsops/sops/v3'].version | regex_replace('^v', '') }}"
     velero_version: "{{ requirements['github.com/vmware-tanzu/velero'].version }}"
     yajsv_version: "{{ requirements['github.com/neilpa/yajsv'].version | regex_replace('^v', '') }}"
@@ -22,6 +23,7 @@
     apt_list:
       - curl={{ curl_version }}
       - s3cmd={{ s3cmd_version }}
+      - socat={{ socat_version }}
       - dnsutils={{ dnsutils_version }}
       - apache2-utils={{ apache2_utils_version }}
       - pwgen={{ pwgen_version }}

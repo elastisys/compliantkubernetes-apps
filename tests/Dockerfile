@@ -107,7 +107,9 @@ COPY --from=node-deps /usr/local/lib/node_modules/welkin-test/node_modules /usr/
 FROM unit AS main
 
 RUN apt-get update && \
-    apt-get install -y buildah docker.io libasound2t64 libatk1.0-0 libatk-bridge2.0-0 libcanberra-gtk-module libcanberra-gtk3-module libcups2 libgbm-dev libgbm1 libglib2.0-0 libgtk2.0-0 libgtk2.0-0t64 libgtk-3-0 libgtk-3-0t64 libnotify-dev libnss3 libxss1 libxtst6 podman-remote skopeo xauth xvfb && \
+    apt-get install -y buildah docker.io libasound2t64 libatk1.0-0 libatk-bridge2.0-0 libcanberra-gtk-module \
+    libcanberra-gtk3-module libcups2 libgbm-dev libgbm1 libglib2.0-0 libgtk2.0-0 libgtk2.0-0t64 libgtk-3-0 \
+    libgtk-3-0t64 libnotify-dev libnss3 libxss1 libxtst6 podman-remote skopeo socat xauth xvfb && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
     ln -s /usr/bin/podman-remote /usr/bin/podman
