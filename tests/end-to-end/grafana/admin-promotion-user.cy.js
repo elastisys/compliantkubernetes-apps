@@ -9,12 +9,12 @@ describe('user grafana user promotion', function () {
       .as('ingress')
 
     // Cypress does not like trailing dots
-    cy.yqDig('sc', '.grafana.user.trailingDots').should((value) =>
+    cy.yqDig('sc', '.grafana.user.trailingDots').then((value) =>
       assert(value !== 'true', ".grafana.user.trailingDots in sc config must not be 'true'")
     )
 
     // skipRoleSync must be true
-    cy.yqDig('sc', '.grafana.user.oidc.skipRoleSync').should((value) =>
+    cy.yqDig('sc', '.grafana.user.oidc.skipRoleSync').then((value) =>
       assert(value === 'true', ".grafana.user.oidc.skipRoleSync in sc config must be 'true'")
     )
 
