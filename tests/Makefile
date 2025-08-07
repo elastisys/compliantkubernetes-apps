@@ -66,16 +66,17 @@ run-all:
 	@FORWARD_ENVIRONMENT=true FORWARD_RUNTIME=true $(launcher) $(image):main make --no-print-directory -C tests container-all
 # run-<target/suite/file> wild card
 run-unit $(patsubst $(tests)/%,run-%,$(filter $(tests)/unit/%,$(suites) $(files))): run-%: preflight-unit
-	@$(launcher) $(image):unit make --no-print-directory -C tests container-$*
+	@$(launcher) $(image):unit make --no-print-directory -C tests container-$*; \
+	exit_code=$$?; $(MAKE) -s postflight-unit; test $$exit_code -eq 0
 run-regression $(patsubst $(tests)/%,run-%,$(filter $(tests)/regression/%,$(suites) $(files))): run-%: preflight-regression
-	@FORWARD_RUNTIME=true $(launcher) $(image):main make --no-print-directory -C tests container-$*
+	@FORWARD_RUNTIME=true $(launcher) $(image):main make --no-print-directory -C tests container-$*; \
+	exit_code=$$?; $(MAKE) -s postflight-regression; test $$exit_code -eq 0
 run-integration $(patsubst $(tests)/%,run-%,$(filter $(tests)/integration/%,$(suites) $(files))): run-%: preflight-integration
-	@FORWARD_RUNTIME=true $(launcher) $(image):main make --no-print-directory -C tests container-$*
+	@FORWARD_RUNTIME=true $(launcher) $(image):main make --no-print-directory -C tests container-$*; \
+	exit_code=$$?; $(MAKE) -s postflight-integration; test $$exit_code -eq 0
 run-end-to-end $(patsubst $(tests)/%,run-%,$(filter $(tests)/end-to-end/%,$(suites) $(files))): run-%: preflight-end-to-end
 	@FORWARD_ENVIRONMENT=true FORWARD_RUNTIME=true $(launcher) $(image):main make --no-print-directory -C tests container-$*; \
-	exit_code=$$?; \
-	$(MAKE) -s postflight-end-to-end; \
-	test $$exit_code -eq 0
+	exit_code=$$?; $(MAKE) -s postflight-end-to-end; test $$exit_code -eq 0
 
 container-all: container-unit container-regression container-integration container-end-to-end
 container-unit: $(patsubst $(tests)/%,container-%,$(filter $(tests)/unit/%,$(suites)))
