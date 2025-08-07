@@ -20,7 +20,7 @@ describe('grafana dev dashboards', function () {
     cy.visit(`https://${this.ingress}/dashboards`)
   })
 
-  after(() => {
+  after(function () {
     Cypress.session.clearAllSavedSessions()
   })
 
