@@ -74,7 +74,7 @@ run-integration $(patsubst $(tests)/%,run-%,$(filter $(tests)/integration/%,$(su
 run-end-to-end $(patsubst $(tests)/%,run-%,$(filter $(tests)/end-to-end/%,$(suites) $(files))): run-%: preflight-end-to-end
 	@FORWARD_ENVIRONMENT=true FORWARD_RUNTIME=true $(launcher) $(image):main make --no-print-directory -C tests container-$*; \
 	exit_code=$$?; \
-	$(MAKE) postflight-end-to-end; \
+	$(MAKE) -s postflight-end-to-end; \
 	test $$exit_code -eq 0
 
 container-all: container-unit container-regression container-integration container-end-to-end

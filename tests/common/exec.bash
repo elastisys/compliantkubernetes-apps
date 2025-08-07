@@ -139,7 +139,7 @@ end_to_end.socat_up() {
   fi
 
   mkdir -p "${tests}/end-to-end/.run"
-  if [[ ! -f "${pid_file}" ]] || ! kill -0 "$(cat "${pid_file}")" 2>/dev/null; then
+  if [[ ! -f "${pid_file}" ]] || ! kill -0 "$(<"${pid_file}")" 2>/dev/null; then
     local -r sock_file="${tests}/end-to-end/.run/open-browser.sock"
     rm -f "${sock_file}"
     socat -lf "${tests}/end-to-end/.run/socat.log" unix-listen:"${sock_file}",fork system:'xargs xdg-open' &
@@ -160,8 +160,8 @@ postflight.end_to_end() {
   local -r pid_file="${tests}/end-to-end/.run/socat.pid"
 
   # we've got a pid file and there's a running socat with that pid => clean it up
-  if [[ -f "${pid_file}" ]] && kill -0 "$(cat "${pid_file}")" 2>/dev/null; then
-    kill "$(cat "${pid_file}")"
+  if [[ -f "${pid_file}" ]] && kill -0 "$(<"${pid_file}")" 2>/dev/null; then
+    kill "$(<"${pid_file}")"
   fi
 }
 
