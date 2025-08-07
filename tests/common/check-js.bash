@@ -28,6 +28,12 @@ if [[ -z "${checker}" ]]; then
   exit 1
 fi
 
+if ! command -v eslint >/dev/null 2>&1; then
+  echo "Fatal: 'eslint' could be found, run: npm install" >&2
+  exit 1
+fi
+
 pushd "${tests}" >/dev/null 2>&1 || exit 1
 $checker --noEmit
+eslint
 popd >/dev/null 2>&1
