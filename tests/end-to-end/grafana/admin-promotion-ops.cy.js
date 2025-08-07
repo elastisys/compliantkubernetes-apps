@@ -1,5 +1,7 @@
 import '../../common/cypress/grafana.js'
 
+const ADMIN_USER = 'admin@example.com'
+
 describe('ops grafana user promotion', function () {
   before(function () {
     cy.yq('sc', '.grafana.ops.subdomain + "." + .global.opsDomain')
@@ -30,27 +32,16 @@ describe('ops grafana user promotion', function () {
     })
   })
 
-  afterEach(function () {
-    cy.clearAllCookies()
-    cy.then(Cypress.session.clearAllSavedSessions)
+  after(function () {
+    Cypress.session.clearAllSavedSessions()
   })
 
-  it('admin demotes admin@example.com to Viewer', function () {
+  it('admin demotes + promotes admin@example.com to Admin', function () {
     cy.grafanaDexStaticLogin(`${this.ingress}/profile`, false)
-    cy.visit(`https://${this.ingress}/logout`)
-
-    cy.grafanaSetRole(this.ingress, '.grafana.password', 'admin@example.com', 'Viewer')
-
-    cy.visit(`https://${this.ingress}/logout`)
-
-    cy.grafanaCheckRole(this.ingress, 'admin@example.com', 'Viewer')
-  })
-
-  it('admin promotes admin@example.com to Admin', function () {
-    cy.grafanaSetRole(this.ingress, '.grafana.password', 'admin@example.com', 'Admin')
-
-    cy.visit(`https://${this.ingress}/logout`)
-
-    cy.grafanaCheckRole(this.ingress, 'admin@example.com', 'Admin')
+      .visit(`https://${this.ingress}/logout`)
+      .grafanaSetRole(this.ingress, '.grafana.password', ADMIN_USER, 'Viewer')
+      .grafanaSetRole(this.ingress, '.grafana.password', ADMIN_USER, 'Admin')
+      .visit(`https://${this.ingress}/logout`)
+      .grafanaCheckRole(this.ingress, ADMIN_USER, 'Admin')
   })
 })

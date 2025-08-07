@@ -15,10 +15,6 @@ teardown_file() {
   cypress_teardown
 }
 
-@test "user grafana user promotion admin demotes dev@example.com to Viewer" {
-  cypress_test "user grafana user promotion admin demotes dev@example.com to Viewer"
-}
-
-@test "user grafana user promotion admin promotes dev@example.com to Admin" {
-  cypress_test "user grafana user promotion admin promotes dev@example.com to Admin"
+@test "user grafana user promotion admin demotes + promotes dev@example.com to Admin" {
+  cypress_test "user grafana user promotion admin demotes + promotes dev@example.com to Admin"
 }
