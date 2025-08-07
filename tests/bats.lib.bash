@@ -107,36 +107,39 @@ with_kubeconfig() {
 }
 
 # sets the kubeconfig to use
-# usage: with_test_kubeconfig <cluster> <static-admin|static-dev>
-with_test_kubeconfig() {
-  if ! [[ "${1:-}" =~ ^(sc|wc)$ ]]; then
-    fail "invalid or missing cluster argument"
-  fi
+# usage: with_static_wc_kubeconfig <dev|...?>
+with_static_wc_kubeconfig() {
+  local -r scope="${1:-dev}"
 
-  if [[ -z "${2:-}" ]]; then
-    fail "missing user argument (e.g. static-dev/static-admin)"
-  fi
+  BASE_KUBECONFIG="${CK8S_CONFIG_PATH}/.state/kube_config_wc.yaml"
+  export KUBECONFIG="${CK8S_CONFIG_PATH}/.state/kube_config_wc_bats-${scope}.yaml"
 
-  BASE_KUBECONFIG="${CK8S_CONFIG_PATH}/.state/kube_config_$1.yaml"
-  export KUBECONFIG="${CK8S_CONFIG_PATH}/.state/kube_config_$1_$2.yaml"
-  if ! [[ -f "${KUBECONFIG}" ]]; then
-    yq '.users[0].user.exec.args += "'"--token-cache-dir=~/.kube/cache/oidc-login/test-${2}"'"' <"${BASE_KUBECONFIG}" >"${KUBECONFIG}"
-  fi
+  test -f "${KUBECONFIG}" || yq '.users[0].user.exec.args += ["'"--token-cache-dir=~/.kube/cache/oidc-login/test-static-${scope}"'", "--skip-open-browser"]' <"${BASE_KUBECONFIG}" >"${KUBECONFIG}"
+
   export DETIK_CLIENT_NAME="kubectl"
+
+  kubectl auth whoami &
+  local kc_pid=$!
+
+  for _ in $(seq 1 40); do
+    sleep .5
+    if nc -z 127.0.0.1 8000; then
+      # auth through cypress
+      cypress_setup "${ROOT}/tests/end-to-end/kubernetes/authentication-${scope}.cy.js"
+      break
+    fi
+    if ! kill -0 "${kc_pid}" >/dev/null 2>&1; then
+      break
+    fi
+  done
+  wait "${kc_pid}"
 }
 
 # deletes a kubeconfig used for tests
-# usage: delete_test_kubeconfig <cluster> <static-admin|static-dev>
-delete_test_kubeconfig() {
-  if ! [[ "${1:-}" =~ ^(sc|wc)$ ]]; then
-    fail "invalid or missing cluster argument"
-  fi
-
-  if [[ -z "${2:-}" ]]; then
-    fail "missing user argument (e.g. static-dev/static-admin)"
-  fi
-
-  rm "${CK8S_CONFIG_PATH}/.state/kube_config_$1_$2.yaml"
+# usage: delete_static_wc_kubeconfig
+delete_static_wc_kubeconfig() {
+  local -r scope="${1:-dev}"
+  rm -f "${CK8S_CONFIG_PATH}/.state/kube_config_wc_bats-${scope}.yaml"
 }
 
 clear_kubeconfig_cache() {

@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+echo "$1" | socat stdio unix:/run/user/"$(id -u)"/open-browser.sock

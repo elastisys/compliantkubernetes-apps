@@ -123,9 +123,45 @@ preflight.end_to_end() {
     failure="true"
   fi
 
+  end_to_end.socat_up
+
   if [[ "${failure}" == "true" ]]; then
     echo "error: preflight checks failure for end-to-end tests" >&2
     exit 1
+  fi
+}
+end_to_end.socat_up() {
+  local -r pid_file="${tests}/end-to-end/.run/socat.pid"
+
+  if ! command -v socat >/dev/null; then
+    echo "error: the end-to-end suites require the socat binary be present on your system" >&2
+    echo "tip: run './bin/ck8s install-requirements' to update your requirements" >&2
+  fi
+
+  mkdir -p "${tests}/end-to-end/.run"
+  if [[ ! -f "${pid_file}" ]] || ! kill -0 "$(<"${pid_file}")" 2>/dev/null; then
+    local -r sock_file="${tests}/end-to-end/.run/open-browser.sock"
+    rm -f "${sock_file}"
+    socat -lf "${tests}/end-to-end/.run/socat.log" unix-listen:"${sock_file}",fork system:'xargs xdg-open' &
+    echo "$!" >"${pid_file}"
+  fi
+}
+
+postflight.unit() {
+  return
+}
+postflight.regression() {
+  return
+}
+postflight.integration() {
+  return
+}
+postflight.end_to_end() {
+  local -r pid_file="${tests}/end-to-end/.run/socat.pid"
+
+  # we've got a pid file and there's a running socat with that pid => clean it up
+  if [[ -f "${pid_file}" ]] && kill -0 "$(<"${pid_file}")" 2>/dev/null; then
+    kill "$(<"${pid_file}")"
   fi
 }
 
@@ -224,22 +260,23 @@ suite.teardown() {
 
 main() {
   case "${1:-}" in
-  preflight)
+  preflight | postflight)
+    local -r phase="${1}"
     case "${2:-}" in
     unit)
-      preflight.unit
+      "${phase}.unit"
       ;;
     regression)
-      preflight.regression
+      "${phase}.regression"
       ;;
     integration)
-      preflight.integration
+      "${phase}.integration"
       ;;
     end-to-end)
-      preflight.end_to_end
+      "${phase}.end_to_end"
       ;;
     *)
-      echo "error: invalid argument for preflight" >&2
+      echo "error: invalid argument for ${phase}" >&2
       exit 1
       ;;
     esac

@@ -14,7 +14,6 @@ grafana_logs() {
 }
 
 @test "grafana admin can discover dashboards" {
-  echo "If this test gets stuck here for too long, visit \"http://localhost:8000\" in your browser in case you need to authenticate" >&3
   with_kubeconfig "sc"
 
   readarray -t dashboards < <(helmfile -e service_cluster -f "${ROOT}/helmfile.d" -l name=grafana-dashboards template | yq -N 'select(.kind == "ConfigMap") | .data | keys | .[]')
