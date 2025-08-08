@@ -4,7 +4,7 @@
 #
 # This file is not meant to be run directly, but is called by a pre-commit hook.
 
-set -euo pipefail
+set -uo pipefail
 
 declare tests
 tests="$(dirname "$(dirname "$(readlink -f "$0")")")"
@@ -28,6 +28,21 @@ if [[ -z "${checker}" ]]; then
   exit 1
 fi
 
+if ! command -v eslint >/dev/null 2>&1; then
+  echo "Fatal: 'eslint' could be found, run: npm install" >&2
+  exit 1
+fi
+
 pushd "${tests}" >/dev/null 2>&1 || exit 1
-$checker --noEmit
-popd >/dev/null 2>&1
+exit_code=0
+
+if ! $checker --noEmit; then
+  ((exit_code++))
+fi
+if ! eslint; then
+  eslint --fix
+  ((exit_code++))
+fi
+
+popd >/dev/null 2>&1 || exit 1
+exit $exit_code

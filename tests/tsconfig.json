@@ -1,13 +1,15 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "nodenext",
     "strict": true,
     "noEmit": true,
     "allowJs": true,
     "checkJs": true,
     "skipLibCheck": true,
     "noImplicitAny": false,
-    "lib": ["ES2023"]
+    "lib": ["ES2023"],
+    "esModuleInterop": true,
+    "moduleResolution": "nodenext"
   },
   "include": ["**/*.js", "**/*.d.ts"]
 }
