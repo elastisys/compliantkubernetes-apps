@@ -26,12 +26,13 @@ spec:
     metadata:
       labels:
         name: node-agent
+        role: node-agent
         app.kubernetes.io/name: {{ include "velero.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
         app.kubernetes.io/managed-by: {{ .Release.Service }}
         helm.sh/chart: {{ include "velero.chart" . }}
-      {{- if .Values.podLabels }}
-        {{- toYaml .Values.podLabels | nindent 8 }}
+      {{- if .Values.nodeAgent.podLabels }}
+        {{- toYaml .Values.nodeAgent.podLabels | nindent 8 }}
       {{- end }}
     {{- if or .Values.podAnnotations .Values.metrics.enabled (and .Values.credentials.useSecret (not .Values.credentials.existingSecret)) }}
       annotations:
@@ -48,6 +49,10 @@ spec:
       {{- end }}
     {{- end }}
     spec:
+      {{- with .Values.nodeAgent.hostAliases }}
+      hostAliases:
+      {{- toYaml . | nindent 8 }}
+      {{- end }}
     {{- if .Values.image.imagePullSecrets }}
       imagePullSecrets:
       {{- range .Values.image.imagePullSecrets }}
@@ -55,12 +60,16 @@ spec:
       {{- end }}
     {{- end }}
       serviceAccountName: {{ include "velero.serverServiceAccount" . }}
+      automountServiceAccountToken: {{ .Values.serviceAccount.server.automountServiceAccountToken }}
       {{- with .Values.nodeAgent.podSecurityContext }}
       securityContext:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- if .Values.nodeAgent.priorityClassName }}
       priorityClassName: {{ include "velero.nodeAgent.priorityClassName" . }}
+      {{- end }}
+      {{- if .Values.nodeAgent.runtimeClassName }}
+      runtimeClassName: {{ include "velero.nodeAgent.runtimeClassName" . }}
       {{- end }}
       terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
       volumes:
@@ -72,6 +81,9 @@ spec:
         - name: host-pods
           hostPath:
             path: {{ .Values.nodeAgent.podVolumePath }}
+        - name: host-plugins
+          hostPath:
+            path: {{ .Values.nodeAgent.pluginVolumePath | default "/var/lib/kubelet/plugins" }}
         {{- if .Values.nodeAgent.useScratchEmptyDir }}
         - name: scratch
           emptyDir: {}
@@ -102,12 +114,18 @@ spec:
             {{- with .features }}
             - --features={{ . }}
             {{- end }}
+            {{- with .dataMoverPrepareTimeout }}
+            - --data-mover-prepare-timeout={{ . }}
+            {{- end }}
             {{- with .logLevel }}
             - --log-level={{ . }}
             {{- end }}
             {{- with .logFormat }}
             - --log-format={{ . }}
             {{- end }}
+          {{- end }}
+          {{- with .Values.nodeAgent.extraArgs }}
+          {{- toYaml . | nindent 12 }}
           {{- end }}
           volumeMounts:
             {{- if .Values.credentials.useSecret }}
@@ -116,6 +134,9 @@ spec:
             {{- end }}
             - name: host-pods
               mountPath: /host_pods
+              mountPropagation: HostToContainer
+            - name: host-plugins
+              mountPath: /host_plugins
               mountPropagation: HostToContainer
             {{- if .Values.nodeAgent.useScratchEmptyDir }}
             - name: scratch
@@ -151,10 +172,7 @@ spec:
               value: /credentials/cloud
           {{- end }}
           {{- with .Values.configuration.extraEnvVars }}
-          {{- range $key, $value := . }}
-            - name: {{ default "none" $key }}
-              value: {{ tpl (default "none" $value) $ | quote }}
-          {{- end }}
+          {{- toYaml . | nindent 12 }}
           {{- end }}
           {{- with .Values.credentials.extraEnvVars }}
           {{- range $key, $value := . }}
@@ -166,10 +184,7 @@ spec:
           {{- end }}
           {{- end }}
           {{- with .Values.nodeAgent.extraEnvVars }}
-          {{- range $key, $value := . }}
-            - name: {{ default "none" $key }}
-              value: {{ default "none" $value | quote }}
-          {{- end }}
+          {{- toYaml . | nindent 12 }}
           {{- end }}
           {{- if .Values.lifecycle }}
           lifecycle: {{ toYaml .Values.nodeAgent.lifecycle | nindent 12 }}
@@ -194,8 +209,12 @@ spec:
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-    {{- with .Values.nodeAgent.dnsConfig }}
-    dnsConfig:
-      {{- toYaml . | nindent 8 }}
-    {{- end }}
+      {{- with .Values.nodeAgent.dnsConfig }}
+      dnsConfig:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+  {{- with .Values.nodeAgent.updateStrategy }}
+  updateStrategy:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 {{- end }}

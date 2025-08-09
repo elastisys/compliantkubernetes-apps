@@ -706,7 +706,7 @@ velero:
   enabled: true
   tolerations: []
   nodeSelector: {}
-  uploaderType: restic
+  uploaderType: kopia
   useVolumeSnapshots: false
   schedule: 0 0 * * * # once per day
   retentionPeriod: 720h0m0s
