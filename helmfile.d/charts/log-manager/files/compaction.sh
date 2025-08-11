@@ -30,19 +30,19 @@ mkdir -p "$SORT_TMP"
 
 # Define functions for the S3 operations
 s3_list_days() {
-  s3cmd --config "$S3_CONFIG" ls "s3://$S3_BUCKET/$S3_PREFIX/" | grep 'DIR' | awk '{print $2}' | sed "s#s3://$S3_BUCKET/$S3_PREFIX/##" | sed 's#/$##'
+  s3cmd --config "$S3_CONFIG" ls "s3://$S3_BUCKET/$S3_PREFIX/" | { grep 'DIR' || true; } | awk '{print $2}' | sed "s#s3://$S3_BUCKET/$S3_PREFIX/##" | sed 's#/$##'
 }
 
 s3_list_indices() {
   S3_PATH="$1"
 
-  s3cmd --config "$S3_CONFIG" ls "s3://$S3_BUCKET/$S3_PREFIX/$S3_PATH/" | grep 'DIR' | awk '{print $2}' | sed "s#s3://$S3_BUCKET/$S3_PREFIX/$S3_PATH/##" | sed 's#/$##'
+  s3cmd --config "$S3_CONFIG" ls "s3://$S3_BUCKET/$S3_PREFIX/$S3_PATH/" | { grep 'DIR' || true; } | awk '{print $2}' | sed "s#s3://$S3_BUCKET/$S3_PREFIX/$S3_PATH/##" | sed 's#/$##'
 }
 
 s3_list_chunks() {
   S3_PATH="$1"
 
-  s3cmd --config "$S3_CONFIG" ls -r "s3://$S3_BUCKET/$S3_PREFIX/$S3_PATH/" | grep '\.gz\|\.zst' | awk '{print $4}' | sed "s#s3://$S3_BUCKET/$S3_PREFIX/$S3_PATH/##"
+  s3cmd --config "$S3_CONFIG" ls -r "s3://$S3_BUCKET/$S3_PREFIX/$S3_PATH/" | { grep '\.gz\|\.zst' || true; } | awk '{print $4}' | sed "s#s3://$S3_BUCKET/$S3_PREFIX/$S3_PATH/##"
 }
 
 s3_get_chunks() {
