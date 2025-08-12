@@ -30,6 +30,10 @@ spec:
       ports:
         - port: 9153
   egress:
+    - to:
+      - podSelector:
+          matchLabels:
+            k8s-app: kube-dns
     {{- if and .Values.global.apiserver.ips .Values.global.apiserver.port }}
     - to:
       {{- range $IP := .Values.global.apiserver.ips }}
