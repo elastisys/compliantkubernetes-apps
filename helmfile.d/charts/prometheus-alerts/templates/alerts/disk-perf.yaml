@@ -38,6 +38,7 @@ spec:
           for: 10m
           labels:
             severity: warning
+            group: DiskPerformance
         - alert: DiskWriteWaitTimeHigh
           annotations:
             description: Disk {{`{{`}} $labels.device {{`}}`}} Wait Time on {{`{{`}} $labels.instance {{`}}`}} is {{`{{`}} $value {{`}}`}}, check the workload
@@ -54,6 +55,7 @@ spec:
           for: 10m
           labels:
             severity: warning
+            group: DiskPerformance
         - alert: DiskQueueSizeHigh
           annotations:
             description: Disk {{`{{`}} $labels.device {{`}}`}} Queue Size on {{`{{`}} $labels.instance {{`}}`}} is {{`{{`}} $value {{`}}`}}, check the workload
@@ -68,4 +70,5 @@ spec:
           for: 10m
           labels:
             severity: warning
+            group: DiskPerformance
 {{- end }}

@@ -26,6 +26,7 @@ spec:
       for: 2m
       labels:
         severity: warning
+        group: Node
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}

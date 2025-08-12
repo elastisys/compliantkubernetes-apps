@@ -32,6 +32,7 @@ spec:
       for: {{ .for }}
       labels:
         severity: {{ .severity }}
+        group: NodeFilesystem
   {{- if $.Values.defaultRules.additionalRuleLabels }}
   {{ toYaml $.Values.defaultRules.additionalRuleLabels | indent 8 }}
   {{- end }}
@@ -53,6 +54,7 @@ spec:
       for: {{ .for }}
       labels:
         severity: {{ .severity }}
+        group: NodeFilesystem
   {{- if $.Values.defaultRules.additionalRuleLabels }}
   {{ toYaml $.Values.defaultRules.additionalRuleLabels | indent 8 }}
   {{- end }}
@@ -72,6 +74,7 @@ spec:
       for: {{ .for }}
       labels:
         severity: {{ .severity }}
+        group: NodeFilesystem
   {{- if $.Values.defaultRules.additionalRuleLabels }}
   {{ toYaml $.Values.defaultRules.additionalRuleLabels | indent 8 }}
   {{- end }}
@@ -93,6 +96,7 @@ spec:
       for: {{ .for }}
       labels:
         severity: {{ .severity }}
+        group: NodeFilesystem
   {{- if $.Values.defaultRules.additionalRuleLabels }}
   {{ toYaml $.Values.defaultRules.additionalRuleLabels | indent 8 }}
   {{- end }}
@@ -106,6 +110,7 @@ spec:
       for: 1h
       labels:
         severity: warning
+        group: NodeNetwork
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
@@ -118,6 +123,7 @@ spec:
       for: 1h
       labels:
         severity: warning
+        group: NodeNetwork
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
@@ -129,6 +135,7 @@ spec:
       expr: (node_nf_conntrack_entries / node_nf_conntrack_entries_limit) > 0.75
       labels:
         severity: warning
+        group: Node
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
@@ -140,6 +147,7 @@ spec:
       expr: node_textfile_scrape_error{job="node-exporter"} == 1
       labels:
         severity: warning
+        group: Node
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
@@ -163,6 +171,7 @@ spec:
       for: 10m
       labels:
         severity: warning
+        group: Node
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
@@ -178,6 +187,7 @@ spec:
       for: 10m
       labels:
         severity: warning
+        group: Node
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
@@ -193,6 +203,7 @@ spec:
       for: 15m
       labels:
         severity: warning
+        group: Node
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
@@ -208,6 +219,7 @@ spec:
       for: 15m
       labels:
         severity: critical
+        group: Node
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}

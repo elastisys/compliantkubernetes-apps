@@ -23,6 +23,7 @@ spec:
       for: 5m
       labels:
         severity: warning
+        group: KuredFailedNodeReboot
       annotations:
         description: "Kured has failed with required reboot of node {{`{{ $labels.node }}`}} over 30 days."
         runbook_url: {{ .Values.runbookUrls.kured.KuredFailedNodeReboot }}

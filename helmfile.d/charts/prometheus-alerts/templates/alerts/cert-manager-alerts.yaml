@@ -27,6 +27,7 @@ spec:
       for: 10m
       labels:
         severity: low
+        group: CertificateExpiringSoon
     - alert: CertificateNotReady
       annotations:
         message: The Certificate {{`{{$labels.name}}`}} is not ready!
@@ -36,4 +37,5 @@ spec:
       for: 10m
       labels:
         severity: critical
+        group: CertificateNotReady
 {{- end }}
