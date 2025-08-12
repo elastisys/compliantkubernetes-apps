@@ -164,13 +164,14 @@ with_namespace() {
 # note: expects with_kubeconfig and with_namespace to be set
 # usage: create_namespace
 create_namespace() {
-  kubectl create namespace "${NAMESPACE}" >/dev/null
+  kubectl create namespace "${NAMESPACE}" --dry-run=client -o yaml | kubectl apply -f - >/dev/null
+  kubectl wait --for jsonpath='{.status.phase}'=Active "namespace/${NAMESPACE}"
 }
 
 # note: expects with_kubeconfig and with_namespace to be set
 # usage: delete_namespace
 delete_namespace() {
-  kubectl delete namespace "${NAMESPACE}" >/dev/null
+  kubectl delete namespace "${NAMESPACE}" --wait=true >/dev/null
 }
 
 # note: expects with_kubeconfig and with_namespace to be set
