@@ -9,8 +9,8 @@ azure:
 s3:
   forcePathStyle: {{ .Values.objectStorage.s3.forcePathStyle }}
   regionEndpoint: {{ .Values.objectStorage.s3.regionEndpoint }}
-  accessKey: {{ .Values.objectStorage.s3.accessKey }}
-  secretKey: {{ .Values.objectStorage.s3.secretKey }}
+  accessKey: {{ include "componentObjectStorage" (list "fluentd" "accessKey" .) }}
+  secretKey: {{ include "componentObjectStorage" (list "fluentd" "secretKey" .) }}
   enabled: true
 {{- end }}
 
