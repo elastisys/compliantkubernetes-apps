@@ -24,8 +24,8 @@ extraDeploy:
     type: Opaque
     stringData:
       {{- if eq .Values.objectStorage.type "s3" }}
-      AWS_ACCESS_KEY_ID: {{ .Values.objectStorage.s3.accessKey }}
-      AWS_ACCESS_SECRET_KEY: {{ .Values.objectStorage.s3.secretKey }}
+      AWS_ACCESS_KEY_ID: {{ include "componentObjectStorage" (list "fluentd" "accessKey" .) }}
+      AWS_ACCESS_SECRET_KEY: {{ include "componentObjectStorage" (list "fluentd" "secretKey" .) }}
       {{- else if eq .Values.objectStorage.type "azure" }}
       STORAGE_ACCOUNT: {{ .Values.objectStorage.azure.storageAccountName }}
       STORAGE_ACCESS_KEY: {{ .Values.objectStorage.azure.storageAccountKey }}
