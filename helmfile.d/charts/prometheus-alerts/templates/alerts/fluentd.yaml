@@ -23,6 +23,7 @@ spec:
       labels:
         service: fluentd
         severity: warning
+        group: Fluentd
       annotations:
         summary: fluentd cannot be scraped
         description: Prometheus could not scrape {{ "{{ $labels.job }}" }} for more than 10 minutes
@@ -33,6 +34,7 @@ spec:
       labels:
         service: fluentd
         severity: critical
+        group: Fluentd
       annotations:
         summary: fluentd cannot be scraped
         description: Prometheus could not scrape {{ "{{ $labels.job }}" }} for more than 30 minutes
@@ -43,6 +45,7 @@ spec:
       labels:
         service: fluentd
         severity: warning
+        group: Fluentd
       annotations:
         summary: fluentd node are failing
         description: In the last 15 minutes, fluentd queues increased 30%. Current value is {{ "{{ $value }}" }}
@@ -53,6 +56,7 @@ spec:
       labels:
         service: fluentd
         severity: critical
+        group: Fluentd
       annotations:
         summary: fluentd node are critical
         description: In the last 5 minutes, fluentd queues increased 50%. Current value is {{ "{{ $value }}" }}
@@ -63,6 +67,7 @@ spec:
       labels:
         service: fluentd
         severity: warning
+        group: Fluentd
       annotations:
         summary: fluentd available space in buffer is less than 50%
         description: For the last 5 minutes, the available buffer space for pod {{ "{{ $labels.pod }}" }}, plugin-id {{  "{{ $labels.plugin_id }}" }} in cluster {{ "{{ $labels.cluster }}" }} is below 50%. Current value is {{ "{{ $value }}" }}
@@ -73,6 +78,7 @@ spec:
       labels:
         service: fluentd
         severity: critical
+        group: Fluentd
       annotations:
         summary: fluentd available space in buffer is less than 90%
         description: For the last 5 minutes, the available buffer space for pod {{ "{{ $labels.pod }}" }}, plugin-id {{  "{{ $labels.plugin_id }}" }} in cluster {{ "{{ $labels.cluster }}" }} is below 10%. Current value is {{ "{{ $value }}" }}
@@ -86,6 +92,7 @@ spec:
       labels:
         service: fluentd
         severity: warning
+        group: Fluentd
       annotations:
         summary: fluentd records count are critical
         description: In the last 5m, records counts increased 3 times, comparing to the latest 15 min.
@@ -96,6 +103,7 @@ spec:
       labels:
         service: fluentd
         severity: warning
+        group: Fluentd
       annotations:
         description: Fluentd retry count has been  {{ "{{ $value }}" }} for the last 10 minutes
         summary: Fluentd retry count has been  {{ "{{ $value }}" }} for the last 10 minutes
@@ -106,6 +114,7 @@ spec:
       labels:
         service: fluentd
         severity: warning
+        group: Fluentd
       annotations:
         description: Fluentd output error count is {{ "{{ $value }}" }} for the last 10 minutes
         summary: There have been Fluentd output error(s) for the last 10 minutes

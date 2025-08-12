@@ -33,6 +33,7 @@ spec:
       for: 1h
       labels:
         severity: warning
+        group: NodeFilesystemSpaceFillingUp
     {{- if .Values.capacityManagementAlertsPersistentVolumeEnabled }}
     - alert: PersistentVolume{{.Values.capacityManagementAlertsPersistentVolumeLimit}}PercentInThreeDays
       annotations:
@@ -42,6 +43,7 @@ spec:
       for: 5m
       labels:
         severity: warning
+        group: ClusterCapacityPersistentVolumePercent
     {{- end }}
     {{- if .Values.capacityManagementAlertsPredictUsage}}
     - alert: Memory{{.Values.capacityManagementAlertsUsageLimit}}PercentInThreeDays
@@ -52,6 +54,7 @@ spec:
       for: 5m
       labels:
         severity: warning
+        group: ClusterCapacityMemoryPercent
     {{- end }}
     - alert: NodeGroupCPU{{.Values.capacityManagementAlertsNodeGroupCpuLimit24h}}PercentOver24h
       annotations:
@@ -61,6 +64,7 @@ spec:
       for: 5m
       labels:
         severity: warning
+        group: ClusterCapacityManagement
     - alert: NodeGroupCPU{{.Values.capacityManagementAlertsNodeGroupCpuLimit1h}}PercentOver1h
       annotations:
         message: CPU usage has been over {{.Values.capacityManagementAlertsNodeGroupCpuLimit1h}}% on average over the span of 1h in the Node Group {{`{{ $labels.label_elastisys_io_node_group }}`}} in Cluster {{`{{ $labels.cluster }}`}}.
@@ -69,6 +73,7 @@ spec:
       for: 5m
       labels:
         severity: warning
+        group: ClusterCapacityManagement
     - alert: NodeGroupMemory{{.Values.capacityManagementAlertsNodeGroupMemoryLimit24h}}PercentOver24h
       annotations:
         message: Memory usage has been over {{.Values.capacityManagementAlertsNodeGroupMemoryLimit24h}}% on average over the span of 24h in the Node Group {{`{{ $labels.label_elastisys_io_node_group }}`}} in Cluster {{`{{ $labels.cluster }}`}}.
@@ -77,6 +82,7 @@ spec:
       for: 5m
       labels:
         severity: warning
+        group: ClusterCapacityManagement
     - alert: NodeGroupMemory{{.Values.capacityManagementAlertsNodeGroupMemoryLimit1h}}PercentOver1h
       annotations:
         message: Memory usage has been over {{.Values.capacityManagementAlertsNodeGroupMemoryLimit1h}}% on average over the span of 1h in the Node Group {{`{{ $labels.label_elastisys_io_node_group }}`}} in Cluster {{`{{ $labels.cluster }}`}}.
@@ -85,6 +91,7 @@ spec:
       for: 5m
       labels:
         severity: warning
+        group: ClusterCapacityManagement
     - alert: NodeCPU{{.Values.capacityManagementAlertsNodeCpuLimit1h}}PercentOver1h
       annotations:
         message: CPU usage has been over {{.Values.capacityManagementAlertsNodeCpuLimit1h}}% on average over the span of 1h for the node {{`{{ $labels.instance }}`}} in Cluster {{`{{ $labels.cluster }}`}}.
@@ -93,6 +100,7 @@ spec:
       for: 5m
       labels:
         severity: warning
+        group: ClusterCapacityManagement
     - alert: NodeMemory{{.Values.capacityManagementAlertsNodeMemoryLimit1h}}PercentOver1h
       annotations:
         message: Memory usage has been over {{.Values.capacityManagementAlertsNodeMemoryLimit1h}}% on average over the span of 1h for the Node {{`{{ $labels.instance }}`}} in Cluster {{`{{ $labels.cluster }}`}}.
@@ -105,6 +113,7 @@ spec:
       for: 5m
       labels:
         severity: warning
+        group: ClusterCapacityManagement
     - alert: NodeGroupCpuRequest{{ .Values.capacityManagementAlertsCpuRequestLimit }}Percent
       annotations:
         message: Average CPU requests is over {{ .Values.capacityManagementAlertsCpuRequestLimit }}% in the Node Group {{`{{ $labels.label_elastisys_io_node_group }}`}} in Cluster {{`{{ $labels.cluster }}`}}.
@@ -121,6 +130,7 @@ spec:
       for: 5m
       labels:
         severity: warning
+        group: ClusterCapacityManagement
     - alert: NodeGroupMemoryRequest{{ .Values.capacityManagementAlertsMemoryRequestLimit }}Percent
       annotations:
         message: Average memory requests is over {{ .Values.capacityManagementAlertsMemoryRequestLimit }}% in the Node Group {{`{{ $labels.label_elastisys_io_node_group }}`}} in Cluster {{`{{ $labels.cluster }}`}}.
@@ -137,6 +147,7 @@ spec:
       for: 5m
       labels:
         severity: warning
+        group: ClusterCapacityManagement
     - alert: NodeMissingElastisysNodeGroupLabel
       annotations:
         description: "The node {{`{{`}} $labels.node {{`}}`}} in {{`{{`}} $labels.cluster {{`}}`}}  is missing the 'elastisys.io/node-group' label. This might affect capacity management monitoring."
@@ -146,4 +157,5 @@ spec:
       for: 60m
       labels:
         severity: warning
+        group: ClusterCapacityManagement
 {{- end }}

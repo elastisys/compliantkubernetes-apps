@@ -13,6 +13,7 @@ groups:
     for: 5m
     labels:
       severity: warning
+      group: Thanos
   - alert: ThanosCompactHalted
     annotations:
       description: Thanos Compact {{`{{$labels.job}}`}} has failed to run and now is halted.
@@ -22,6 +23,7 @@ groups:
     for: 5m
     labels:
       severity: warning
+      group: Thanos
   - alert: ThanosCompactHighCompactionFailures
     annotations:
       description: Thanos Compact {{`{{$labels.job}}`}} is failing to execute {{`{{$value | humanize}}`}}% of compactions.
@@ -37,6 +39,7 @@ groups:
     for: 15m
     labels:
       severity: warning
+      group: Thanos
   - alert: ThanosCompactBucketHighOperationFailures
     annotations:
       description: Thanos Compact {{`{{$labels.job}}`}} Bucket is failing to execute {{`{{$value | humanize}}`}}% of operations.
@@ -52,6 +55,7 @@ groups:
     for: 15m
     labels:
       severity: warning
+      group: Thanos
   - alert: ThanosCompactHasNotRun
     annotations:
       description: Thanos Compact {{`{{$labels.job}}`}} has not uploaded anything for 24
@@ -62,6 +66,7 @@ groups:
       / 60 / 60 > 24
     labels:
       severity: warning
+      group: Thanos
 - name: thanos-query
   rules:
   - alert: ThanosQueryHttpRequestQueryErrorRateHigh
@@ -79,6 +84,7 @@ groups:
     for: 5m
     labels:
       severity: critical
+      group: Thanos
   - alert: ThanosQueryHttpRequestQueryRangeErrorRateHigh
     annotations:
       description: Thanos Query {{`{{$labels.job}}`}} is failing to handle {{`{{$value | humanize}}`}}%
@@ -94,6 +100,7 @@ groups:
     for: 5m
     labels:
       severity: critical
+      group: Thanos
   - alert: ThanosQueryGrpcServerErrorRate
     annotations:
       description: Thanos Query {{`{{$labels.job}}`}} is failing to handle {{`{{$value | humanize}}`}}%
@@ -110,6 +117,7 @@ groups:
     for: 5m
     labels:
       severity: warning
+      group: Thanos
   - alert: ThanosQueryGrpcClientErrorRate
     annotations:
       description: Thanos Query {{`{{$labels.job}}`}} is failing to send {{`{{$value | humanize}}`}}%
@@ -125,6 +133,7 @@ groups:
     for: 5m
     labels:
       severity: warning
+      group: Thanos
   - alert: ThanosQueryHighDNSFailures
     annotations:
       description: Thanos Query {{`{{$labels.job}}`}} have {{`{{$value | humanize}}`}}% of failing
@@ -140,6 +149,7 @@ groups:
     for: 15m
     labels:
       severity: warning
+      group: Thanos
   - alert: ThanosQueryInstantLatencyHigh
     annotations:
       description: Thanos Query {{`{{$labels.job}}`}} has a 99th percentile latency of {{`{{$value}}`}}
@@ -155,6 +165,7 @@ groups:
     for: 10m
     labels:
       severity: critical
+      group: Thanos
   - alert: ThanosQueryRangeLatencyHigh
     annotations:
       description: Thanos Query {{`{{$labels.job}}`}} has a 99th percentile latency of {{`{{$value}}`}}
@@ -170,6 +181,7 @@ groups:
     for: 10m
     labels:
       severity: critical
+      group: Thanos
 - name: thanos-receive
   rules:
   - alert: ThanosReceiveHttpRequestErrorRateHigh
@@ -186,6 +198,7 @@ groups:
     for: 20m
     labels:
       severity: critical
+      group: Thanos
   - alert: ThanosReceiveHttpRequestLatencyHigh
     annotations:
       description: Thanos Receive {{`{{$labels.job}}`}} has a 99th percentile latency of
@@ -201,6 +214,7 @@ groups:
     for: 10m
     labels:
       severity: critical
+      group: Thanos
   - alert: ThanosReceiveHighReplicationFailures
     annotations:
       description: Thanos Receive {{`{{$labels.job}}`}} is failing to replicate {{`{{$value | humanize}}`}}% of requests.
@@ -225,6 +239,7 @@ groups:
     for: 5m
     labels:
       severity: warning
+      group: Thanos
   - alert: ThanosReceiveHighForwardRequestFailures
     annotations:
       description: Thanos Receive {{`{{$labels.job}}`}} is failing to forward {{`{{$value | humanize}}`}}% of requests.
@@ -239,6 +254,7 @@ groups:
     for: 5m
     labels:
       severity: info
+      group: Thanos
   - alert: ThanosReceiveHighHashringFileRefreshFailures
     annotations:
       description: Thanos Receive {{`{{$labels.job}}`}} is failing to refresh hashring file,
@@ -255,6 +271,7 @@ groups:
     for: 15m
     labels:
       severity: warning
+      group: Thanos
   - alert: ThanosReceiveConfigReloadFailure
     annotations:
       description: Thanos Receive {{`{{$labels.job}}`}} has not been able to reload hashring
@@ -266,6 +283,7 @@ groups:
     for: 5m
     labels:
       severity: warning
+      group: Thanos
   - alert: ThanosReceiveNoUpload
     annotations:
       description: Thanos Receive {{`{{$labels.instance}}`}} has not uploaded latest data
@@ -279,6 +297,7 @@ groups:
     for: 3h
     labels:
       severity: critical
+      group: Thanos
   - alert: ThanosReceiveTrafficBelowThreshold
     annotations:
       description: At Thanos Receive {{`{{$labels.job}}`}} in {{`{{$labels.namespace}}`}} , the
@@ -296,6 +315,7 @@ groups:
     for: 1h
     labels:
       severity: warning
+      group: Thanos
 - name: thanos-store
   rules:
   - alert: ThanosStoreGrpcErrorRate
@@ -314,6 +334,7 @@ groups:
     for: 5m
     labels:
       severity: warning
+      group: Thanos
   - alert: ThanosStoreSeriesGateLatencyHigh
     annotations:
       description: Thanos Store {{`{{$labels.job}}`}} has a 99th percentile latency of {{`{{$value}}`}}
@@ -329,6 +350,7 @@ groups:
     for: 10m
     labels:
       severity: warning
+      group: Thanos
   - alert: ThanosStoreBucketHighOperationFailures
     annotations:
       description: Thanos Store {{`{{$labels.job}}`}} Bucket is failing to execute {{`{{$value | humanize}}`}}% of operations.
@@ -344,6 +366,7 @@ groups:
     for: 15m
     labels:
       severity: warning
+      group: Thanos
   - alert: ThanosStoreObjstoreOperationLatencyHigh
     annotations:
       description: Thanos Store {{`{{$labels.job}}`}} Bucket has a 99th percentile latency
@@ -359,6 +382,7 @@ groups:
     for: 10m
     labels:
       severity: warning
+      group: Thanos
 - name: thanos-bucket-replicate
   rules:
   - alert: ThanosBucketReplicateErrorRate
@@ -376,6 +400,7 @@ groups:
     for: 5m
     labels:
       severity: critical
+      group: Thanos
   - alert: ThanosBucketReplicateRunLatency
     annotations:
       description: Thanos Replicate {{`{{$labels.job}}`}} has a 99th percentile latency
@@ -391,6 +416,7 @@ groups:
     for: 5m
     labels:
       severity: critical
+      group: Thanos
 - name: thanos-component-absent
   rules:
   - alert: ThanosCompactIsDown
@@ -404,6 +430,7 @@ groups:
     for: 5m
     labels:
       severity: critical
+      group: Thanos
   - alert: ThanosQueryIsDown
     annotations:
       description: ThanosQuery has disappeared. Prometheus target for the component
@@ -415,6 +442,7 @@ groups:
     for: 5m
     labels:
       severity: critical
+      group: Thanos
   - alert: ThanosReceiveIsDown
     annotations:
       description: ThanosReceive has disappeared. Prometheus target for the component
@@ -426,6 +454,7 @@ groups:
     for: 5m
     labels:
       severity: critical
+      group: Thanos
   - alert: ThanosStoreIsDown
     annotations:
       description: ThanosStore has disappeared. Prometheus target for the component
@@ -437,3 +466,4 @@ groups:
     for: 5m
     labels:
       severity: critical
+      group: Thanos

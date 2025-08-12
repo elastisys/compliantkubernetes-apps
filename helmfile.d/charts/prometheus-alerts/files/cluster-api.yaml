@@ -10,6 +10,7 @@
       labels:
         rulesgroup: cluster-api
         severity: warning
+        group: ClusterApiCluster
       expr: |
         sum(capi_cluster_spec_paused) by (name) != 0
       for: 15m
@@ -23,6 +24,7 @@
       labels:
         rulesgroup: cluster-api
         severity: warning
+        group: ClusterApiCluster
       expr: |
         sum(capi_cluster_status_condition{type="ControlPlaneInitialized", status="True"}) by (name) != 1
       for: 15m
@@ -36,6 +38,7 @@
       labels:
         rulesgroup: cluster-api
         severity: high
+        group: ClusterApiCluster
       expr: |
         sum(capi_cluster_status_condition{type="ControlPlaneReady", status="True"}) by (name) != 1
       for: 5m
@@ -49,6 +52,7 @@
       labels:
         rulesgroup: cluster-api
         severity: high
+        group: ClusterApiCluster
       expr: |
         sum(capi_cluster_status_condition{type="InfrastructureReady", status="True"}) by (name) != 1
       for: 15m
@@ -62,6 +66,7 @@
       labels:
         rulesgroup: cluster-api
         severity: warning
+        group: ClusterApiCluster
       expr: |
         capi_cluster_status_phase{phase!="Provisioned"} == 1
       for: 15m
@@ -75,6 +80,7 @@
       labels:
         rulesgroup: cluster-api
         severity: high
+        group: ClusterApiCluster
       expr: |
         capi_cluster_status_phase{phase!="Provisioned"} == 1
       for: 60m
@@ -90,6 +96,7 @@
       labels:
         rulesgroup: cluster-api
         severity: warning
+        group: ClusterApiKubeadmControlPlane
       expr: |
         sum(capi_kubeadmcontrolplane_status_replicas_ready / capi_kubeadmcontrolplane_status_replicas) by (cluster_name, name) != 1
       for: 10m
@@ -103,6 +110,7 @@
       labels:
         rulesgroup: cluster-api
         severity: warning
+        group: ClusterApiKubeadmControlPlane
       expr: |
         sum(capi_kubeadmcontrolplane_status_replicas_ready / capi_kubeadmcontrolplane_status_replicas) by (cluster_name, name) < 0.5
       for: 10m
@@ -116,6 +124,7 @@
       labels:
         rulesgroup: cluster-api
         severity: high
+        group: ClusterApiKubeadmControlPlane
       expr: |
         sum(capi_kubeadmcontrolplane_status_replicas_ready / capi_kubeadmcontrolplane_status_replicas) by (cluster_name, name) < 0.5
       for: 2m
@@ -131,6 +140,7 @@
       labels:
         rulesgroup: cluster-api
         severity: warning
+        group: ClusterApiMachineDeployment
       expr: |
         sum(capi_machinedeployment_status_replicas_ready / (capi_machinedeployment_status_replicas > 0)) by (cluster_name, name) != 1
       for: 15m
@@ -144,6 +154,7 @@
       labels:
         rulesgroup: cluster-api
         severity: high
+        group: ClusterApiMachineDeployment
       expr: |
         sum(capi_machinedeployment_status_replicas_ready / capi_machinedeployment_status_replicas) by (cluster_name, name) < 0.5
       for: 2m
@@ -159,6 +170,7 @@
       labels:
         rulesgroup: cluster-api
         severity: warning
+        group: ClusterApiMachineConditionNotTrue
       expr: |
         sum((capi_machine_status_condition{status!="True"}) * on (name) group_left(node_name) sum(capi_machine_status_noderef) by (name, node_name)) by (cluster_name, node_name, type, status) > 0
       for: 15m

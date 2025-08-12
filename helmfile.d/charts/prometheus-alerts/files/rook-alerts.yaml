@@ -13,6 +13,7 @@ groups:
         for: 5s
         labels:
           severity: warning
+          group: PersistentVolumeUsageNearFull
       - alert: PersistentVolumeUsageCritical
         annotations:
           description: PVC {{ $labels.persistentvolumeclaim }} utilization has crossed 85%. Free up some space or expand the PVC immediately.
@@ -24,6 +25,7 @@ groups:
         for: 5s
         labels:
           severity: critical
+          group: PersistentVolumeUsageCritical
   # Taken from https://github.com/rook/rook/blob/v1.10.5/deploy/charts/rook-ceph-cluster/prometheus/localrules.yaml
   #
   # Note: CephNodeInconsistentMTU has been removed as it would be constantly firing.
@@ -38,6 +40,7 @@ groups:
           severity: critical
           type: ceph_default
           oid: 1.3.6.1.4.1.50495.1.2.1.2.1
+          group: CephHealthError
         annotations:
           summary: Cluster is in the ERROR state
           description: >
@@ -50,6 +53,7 @@ groups:
         labels:
           severity: warning
           type: ceph_default
+          group: CephHealthWarning
         annotations:
           summary: Cluster is in the WARNING state
           description: >
@@ -65,6 +69,7 @@ groups:
           severity: critical
           type: ceph_default
           oid: 1.3.6.1.4.1.50495.1.2.1.3.1
+          group: CephMonDownQuorumAtRisk
         annotations:
           documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks#mon-down
           summary: Monitor quorum is at risk
@@ -82,6 +87,7 @@ groups:
         labels:
           severity: warning
           type: ceph_default
+          group: CephMonDown
         annotations:
           documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks#mon-down
           summary: One or more monitors down
@@ -100,6 +106,7 @@ groups:
           severity: critical
           type: ceph_default
           oid: 1.3.6.1.4.1.50495.1.2.1.3.2
+          group: CephMonDiskspaceCritical
         annotations:
           documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks#mon-disk-crit
           summary: Filesystem space on at least one monitor is critically low
@@ -121,6 +128,7 @@ groups:
         labels:
           severity: warning
           type: ceph_default
+          group: CephMonDiskspaceLow
         annotations:
           documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks#mon-disk-low
           summary: Disk space on at least one monitor is approaching full
@@ -142,6 +150,7 @@ groups:
         labels:
           severity: warning
           type: ceph_default
+          group: CephMonClockSkew
         annotations:
           documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks#mon-clock-skew
           summary: Clock skew detected among monitors
@@ -162,6 +171,7 @@ groups:
           severity: critical
           type: ceph_default
           oid: 1.3.6.1.4.1.50495.1.2.1.4.1
+          group: CephOSDDownHigh
         annotations:
           summary: More than 10% of OSDs are down
           description: |
@@ -178,6 +188,7 @@ groups:
           severity: warning
           type: ceph_default
           oid: 1.3.6.1.4.1.50495.1.2.1.4.8
+          group: CephOSDHostDown
         annotations:
           summary: An OSD host is offline
           description: |
@@ -192,6 +203,7 @@ groups:
           severity: warning
           type: ceph_default
           oid: 1.3.6.1.4.1.50495.1.2.1.4.2
+          group: CephOSDDown
         annotations:
           documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks#osd-down
           summary: An OSD has been marked down
@@ -210,6 +222,7 @@ groups:
           severity: warning
           type: ceph_default
           oid: 1.3.6.1.4.1.50495.1.2.1.4.3
+          group: CephOSDNearFull
         annotations:
           documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks#osd-nearfull
           summary: OSD(s) running low on free space (NEARFULL)
@@ -225,6 +238,7 @@ groups:
           severity: critical
           type: ceph_default
           oid: 1.3.6.1.4.1.50495.1.2.1.4.6
+          group: CephOSDFull
         annotations:
           documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks#osd-full
           summary: OSD full, writes blocked
@@ -240,6 +254,7 @@ groups:
         labels:
           severity: warning
           type: ceph_default
+          group: CephOSDBackfillFull
         annotations:
           documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks#osd-backfillfull
           summary: OSD(s) too full for backfill operations
@@ -255,6 +270,7 @@ groups:
         labels:
           severity: warning
           type: ceph_default
+          group: CephOSDTooManyRepairs
         annotations:
           documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks#osd-too-many-repairs
           summary: OSD reports a high number of read errors
@@ -267,6 +283,7 @@ groups:
         labels:
           severity: warning
           type: ceph_default
+          group: CephOSDTimeoutsPublicNetwork
         annotations:
           summary: Network issues delaying OSD heartbeats (public network)
           description: |
@@ -278,6 +295,7 @@ groups:
         labels:
           severity: warning
           type: ceph_default
+          group: CephOSDTimeoutsClusterNetwork
         annotations:
           summary: Network issues delaying OSD heartbeats (cluster network)
           description: |
@@ -289,6 +307,7 @@ groups:
         labels:
           severity: warning
           type: ceph_default
+          group: CephOSDInternalDiskSizeMismatch
         annotations:
           documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks#bluestore-disk-size-mismatch
           summary: OSD size inconsistency error
@@ -301,6 +320,7 @@ groups:
         labels:
           severity: warning
           type: ceph_default
+          group: CephDeviceFailurePredicted
         annotations:
           documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks#id2
           summary: Device(s) predicted to fail soon
@@ -318,6 +338,7 @@ groups:
           severity: critical
           type: ceph_default
           oid: 1.3.6.1.4.1.50495.1.2.1.4.7
+          group: CephDeviceFailurePredictionTooHigh
         annotations:
           documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks#device-health-toomany
           summary: Too many devices are predicted to fail, unable to resolve
@@ -332,6 +353,7 @@ groups:
         labels:
           severity: warning
           type: ceph_default
+          group: CephDeviceFailureRelocationIncomplete
         annotations:
           documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks#device-health-in-use
           summary: Device failure is predicted, but unable to relocate data
@@ -354,6 +376,7 @@ groups:
           severity: warning
           type: ceph_default
           oid: 1.3.6.1.4.1.50495.1.2.1.4.4
+          group: CephOSDFlapping
         annotations:
           documentation: https://docs.ceph.com/en/latest/rados/troubleshooting/troubleshooting-osd#flapping-osds
           summary: Network issues are causing OSDs to flap (mark each other down)
@@ -370,6 +393,7 @@ groups:
         labels:
           severity: warning
           type: ceph_default
+          group: CephOSDReadErrors
         annotations:
           documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks#bluestore-spurious-read-errors
           summary: Device read errors detected
@@ -389,6 +413,7 @@ groups:
           severity: warning
           type: ceph_default
           oid: 1.3.6.1.4.1.50495.1.2.1.4.5
+          group: CephPGImbalance
         annotations:
           summary: PGs are not balanced across OSDs
           description: >
@@ -405,6 +430,7 @@ groups:
           severity: critical
           type: ceph_default
           oid: 1.3.6.1.4.1.50495.1.2.1.5.1
+          group: CephFilesystemDamaged
         annotations:
           documentation: https://docs.ceph.com/en/latest/cephfs/health-messages#cephfs-health-messages
           summary: CephFS filesystem is damaged.
@@ -419,6 +445,7 @@ groups:
           severity: critical
           type: ceph_default
           oid: 1.3.6.1.4.1.50495.1.2.1.5.3
+          group: CephFilesystemOffline
         annotations:
           documentation: https://docs.ceph.com/en/latest/cephfs/health-messages/#mds-all-down
           summary: CephFS filesystem is offline
@@ -432,6 +459,7 @@ groups:
           severity: critical
           type: ceph_default
           oid: 1.3.6.1.4.1.50495.1.2.1.5.4
+          group: CephFilesystemDegraded
         annotations:
           documentation: https://docs.ceph.com/en/latest/cephfs/health-messages/#fs-degraded
           summary: CephFS filesystem is degraded
@@ -445,6 +473,7 @@ groups:
         labels:
           severity: warning
           type: ceph_default
+          group: CephFilesystemMDSRanksLow
         annotations:
           documentation: https://docs.ceph.com/en/latest/cephfs/health-messages/#mds-up-less-than-max
           summary: MDS daemon count is lower than configured
@@ -458,6 +487,7 @@ groups:
         labels:
           severity: warning
           type: ceph_default
+          group: CephFilesystemInsufficientStandby
         annotations:
           documentation: https://docs.ceph.com/en/latest/cephfs/health-messages/#mds-insufficient-standby
           summary: Ceph filesystem standby daemons too few
@@ -472,6 +502,7 @@ groups:
           severity: critical
           type: ceph_default
           oid: 1.3.6.1.4.1.50495.1.2.1.5.5
+          group: CephFilesystemFailureNoStandby
         annotations:
           documentation: https://docs.ceph.com/en/latest/cephfs/health-messages/#fs-with-failed-mds
           summary: MDS daemon failed, no further standby available
@@ -486,6 +517,7 @@ groups:
           severity: critical
           type: ceph_default
           oid: 1.3.6.1.4.1.50495.1.2.1.5.2
+          group: CephFilesystemReadOnly
         annotations:
           documentation: https://docs.ceph.com/en/latest/cephfs/health-messages#cephfs-health-messages
           summary: CephFS filesystem in read only mode due to write error(s)
@@ -505,6 +537,7 @@ groups:
           severity: critical
           type: ceph_default
           oid: 1.3.6.1.4.1.50495.1.2.1.6.1
+          group: CephMgrModuleCrash
         annotations:
           documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks#recent-mgr-module-crash
           summary: A manager module has recently crashed
@@ -519,6 +552,7 @@ groups:
           severity: critical
           type: ceph_default
           oid: 1.3.6.1.4.1.50495.1.2.1.6.2
+          group: CephMgrPrometheusModuleInactive
         annotations:
           summary: The mgr/prometheus module is not available
           description: >
@@ -540,6 +574,7 @@ groups:
           severity: critical
           type: ceph_default
           oid: 1.3.6.1.4.1.50495.1.2.1.7.1
+          group: CephPGsInactive
         annotations:
           summary: One or more placement groups are inactive
           description: >
@@ -552,6 +587,7 @@ groups:
           severity: warning
           type: ceph_default
           oid: 1.3.6.1.4.1.50495.1.2.1.7.2
+          group: CephPGsUnclean
         annotations:
           summary: One or more placement groups are marked unclean
           description: >
@@ -564,6 +600,7 @@ groups:
           severity: critical
           type: ceph_default
           oid: 1.3.6.1.4.1.50495.1.2.1.7.4
+          group: CephPGsDamaged
         annotations:
           documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks#pg-damaged
           summary: Placement group damaged; manual intervention needed
@@ -580,6 +617,7 @@ groups:
           severity: critical
           type: ceph_default
           oid: 1.3.6.1.4.1.50495.1.2.1.7.5
+          group: CephPGRecoveryAtRisk
         annotations:
           documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks#pg-recovery-full
           summary: OSDs are too full for recovery
@@ -594,6 +632,7 @@ groups:
           severity: critical
           type: ceph_default
           oid: 1.3.6.1.4.1.50495.1.2.1.7.3
+          group: CephPGUnavailableBlockingIO
         annotations:
           documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks#pg-availability
           summary: PG is unavailable, blocking I/O
@@ -607,6 +646,7 @@ groups:
           severity: critical
           type: ceph_default
           oid: 1.3.6.1.4.1.50495.1.2.1.7.6
+          group: CephPGBackfillAtRisk
         annotations:
           documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks#pg-backfill-full
           summary: Backfill operations are blocked due to lack of free space
@@ -619,6 +659,7 @@ groups:
         labels:
           severity: warning
           type: ceph_default
+          group: CephPGNotScrubbed
         annotations:
           documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks#pg-not-scrubbed
           summary: Placement group(s) have not been scrubbed
@@ -636,6 +677,7 @@ groups:
         labels:
           severity: warning
           type: ceph_default
+          group: CephPGsHighPerOSD
         annotations:
           documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks/#too-many-pgs
           summary: Placement groups per OSD is too high
@@ -653,6 +695,7 @@ groups:
         labels:
           severity: warning
           type: ceph_default
+          group: CephPGNotDeepScrubbed
         annotations:
           documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks#pg-not-deep-scrubbed
           summary: Placement group(s) have not been deep scrubbed
@@ -674,6 +717,7 @@ groups:
           severity: critical
           type: ceph_default
           oid: 1.3.6.1.4.1.50495.1.2.1.8.1
+          group: CephNodeRootFilesystemFull
         annotations:
           summary: Root filesystem is dangerously full
           description: >
@@ -697,6 +741,7 @@ groups:
           severity: warning
           type: ceph_default
           oid: 1.3.6.1.4.1.50495.1.2.1.8.3
+          group: CephNodeNetworkPacketErrors
         annotations:
           summary: One or more NICs reports packet errors
           description: >
@@ -713,6 +758,7 @@ groups:
           severity: warning
           type: ceph_default
           oid: 1.3.6.1.4.1.50495.1.2.1.8.4
+          group: CephNodeDiskspaceWarning
         annotations:
           summary: Host filesystem free space is low
           description: >
@@ -730,6 +776,7 @@ groups:
           severity: warning
           type: ceph_default
           oid: 1.3.6.1.4.1.50495.1.2.1.9.2
+          group: CephPoolGrowthWarning
         annotations:
           summary: Pool growth rate may soon exceed capacity
           description: >
@@ -740,6 +787,7 @@ groups:
         labels:
           severity: warning
           type: ceph_default
+          group: CephPoolBackfillFull
         annotations:
           summary: Free space in a pool is too low for recovery/backfill
           description: >
@@ -753,6 +801,7 @@ groups:
           severity: critical
           type: ceph_default
           oid: 1.3.6.1.4.1.50495.1.2.1.9.1
+          group: CephPoolFull
         annotations:
           documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks#pool-full
           summary: Pool is full - writes are blocked
@@ -772,6 +821,7 @@ groups:
         labels:
           severity: warning
           type: ceph_default
+          group: CephPoolNearFull
         annotations:
           summary: One or more Ceph pools are nearly full
           description: |
@@ -793,6 +843,7 @@ groups:
         labels:
           severity: warning
           type: ceph_default
+          group: CephSlowOps
         annotations:
           documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks#slow-ops
           summary: OSD operations are slow to complete
@@ -809,6 +860,7 @@ groups:
           severity: critical
           type: ceph_default
           oid: 1.3.6.1.4.1.50495.1.2.1.10.1
+          group: CephObjectMissing
         annotations:
           documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks#object-unfound
           summary: Object(s) marked UNFOUND
@@ -826,6 +878,7 @@ groups:
           severity: critical
           type: ceph_default
           oid: 1.3.6.1.4.1.50495.1.2.1.1.2
+          group: CephDaemonCrash
         annotations:
           documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks/#recent-crash
           summary: One or more Ceph daemons have crashed, and are pending acknowledgement
