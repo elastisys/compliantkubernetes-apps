@@ -4,7 +4,7 @@
 #
 # This file is not meant to be run directly, but is called by a pre-commit hook.
 
-set -uo pipefail
+set -euo pipefail
 
 declare tests
 tests="$(dirname "$(dirname "$(readlink -f "$0")")")"
@@ -33,9 +33,10 @@ if ! command -v eslint >/dev/null 2>&1; then
   exit 1
 fi
 
-pushd "${tests}" >/dev/null 2>&1 || exit 1
-exit_code=0
+pushd "${tests}" >/dev/null 2>&1
 
+set +e
+exit_code=0
 if ! $checker --noEmit; then
   ((exit_code++))
 fi
@@ -43,6 +44,7 @@ if ! eslint; then
   eslint --fix
   ((exit_code++))
 fi
+set -e
 
-popd >/dev/null 2>&1 || exit 1
+popd >/dev/null 2>&1
 exit $exit_code
