@@ -98,7 +98,7 @@ Cypress.Commands.add('grafanaSetRole', (ingress, adminPasswordKey, user, role) =
   cy.contains('Organization users').should('be.visible').click()
 
   // remove TLD, form doesn't seem to like it
-  const searchString = user.substring(0, user.lastIndexOf('.'))
+  const searchString = user.slice(0, Math.max(0, user.lastIndexOf('.')))
   cy.get('input[placeholder*="Search user by login"]')
     .should('not.be.disabled')
     .type(`${searchString}{enter}`)

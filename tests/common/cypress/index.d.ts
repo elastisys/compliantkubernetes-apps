@@ -1,7 +1,7 @@
 type Cluster = 'sc' | 'wc'
 type GrafanaRole = 'Admin' | 'Editor' | 'Viewer'
 
-declare const yqArgsToConfigFiles: (cluster: Cluster, expression: string) => string
+declare const yqArgumentsToConfigFiles: (cluster: Cluster, expression: string) => string
 declare const userToSession: (user: string) => string
 
 /// <reference types="cypress" />
@@ -45,6 +45,29 @@ declare namespace Cypress {
 
     /**
      * @example
+     * cy.retryRequest({
+     *   request: {
+     *     url: 'http://example.com',
+     *     headers: { Accept: 'application/json' },
+     *     failOnStatusCode: false,
+     *   },
+     *   condition: (response) => response.status === 200,
+     *   body: (response) => {
+     *     expect(response.body).to.be.an('array')
+     *   },
+     *   attempts: 12,
+     * })
+     */
+    retryRequest(arguments_: {
+      request: Partial<RequestOptions>
+      condition: (Response) => bool
+      body: (Response) => void
+      attempts?: number
+      waitTime?: number
+    }): Chainable<any>
+
+    /**
+     * @example
      * cy.dexStaticLogin()
      */
     dexStaticLogin(): Chainable<any>
@@ -81,7 +104,11 @@ declare namespace Cypress {
      * @example
      * cy.withTestKubeconfig({ session: 'static-admin', refresh: true })
      */
-    withTestKubeconfig(args: { session: string; url?: string; refresh: boolean }): Chainable<string>
+    withTestKubeconfig(arguments_: {
+      session: string
+      url?: string
+      refresh: boolean
+    }): Chainable<string>
 
     /**
      * @example
@@ -152,7 +179,6 @@ declare namespace Cypress {
      * @example
      * cy.opensearchTestIndexPattern('indexPattern')
      */
-    opensearchTestIndexPattern(indexPattern:  string):  Chainable<any>
-
+    opensearchTestIndexPattern(indexPattern: string): Chainable<any>
   }
 }

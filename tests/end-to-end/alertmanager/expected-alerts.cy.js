@@ -37,14 +37,14 @@ const makeAlertManagerURL = (namespace, route = '') => {
 }
 
 const assertExpectedAlerts = (response) => {
-  const extraAlerts = Array.from(
-    new Set(
+  const extraAlerts = [
+    ...new Set(
       response.body
         .filter((item) => item.status.state === 'active')
         .map((item) => item.labels.alertname)
         .filter((item) => !EXPECTED_ALERTS.has(item))
-    )
-  ).toSorted()
+    ),
+  ].toSorted()
 
   expect(extraAlerts, `Unexpected alerts in alertmanager: ${extraAlerts.join(', ')}`).to.be.an(
     'array'
