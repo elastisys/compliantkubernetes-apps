@@ -23,7 +23,7 @@ export default defineConfig({
 
             child.unref()
 
-            resolve(-1)
+            resolve(true)
           })
         },
         wrapProxy(kubeconfig) {
@@ -42,7 +42,7 @@ export default defineConfig({
               if (data.includes(PROXY_WAITING_FOR_DEX_MARKER)) {
                 resolve(data.toString().split(' ')[1])
               } else if (data.includes(PROXY_READY_MARKER)) {
-                resolve(-1)
+                resolve(true)
               }
             })
           })
@@ -50,7 +50,7 @@ export default defineConfig({
         pKill(name) {
           return new Promise((resolve) => {
             spawn('pkill', ['-f', name], { detached: true, stdio: 'ignore' })
-            resolve(-1)
+            resolve(true)
           })
         },
       })
