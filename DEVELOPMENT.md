@@ -83,7 +83,7 @@ Since these snippets depend on the IP addresses of running containers, they must
 The following command will configure node-local DNS and (re)deploy the `node-local-dns` stack:
 
 ```sh
-./scripts/local-cluster-sh setup node-local-dns
+./scripts/local-cluster.sh setup node-local-dns
 ```
 
 #### Self-signed certificate setup
