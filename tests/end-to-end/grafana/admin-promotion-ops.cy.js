@@ -32,7 +32,7 @@ describe('ops grafana user promotion', function () {
 
   afterEach(function () {
     cy.clearAllCookies()
-    cy.wrap(-1).then(Cypress.session.clearAllSavedSessions)
+    cy.then(Cypress.session.clearAllSavedSessions)
   })
 
   it('admin demotes admin@example.com to Viewer', function () {
