@@ -207,14 +207,31 @@ describe('Create a manual snapshot', function () {
     cy.get('div[role="combobox"]').first().should('contain.text', '*')
 
     cy.intercept('PUT', '/api/ism/_snapshots/**').as('takeSnapshot')
+
     // After clicking "Add"
     cy.contains('button', 'Add', opt).should('not.be.disabled').click()
 
-    cy.contains('th', 'Time last updated').click()
-    cy.wait('@takeSnapshot') // Wait for snapshot request to complete
-    cy.contains('th', 'Time last updated').click()
-    // Wait for snapshot name to show up in the table
-    cy.contains('td', snapshotName).should('be.visible')
+    // Check the snapshot's existence directly through the API
+    cy.retryRequest({
+      request: {
+        method: 'GET',
+        url: `https://${this.ingress}/api/ism/_snapshots`,
+        failOnStatusCode: false,
+      },
+      condition: (response) => {
+        return (
+          response.status === 200 &&
+          response.body.ok &&
+          response.body.response.snapshots.some(
+            (its) => its.id === snapshotName && its.status === 'SUCCESS'
+          )
+        )
+      },
+      body: () => {
+        cy.log(`Found snapshot with ID ${snapshotName} in API response!`)
+      },
+      attempts: 10,
+    })
   })
 })
 
