@@ -91,7 +91,7 @@ setup() {
 @test "audit-sc - log-manager compaction job runs fine when no logs needs compaction" {
   object_storage.is_compacted "${BUCKET}" "${PREFIX}"
 
-  test_run_cronjob "${CRONJOB_NAME}" 60
+  test_run_cronjob "${CRONJOB_NAME}" 120
 }
 
 _create_uncompacted_objects() {

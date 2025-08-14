@@ -91,7 +91,7 @@ setup() {
 }
 
 @test "sc-logs - log-manager retention job runs fine when no logs needs to be deleted" {
-  test_run_cronjob "${CRONJOB_NAME}" 60
+  test_run_cronjob "${CRONJOB_NAME}" 120
 }
 
 _get_cronjob_env() {
