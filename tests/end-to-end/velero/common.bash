@@ -1,5 +1,17 @@
 velero_backups_spec() {
-  ck8s ops velero "${1}" backup create --from-schedule velero-daily-backup -o yaml 2>/dev/null | yq .spec
+  ck8s ops velero "${1}" backup create --from-schedule velero-daily-backup -o yaml 2>/dev/null | yq '.spec | del(.excludedNamespaces)'
+}
+
+velero_backups_excluded_ns() {
+  ck8s ops velero "${1}" backup create --from-schedule velero-daily-backup -o yaml 2>/dev/null | yq '.spec.excludedNamespaces'
+}
+
+velero_expected_spec() {
+  yq 'del(.excludedNamespaces)' <"${BATS_TEST_DIRNAME}/resources/backup-spec-${1}.yaml"
+}
+
+velero_expected_excluded_ns() {
+  yq '.excludedNamespaces' <"${BATS_TEST_DIRNAME}/resources/backup-spec-${1}.yaml"
 }
 
 velero_backup_create() {

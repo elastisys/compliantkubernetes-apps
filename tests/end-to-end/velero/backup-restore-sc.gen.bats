@@ -11,7 +11,14 @@ setup() {
 @test "velero backup spec sc" {
   run velero_backups_spec sc
   assert_success
-  assert_output "$(cat "${BATS_TEST_DIRNAME}/resources/backup-spec-sc.yaml")"
+  assert_output "$(velero_expected_spec sc)"
+
+  # Expect the spec to contain _at least_ the namespaces specified by the fixture
+  # (but we don't mind if we find more)
+  run comm -13 \
+    <(velero_backups_excluded_ns sc | sort) \
+    <(velero_expected_excluded_ns sc | sort)
+  refute_output
 }
 
 @test "velero backup and restore sc" {
