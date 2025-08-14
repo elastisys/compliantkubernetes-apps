@@ -52,7 +52,7 @@ export default tseslint.config([
 
   { ignores: ['node_modules/**'] },
 
-  { files: ['**/*.js'], rules: rules },
+  { files: ['**/*.js', '**/*.cjs'], rules: rules },
 
   { files: ['**/*.ts'], rules: { ...rules, 'no-unused-vars': 'off' } },
 ])
