@@ -347,8 +347,9 @@ validate_version() {
     log_error "Welkin Apps repository version: ${version}"
     exit 1
   fi
-  if [[ -z "${cluster_version}" ]]; then
-    log_warning "Welkin Apps cluster version:    Unknown"
+
+  if [[ -z "${cluster_version}" ]] || [[ "${ck8s_version}" == "any" ]] || [[ "${ck8s_version}" =~ ^[0-9a-f]{40}$ ]]; then
+    log_warning "Welkin Apps cluster version:    ${cluster_version:-Unknown}"
     log_warning "Welkin Apps config version:     ${ck8s_version}"
     log_warning "Welkin Apps repository version: ${version}"
   elif [[ "${cluster_version}" != "${version%.*}" ]]; then
