@@ -14,9 +14,6 @@ networkPolicies:
   global:
     externalLoadBalancer: true
     ingressUsingHostNetwork: true
-  ingressNginx:
-    ingressOverride:
-      enabled: false
   rookCeph:
     enabled: true
 opa:
