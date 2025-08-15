@@ -65,6 +65,7 @@ global:
         - protocol: TCP
           port: {{ . }}
         {{- end }}
+  clusterDns: {{ .Values.global.clusterDns}}
 
 monitoring:
   enabled: {{ .Values.networkPolicies.monitoring.enabled }}
