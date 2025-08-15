@@ -1,20 +1,20 @@
-# Usage: velero_backups_spec <cluster>
-velero_backups_spec() {
+# Usage: velero_backups_spec_without_excluded_namespaces <cluster>
+velero_backups_spec_without_excluded_namespaces() {
   ck8s ops velero "${1}" backup create --from-schedule velero-daily-backup -o yaml 2>/dev/null | yq '.spec | del(.excludedNamespaces)'
 }
 
-# Usage: velero_backups_excluded_ns <cluster>
-velero_backups_excluded_ns() {
+# Usage: velero_backups_excluded_namespaces <cluster>
+velero_backups_excluded_namespaces() {
   ck8s ops velero "${1}" backup create --from-schedule velero-daily-backup -o yaml 2>/dev/null | yq '.spec.excludedNamespaces'
 }
 
-# Usage: velero_expected_spec <cluster>
-velero_expected_spec() {
+# Usage: velero_expected_spec_without_excluded_namespaces <cluster>
+velero_expected_spec_without_excluded_namespaces() {
   yq 'del(.excludedNamespaces)' <"${BATS_TEST_DIRNAME}/resources/backup-spec-${1}.yaml"
 }
 
-# Usage: velero_expected_excluded_ns <cluster>
-velero_expected_excluded_ns() {
+# Usage: velero_expected_excluded_namespaces <cluster>
+velero_expected_excluded_namespaces() {
   yq '.excludedNamespaces' <"${BATS_TEST_DIRNAME}/resources/backup-spec-${1}.yaml"
 }
 
