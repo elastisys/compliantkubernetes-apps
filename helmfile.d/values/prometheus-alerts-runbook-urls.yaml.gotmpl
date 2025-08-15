@@ -104,6 +104,7 @@ runbookUrls:
     {{- dict "name" "FluentdRecordsCountsHigh" "config" .fluentd | include "tpl.missing-runbook" }}
     {{- dict "name" "FluentdRetry" "config" .fluentd | include "tpl.missing-runbook" }}
     {{- dict "name" "FluentdOutputError" "config" .fluentd | include "tpl.missing-runbook" }}
+    {{- dict "name" "FluentdOutputClientError" "config" .fluentd | include "tpl.missing-runbook" }}
   general:
     {{- dict "name" "TargetDown" "subpath" "general" "config" .general | include "tpl.prometheus-operator" }}
     {{- dict "name" "Watchdog" "subpath" "general" "config" .general | include "tpl.prometheus-operator" }}

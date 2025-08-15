@@ -119,4 +119,15 @@ spec:
         description: Fluentd output error count is {{ "{{ $value }}" }} for the last 10 minutes
         summary: There have been Fluentd output error(s) for the last 10 minutes
         runbook_url: {{ .Values.runbookUrls.fluentd.FluentdOutputError }}
+    - alert: FluentdOutputClientError
+      expr: sum(increase(fluentd_output_status_num_client_errors[10m])) by (pod, cluster, service) > 0
+      for: 1m
+      labels:
+        service: fluentd
+        severity: warning
+        group: Fluentd
+      annotations:
+        description: Fluentd output client error count is {{ "{{ $value }}" }} for the last 10 minutes
+        summary: There have been Fluentd output client error(s) for the last 10 minutes
+        runbook_url: {{ .Values.runbookUrls.fluentd.FluentdOutputClientError }}
 {{- end }}

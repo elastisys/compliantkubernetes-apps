@@ -278,6 +278,17 @@ extraConfigMaps:
       </metric>
     </filter>
 
+    <label @ERROR>
+      <match **>
+        @type prometheus
+        <metric>
+          name fluentd_output_status_num_client_errors
+          type counter
+          desc The total number of errors from kubernetes containers output
+        </metric>
+      </match>
+    </label>
+
 # Liveliness probe reverted from upstream changes to prevent that it fails if just one buffer is inactive.
 # E.g. the authlog buffer will often be inactive, so it would make the probe fail.
 livenessProbe:
