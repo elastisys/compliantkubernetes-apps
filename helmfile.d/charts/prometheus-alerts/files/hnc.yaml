@@ -10,6 +10,7 @@
       labels:
         rulesgroup: hnc
         severity: warning
+        group: HierarchicalNamespaceControllerNamespaceCondition
       expr: |
         hnc_namespace_conditions > 0
       for: 1m

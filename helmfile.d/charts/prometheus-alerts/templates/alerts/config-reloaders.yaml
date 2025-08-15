@@ -27,6 +27,7 @@ spec:
       for: 10m
       labels:
         severity: warning
+        group: ConfigReloaderSidecarErrors
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}

@@ -23,6 +23,7 @@ spec:
       for: 5m
       labels:
         severity: critical
+        group: Harbor
       annotations:
         description: Harbor Core Is Down
         runbook_url: {{ .Values.runbookUrls.harbor.HarborCoreDown }}
@@ -33,6 +34,7 @@ spec:
       for: 5m
       labels:
         severity: critical
+        group: Harbor
       annotations:
         description: Harbor Database Is Down
         runbook_url: {{ .Values.runbookUrls.harbor.HarborDatabaseDown }}
@@ -43,6 +45,7 @@ spec:
       for: 5m
       labels:
         severity: critical
+        group: Harbor
       annotations:
         description: Harbor Registry Is Down
         runbook_url: {{ .Values.runbookUrls.harbor.HarborRegistryDown }}
@@ -53,6 +56,7 @@ spec:
       for: 5m
       labels:
         severity: critical
+        group: Harbor
       annotations:
         description: Harbor Redis Is Down
         runbook_url: {{ .Values.runbookUrls.harbor.HarborRedisDown }}
@@ -63,6 +67,7 @@ spec:
       for: 5m
       labels:
         severity: critical
+        group: Harbor
       annotations:
         description: Harbor Trivy Is Down
         runbook_url: {{ .Values.runbookUrls.harbor.HarborTrivyDown }}
@@ -72,6 +77,7 @@ spec:
       for: 5m
       labels:
         severity: critical
+        group: Harbor
       annotations:
         description: Harbor JobService Is Down
         runbook_url: {{ .Values.runbookUrls.harbor.HarborJobServiceDown }}
@@ -81,6 +87,7 @@ spec:
       for: 5m
       labels:
         severity: medium
+        group: Harbor
       annotations:
         description: Total used storage for Harbor is high (above the threshold of {{ .Values.harbor.alerts.maxTotalStorageUsedGB }}GB). This indicates that users have not set up artifact retention. If the total size of artifacts continues to grow, then Harbor will likely consume more resources and slow down. This might also cause issues with object storage quota at the infrastructure provider.
         runbook_url: {{ .Values.runbookUrls.harbor.HarborStorageUsageAboveThreshold }}
@@ -90,6 +97,7 @@ spec:
       for: 5m
       labels:
         severity: low
+        group: Harbor
       annotations:
         description: Harbor p99 latency is higher than 10 seconds
         runbook_url: {{ .Values.runbookUrls.harbor.HarborP99LatencyHigherThan10Seconds }}
@@ -99,6 +107,7 @@ spec:
       for: 5m
       labels:
         severity: low
+        group: Harbor
       annotations:
         description: Harbor Error Rate is High
         runbook_url: {{ .Values.runbookUrls.harbor.HarborErrorRateHigh }}
@@ -108,6 +117,7 @@ spec:
       for: 5m
       labels:
         severity: low
+        group: Harbor
       annotations:
         description: Total number of artifacts is high (above alert threshold of {{ .Values.harbor.alerts.maxTotalArtifacts }}). This indicates that users have not set up artifact retention. If the number of artifacts continues to grow, then Harbor will likely consume more resources and slow down.
         runbook_url: {{ .Values.runbookUrls.harbor.HarborTotalNumberOfArtifactsAboveThreshold }}

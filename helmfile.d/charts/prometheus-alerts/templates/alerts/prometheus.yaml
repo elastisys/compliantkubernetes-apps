@@ -32,6 +32,7 @@ spec:
       for: 10m
       labels:
         severity: critical
+        group: Prometheus
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
@@ -51,6 +52,7 @@ spec:
       for: 15m
       labels:
         severity: warning
+        group: Prometheus
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
@@ -70,6 +72,7 @@ spec:
       for: 15m
       labels:
         severity: warning
+        group: Prometheus
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
@@ -85,6 +88,7 @@ spec:
       for: 10m
       labels:
         severity: warning
+        group: Prometheus
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
@@ -97,6 +101,7 @@ spec:
       for: 4h
       labels:
         severity: warning
+        group: Prometheus
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
@@ -109,6 +114,7 @@ spec:
       for: 4h
       labels:
         severity: warning
+        group: Prometheus
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
@@ -130,6 +136,7 @@ spec:
       for: 10m
       labels:
         severity: warning
+        group: Prometheus
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
@@ -142,6 +149,7 @@ spec:
       for: 10m
       labels:
         severity: warning
+        group: Prometheus
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
@@ -154,6 +162,7 @@ spec:
       for: 10m
       labels:
         severity: warning
+        group: Prometheus
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
@@ -177,6 +186,7 @@ spec:
       for: 15m
       labels:
         severity: critical
+        group: Prometheus
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
@@ -197,6 +207,7 @@ spec:
       for: 15m
       labels:
         severity: critical
+        group: Prometheus
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
@@ -216,6 +227,7 @@ spec:
       for: 15m
       labels:
         severity: warning
+        group: Prometheus
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
@@ -228,6 +240,7 @@ spec:
       for: 15m
       labels:
         severity: critical
+        group: Prometheus
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
@@ -240,6 +253,7 @@ spec:
       for: 15m
       labels:
         severity: warning
+        group: Prometheus
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
@@ -252,6 +266,7 @@ spec:
       for: 15m
       labels:
         severity: warning
+        group: Prometheus
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
@@ -264,6 +279,7 @@ spec:
       for: 15m
       labels:
         severity: warning
+        group: Prometheus
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
@@ -276,6 +292,7 @@ spec:
       for: 15m
       labels:
         severity: warning
+        group: Prometheus
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
@@ -288,6 +305,7 @@ spec:
       for: 15m
       labels:
         severity: warning
+        group: Prometheus
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
@@ -300,6 +318,7 @@ spec:
       for: 5m
       labels:
         severity: critical
+        group: Prometheus
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
@@ -319,6 +338,7 @@ spec:
       for: 15m
       labels:
         severity: critical
+        group: Prometheus
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}

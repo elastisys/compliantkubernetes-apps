@@ -14,6 +14,7 @@ groups:
     for: 5m
     labels:
       severity: critical
+      group: Thanos
   - alert: ThanosRuleQueueIsDroppingAlerts
     annotations:
       description: Thanos Rule {{`{{$labels.instance}}`}} is failing to queue alerts.
@@ -24,6 +25,7 @@ groups:
     for: 5m
     labels:
       severity: critical
+      group: Thanos
   - alert: ThanosRuleSenderIsFailingAlerts
     annotations:
       description: Thanos Rule {{`{{$labels.instance}}`}} is failing to send alerts to alertmanager.
@@ -34,6 +36,7 @@ groups:
     for: 5m
     labels:
       severity: critical
+      group: Thanos
   - alert: ThanosRuleHighRuleEvaluationFailures
     annotations:
       description: Thanos Rule {{`{{$labels.instance}}`}} is failing to evaluate rules.
@@ -49,6 +52,7 @@ groups:
     for: 5m
     labels:
       severity: critical
+      group: Thanos
   - alert: ThanosRuleHighRuleEvaluationWarnings
     annotations:
       description: Thanos Rule {{`{{$labels.instance}}`}} has high number of evaluation
@@ -60,6 +64,7 @@ groups:
     for: 15m
     labels:
       severity: info
+      group: Thanos
   - alert: ThanosRuleRuleEvaluationLatencyHigh
     annotations:
       description: Thanos Rule {{`{{$labels.instance}}`}} has higher evaluation latency
@@ -75,6 +80,7 @@ groups:
     for: 5m
     labels:
       severity: warning
+      group: Thanos
   - alert: ThanosRuleGrpcErrorRate
     annotations:
       description: Thanos Rule {{`{{$labels.job}}`}} is failing to handle {{`{{$value | humanize}}`}}%
@@ -91,6 +97,7 @@ groups:
     for: 5m
     labels:
       severity: warning
+      group: Thanos
   - alert: ThanosRuleConfigReloadFailure
     annotations:
       description: Thanos Rule {{`{{$labels.job}}`}} has not been able to reload its configuration.
@@ -101,6 +108,7 @@ groups:
     for: 5m
     labels:
       severity: info
+      group: Thanos
   - alert: ThanosRuleQueryHighDNSFailures
     annotations:
       description: Thanos Rule {{`{{$labels.job}}`}} has {{`{{$value | humanize}}`}}% of failing
@@ -117,6 +125,7 @@ groups:
     for: 15m
     labels:
       severity: warning
+      group: Thanos
   - alert: ThanosRuleAlertmanagerHighDNSFailures
     annotations:
       description: Thanos Rule {{`{{$labels.instance}}`}} has {{`{{$value | humanize}}`}}% of
@@ -133,6 +142,7 @@ groups:
     for: 15m
     labels:
       severity: warning
+      group: Thanos
   - alert: ThanosRuleNoEvaluationFor10Intervals
     annotations:
       description: Thanos Rule {{`{{$labels.job}}`}} has {{`{{$value | humanize}}`}}% rule groups
@@ -146,6 +156,7 @@ groups:
     for: 5m
     labels:
       severity: info
+      group: Thanos
   - alert: ThanosNoRuleEvaluations
     annotations:
       description: Thanos Rule {{`{{$labels.instance}}`}} did not perform any rule evaluations
@@ -159,3 +170,4 @@ groups:
     for: 5m
     labels:
       severity: critical
+      group: Thanos

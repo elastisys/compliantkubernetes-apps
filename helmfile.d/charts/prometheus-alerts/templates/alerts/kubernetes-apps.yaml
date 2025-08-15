@@ -27,6 +27,7 @@ spec:
       for: 15m
       labels:
         severity: warning
+        group: KubernetesApps
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
@@ -46,6 +47,7 @@ spec:
       for: 15m
       labels:
         severity: warning
+        group: KubernetesApps
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
@@ -58,6 +60,7 @@ spec:
       for: 0m
       labels:
         severity: warning
+        group: KubernetesApps
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
@@ -73,6 +76,7 @@ spec:
       for: 15m
       labels:
         severity: warning
+        group: KubeDeploymentGenerationMismatch
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
@@ -94,6 +98,7 @@ spec:
       for: 15m
       labels:
         severity: warning
+        group: KubernetesApps
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
@@ -115,6 +120,7 @@ spec:
       for: 15m
       labels:
         severity: warning
+        group: KubernetesApps
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
@@ -130,6 +136,7 @@ spec:
       for: 15m
       labels:
         severity: warning
+        group: KubernetesApps
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
@@ -159,6 +166,7 @@ spec:
       for: 15m
       labels:
         severity: warning
+        group: KubernetesApps
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
@@ -194,6 +202,7 @@ spec:
       for: 15m
       labels:
         severity: warning
+        group: KubernetesApps
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
@@ -206,6 +215,7 @@ spec:
       for: 1h
       labels:
         severity: warning
+        group: KubernetesApps
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
@@ -221,6 +231,7 @@ spec:
       for: 10m
       labels:
         severity: warning
+        group: KubernetesApps
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
@@ -233,6 +244,7 @@ spec:
       for: 15m
       labels:
         severity: warning
+        group: KubernetesApps
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
@@ -247,6 +259,7 @@ spec:
         kube_job_status_active{job="kube-state-metrics", namespace=~"{{ $targetNamespace }}"} > 0) > 43200
       labels:
         severity: warning
+        group: KubeJob
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
@@ -259,6 +272,7 @@ spec:
       for: 15m
       labels:
         severity: warning
+        group: KubeJob
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
@@ -271,6 +285,7 @@ spec:
       for: 10m
       labels:
         severity: warning
+        group: KubeFailedEvictedPods
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}

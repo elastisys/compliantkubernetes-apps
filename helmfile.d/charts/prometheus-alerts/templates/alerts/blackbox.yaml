@@ -22,6 +22,7 @@ spec:
           for: 60s
           labels:
             severity: "critical"
+            group: EndpointDown
           annotations:
             summary: "Endpoint {{`{{ $labels.target }}`}} at {{`{{ $labels.instance }}`}} down"
             runbook_url: {{ .Values.runbookUrls.blackbox.EndpointDown }}

@@ -37,6 +37,7 @@ spec:
       for: 1h
       labels:
         severity: warning
+        group: S3BucketSizeOverPercent
     {{- end }}
     {{- if .objects.enabled }}
     - alert: S3BucketObjectsOver{{.objects.percent}}Percent-{{ .name }}
@@ -50,6 +51,7 @@ spec:
       for: 2h
       labels:
         severity: warning
+        group: S3BucketObjectsOverPercent
     {{- end }}
   {{- end }}
 {{- end }}
@@ -65,6 +67,7 @@ spec:
       for: 1h
       labels:
         severity: warning
+        group: S3BucketSizeOverPercent
 {{- end }}
 {{- if .Values.s3BucketAlerts.totalSize.enabled }}
     - alert: S3BucketsTotalSizeOver{{.Values.s3BucketAlerts.totalSize.percent}}Percent
@@ -78,6 +81,7 @@ spec:
       for: 1h
       labels:
         severity: warning
+        group: S3BucketSizeOverPercent
 {{- end }}
 {{- if .Values.s3BucketAlerts.objects.enabled }}
     - alert: S3BucketObjectsOver{{.Values.s3BucketAlerts.objects.percent}}Percent
@@ -91,6 +95,7 @@ spec:
       for: 2h
       labels:
         severity: warning
+        group: S3BucketObjectsOverPercent
 {{- end }}
     - alert: Bucket36hActivityCheck
       annotations:
@@ -103,4 +108,5 @@ spec:
       for: 1h
       labels:
         severity: warning
+        group: Bucket36hActivityCheck
 {{- end }}

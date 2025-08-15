@@ -205,6 +205,7 @@ alertmanager:
           api_url: {{ .Values.alerts.opsGenie.apiUrl }}
           source: {{ .Values.grafana.user.subdomain }}.{{ .Values.global.opsDomain }}
           priority: {{`'{{ if eq .GroupLabels.severity "critical"}}P1{{else if or (eq .GroupLabels.severity "warning") (eq .GroupLabels.severity "high")}}P2{{else if eq .GroupLabels.severity "medium"}}P3{{else if eq .GroupLabels.severity "low"}}P4{{else}}P5{{end}}'`}}
+          update_alerts: {{ .Values.alerts.opsGenie.updateAlerts }}
       {{ end }}
     {{- with .Values.alerts.customReceivers }}
     {{- toYaml . | nindent 4 }}

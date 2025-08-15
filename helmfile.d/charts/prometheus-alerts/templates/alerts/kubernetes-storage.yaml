@@ -34,6 +34,7 @@ spec:
       for: 1m
       labels:
         severity: critical
+        group: KubernetesStorage
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
@@ -55,6 +56,7 @@ spec:
       for: 1h
       labels:
         severity: warning
+        group: KubernetesStorage
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
@@ -67,6 +69,7 @@ spec:
       for: 5m
       labels:
         severity: critical
+        group: KubernetesStorage
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}

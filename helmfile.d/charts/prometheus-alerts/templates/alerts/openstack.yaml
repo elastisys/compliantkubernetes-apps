@@ -25,6 +25,7 @@ spec:
       for: 10m
       labels:
         severity: critical
+        group: Openstack
     - alert: OpenStackApiRequestFailed
       annotations:
         summary: Failed OpenStack API call.
@@ -33,6 +34,7 @@ spec:
       for: 5m
       labels:
         severity: high
+        group: Openstack
     - alert: OpenStackApiRequestDuration
       annotations:
         summary: OpenStack API has taken longer than 15 seconds.
@@ -41,6 +43,7 @@ spec:
       for: 5m
       labels:
         severity: high
+        group: Openstack
     - alert: OpenStackApiRequestTotal
       annotations:
         summary: Too high amount of OpenStack API calls.
@@ -49,6 +52,7 @@ spec:
       for: 5m
       labels:
         severity: high
+        group: Openstack
     - alert: OpenStackReconcileFailed
       annotations:
         summary: Increased reconciliation errors.
@@ -57,6 +61,7 @@ spec:
       for: 10m
       labels:
         severity: high
+        group: Openstack
     - alert: OpenStackReconcileDuration
       annotations:
         summary: Reconciliation has taken longer than 10 minutes.
@@ -65,4 +70,5 @@ spec:
       for: 10m
       labels:
         severity: high
+        group: Openstack
 {{- end }}

@@ -4199,6 +4199,10 @@ properties:
             type: string
             format: uri
             default: https://api.eu.opsgenie.com
+          updateAlerts:
+            title: Whether to dynamically update existing alerts
+            type: boolean
+            default: false
       opsGenieHeartbeat:
         title: Alert OpsGenie Heartbeat
         description: Configure heartbeats to OpsGenie.

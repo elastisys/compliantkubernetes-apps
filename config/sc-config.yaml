@@ -1123,6 +1123,8 @@ alerts:
     #   {{ end }}
   opsGenie:
     apiUrl: https://api.eu.opsgenie.com
+    # Set updateAlerts to true if you intend to group alerts
+    updateAlerts: false
   # Configure custom alert receivers
   customReceivers: []
   customRoutes: []

@@ -27,6 +27,7 @@ spec:
       for: 5m
       labels:
         severity: warning
+        group: PacketsDropped
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
@@ -40,6 +41,7 @@ spec:
       for: 6h
       labels:
         severity: info
+        group: PacketsDropped
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
@@ -53,6 +55,7 @@ spec:
       for: 5m
       labels:
         severity: warning
+        group: PacketsDropped
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
@@ -66,6 +69,7 @@ spec:
       for: 6h
       labels:
         severity: info
+        group: PacketsDropped
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}

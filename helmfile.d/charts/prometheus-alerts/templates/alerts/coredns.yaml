@@ -27,6 +27,7 @@ spec:
       for: 15m
       labels:
         severity: critical
+        group: {{ . | title }}
     - alert: {{ . | title }}LatencyHigh
       annotations:
         description: {{ . | title }} has 99th percentile latency of {{`{{`}} $value {{`}}`}} seconds for server  {{`{{`}} $labels.server {{`}}`}} zone  {{`{{`}} $labels.zone {{`}}`}}.
@@ -37,6 +38,7 @@ spec:
       for: 10m
       labels:
         severity: medium
+        group: {{ . | title }}
     - alert: {{ . | title }}ErrorsHigh
       annotations:
         description: {{ . | title }} is returning SERVFAIL for {{`{{`}} $value | humanizePercentage {{`}}`}} of requests.
@@ -49,6 +51,7 @@ spec:
       for: 10m
       labels:
         severity: medium
+        group: {{ . | title }}
     - alert: {{ . | title }}ErrorsHigh
       annotations:
         description: {{ . | title }} is returning SERVFAIL for {{`{{`}} $value | humanizePercentage {{`}}`}} of requests.
@@ -61,6 +64,7 @@ spec:
       for: 10m
       labels:
         severity: low
+        group: {{ . | title }}
     - alert: {{ . | title }}ForwardLatencyHigh
       annotations:
         description: {{ . | title }} has 99th percentile latency of {{`{{`}} $value {{`}}`}} seconds forwarding requests to  {{`{{`}} $labels.to {{`}}`}}.
@@ -71,6 +75,7 @@ spec:
       for: 10m
       labels:
         severity: medium
+        group: {{ . | title }}
     - alert: {{ . | title }}ForwardErrorsHigh
       annotations:
         description: {{ . | title }} is returning SERVFAIL for {{`{{`}} $value | humanizePercentage {{`}}`}} of forward requests to  {{`{{`}} $labels.to {{`}}`}}.
@@ -83,6 +88,7 @@ spec:
       for: 10m
       labels:
         severity: medium
+        group: {{ . | title }}
     - alert: {{ . | title }}ForwardErrorsHigh
       annotations:
         description: {{ . | title }} is returning SERVFAIL for {{`{{`}} $value | humanizePercentage {{`}}`}} of forward requests to  {{`{{`}} $labels.to {{`}}`}}.
@@ -95,6 +101,7 @@ spec:
       for: 10m
       labels:
         severity: low
+        group: {{ . | title }}
     - alert: {{ . | title }}ForwardHealthcheckFailureCount
       annotations:
         description: {{ . | title }} health checks have failed to upstream server  {{`{{`}} $labels.to {{`}}`}}.
@@ -105,6 +112,7 @@ spec:
       for: 10m
       labels:
         severity: low
+        group: {{ . | title }}
     - alert: {{ . | title }}ForwardHealthcheckBrokenCount
       annotations:
         description: {{ . | title }} health checks have failed for all upstream servers.
@@ -115,6 +123,7 @@ spec:
       for: 10m
       labels:
         severity: low
+        group: {{ . | title }}
     - alert: {{ . | title }}PanicCount
       annotations:
         description: "Number of {{ . | title }} panics encountered VALUE = {{`{{`}} $value {{`}}`}}  LABELS = {{`{{`}} $labels {{`}}`}}"
@@ -124,6 +133,7 @@ spec:
       for: 1m
       labels:
         severity: low
+        group: {{ . | title }}
     {{- end }}
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}

@@ -25,4 +25,5 @@ spec:
         falcosecurity_falcosidekick_falco_events_total != 0
       labels:
         severity: warning
+        group: FalcoAlert
 {{- end }}
