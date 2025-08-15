@@ -707,7 +707,7 @@ velero:
   tolerations: []
   nodeSelector: {}
   uploaderType: kopia
-  useVolumeSnapshots: false
+  useVolumeSnapshots: true
   schedule: 0 0 * * * # once per day
   retentionPeriod: 720h0m0s
   resources:
