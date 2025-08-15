@@ -13,6 +13,7 @@ metadata:
     app.kubernetes.io/name: {{ include "velero.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
+    app.kubernetes.io/version: {{ .Chart.AppVersion }}
     helm.sh/chart: {{ include "velero.chart" . }}
     component: velero
     {{- with .Values.labels }}
@@ -20,7 +21,7 @@ metadata:
     {{- end }}
 spec:
   replicas: 1
-  {{- if .Values.revisionHistoryLimit }}
+  {{- if hasKey .Values "revisionHistoryLimit" }}
   revisionHistoryLimit: {{ .Values.revisionHistoryLimit }}
   {{- end }}
   strategy:
@@ -36,6 +37,7 @@ spec:
         app.kubernetes.io/name: {{ include "velero.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
         app.kubernetes.io/managed-by: {{ .Release.Service }}
+        app.kubernetes.io/version: {{ .Chart.AppVersion }}
         helm.sh/chart: {{ include "velero.chart" . }}
         {{- if .Values.podLabels }}
           {{- toYaml .Values.podLabels | nindent 8 }}
@@ -55,6 +57,10 @@ spec:
       {{- end }}
     {{- end }}
     spec:
+      {{- with .Values.hostAliases }}
+      hostAliases:
+      {{- toYaml . | nindent 8 }}
+      {{- end }}
     {{- if .Values.image.imagePullSecrets }}
       imagePullSecrets:
       {{- range .Values.image.imagePullSecrets }}
@@ -63,8 +69,12 @@ spec:
     {{- end }}
       restartPolicy: Always
       serviceAccountName: {{ include "velero.serverServiceAccount" . }}
+      automountServiceAccountToken: {{ .Values.serviceAccount.server.automountServiceAccountToken }}
       {{- if .Values.priorityClassName }}
       priorityClassName: {{ include "velero.priorityClassName" . }}
+      {{- end }}
+      {{- if .Values.runtimeClassName }}
+      runtimeClassName: {{ include "velero.runtimeClassName" . }}
       {{- end }}
       terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
       containers:
@@ -123,8 +133,14 @@ spec:
             {{- with .disableControllers }}
             - --disable-controllers={{ . }}
             {{- end }}
+            {{- with .disableInformerCache }}
+            - --disable-informer-cache={{ . }}
+            {{- end }}
             {{- with .garbageCollectionFrequency }}
             - --garbage-collection-frequency={{ . }}
+            {{- end }}
+            {{- with .itemBlockWorkerCount }}
+            - --item-block-worker-count={{ . }}
             {{- end }}
             {{- with .logFormat }}
             - --log-format={{ . }}
@@ -162,6 +178,31 @@ spec:
             {{- end }}
             {{- with .namespace }}
             - --namespace={{ . }}
+            {{- end }}
+            {{- with .repositoryMaintenanceJob }}
+            {{- with .requests }}
+            {{- with .cpu }}
+            - --maintenance-job-cpu-request={{ . }}
+            {{- end }}
+            {{- with .memory }}
+            - --maintenance-job-mem-request={{ . }}
+            {{- end }}
+            {{- end }}
+            {{- with .limits }}
+            {{- with .cpu }}
+            - --maintenance-job-cpu-limit={{ . }}
+            {{- end }}
+            {{- with .memory }}
+            - --maintenance-job-mem-limit={{ . }}
+            {{- end }}
+            {{- end }}
+            {{- with .latestJobsCount }}
+            - --keep-latest-maintenance-jobs={{ . }}
+            {{- end }}
+            {{- end }}
+            {{- with .extraArgs }}
+            ### User-supplied overwrite flags
+            {{- toYaml . | nindent 12 }}
             {{- end }}
           {{- end }}
           {{- with .Values.resources }}
@@ -222,10 +263,7 @@ spec:
               value: /credentials/cloud
           {{- end }}
           {{- with .Values.configuration.extraEnvVars }}
-          {{- range $key, $value := . }}
-            - name: {{ default "none" $key }}
-              value: {{ tpl (default "none" $value) $ | quote }}
-          {{- end }}
+          {{- toYaml . | nindent 12 }}
           {{- end }}
           {{- with .Values.credentials.extraEnvVars }}
           {{- range $key, $value := . }}

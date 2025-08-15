@@ -89,7 +89,7 @@ images:
   thanos:
     image: ghcr.io/elastisys/bitnami/thanos:0.37.2-debian-12-r8
   velero:
-    image: docker.io/velero/velero:v1.13.0
+    image: docker.io/velero/velero:v1.16.1
     pluginCsi: docker.io/velero/velero-plugin-for-csi:v0.7.1
     pluginAws: docker.io/velero/velero-plugin-for-aws:v1.9.0
     pluginGcp: docker.io/velero/velero-plugin-for-gcp:v1.9.1

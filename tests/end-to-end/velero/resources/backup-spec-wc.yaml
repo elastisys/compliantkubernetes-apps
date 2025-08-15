@@ -42,6 +42,6 @@ labelSelector:
     - key: compliantkubernetes.io/nobackup
       operator: DoesNotExist
 metadata: {}
-snapshotMoveData: false
+snapshotMoveData: true
 storageLocation: default
 ttl: 720h0m0s
