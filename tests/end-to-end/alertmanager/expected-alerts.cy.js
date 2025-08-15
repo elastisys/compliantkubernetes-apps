@@ -23,10 +23,10 @@ describe('service cluster alertmanager', function () {
 const makeAlertManagerURL = (/** @type {Cluster} */ cluster, route = '') => {
   let port, namespace
   if (cluster === 'sc') {
-    port = '18001'
+    port = Cypress.env('SC_PROXY_PORT')
     namespace = 'monitoring'
   } else if (cluster === 'wc') {
-    port = '18002'
+    port = Cypress.env('WC_PROXY_PORT')
     namespace = 'alertmanager'
   }
   return `http://127.0.0.1:${port}/api/v1/namespaces/${namespace}/services/alertmanager-operated:9093/proxy${route}`
