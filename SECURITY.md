@@ -4,7 +4,7 @@ If you think you have found a security vulnerability, please send a report to [s
 
 Please encrypt your message to us; please use our PGP key. The key fingerprint is:
 
-31AA7FFF035F50788C01294B6F878E4273E4D4B9
+`31AA7FFF035F50788C01294B6F878E4273E4D4B9`
 
 The key is available from [keyserver.ubuntu.com](https://keyserver.ubuntu.com/pks/lookup?search=0x31AA7FFF035F50788C01294B6F878E4273E4D4B9&fingerprint=on&op=index).
 
@@ -12,4 +12,4 @@ The key is available from [keyserver.ubuntu.com](https://keyserver.ubuntu.com/pk
 
 ## Security patches
 
-To receive notification when we release security patches, watch the Releases of this GitHub repository.
+To receive notification when we release security patches, watch the [Releases](https://github.com/elastisys/compliantkubernetes-apps/releases) of this GitHub repository.
