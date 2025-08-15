@@ -10,6 +10,30 @@ nodes:
   - role: control-plane
     labels:
       elastisys.io/node-group: control-plane
+    kubeadmConfigPatches:
+      - |
+        kind: ClusterConfiguration
+        apiServer:
+          extraArgs:
+            audit-log-path: /var/log/audit/kube-apiserver-audit.log
+            audit-policy-file: /etc/kubernetes/audit-policy/apiserver-audit-policy.yaml
+            audit-log-maxage: "7"
+            audit-log-maxbackup: "10"
+            audit-log-maxsize: "100"
+            profiling: "false"
+          extraVolumes:
+            - name: audit-policy
+              hostPath: /etc/kubernetes/audit-policy
+              pathType: DirectoryOrCreate
+              mountPath: /etc/kubernetes/audit-policy
+            - name: audit-logs
+              hostPath: /var/log/kubernetes/audit
+              pathType: DirectoryOrCreate
+              mountPath: /var/log/audit/
+    extraMounts:
+      - hostPath: ${ROOT}/scripts/local-clusters/profiles/audit-policy.yaml
+        containerPath: /etc/kubernetes/audit-policy/apiserver-audit-policy.yaml
+        readOnly: true
   - role: worker
     extraPortMappings:
       - containerPort: 30080
