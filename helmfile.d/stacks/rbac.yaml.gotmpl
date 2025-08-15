@@ -60,6 +60,7 @@ templates:
       - values/userCRDs/flux/fluxv2.yaml.gotmpl
       - values/userCRDs/mongodbcommunity/mongodb.yaml.gotmpl
       - values/userCRDs/strimzi/kafka.yaml.gotmpl
+      - values/userCRDs/jaeger/jaeger.yaml.gotmpl
 
   dev-rbac-extra:
     condition: ck8sWorkloadCluster.enabled
