@@ -10,11 +10,11 @@ run() {
   execute)
 
     if [[ "${CK8S_CLUSTER}" =~ ^(sc|both)$ ]]; then
-      log_info "installing gatekeeper crds in service cluster"
+      log_info "installing Velero CRDs in the service cluster"
       helmfile_do sc -l app=velero apply --set upgradeCRDs=true
     fi
     if [[ "${CK8S_CLUSTER}" =~ ^(wc|both)$ ]]; then
-      log_info "installing gatekeeper crds in workload cluster"
+      log_info "installing Velero CRDs in the workload cluster"
       helmfile_do wc -l app=velero apply --set upgradeCRDs=true
     fi
     ;;

@@ -40,13 +40,6 @@ run() {
 
   rollback)
     log_warn "rollback not implemented"
-
-    # if [[ "${CK8S_CLUSTER}" =~ ^(sc|both)$ ]]; then
-    #   log_info "rollback operation on service cluster"
-    # fi
-    # if [[ "${CK8S_CLUSTER}" =~ ^(wc|both)$ ]]; then
-    #   log_info "rollback operation on workload cluster"
-    # fi
     ;;
 
   *)
