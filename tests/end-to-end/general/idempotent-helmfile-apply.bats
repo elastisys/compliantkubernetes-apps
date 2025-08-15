@@ -18,9 +18,12 @@ setup() {
   load_assert
 }
 
+_apply() {
+  local -r cluster="${1}"
+  ck8s ops helmfile "${cluster}" apply --concurrency="$(nproc)" --suppress-diff
+}
+
 @test "SC helmfile apply is idempotent" {
-  # double apply as per the QA checklist instructions
-  _apply sc
   _apply sc
 
   run --separate-stderr bash -eo pipefail -c "ck8s ops helmfile sc diff --output json | sed -n '/^\[/p' | jq -s 'reduce .[] as \$item (0; . + (\$item | length))'"
@@ -29,16 +32,9 @@ setup() {
 }
 
 @test "WC helmfile apply is idempotent" {
-  # double apply as per the QA checklist instructions
-  _apply wc
   _apply wc
 
   run --separate-stderr bash -eo pipefail -c "ck8s ops helmfile wc diff --output json | sed -n '/^\[/p' | jq -s 'reduce .[] as \$item (0; . + (\$item | length))'"
   assert_success
   assert_output "0"
-}
-
-_apply() {
-  local -r cluster="${1}"
-  ck8s ops helmfile "${cluster}" apply --concurrency="$(nproc)" --suppress-diff
 }
