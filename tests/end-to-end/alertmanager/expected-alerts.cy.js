@@ -1,39 +1,35 @@
 const EXPECTED_ALERTS = new Set(['Watchdog', 'CPUThrottlingHigh', 'FalcoAlert'])
 
 describe('workload cluster alertmanager', function () {
-  before(function () {
-    cy.visitProxiedWC(makeAlertManagerURL('alertmanager'))
-  })
-
   it('should validate all alert names are from expected set', function () {
-    cy.request('GET', makeAlertManagerURL('alertmanager', '/api/v2/alerts')).then(
-      assertExpectedAlerts
-    )
-  })
+    cy.visit(makeAlertManagerURL('wc'))
 
-  after(() => {
-    cy.cleanupProxy('wc')
+    cy.contains('span', 'alertname="Watchdog"').should('exist')
+
+    cy.request('GET', makeAlertManagerURL('sc', '/api/v2/alerts')).then(assertExpectedAlerts)
   })
 })
 
 describe('service cluster alertmanager', function () {
-  before(function () {
-    cy.visitProxiedSC(makeAlertManagerURL('monitoring'))
-  })
-
   it('should validate all alert names are from expected set', function () {
-    cy.request('GET', makeAlertManagerURL('monitoring', '/api/v2/alerts')).then(
-      assertExpectedAlerts
-    )
-  })
+    cy.visit(makeAlertManagerURL('sc'))
 
-  after(() => {
-    cy.cleanupProxy('sc')
+    cy.contains('span', 'alertname="Watchdog"').should('exist')
+
+    cy.request('GET', makeAlertManagerURL('sc', '/api/v2/alerts')).then(assertExpectedAlerts)
   })
 })
 
-const makeAlertManagerURL = (namespace, route = '') => {
-  return `http://127.0.0.1:8001/api/v1/namespaces/${namespace}/services/alertmanager-operated:9093/proxy${route}`
+const makeAlertManagerURL = (/** @type {Cluster} */ cluster, route = '') => {
+  let port, namespace
+  if (cluster === 'sc') {
+    port = '18001'
+    namespace = 'monitoring'
+  } else if (cluster === 'wc') {
+    port = '18002'
+    namespace = 'alertmanager'
+  }
+  return `http://127.0.0.1:${port}/api/v1/namespaces/${namespace}/services/alertmanager-operated:9093/proxy${route}`
 }
 
 const assertExpectedAlerts = (response) => {

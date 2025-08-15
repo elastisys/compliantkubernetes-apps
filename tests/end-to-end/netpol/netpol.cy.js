@@ -1,64 +1,55 @@
-const PROMETHEUS_URL =
-  'http://127.0.0.1:8001/api/v1/namespaces/monitoring/services' +
-  '/kube-prometheus-stack-prometheus:9090/proxy'
 const DROP_QUERY = 'round(increase(no_policy_drop_counter[15m]))'
 const ACCEPT_QUERY = 'sum by (type) (round(increase(policy_accept_counter[15m])))'
 
+const makePrometheusURL = (proxyPort) =>
+  `http://127.0.0.1:${proxyPort}/api/v1/namespaces/monitoring/services` +
+  '/kube-prometheus-stack-prometheus:9090/proxy'
+
 describe('workload cluster network policies', function () {
   before(function () {
-    cy.visitProxiedWC(PROMETHEUS_URL)
-    cy.request('GET', `${PROMETHEUS_URL}/api/v1/status/runtimeinfo`)
+    cy.request('GET', `${makePrometheusURL(18002)}/api/v1/status/runtimeinfo`)
       .then(assertServerTime)
       .as('serverTime')
   })
 
   it('are not dropping any packets from workloads', function () {
-    cy.request('GET', makeQueryURL(DROP_QUERY, this.serverTime)).then((response) => {
+    cy.request('GET', makeQueryURL(18002, DROP_QUERY, this.serverTime)).then((response) => {
       assertNoDrops(response, 'fw', 'from')
     })
   })
 
   it('are not dropping any packets to workloads', function () {
-    cy.request('GET', makeQueryURL(DROP_QUERY, this.serverTime)).then((response) => {
+    cy.request('GET', makeQueryURL(18002, DROP_QUERY, this.serverTime)).then((response) => {
       assertNoDrops(response, 'tw', 'to')
     })
   })
 
   it('are accepting allowed traffic', function () {
-    cy.request('GET', makeQueryURL(ACCEPT_QUERY, this.serverTime)).then(assertAccepts)
-  })
-
-  after(() => {
-    cy.cleanupProxy('wc')
+    cy.request('GET', makeQueryURL(18002, ACCEPT_QUERY, this.serverTime)).then(assertAccepts)
   })
 })
 
 describe('service cluster network policies', function () {
   before(function () {
-    cy.visitProxiedSC(PROMETHEUS_URL)
-    cy.request('GET', `${PROMETHEUS_URL}/api/v1/status/runtimeinfo`)
+    cy.request('GET', `${makePrometheusURL(18001)}/api/v1/status/runtimeinfo`)
       .then(assertServerTime)
       .as('serverTime')
   })
 
   it('are not dropping any packets from workloads', function () {
-    cy.request('GET', makeQueryURL(DROP_QUERY, this.serverTime)).then((response) => {
+    cy.request('GET', makeQueryURL(18001, DROP_QUERY, this.serverTime)).then((response) => {
       assertNoDrops(response, 'fw', 'from')
     })
   })
 
   it('are not dropping any packets to workloads', function () {
-    cy.request('GET', makeQueryURL(DROP_QUERY, this.serverTime)).then((response) => {
+    cy.request('GET', makeQueryURL(18001, DROP_QUERY, this.serverTime)).then((response) => {
       assertNoDrops(response, 'tw', 'to')
     })
   })
 
   it('are accepting allowed traffic', function () {
-    cy.request('GET', makeQueryURL(ACCEPT_QUERY, this.serverTime)).then(assertAccepts)
-  })
-
-  after(() => {
-    cy.cleanupProxy('sc')
+    cy.request('GET', makeQueryURL(18001, ACCEPT_QUERY, this.serverTime)).then(assertAccepts)
   })
 })
 
@@ -72,9 +63,9 @@ const assertServerTime = (response) => {
   return runtimeInfo.data.serverTime
 }
 
-const makeQueryURL = (query, serverTime) => {
+const makeQueryURL = (proxyPort, query, serverTime) => {
   const metric = encodeURI(query)
-  return `${PROMETHEUS_URL}/api/v1/query?query=${metric}&${new URLSearchParams({ time: serverTime })}`
+  return `${makePrometheusURL(proxyPort)}/api/v1/query?query=${metric}&${new URLSearchParams({ time: serverTime })}`
 }
 
 const assertNoDrops = (response, metricType, direction) => {

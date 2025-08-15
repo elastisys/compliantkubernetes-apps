@@ -1,5 +1,3 @@
-const DEV_USER = 'dev@example.com'
-
 const yqArgumentsToConfigFiles = (cluster, expression) => {
   const configPath = Cypress.env('CK8S_CONFIG_PATH')
   if (configPath === undefined) {
@@ -17,10 +15,6 @@ const yqArgumentsToConfigFiles = (cluster, expression) => {
   }
 
   return `${configPath}/defaults/common-config.yaml ${configPath}/defaults/${cluster}-config.yaml ${configPath}/common-config.yaml ${configPath}/${cluster}-config.yaml`
-}
-
-const userToSession = function (user) {
-  return user.replaceAll(/[^a-zA-Z]+/g, '-').replaceAll(/^-+|-+$/g, '')
 }
 
 // Available as cy.yq("sc|wc", "expression") merge first then expression
@@ -141,39 +135,6 @@ Cypress.Commands.add('dexExtraStaticLogin', (email) => {
       cy.get('button').contains('Login').click()
     }
   )
-})
-
-Cypress.Commands.add('visitProxiedWC', function (url, user = DEV_USER) {
-  cy.yqDigParse('wc', '.user.adminUsers').then((adminUsers) => {
-    if (!adminUsers.includes(user)) {
-      cy.fail(
-        `${user} not found in .user.adminUsers\n` +
-          `Please add it and run 'ck8s ops helmfile wc -lapp=dev-rbac apply' to update the RBAC rules.`
-      )
-    }
-  })
-
-  cy.withTestKubeconfig({ session: userToSession(user), url, refresh: true }).then(() => {
-    cy.task('wrapProxy', Cypress.env('KUBECONFIG')).then((dex_url) => {
-      assert(dex_url, 'could not extract Dex URL from kube proxy')
-      cy.visit(`${dex_url}`)
-      cy.dexExtraStaticLogin(user)
-    })
-  })
-})
-
-Cypress.Commands.add('visitProxiedSC', function (url) {
-  Cypress.env('KUBECONFIG', Cypress.env('CK8S_CONFIG_PATH') + '/.state/kube_config_sc.yaml')
-  cy.task('wrapProxy', Cypress.env('KUBECONFIG')).then((dex_url) => {
-    cy.visit(url, { retryOnStatusCodeFailure: dex_url !== true })
-  })
-})
-
-Cypress.Commands.add('cleanupProxy', function (cluster, user = DEV_USER) {
-  cy.task('pKill', 'kubeproxy-wrapper.sh')
-  if (cluster === 'wc' && user !== null) {
-    cy.deleteTestKubeconfig(userToSession(user))
-  }
 })
 
 Cypress.Commands.add('withTestKubeconfig', function ({ session, url, refresh }) {

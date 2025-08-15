@@ -1,6 +1,6 @@
 describe('falco', function () {
   const alertmanagerUrl =
-    'http://127.0.0.1:8001/api/v1/namespaces/monitoring/services/alertmanager-operated:9093/proxy'
+    'http://127.0.0.1:18001/api/v1/namespaces/monitoring/services/alertmanager-operated:9093/proxy'
 
   it('alerts are triggered and are relevant', function () {
     cy.fixture('falco-event-generator-actions.json').then((expectedAlertRules) => {

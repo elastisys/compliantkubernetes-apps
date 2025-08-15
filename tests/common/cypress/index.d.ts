@@ -80,28 +80,6 @@ declare namespace Cypress {
 
     /**
      * @example
-     * cy.visitProxiedWC(
-     *   'http://127.0.0.1:8001/api/v1/namespaces/monitoring/services/kube-prometheus-stack-prometheus:9090/proxy/targets?pool=serviceMonitor%2Fmonitoring%2Fkube-prometheus-stack-apiserver%2F0',
-     *   'dev@example.com'
-     * )
-     */
-    visitProxiedWC(url: string, user?: string): Chainable<any>
-
-    /**
-     * @example
-     * cy.visitProxiedSC('http://127.0.0.1:8001/api/v1/namespaces/monitoring/services/kube-prometheus-stack-prometheus:9090/proxy/targets?pool=serviceMonitor%2Fmonitoring%2Fkube-prometheus-stack-apiserver%2F0')
-     */
-    visitProxiedSC(url: string): Chainable<any>
-
-    /**
-     * @example
-     * cy.cleanupProxy('wc', 'dev@example.com')
-     * cy.cleanupProxy('sc')
-     */
-    cleanupProxy(cluster: Cluster, user?: string): Chainable<any>
-
-    /**
-     * @example
      * cy.withTestKubeconfig({ session: 'static-admin', refresh: true })
      */
     withTestKubeconfig(arguments_: {
