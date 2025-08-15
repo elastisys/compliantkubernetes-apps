@@ -2,8 +2,7 @@ const DROP_QUERY = 'round(increase(no_policy_drop_counter[15m]))'
 const ACCEPT_QUERY = 'sum by (type) (round(increase(policy_accept_counter[15m])))'
 
 function makePrometheusURL(/** @type {Cluster} */ cluster) {
-  let port
-  port = cluster === 'wc' ? Cypress.env('WC_PROXY_PORT') : Cypress.env('SC_PROXY_PORT')
+  const port = cluster === 'wc' ? Cypress.env('WC_PROXY_PORT') : Cypress.env('SC_PROXY_PORT')
 
   return (
     `http://127.0.0.1:${port}/api/v1/namespaces/monitoring/services` +
