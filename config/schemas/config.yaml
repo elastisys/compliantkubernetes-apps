@@ -1665,6 +1665,18 @@ properties:
             title: Enable Kafka
             type: boolean
         additionalProperties: false
+      jaeger:
+        title: Jaeger
+        description: |-
+          Installs required cluster resources needed to install jaeger.
+
+          Requires that `gatekeeper.allowUserCRDs.enabled` is enabled.
+        type: object
+        properties:
+          enabled:
+            title: Enable Jaeger
+            type: boolean
+        additionalProperties: false
       extraRoles:
         title: Extra Application Developer Roles
         description: |
