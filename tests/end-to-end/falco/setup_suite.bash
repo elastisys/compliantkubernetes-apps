@@ -31,6 +31,7 @@ delete_test_application() {
 
 setup_suite() {
   load "../../bats.lib.bash"
+  load_common "proxy.bash"
 
   with_namespace "${falco_event_generator_namespace}"
 
@@ -42,9 +43,8 @@ setup_suite() {
 
   create_test_application "${falco_event_generator_namespace}"
 
-  echo -e "\033[1m[Starting kube proxy on SC]\033[0m" >&3
   with_kubeconfig sc
-  "../scripts/kubeproxy-wrapper.sh" >/dev/null 2>&1 3>&- &
+  proxy.start_proxy sc
 }
 
 teardown_suite() {
@@ -54,6 +54,5 @@ teardown_suite() {
   delete_test_application "${falco_event_generator_namespace}"
   delete_namespace
 
-  echo -e "\033[1m[Stopping kube proxy on SC]\033[0m" >&3
-  pkill -f "bash ../scripts/kubeproxy-wrapper.sh"
+  proxy.stop_all
 }
