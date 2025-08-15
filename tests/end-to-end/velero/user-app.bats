@@ -46,7 +46,7 @@ setup() {
   create_test_namespace
   wait_test_namespace
 
-  harbor.create_pull_secret wc velero-test
+  harbor.create_pull_secret velero-test
 
   create_test_application "${image}"
   wait_test_application
