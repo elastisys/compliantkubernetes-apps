@@ -11,12 +11,6 @@ setup_file() {
 
   load "../../bats.lib.bash"
   load_assert
-
-  load_common "git.bash"
-
-  if git.is_modified "$CK8S_CONFIG_PATH"; then
-    fail "Fatal: CK8S_CONFIG_PATH (${CK8S_CONFIG_PATH}) is tracked in a git repository and has uncommitted changes. Please commit or stash your changes and be mindful that this test suite will 'apply' all of the application stacks in both the SC and the WC clusters."
-  fi
 }
 
 setup() {

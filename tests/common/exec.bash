@@ -123,7 +123,17 @@ preflight.end_to_end() {
     failure="true"
   fi
 
-  end_to_end.socat_up
+  # shellcheck source=tests/common/git.bash
+  source "${tests}/common/git.bash"
+  if git.is_modified "$CK8S_CONFIG_PATH"; then
+    echo "Fatal: CK8S_CONFIG_PATH (${CK8S_CONFIG_PATH}) is tracked in a git repository and has uncommitted changes.
+    Please commit or stash your changes and be mindful that the end-to-end suite might 'apply' all of the application stacks in both the SC and the WC clusters." >&2
+    failure="true"
+  fi
+
+  if ! end_to_end.socat_up; then
+    failure="true"
+  fi
 
   if [[ "${failure}" == "true" ]]; then
     echo "error: preflight checks failure for end-to-end tests" >&2
