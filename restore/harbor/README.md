@@ -107,6 +107,22 @@ To fix this you need to login as an admin user (you can login with the default, 
 </details>
 
 <details>
+<summary>Login with Dex fails</summary>
+
+Symptom: Login fails and Dex logs shows `level=INFO msg="invalid client_secret on token request" client_id=harbor`.
+
+Possible cause: Harbors OIDC Client Secret changed, but was reverted to the previous version by the restore job.
+
+Solution: Re-run the init job to refresh the OIDC client details.
+
+```bash
+./bin/ck8s ops kubectl sc delete job -n harbor init-harbor-job
+./bin/ck8s ops helmfile sc -l app=harbor sync
+```
+
+</details>
+
+<details>
     <summary>Restore between swift and s3/azure</summary>
 
 If you are restoring Harbor from an environment that is using swift to an environment that is using s3 (or vice versa), then you need to modify some files in the object storage.
