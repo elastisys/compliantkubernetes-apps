@@ -35,3 +35,15 @@ constraints:
           rule: MustRunAsNonRoot
       mutation:
         runAsUser: 1000
+    repo-maintenance:
+      podSelectorExpressions:
+        - key: velero.io/repo-name
+          operator: Exists
+      allow:
+        runAsUser:
+          rule: MustRunAsNonRoot
+      metadata:
+        labels:
+          app: velero-repo-maintenance
+      mutation:
+        runAsUser: 1002
