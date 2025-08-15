@@ -267,7 +267,7 @@
          "pluginVersion": "7.4.5",
          "targets": [
             {
-               "expr": "label_join(avg by (name, namespace, condition, exported_namespace) (certmanager_certificate_ready_status == 1), \"namespaced_name\", \"-\", \"namespace\", \"exported_namespace\", \"name\")",
+               "expr": "label_join(avg by (name, namespace, condition) (certmanager_certificate_ready_status == 1), \"namespaced_name\", \"-\", \"namespace\", \"name\")",
                "format": "table",
                "instant": true,
                "interval": "",
@@ -275,7 +275,7 @@
                "refId": "A"
             },
             {
-               "expr": "label_join(avg by (name, namespace, exported_namespace) (certmanager_certificate_expiration_timestamp_seconds) * 1000, \"namespaced_name\", \"-\", \"namespace\", \"exported_namespace\", \"name\")",
+               "expr": "label_join(avg by (name, namespace) (certmanager_certificate_expiration_timestamp_seconds) * 1000, \"namespaced_name\", \"-\", \"namespace\", \"name\")",
                "format": "table",
                "instant": true,
                "interval": "",
@@ -301,9 +301,6 @@
                      "Time 1": true,
                      "Time 2": true,
                      "Value #A": true,
-                     "exported_namespace": false,
-                     "exported_namespace 1": false,
-                     "exported_namespace 2": true,
                      "name 1": true,
                      "namespace 2": true,
                      "namespaced_name": true
@@ -314,8 +311,6 @@
                      "Value #A": 6,
                      "Value #B": 5,
                      "condition": 4,
-                     "exported_namespace 1": 1,
-                     "exported_namespace 2": 11,
                      "name 1": 9,
                      "name 2": 3,
                      "namespace": 0,
@@ -326,9 +321,6 @@
                      "Time 1": "",
                      "Value #B": "Valid Until",
                      "condition": "Ready Status",
-                     "exported_namespace": "Certificate Namespace",
-                     "exported_namespace 1": "Certificate Namespace",
-                     "exported_namespace 2": "",
                      "name": "Certificate",
                      "name 2": "Certificate",
                      "namespace": "Namespace",
