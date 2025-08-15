@@ -20,12 +20,12 @@ proxy.start_proxy() {
   *) return ;;
   esac
 
-  if ! nc -z 127.0.0.1:"${port}"; then
+  if ! nc -z "127.0.0.1:${port}"; then
     echo -e "\033[1m[Starting kube proxy on ${1}]\033[0m" >&3
     kubectl proxy --port="${port}" --keepalive=3s 3>&- &
     proxy_pids+=($!)
   fi
-  curl --silent --retry 10 --retry-all-errors http://127.0.0.1:"${port}"/healthz
+  curl --silent --retry 10 --retry-all-errors "http://127.0.0.1:${port}/healthz"
 }
 
 proxy.stop_all() {
