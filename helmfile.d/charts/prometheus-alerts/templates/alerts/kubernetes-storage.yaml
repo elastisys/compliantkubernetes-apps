@@ -87,6 +87,7 @@ spec:
       for: 5m
       labels:
         severity: critical
+        group: KubernetesStorage
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
