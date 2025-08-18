@@ -165,8 +165,10 @@ log_info "Cleaning up restore artifacts..."
 "${root_path}/bin/ck8s" ops kubectl sc delete -n harbor -f "${TMP_JOB_FILE}"
 "${root_path}/bin/ck8s" ops kubectl sc delete configmap -n harbor restore-harbor
 
+# Reinitialize
+"${root_path}/bin/ck8s" ops kubectl sc delete job -n harbor init-harbor-job
+"${root_path}/bin/ck8s" ops helmfile sc sync -l app=harbor
+
 log_info "Harbor restore from ${STORAGE_TYPE} completed successfully."
 log_info "Post-restore steps from documentation (manual intervention may be required):"
-log_info "- If restoring to a different domain, re-run the init job (see docs)."
 log_info "- If restoring between Swift and S3/Azure, manual object storage modifications may be needed (see docs)."
-log_info "- If OIDC secrets has changed, re-run the init job (see docs)."
