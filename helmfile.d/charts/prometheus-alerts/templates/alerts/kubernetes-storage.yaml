@@ -73,4 +73,22 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+    - alert: KubeletVolumeMountFailures
+      annotations:
+        summary: "Volume mount failures on {{`{{`}} $labels.node {{`}}`}}"
+        description: "Check kubelet and CSI node plugin on {{`{{`}} $labels.node {{`}}`}}."
+      expr: |
+        sum by (node) (
+        rate(storage_operation_duration_seconds_count{
+          job="kubelet",
+          status!="success",
+          operation_name=~"MountVolume|volume_mount|device_mount"
+        }[5m])) > 0
+      for: 5m
+      labels:
+        severity: critical
+        group: KubernetesStorage
+{{- if .Values.defaultRules.additionalRuleLabels }}
+{{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
+{{- end }}
 {{- end }}
