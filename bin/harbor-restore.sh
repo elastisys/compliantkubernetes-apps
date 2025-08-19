@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-here="$(readlink -f "$(dirname "${0}")")"
+here="$(readlink --canonicalize "$(dirname "${0}")")"
 
 # shellcheck source=bin/common.bash
 source "${here}/common.bash"
