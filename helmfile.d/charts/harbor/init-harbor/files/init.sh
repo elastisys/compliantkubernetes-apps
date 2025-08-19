@@ -3,7 +3,7 @@ set -e
 
 validate_harbor() {
   echo "testing curl address ${ENDPOINT}"
-  exists=$(curl -k "${ENDPOINT}"/projects/1 | jq '.code') || {
+  exists=$(curl --insecure "${ENDPOINT}"/projects/1 | jq '.code') || {
     echo "ERROR L.${LINENO} - Harbor url ${ENDPOINT}/projects/1 cannot be reached."
     exit 1
   }
@@ -17,12 +17,12 @@ validate_harbor() {
 delete_library_project() {
   echo Removing project library from harbor
   # Curl will return status 500 even though it successfully removed the project.
-  curl -k -X DELETE -u admin:"${HARBOR_PASSWORD}" "${ENDPOINT}"/projects/1 >/dev/null
+  curl --insecure -X DELETE -u admin:"${HARBOR_PASSWORD}" "${ENDPOINT}"/projects/1 >/dev/null
 }
 
 create_new_private_default_project() {
   echo "Creating new private project default"
-  curl -k -X POST -u admin:"${HARBOR_PASSWORD}" "${ENDPOINT}"/projects --header 'Content-Type: application/json' --header 'Accept: application/json' --data '{
+  curl --insecure -X POST -u admin:"${HARBOR_PASSWORD}" "${ENDPOINT}"/projects --header 'Content-Type: application/json' --header 'Accept: application/json' --data '{
                 "project_name": "default",
                 "metadata": {
                     "public": "0",
@@ -41,7 +41,7 @@ init_harbor_state() {
 
   echo "Setting up initial harbor state"
   if [ "$exists" != "404" ]; then
-    name=$(curl -k -X GET "${ENDPOINT}"/projects/1 | jq '.name')
+    name=$(curl --insecure -X GET "${ENDPOINT}"/projects/1 | jq '.name')
 
     if [ "$name" = "\"library\"" ]; then
       delete_library_project
@@ -54,7 +54,7 @@ init_harbor_state() {
 
 configure_OIDC() {
   echo "Configuring oidc support"
-  err=$(curl -k -X PUT "${ENDPOINT}/configurations" \
+  err=$(curl --insecure -X PUT "${ENDPOINT}/configurations" \
     -u admin:"${HARBOR_PASSWORD}" \
     -H "accept: application/json" \
     -H "Content-Type: application/json" \
@@ -79,7 +79,7 @@ configure_GC() {
   echo "Configuring GC"
 
   if [ "${GC_FORCE_CONFIGURE}" = "false" ]; then
-    res=$(curl -k -X GET -w "%{http_code}" "${ENDPOINT}/system/gc/schedule" \
+    res=$(curl --insecure -X GET -w "%{http_code}" "${ENDPOINT}/system/gc/schedule" \
       -u admin:"${HARBOR_PASSWORD}")
 
     # shellcheck disable=SC3057
@@ -96,7 +96,7 @@ configure_GC() {
     fi
   fi
 
-  err=$(curl -k -X PUT "${ENDPOINT}/system/gc/schedule" \
+  err=$(curl --insecure -X PUT "${ENDPOINT}/system/gc/schedule" \
     -u admin:"${HARBOR_PASSWORD}" \
     -H "accept: application/json" \
     -H "Content-Type: application/json" \
