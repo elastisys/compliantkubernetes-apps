@@ -53,7 +53,7 @@ run_backup() {
     log "Found snapshot repository: ${snapshot_repo}"
 
     local snapshot_name
-    snapshot_name="manual-snapshot-$(date --utc +%Y%m%d%H%M%S)Z"
+    snapshot_name="manual-snapshot-$(date --utc +%Y%m%d%H%M%S)z"
     log "Taking snapshot: ${snapshot_name}"
     curl -kL -u "${user}:${password}" -X PUT "${os_url}/_snapshot/${snapshot_repo}/${snapshot_name}" -H 'Content-Type: application/json' -d'
       {
@@ -87,7 +87,7 @@ run_backup() {
   harbor)
     log "Starting Harbor backup..."
     local backup_job_name
-    backup_job_name="harbor-backup-manual-$(date --utc +%Y%m%d%H%M%S)Z"
+    backup_job_name="harbor-backup-manual-$(date --utc +%Y%m%d%H%M%S)z"
     log "Creating on-demand backup job: $backup_job_name"
 
     "$CK8S_CMD" ops kubectl sc -n harbor create job "$backup_job_name" --from=cronjob/harbor-backup-cronjob
@@ -170,7 +170,7 @@ run_backup() {
     log "Starting Velero backup..."
 
     local backup_name
-    backup_name="manual-backup-$(date --utc +%Y%m%d%H%M%S)Z"
+    backup_name="manual-backup-$(date --utc +%Y%m%d%H%M%S)z"
     log "Creating Velero backup: ${backup_name}"
 
     "$CK8S_CMD" ops velero wc backup create "$backup_name" --from-schedule velero-daily-backup
@@ -367,7 +367,7 @@ run_restore() {
     "$CK8S_CMD" ops kubectl wc delete secret -n alertmanager alertmanager-kube-prometheus-stack-alertmanager --ignore-not-found=true
 
     local restore_name
-    restore_name="restore-$(date --utc +%Y%m%d%H%M%S)Z"
+    restore_name="restore-$(date --utc +%Y%m%d%H%M%S)z"
     log "Creating restore '${restore_name}' from backup '${latest_backup}'"
     "$CK8S_CMD" ops velero wc restore create "$restore_name" --from-backup "$latest_backup"
 
