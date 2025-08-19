@@ -122,8 +122,8 @@ run_backup() {
 
     # Create jobs from cronjobs
     for cronjob in $cronjob_list; do
-      "$CK8S_CMD" ops kubectl sc -n rclone create job --from "${cronjob}" "${cronjob/#cronjob.batch\//}"
       local job_name=${cronjob/#cronjob.batch\//}
+      "$CK8S_CMD" ops kubectl sc -n rclone create job --from "${cronjob}" "${job_name}"
       log "Created job '${job_name}' from '${cronjob}' cronjob..."
     done
 
@@ -305,8 +305,8 @@ run_restore() {
 
     # Create jobs from cronjobs
     for cronjob in $cronjob_list; do
-      "$CK8S_CMD" ops kubectl sc -n rclone create job --from "${cronjob}" "${cronjob/#cronjob.batch\//}"
       local job_name=${cronjob/#cronjob.batch\//}
+      "$CK8S_CMD" ops kubectl sc -n rclone create job --from "${cronjob}" "${job_name}"
       log "Created job '${job_name}' from '${cronjob}' cronjob..."
     done
 
