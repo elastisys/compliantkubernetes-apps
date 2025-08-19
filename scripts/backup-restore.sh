@@ -15,7 +15,7 @@ usage() {
 PURPLE='\033[0;35m'
 NOCOLOR='\033[0m'
 log() {
-  echo -e "[${PURPLE}$(date --utc +'%Y-%m-%d %H:%M:%S')${NOCOLOR}]: $1"
+  echo -e "[${PURPLE}$(date +'%Y-%m-%d %H:%M:%S')${NOCOLOR}]: $1"
 }
 
 # allows the script to be run from anywhere
@@ -45,7 +45,7 @@ run_backup() {
 
     log "Discovering snapshot repository name..."
     local snapshot_repo
-    snapshot_repo=$(curl --insecure --location --silent --user "${user}:${password}" "${os_url}/_cat/repositories?v" | awk 'NR==2 {print $1}')
+    snapshot_repo=$(curl --location --silent --user "${user}:${password}" "${os_url}/_cat/repositories?v" | awk 'NR==2 {print $1}')
     if [ -z "$snapshot_repo" ]; then
       log "ERROR: Could not find OpenSearch snapshot repository."
       exit 1
@@ -53,7 +53,7 @@ run_backup() {
     log "Found snapshot repository: ${snapshot_repo}"
 
     local snapshot_name
-    snapshot_name="manual-snapshot-$(date --utc +%Y%m%d%H%M%S)"
+    snapshot_name="manual-snapshot-$(date --utc +%Y%m%d%H%M%S)Z"
     log "Taking snapshot: ${snapshot_name}"
     curl -kL -u "${user}:${password}" -X PUT "${os_url}/_snapshot/${snapshot_repo}/${snapshot_name}" -H 'Content-Type: application/json' -d'
       {
@@ -66,7 +66,7 @@ run_backup() {
     local status=""
     local retries=60 # 30 min timeout
     while [ $retries -gt 0 ]; do
-      status=$(curl --insecure --location --silent --user "${user}:${password}" "${os_url}/_snapshot/${snapshot_repo}/${snapshot_name}" | jq -r '.snapshots[0].state')
+      status=$(curl --location --silent --user "${user}:${password}" "${os_url}/_snapshot/${snapshot_repo}/${snapshot_name}" | jq -r '.snapshots[0].state')
       log "Current snapshot status: ${status}"
 
       if [ "$status" = "SUCCESS" ]; then
@@ -87,7 +87,7 @@ run_backup() {
   harbor)
     log "Starting Harbor backup..."
     local backup_job_name
-    backup_job_name="harbor-backup-manual-$(date --utc +%Y%m%d%H%M%S)"
+    backup_job_name="harbor-backup-manual-$(date --utc +%Y%m%d%H%M%S)Z"
     log "Creating on-demand backup job: $backup_job_name"
 
     "$CK8S_CMD" ops kubectl sc -n harbor create job "$backup_job_name" --from=cronjob/harbor-backup-cronjob
@@ -170,7 +170,7 @@ run_backup() {
     log "Starting Velero backup..."
 
     local backup_name
-    backup_name="manual-backup-$(date --utc +%Y%m%d%H%M%S)"
+    backup_name="manual-backup-$(date --utc +%Y%m%d%H%M%S)Z"
     log "Creating Velero backup: ${backup_name}"
 
     "$CK8S_CMD" ops velero wc backup create "$backup_name" --from-schedule velero-daily-backup
@@ -219,7 +219,7 @@ run_restore() {
 
     log "Discovering snapshot repository name..."
     local snapshot_repo
-    snapshot_repo=$(curl --insecure --location --silent --user "${user}:${password}" "${os_url}/_cat/repositories?v" | awk 'NR==2 {print $1}')
+    snapshot_repo=$(curl --location --silent --user "${user}:${password}" "${os_url}/_cat/repositories?v" | awk 'NR==2 {print $1}')
     if [ -z "$snapshot_repo" ]; then
       log "ERROR: Could not find OpenSearch snapshot repository."
       exit 1
@@ -228,7 +228,7 @@ run_restore() {
 
     log "Finding latest successful snapshot..."
     local latest_snapshot
-    latest_snapshot=$(curl --insecure --location --silent --user "${user}:${password}" -X GET "${os_url}/_snapshot/${snapshot_repo}/_all" | jq -r '.snapshots | map(select(.state == "SUCCESS")) | sort_by(.start_time_in_millis) | .[-1].snapshot')
+    latest_snapshot=$(curl --location --silent --user "${user}:${password}" -X GET "${os_url}/_snapshot/${snapshot_repo}/_all" | jq -r '.snapshots | map(select(.state == "SUCCESS")) | sort_by(.start_time_in_millis) | .[-1].snapshot')
     if [ -z "$latest_snapshot" ] || [ "$latest_snapshot" = "null" ]; then
       log "ERROR: No successful snapshots found to restore."
       exit 1
@@ -251,10 +251,10 @@ run_restore() {
     log "Will restore indices matching pattern: ${indices_to_restore}"
 
     log "Closing existing indices matching the restore pattern..."
-    curl --insecure --location --silent --user "${user}:${password}" -X POST "${os_url}/${indices_to_restore}/_close?pretty"
+    curl --location --silent --user "${user}:${password}" -X POST "${os_url}/${indices_to_restore}/_close?pretty"
 
     log "Starting restore from snapshot ${latest_snapshot}..."
-    curl --insecure --location --silent --user "${user}:${password}" -X POST "${os_url}/_snapshot/${snapshot_repo}/${latest_snapshot}/_restore?pretty" -H 'Content-Type: application/json' -d'
+    curl --location --silent --user "${user}:${password}" -X POST "${os_url}/_snapshot/${snapshot_repo}/${latest_snapshot}/_restore?pretty" -H 'Content-Type: application/json' -d'
       {
         "indices": "'"${indices_to_restore}"'"
       }
@@ -264,7 +264,7 @@ run_restore() {
     local status=""
     local retries=60 # 30 min timeout
     while [ $retries -gt 0 ]; do
-      status=$(curl --insecure --location --silent --user "${user}:${password}" "${os_url}/_cluster/health" | jq -r '.status')
+      status=$(curl --location --silent --user "${user}:${password}" "${os_url}/_cluster/health" | jq -r '.status')
       log "Current cluster status: ${status}"
 
       if [ "$status" = "green" ]; then
@@ -367,7 +367,7 @@ run_restore() {
     "$CK8S_CMD" ops kubectl wc delete secret -n alertmanager alertmanager-kube-prometheus-stack-alertmanager --ignore-not-found=true
 
     local restore_name
-    restore_name="restore-$(date --utc +%Y%m%d%H%M%S)"
+    restore_name="restore-$(date --utc +%Y%m%d%H%M%S)Z"
     log "Creating restore '${restore_name}' from backup '${latest_backup}'"
     "$CK8S_CMD" ops velero wc restore create "$restore_name" --from-backup "$latest_backup"
 
