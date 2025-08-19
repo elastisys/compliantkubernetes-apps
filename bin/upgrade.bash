@@ -2,9 +2,9 @@
 
 : "${CK8S_CLUSTER:?Missing CK8S_CLUSTER}"
 
-here="$(readlink -f "$(dirname "${0}")")"
+here="$(readlink --canonicalize "$(dirname "${0}")")"
 
-ROOT="$(readlink -f "${here}/../")"
+ROOT="$(readlink --canonicalize "${here}/../")"
 # Allow overriding from test suite
 MIGRATION_ROOT="${MIGRATION_ROOT:-"${ROOT}/migration"}"
 

@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-root_path="$(readlink -f "$(dirname "${0}")/../")"
+root_path="$(readlink --canonicalize "$(dirname "${0}")/../")"
 
 export ANSIBLE_STDOUT_CALLBACK=yaml
 

@@ -36,7 +36,7 @@ fi
 
 # Destroy user subnamespaces before their parent namespaces,
 # this might fail if there are multiple levels.
-"${here}/.././bin/ck8s" ops kubectl wc delete subns -A --all
+"${here}/.././bin/ck8s" ops kubectl wc delete subns --all-namespaces --all
 
 # Destroy user namespaces before everything else,
 # to avoid race conditions where CRs are not deleted before controllers in other namespaces
@@ -56,7 +56,7 @@ fi
 
 # Clean up any leftover challenges
 mapfile -t CHALLENGES < <(
-  "${here}/.././bin/ck8s" ops kubectl wc get challenge -A -oyaml |
+  "${here}/.././bin/ck8s" ops kubectl wc get challenge --all-namespaces -oyaml |
     yq '.items[] | .metadata.name + "," + .metadata.namespace'
 )
 for challenge in "${CHALLENGES[@]}"; do
@@ -79,7 +79,7 @@ if [[ -f "${CK8S_CONFIG_PATH}/cluster-index.yaml" ]]; then
 fi
 
 # Remove any lingering persistent volume claims
-"${here}/.././bin/ck8s" ops kubectl wc delete pvc -A --all
+"${here}/.././bin/ck8s" ops kubectl wc delete pvc --all-namespaces --all
 
 # Velero-specific removal: https://velero.io/docs/v1.10/uninstalling/
 "${here}/.././bin/ck8s" ops kubectl wc delete crds -l component=velero

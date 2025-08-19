@@ -17,12 +17,12 @@ validate_harbor() {
 delete_library_project() {
   echo Removing project library from harbor
   # Curl will return status 500 even though it successfully removed the project.
-  curl --insecure -X DELETE -u admin:"${HARBOR_PASSWORD}" "${ENDPOINT}"/projects/1 >/dev/null
+  curl --insecure --request DELETE --user admin:"${HARBOR_PASSWORD}" "${ENDPOINT}"/projects/1 >/dev/null
 }
 
 create_new_private_default_project() {
   echo "Creating new private project default"
-  curl --insecure -X POST -u admin:"${HARBOR_PASSWORD}" "${ENDPOINT}"/projects --header 'Content-Type: application/json' --header 'Accept: application/json' --data '{
+  curl --insecure --request POST --user admin:"${HARBOR_PASSWORD}" "${ENDPOINT}"/projects --header 'Content-Type: application/json' --header 'Accept: application/json' --data '{
                 "project_name": "default",
                 "metadata": {
                     "public": "0",
@@ -41,7 +41,7 @@ init_harbor_state() {
 
   echo "Setting up initial harbor state"
   if [ "$exists" != "404" ]; then
-    name=$(curl --insecure -X GET "${ENDPOINT}"/projects/1 | jq '.name')
+    name=$(curl --insecure --request GET "${ENDPOINT}"/projects/1 | jq '.name')
 
     if [ "$name" = "\"library\"" ]; then
       delete_library_project
@@ -54,11 +54,11 @@ init_harbor_state() {
 
 configure_OIDC() {
   echo "Configuring oidc support"
-  err=$(curl --insecure -X PUT "${ENDPOINT}/configurations" \
-    -u admin:"${HARBOR_PASSWORD}" \
-    -H "accept: application/json" \
-    -H "Content-Type: application/json" \
-    -d "{ \"primary_auth_mode\": true,
+  err=$(curl --insecure --request PUT "${ENDPOINT}/configurations" \
+    --user admin:"${HARBOR_PASSWORD}" \
+    --header "accept: application/json" \
+    --header "Content-Type: application/json" \
+    --data "{ \"primary_auth_mode\": true,
               \"oidc_verify_cert\": ${OIDC_VERIFY_CERT},
               \"auth_mode\": \"oidc_auth\",
               \"self_registration\": false,
@@ -79,8 +79,8 @@ configure_GC() {
   echo "Configuring GC"
 
   if [ "${GC_FORCE_CONFIGURE}" = "false" ]; then
-    res=$(curl --insecure -X GET -w "%{http_code}" "${ENDPOINT}/system/gc/schedule" \
-      -u admin:"${HARBOR_PASSWORD}")
+    res=$(curl --insecure --request GET --write-out "%{http_code}" "${ENDPOINT}/system/gc/schedule" \
+      --user admin:"${HARBOR_PASSWORD}")
 
     # shellcheck disable=SC3057
     http_code="${res:${#res}-3}"
@@ -96,11 +96,11 @@ configure_GC() {
     fi
   fi
 
-  err=$(curl --insecure -X PUT "${ENDPOINT}/system/gc/schedule" \
-    -u admin:"${HARBOR_PASSWORD}" \
-    -H "accept: application/json" \
-    -H "Content-Type: application/json" \
-    -d "{ \"parameters\": {},
+  err=$(curl --insecure --request PUT "${ENDPOINT}/system/gc/schedule" \
+    --user admin:"${HARBOR_PASSWORD}" \
+    --header "accept: application/json" \
+    --header "Content-Type: application/json" \
+    --data "{ \"parameters\": {},
               \"schedule\": {
                 \"cron\": \"${GC_SCHEDULE}\",
                 \"type\": \"Custom\"

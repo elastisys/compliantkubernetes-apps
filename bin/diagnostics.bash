@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-here="$(dirname "$(readlink -f "$0")")"
+here="$(dirname "$(readlink --canonicalize "$0")")"
 # shellcheck source=bin/common.bash
 source "${here}/common.bash"
 
@@ -108,7 +108,7 @@ sops_encrypt_file() {
 
   log_info "Encrypting ${file}"
 
-  sops --pgp "${CK8S_PGP_FP}" -e -i "${file}"
+  sops --pgp "${CK8S_PGP_FP}" --encrypt --in-place "${file}"
 }
 
 fetch_oidc_token() {
@@ -155,7 +155,7 @@ run_diagnostics() {
   # -- DS and Deployments --
   printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
   echo -e "\nFetching Deployments without desired number of ready pods (<deployment>)"
-  deployments=$("${here}"/ops.bash kubectl "${cluster}" get deployments -A -o=yaml | yq '.items[] | select(.status.conditions[] | select((.type == "Progressing" and .status != "True") or (.type == "Available" and .status != "True")))')
+  deployments=$("${here}"/ops.bash kubectl "${cluster}" get deployments --all-namespaces -o=yaml | yq '.items[] | select(.status.conditions[] | select((.type == "Progressing" and .status != "True") or (.type == "Available" and .status != "True")))')
   if [ -z "${deployments}" ]; then
     echo -e "All Deployments are ready"
   else
@@ -164,7 +164,7 @@ run_diagnostics() {
   printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 
   echo -e "\nFetching DaemonSets without desired number of ready pods (<daemonset>)"
-  daemonsets=$("${here}"/ops.bash kubectl "${cluster}" get daemonsets -A -o=yaml | yq '.items[] | select(.status.numberMisscheduled != 0)')
+  daemonsets=$("${here}"/ops.bash kubectl "${cluster}" get daemonsets --all-namespaces -o=yaml | yq '.items[] | select(.status.numberMisscheduled != 0)')
   if [ -z "${daemonsets}" ]; then
     echo -e "All daemonsets are ready"
   else
@@ -173,7 +173,7 @@ run_diagnostics() {
   printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 
   echo -e "\nFetching StatefulSets without desired number of ready pods (<statefulset>)"
-  statefulsets=$("${here}"/ops.bash kubectl "${cluster}" get statefulsets -A -o=yaml | yq '.items[] | select(.status.collisionCount != 0 and .status.readyReplicas != .status.updatedReplicas and .status.replicas != .status.readyReplicas)')
+  statefulsets=$("${here}"/ops.bash kubectl "${cluster}" get statefulsets --all-namespaces -o=yaml | yq '.items[] | select(.status.collisionCount != 0 and .status.readyReplicas != .status.updatedReplicas and .status.replicas != .status.readyReplicas)')
   if [ -z "${statefulsets}" ]; then
     echo -e "All statefulsets are ready"
   else
@@ -183,15 +183,15 @@ run_diagnostics() {
 
   # -- Pods --
   echo -e "\nFetching Pods that are NotReady (<pod>)"
-  pods=$("${here}/ops.bash" kubectl "${cluster}" get pod -A -o=yaml | yq '.items[] | select(.status.conditions[] | select(.type == "Ready" and .status != "True" and .reason != "PodCompleted")) | [{"name": .metadata.name, "namespace": .metadata.namespace}]')
+  pods=$("${here}/ops.bash" kubectl "${cluster}" get pod --all-namespaces -o=yaml | yq '.items[] | select(.status.conditions[] | select(.type == "Ready" and .status != "True" and .reason != "PodCompleted")) | [{"name": .metadata.name, "namespace": .metadata.namespace}]')
   readarray pod_arr < <(echo "$pods" | yq e -o=j -I=0 '.[]')
 
   if [ "${pods}" == '[]' ]; then
     echo -e "All pods are ready"
   else
     for pod in "${pod_arr[@]}"; do
-      pod_name=$(echo "$pod" | jq -r '.name')
-      namespace=$(echo "$pod" | jq -r '.namespace')
+      pod_name=$(echo "$pod" | jq --raw-output '.name')
+      namespace=$(echo "$pod" | jq --raw-output '.namespace')
 
       echo -e "\nDescribing pod <${pod_name}>"
       "${here}/ops.bash" kubectl "${cluster}" describe pod "${pod_name}" -n "${namespace}"
@@ -223,7 +223,7 @@ run_diagnostics() {
   # -- Helm --
   printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
   echo -e "\nFetching Helm releases that are not deployed (<helm>)"
-  helm=$("${here}"/ops.bash helm "${cluster}" list -A --all -o yaml | yq '.[] | select(.status != "deployed")')
+  helm=$("${here}"/ops.bash helm "${cluster}" list --all-namespaces --all -o yaml | yq '.[] | select(.status != "deployed")')
   if [ -z "${helm}" ]; then
     echo -e "All charts are deployed"
   else
@@ -238,14 +238,14 @@ run_diagnostics() {
 
   printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
   echo -e "\nDescribing failed Challenges (<challenge>)"
-  challenges=$("${here}/ops.bash" kubectl "${cluster}" get challenge -A -o=yaml | yq '.items[] | select(.status.state != "valid") | [{"name": .metadata.name, "namespace": .metadata.namespace}]')
+  challenges=$("${here}/ops.bash" kubectl "${cluster}" get challenge --all-namespaces -o=yaml | yq '.items[] | select(.status.state != "valid") | [{"name": .metadata.name, "namespace": .metadata.namespace}]')
   readarray challenge_arr < <(echo "$challenges" | yq e -o=j -I=0 '.[]')
   if [ "${challenges}" == '[]' ]; then
     echo -e "All challenges are valid"
   else
     for challenge in "${challenge_arr[@]}"; do
-      challenge_name=$(echo "$challenge" | jq -r '.name')
-      namespace=$(echo "$challenge" | jq -r '.namespace')
+      challenge_name=$(echo "$challenge" | jq --raw-output '.name')
+      namespace=$(echo "$challenge" | jq --raw-output '.namespace')
       "${here}/ops.bash" kubectl "${cluster}" describe challenge "${challenge_name}" -n "${namespace}"
     done
   fi
@@ -254,7 +254,7 @@ run_diagnostics() {
   # -- Events --
   printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
   echo -e "\nFetching all Events (<event>)"
-  "${here}/ops.bash" kubectl "${cluster}" get events -A --sort-by=.metadata.creationTimestamp
+  "${here}/ops.bash" kubectl "${cluster}" get events --all-namespaces --sort-by=.metadata.creationTimestamp
   printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 
   # # -- Test --
@@ -345,7 +345,7 @@ run_diagnostics_default_metrics() {
     print_func="${2}"
     res="$(curl "${endpoint}/query_range" --insecure -s --header "${header}" --data-urlencode query="${query}" "${range_arg[@]}")"
     if [[ $(jq '.data.result | length' <<<"${res}") -gt 0 ]]; then
-      readarray metric_results_arr < <(jq -c '.data.result[]' <<<"${res}")
+      readarray metric_results_arr < <(jq --compact-output '.data.result[]' <<<"${res}")
       for row in "${metric_results_arr[@]}"; do
         "${print_func}" "${row}"
       done
@@ -364,7 +364,7 @@ run_diagnostics_default_metrics() {
   query_and_parse 'sum(rate(fluentd_output_status_retry_count[1m])) > 0' print_fluentd
 
   print_dropped_packages() {
-    direction="$([[ $(jq -r .metric.type <<<"${1}") == "fw" ]] && echo "from" || echo "to")"
+    direction="$([[ $(jq --raw-output .metric.type <<<"${1}") == "fw" ]] && echo "from" || echo "to")"
     pod="$(jq '.metric.exported_pod' <<<"${1}")"
     echo "Found dropped packages going ${direction} pod: ${pod} on dates:"
     jq '.values[][0]' <<<"${1}" | xargs -I {} date -d@{}

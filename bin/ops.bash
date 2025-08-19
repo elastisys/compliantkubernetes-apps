@@ -4,7 +4,7 @@
 
 set -eu
 
-here="$(dirname "$(readlink -f "$0")")"
+here="$(dirname "$(readlink --canonicalize "$0")")"
 
 # shellcheck source=bin/common.bash
 source "${here}/common.bash"

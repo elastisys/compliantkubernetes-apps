@@ -56,13 +56,13 @@ run_diff() {
     usage
     ;;
   all)
-    rm -rf "/tmp/charts/${chart}"
+    rm --recursive --force "/tmp/charts/${chart}"
     helm pull "${chart}" --version "${requested_version}" --untar --untardir "/tmp/charts/${chart%%/*}" &>/dev/null
     if diff -r --color -U3 "${CHARTS}/${chart}" "/tmp/charts/${chart}"; then
       out "  state: \e[32mvalid\e[0m"
       RETURN="1"
     fi
-    rm -rf "/tmp/charts/${chart}"
+    rm --recursive --force "/tmp/charts/${chart}"
     ;;
   chart | crds | readme | values)
     if diff --color -U3 --label "current: ${chart} - ${current_version}" <(helm show "${part}" "${CHARTS}/${chart}" 2>/dev/null) --label "requested: ${chart} - ${requested_version}" <(helm show "${part}" "${chart}" --version "${requested_version}" 2>/dev/null); then
@@ -128,7 +128,7 @@ run_pull() {
   fi
 
   if [[ -d "${CHARTS}/tmp/${chart}" ]]; then
-    rm -rf "${CHARTS}/tmp/${chart}"
+    rm --recursive --force "${CHARTS}/tmp/${chart}"
   fi
 
   mkdir -p "${CHARTS}/tmp"
@@ -136,7 +136,7 @@ run_pull() {
   error="$(helm pull "${chart}" --version "${requested_version}" --untar --untardir "${CHARTS}/tmp/${chart%%/*}" 2>&1 >/dev/null || true)"
   error="$(grep "Error" <<<"${error}" || true)"
   if [[ -z "${error}" ]]; then
-    rm -rf "${CHARTS:?}/${chart:?}"
+    rm --recursive --force "${CHARTS:?}/${chart:?}"
     mkdir -p "${CHARTS}/${chart%%/*}"
     mv "${CHARTS}/tmp/${chart}" "${CHARTS}/${chart}"
     out "  state: \e[32msuccess\e[0m"
@@ -145,7 +145,7 @@ run_pull() {
     RETURN="1"
   fi
 
-  rm -rf "${CHARTS}/tmp"
+  rm --recursive --force "${CHARTS}/tmp"
 }
 
 run_verify() {
@@ -166,7 +166,7 @@ run_verify() {
     return
   fi
 
-  rm -rf "/tmp/charts/${chart}"
+  rm --recursive --force "/tmp/charts/${chart}"
 
   helm pull "${chart}" --version "${current_version}" --untar --untardir "/tmp/charts/${chart%%/*}" 2>/dev/null
 
@@ -180,7 +180,7 @@ run_verify() {
     RETURN="1"
   fi
 
-  rm -rf "/tmp/charts/${chart}"
+  rm --recursive --force "/tmp/charts/${chart}"
 }
 
 usage() {

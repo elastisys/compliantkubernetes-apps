@@ -9,7 +9,7 @@ set -eu -o pipefail
 # TODO: Implement a proper dry-run command which actually gives the user some
 #       reassurance that the cluster will not change when deploying.
 
-here="$(dirname "$(readlink -f "$0")")"
+here="$(dirname "$(readlink --canonicalize "$0")")"
 # shellcheck source=bin/common.bash
 source "${here}/common.bash"
 
