@@ -9,7 +9,7 @@
 
 set -euo pipefail
 
-here="$(dirname "$(readlink -f "$0")")"
+here="$(dirname "$(readlink --canonicalize "$0")")"
 # shellcheck source=bin/common.bash
 source "${here}/common.bash"
 
@@ -63,7 +63,7 @@ yq_read_secret() {
   local default_value="${2}"
 
   local value
-  value=$(sops -d "${secrets["secrets_file"]}" | yq "${config_option}")
+  value=$(sops --decrypt "${secrets["secrets_file"]}" | yq "${config_option}")
 
   if [[ "${value}" != "null" ]]; then
     echo "${value}"
@@ -277,7 +277,7 @@ get_swift_url() {
       [[ -z "${header}" ]] && break
       [[ "${header}" == "x-subject-token:" ]] && os_token="${value}"
     done
-    swift_url=$(jq -r '.token.catalog[] | select( .type == "object-store" and .name == "swift") | .endpoints[] | select(.interface == "public" and .region == "'"${swift_region}"'") | .url')
+    swift_url=$(jq --raw-output '.token.catalog[] | select( .type == "object-store" and .name == "swift") | .endpoints[] | select(.interface == "public" and .region == "'"${swift_region}"'") | .url')
   } <<<"${response}"
 
   curl -i -s -X DELETE -H "X-Auth-Token: ${os_token}" -H "X-Subject-Token: ${os_token}" "${auth_url}/auth/tokens" >/dev/null

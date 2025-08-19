@@ -5,7 +5,7 @@
 # are used throughout all of the scripts.
 
 : "${CK8S_CONFIG_PATH:?Missing CK8S_CONFIG_PATH}"
-here="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
+here="$(dirname "$(readlink --canonicalize "${BASH_SOURCE[0]}")")"
 root_path="${here}/.."
 
 # shellcheck disable=SC2034
@@ -23,7 +23,7 @@ CK8S_AUTO_APPROVE=${CK8S_AUTO_APPROVE:-"false"}
 
 # Create CK8S_CONFIG_PATH if it does not exist and make it absolute
 mkdir -p "${CK8S_CONFIG_PATH}"
-CK8S_CONFIG_PATH=$(readlink -f "${CK8S_CONFIG_PATH}")
+CK8S_CONFIG_PATH=$(readlink --canonicalize "${CK8S_CONFIG_PATH}")
 export CK8S_CONFIG_PATH
 
 config_template_path="${root_path}/config"
@@ -147,14 +147,14 @@ check_tools() {
     fi
   }
 
-  check_minor "$(echo "${req}" | jq -r '.["github.com/mikefarah/yq/v4"].version')" "$(yq --version)" yq
-  check_minor "$(echo "${req}" | jq -r '.["kubectl"].version')" "$(kubectl version --client=true -oyaml 2>/dev/null | yq '.clientVersion.gitVersion')" kubectl
-  check_minor "$(echo "${req}" | jq -r '.["helm.sh/helm/v3"].version')" "$(helm version --template='{{.Version}}')" helm
-  check_minor "$(echo "${req}" | jq -r '.["github.com/helmfile/helmfile"].version')" "$(helmfile --version)" helmfile
-  check_minor "$(echo "${req}" | jq -r '.["github.com/databus23/helm-diff/v3"].version')" "$(helm plugin list | grep diff)" "helm diff plugin"
-  check_minor "$(echo "${req}" | jq -r '.["helm-secrets"].version')" "$(helm plugin list | grep secrets)" "helm secrets plugin"
-  check_minor "$(echo "${req}" | jq -r '.["getsops/sops/v3"].version')" "$(sops --version)" "sops"
-  check_minor "$(echo "${req}" | jq -r '.["s3cmd"].version')" "$(s3cmd --version)" "s3cmd"
+  check_minor "$(echo "${req}" | jq --raw-output '.["github.com/mikefarah/yq/v4"].version')" "$(yq --version)" yq
+  check_minor "$(echo "${req}" | jq --raw-output '.["kubectl"].version')" "$(kubectl version --client=true -oyaml 2>/dev/null | yq '.clientVersion.gitVersion')" kubectl
+  check_minor "$(echo "${req}" | jq --raw-output '.["helm.sh/helm/v3"].version')" "$(helm version --template='{{.Version}}')" helm
+  check_minor "$(echo "${req}" | jq --raw-output '.["github.com/helmfile/helmfile"].version')" "$(helmfile --version)" helmfile
+  check_minor "$(echo "${req}" | jq --raw-output '.["github.com/databus23/helm-diff/v3"].version')" "$(helm plugin list | grep diff)" "helm diff plugin"
+  check_minor "$(echo "${req}" | jq --raw-output '.["helm-secrets"].version')" "$(helm plugin list | grep secrets)" "helm secrets plugin"
+  check_minor "$(echo "${req}" | jq --raw-output '.["getsops/sops/v3"].version')" "$(sops --version)" "sops"
+  check_minor "$(echo "${req}" | jq --raw-output '.["s3cmd"].version')" "$(s3cmd --version)" "s3cmd"
 
   if [[ "${warn}" != 0 ]]; then
     if [[ -t 1 ]]; then
@@ -550,7 +550,7 @@ sops_config_write_fingerprints() {
 
 # Encrypt stdin to file. If the file already exists it's overwritten.
 sops_encrypt_stdin() {
-  sops --config "${sops_config}" -e --input-type "${1}" --output-type "${1}" /dev/stdin >"${2}"
+  sops --config "${sops_config}" --encrypt --input-type "${1}" --output-type "${1}" /dev/stdin >"${2}"
 }
 
 # Encrypt a file in place.
@@ -563,7 +563,7 @@ sops_encrypt() {
 
   log_info "Encrypting ${1}"
 
-  sops --config "${sops_config}" -e -i "${1}"
+  sops --config "${sops_config}" --encrypt --in-place "${1}"
 }
 
 # Check that a file exists and is actually encrypted using SOPS.
@@ -595,7 +595,7 @@ sops_decrypt() {
 
   sops_decrypt_verify "${1}"
 
-  sops --config "${sops_config}" -d -i "${1}"
+  sops --config "${sops_config}" --decrypt --in-place "${1}"
   append_trap "sops_encrypt ${1}" EXIT
 }
 

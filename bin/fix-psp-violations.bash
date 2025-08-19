@@ -2,7 +2,7 @@
 
 : "${CK8S_CLUSTER:?Missing CK8S_CLUSTER}"
 
-ROOT="$(readlink -f "$(dirname "${0}")/../")"
+ROOT="$(readlink --canonicalize "$(dirname "${0}")/../")"
 
 # shellcheck source=scripts/migration/lib.sh
 source "${ROOT}/scripts/migration/lib.sh"

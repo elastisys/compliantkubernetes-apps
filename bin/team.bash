@@ -4,7 +4,7 @@
 
 set -eu -o pipefail
 
-here="$(dirname "$(readlink -f "$0")")"
+here="$(dirname "$(readlink --canonicalize "$0")")"
 # shellcheck source=bin/common.bash
 source "${here}/common.bash"
 
@@ -102,7 +102,7 @@ sops_rotate_data_key() {
     fi
 
     log_info "Rotating data key and reencrypting: ${secret}"
-    sops --config "${sops_config}" -r -i "${secret}"
+    sops --config "${sops_config}" --rotate --in-place "${secret}"
   done
 }
 

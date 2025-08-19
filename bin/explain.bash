@@ -6,7 +6,7 @@
 set -euo pipefail
 
 declare here root
-here="$(dirname "$(readlink -f "$0")")"
+here="$(dirname "$(readlink --canonicalize "$0")")"
 root="$(dirname "${here}")"
 
 # shellcheck source=bin/common.bash
