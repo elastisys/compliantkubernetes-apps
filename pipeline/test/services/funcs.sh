@@ -259,7 +259,8 @@ function testEndpoint {
     args=(
       --connect-timeout 20
       --max-time 60
-      -ksIL
+      --insecure
+      -sIL
       -o /dev/null
       -X GET
       -w "%{http_code}"
@@ -294,7 +295,8 @@ function testEndpointProtected {
     args=(
       --connect-timeout 20
       --max-time 60
-      -ksI
+      --insecure
+      -sI
       -o /dev/null
       -X GET
       -w "%{http_code}"

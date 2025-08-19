@@ -343,7 +343,7 @@ run_diagnostics_default_metrics() {
   query_and_parse() {
     query="${1}"
     print_func="${2}"
-    res="$(curl "${endpoint}/query_range" -k -s --header "${header}" --data-urlencode query="${query}" "${range_arg[@]}")"
+    res="$(curl "${endpoint}/query_range" --insecure -s --header "${header}" --data-urlencode query="${query}" "${range_arg[@]}")"
     if [[ $(jq '.data.result | length' <<<"${res}") -gt 0 ]]; then
       readarray metric_results_arr < <(jq -c '.data.result[]' <<<"${res}")
       for row in "${metric_results_arr[@]}"; do
@@ -390,7 +390,7 @@ run_diagnostics_default_metrics() {
   # Opensearch status <instant Query>
   printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
   echo "Querying Opensearch cluster status"
-  res="$(curl "${endpoint}/query" -k -s --header "${header}" --data-urlencode query='elasticsearch_cluster_health_status{color=~"yellow|red"} > 0')"
+  res="$(curl "${endpoint}/query" --insecure -s --header "${header}" --data-urlencode query='elasticsearch_cluster_health_status{color=~"yellow|red"} > 0')"
   if [[ $(jq '.data.result | length' <<<"${res}") -gt 0 ]]; then
     echo "Opensearch is in $(jq '.data.result[0].metric.color' <<<"${res}") state!"
   fi
@@ -403,7 +403,7 @@ run_diagnostics_query_metric() {
   endpoint="${domain}/api/v1/namespaces/thanos/services/thanos-query-query-frontend:9090/proxy/api/v1"
   header="Authorization: Bearer ${token}"
 
-  curl "${endpoint}/query" -k --header "${header}" --data-urlencode query="${1}" | jq
+  curl "${endpoint}/query" --insecure --header "${header}" --data-urlencode query="${1}" | jq
 }
 
 if [[ -z "${CK8S_PGP_FP:-}" ]]; then

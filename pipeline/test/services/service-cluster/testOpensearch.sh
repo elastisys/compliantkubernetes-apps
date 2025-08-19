@@ -84,7 +84,7 @@ function sc_opensearch_checks() {
 
 check_opensearch_cluster_health() {
   echo -ne "Checking if opensearch cluster is healthy ... "
-  cluster_health=$(curl -sk -u admin:"${adminPassword}" -X GET "https://opensearch.${opsDomain}/_cluster/health")
+  cluster_health=$(curl -s --insecure -u admin:"${adminPassword}" -X GET "https://opensearch.${opsDomain}/_cluster/health")
   status=$(echo "$cluster_health" | jq -r '.status')
   if [[ $status != "green" ]]; then
     echo -e "failure ❌"
@@ -99,9 +99,9 @@ check_opensearch_snapshots_status() {
   no_error=true
   debug_msg=""
   repo_name=$(yq -e '.opensearch.snapshot.repository' "${config['config_file_sc']}")
-  repo_exists_status=$(curl -sk -u admin:"${adminPassword}" -X GET "https://opensearch.${opsDomain}/_snapshot/${repo_name}" | jq "select(.error)")
+  repo_exists_status=$(curl -s --insecure -u admin:"${adminPassword}" -X GET "https://opensearch.${opsDomain}/_snapshot/${repo_name}" | jq "select(.error)")
   if [[ -z "$repo_exists_status" ]]; then
-    snapshots=$(curl -sk -u admin:"${adminPassword}" -X GET "https://opensearch.${opsDomain}/_cat/snapshots/${repo_name}")
+    snapshots=$(curl -s --insecure -u admin:"${adminPassword}" -X GET "https://opensearch.${opsDomain}/_cat/snapshots/${repo_name}")
     error=$(echo "$snapshots" | jq '.error' 2>/dev/null || true)
     failed=$(echo "$snapshots" | grep 'FAILED' || true)
     partial=$(echo "$snapshots" | grep 'PARTIAL' || true)
@@ -159,7 +159,7 @@ check_opensearch_indices() {
   no_error=true
 
   for index in 'other' 'kubernetes' 'kubeaudit' 'authlog'; do
-    res=$(curl -w "%{http_code}" -o /dev/null -ksIL -u admin:"${adminPassword}" -X HEAD "https://opensearch.${opsDomain}/${index}")
+    res=$(curl -w "%{http_code}" -o /dev/null --insecure -sIL -u admin:"${adminPassword}" -X HEAD "https://opensearch.${opsDomain}/${index}")
     if [[ $res != "200" ]]; then
       debug_msg+="[ERROR] Missing index : ${index}\n"
       no_error=false
@@ -177,7 +177,7 @@ check_opensearch_indices() {
 
 check_opensearch_breakers() {
   echo -ne "Checking opensearch breakers ... "
-  breakers_data=$(curl -sk -u admin:"${adminPassword}" -X GET "https://opensearch.${opsDomain}/_nodes/_all/stats/breaker")
+  breakers_data=$(curl -s --insecure -u admin:"${adminPassword}" -X GET "https://opensearch.${opsDomain}/_nodes/_all/stats/breaker")
   no_error=true
   debug_msg=""
   nodes_data=$(echo "$breakers_data" | jq ".nodes")
@@ -211,7 +211,7 @@ check_opensearch_aliases() {
   no_error=true
   debug_msg=""
 
-  curl -sk -o /tmp/response -u admin:"${adminPassword}" -X GET "https://opensearch.${opsDomain}/_cat/aliases"
+  curl -s --insecure -o /tmp/response -u admin:"${adminPassword}" -X GET "https://opensearch.${opsDomain}/_cat/aliases"
 
   aliases=$(awk '{print $1}' </tmp/response)
   aliases_arr=("$aliases")
@@ -221,7 +221,7 @@ check_opensearch_aliases() {
   for alias in $uniq_aliases; do
     if ! [[ $alias =~ ^[\.*] ]]; then
 
-      alias_data=$(curl -sk -u admin:"${adminPassword}" -X GET "https://opensearch.${opsDomain}/_alias/${alias}")
+      alias_data=$(curl -s --insecure -u admin:"${adminPassword}" -X GET "https://opensearch.${opsDomain}/_alias/${alias}")
       is_write_index="$(echo "$alias_data" | jq ".[].aliases.$alias.is_write_index | select(. == true)")"
       if [[ "$is_write_index" == "" ]]; then
         no_error=false
@@ -248,11 +248,11 @@ check_opensearch_mappings() {
   debug_msg="INDEX\t\t\t\t\t\t| #FIELDS \t| LIMIT \n"
   debug_msg+="------------------------------------------------------------------------\n"
 
-  indices_data=$(curl -sk -u admin:"${adminPassword}" -X GET "https://opensearch.${opsDomain}/_cat/indices" | awk '{print $3}' | tr '\n' ' ')
+  indices_data=$(curl -s --insecure -u admin:"${adminPassword}" -X GET "https://opensearch.${opsDomain}/_cat/indices" | awk '{print $3}' | tr '\n' ' ')
   IFS=' ' read -ra indices <<<"$indices_data"
   for index in "${indices[@]}"; do
-    fields_limit=$(curl -sk -u admin:"${adminPassword}" -X GET "https://opensearch.${opsDomain}/${index}/_settings" | jq -r ".[\"${index}\"].settings.index.mapping.total_fields.limit")
-    fields_count=$(curl -sk -u admin:"${adminPassword}" -X GET "https://opensearch.${opsDomain}/${index}/_field_caps?fields=*" | jq -r ".fields | keys | length")
+    fields_limit=$(curl -s --insecure -u admin:"${adminPassword}" -X GET "https://opensearch.${opsDomain}/${index}/_settings" | jq -r ".[\"${index}\"].settings.index.mapping.total_fields.limit")
+    fields_count=$(curl -s --insecure -u admin:"${adminPassword}" -X GET "https://opensearch.${opsDomain}/${index}/_field_caps?fields=*" | jq -r ".fields | keys | length")
 
     if [[ $fields_limit != "null" ]]; then
       fields_limit_usage=$((fields_count * 100 / fields_limit))
@@ -286,7 +286,7 @@ check_opensearch_user_roles() {
 
   readarray configuredMappings < <(yq e -o=j -I=0 '.opensearch.extraRoleMappings[]' "${config['config_file_sc']}")
 
-  rolesmapping=$(curl -sk -u admin:"${adminPassword}" -X GET "https://opensearch.${opsDomain}/_plugins/_security/api/rolesmapping")
+  rolesmapping=$(curl -s --insecure -u admin:"${adminPassword}" -X GET "https://opensearch.${opsDomain}/_plugins/_security/api/rolesmapping")
 
   for roleMapping in "${configuredMappings[@]}"; do
     configured_mapping_name=$(echo "$roleMapping" | yq e '.mapping_name' -)
@@ -322,7 +322,7 @@ check_opensearch_ism() {
   if [[ $default_policies_enabled == "true" ]]; then
     default_policies=("kubernetes" "kubeaudit" "authlog" "other")
     for policy in "${default_policies[@]}"; do
-      res=$(curl -w "%{http_code}" -o /dev/null -sk -u admin:"${adminPassword}" -X GET "https://opensearch.${opsDomain}/_plugins/_ism/policies/${policy}")
+      res=$(curl -w "%{http_code}" -o /dev/null -s --insecure -u admin:"${adminPassword}" -X GET "https://opensearch.${opsDomain}/_plugins/_ism/policies/${policy}")
       if [[ $res != "200" ]]; then
         no_error=false
         debug_msg+="[ERROR] Missing default policy : ${policy}\n"
@@ -339,7 +339,7 @@ check_opensearch_ism() {
 
   for policy in "${additional_policies[@]}"; do
     policy_name=$(echo "$policy" | awk -F'.' '{print $1}' | tr '"' ' ')
-    res=$(curl -w "%{http_code}" -o /dev/null -sk -u admin:"${adminPassword}" -X GET "https://opensearch.${opsDomain}/_plugins/_ism/policies/${policy_name}")
+    res=$(curl -w "%{http_code}" -o /dev/null -s --insecure -u admin:"${adminPassword}" -X GET "https://opensearch.${opsDomain}/_plugins/_ism/policies/${policy_name}")
     if [[ $res != "200" ]]; then
       no_error=false
       debug_msg+="[ERROR] Missing additional policy : ${policy_name}\n"
@@ -354,7 +354,7 @@ check_opensearch_ism() {
     ((rollover_limit = rollover_age_days * 86400000))
 
     epoch_now=$(date +%s%3N)
-    write_index_creation_date=$(curl -sk -u admin:"${adminPassword}" -X GET "https://opensearch.${opsDomain}/_cat/indices/${write_index}?h=creation.date")
+    write_index_creation_date=$(curl -s --insecure -u admin:"${adminPassword}" -X GET "https://opensearch.${opsDomain}/_cat/indices/${write_index}?h=creation.date")
 
     ((creation_lapse = epoch_now - write_index_creation_date))
 
@@ -425,7 +425,7 @@ check_fluentd_connection() {
   no_error=true
   debug_msg=""
 
-  res=$(curl -w "%{http_code}" -o /dev/null -ksIL -u fluentd:"${fluentdPassword}" -X HEAD "https://opensearch.${opsDomain}/")
+  res=$(curl -w "%{http_code}" -o /dev/null --insecure -sIL -u fluentd:"${fluentdPassword}" -X HEAD "https://opensearch.${opsDomain}/")
   if [[ $res != "200" ]]; then
     debug_msg+="[ERROR] $res : Fluentd cannot connect to opensearch.\nPlease check your credentials"
     no_error=false

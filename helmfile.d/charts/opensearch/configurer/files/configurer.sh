@@ -50,7 +50,7 @@ wait_for_dashboards() {
 setup_dashboards() {
   echo
   echo "Setting up OpenSearch Dashboards"
-  resp=$(curl -s -kL -X POST "${osd_url}/api/saved_objects/_import?overwrite=true" \
+  resp=$(curl -s --insecure -L -X POST "${osd_url}/api/saved_objects/_import?overwrite=true" \
     -H "osd-xsrf: true" \
     --form file=@/files/dashboards.ndjson -u "${auth}")
   success=$(echo "${resp}" | grep "^{" | jq -r '.success')
@@ -84,7 +84,7 @@ register_s3_repository() {
   resp=$(curl --insecure -X PUT "${os_url}/_snapshot/${snapshot_repository}" \
     -H 'Content-Type: application/json' \
     -d' {"type": "s3", "settings":{ "bucket": "{{ .Values.config.s3.bucketName }}", "client": "default"}}' \
-    -s -k -u "${auth}")
+    -s --insecure -u "${auth}")
   acknowledged=$(echo "${resp}" | grep "^{" | jq -r '.acknowledged')
   if [ "${acknowledged}" != "true" ]; then
     log_error_exit "Failed to register S3 repository" "${resp}"
@@ -97,7 +97,7 @@ register_gcs_repository() {
   resp=$(curl --insecure -X PUT "${os_url}/_snapshot/${snapshot_repository}" \
     -H 'Content-Type: application/json' \
     -d' {"type": "gcs", "settings":{ "bucket": "{{ .Values.config.gcs.bucketName }}", "client": "default"}}' \
-    -s -k -u "${auth}")
+    -s --insecure -u "${auth}")
   acknowledged=$(echo "${resp}" | grep "^{" | jq -r '.acknowledged')
   if [ "${acknowledged}" != "true" ]; then
     log_error_exit "Failed to register GSC repository" "${resp}"
@@ -110,7 +110,7 @@ register_azure_repository() {
   resp=$(curl --insecure -X PUT "${os_url}/_snapshot/${snapshot_repository}" \
     -H 'Content-Type: application/json' \
     -d' {"type": "azure", "settings":{ "container": "{{ .Values.config.azure.containerName }}", "client": "default" }}' \
-    -s -k -u "${auth}")
+    -s --insecure -u "${auth}")
   acknowledged=$(echo "${resp}" | grep "^{" | jq -r '.acknowledged')
   if [ "${acknowledged}" != "true" ]; then
     log_error_exit "Failed to register Azure repository" "${resp}"
@@ -131,7 +131,7 @@ create_index_template() {
   echo "Creating index template from file '${filename}'"
   resp=$(curl --insecure -X PUT "${os_url}/_index_template/${name}?create=${strict}" \
     -H "Content-Type: application/json" -s \
-    -d@/files/${filename} -k -u "${auth}")
+    -d@/files/${filename} --insecure -u "${auth}")
   acknowledged=$(echo "${resp}" | grep "^{" | jq -r '.acknowledged')
   if [ "${acknowledged}" != "true" ]; then
     if [ "${overwrite_templates}" = "false" ] \
@@ -150,12 +150,12 @@ setup_policy() {
     update_policy() {
       policy=$1
       policy_json=$(curl --insecure -X GET "${os_url}/_plugins/_ism/policies/${policy}" \
-        -H "Content-Type: application/json" -k -s \
+        -H "Content-Type: application/json" --insecure -s \
         -u "${auth}")
       seq_no=$(echo "${policy_json}" | jq -r '._seq_no')
       primary_term=$(echo "${policy_json}" | jq -r '._primary_term')
       resp=$(curl --insecure -X PUT "${os_url}/_plugins/_ism/policies/${policy}?if_seq_no=${seq_no}&if_primary_term=${primary_term}" \
-        -H "Content-Type: application/json" -k -s \
+        -H "Content-Type: application/json" --insecure -s \
         -d@"/files/${policy}.policy.json" \
         -u "${auth}")
       id=$(echo "${resp}" | grep "^{" | jq -r '._id')
@@ -169,7 +169,7 @@ setup_policy() {
     echo "Creating policy '${policy}'"
     resp=$(curl --insecure -X PUT "${os_url}/_plugins/_ism/policies/${policy}" \
       -H "Content-Type: application/json" \
-      -d@"/files/${policy}.policy.json" -k -s \
+      -d@"/files/${policy}.policy.json" --insecure -s \
       -u "${auth}")
     status=$(echo "${resp}" | grep "^{" | jq -r '.status')
     id=$(echo "${resp}" | grep "^{" | jq -r '._id')
@@ -192,13 +192,13 @@ init_indices() {
 
   for idx in other kubernetes kubeaudit authlog; do
     indices=$(curl --insecure -X GET "${os_url}/_cat/aliases/${idx}" \
-      -k -s -u "${auth}")
+      --insecure -s -u "${auth}")
     if echo "${indices}" | grep "true" > /dev/null; then # idx exists
       echo "Index '${idx}' already exists"
     else # create idx
       resp=$(curl --insecure -X PUT "${os_url}/%3C${idx}-default-%7Bnow%2Fd%7D-000001%3E" \
         -H 'Content-Type: application/json' \
-        -k -s -u "${auth}" \
+        --insecure -s -u "${auth}" \
         -d '{"aliases": {"'"${idx}"'": {"is_write_index": true }}}')
       acknowledged=$(echo "${resp}" | grep "^{" | jq -r '.acknowledged')
       if [ "${acknowledged}" = "true" ]; then
@@ -214,7 +214,7 @@ create_role() {
   role_name="$1"; role_definition="$2"
   response=$(curl --insecure -X PUT "${os_url}/_plugins/_security/api/roles/${role_name}" \
     -H 'Content-Type: application/json' \
-    -k -s -u "${auth}" \
+    --insecure -s -u "${auth}" \
     -d "${role_definition}")
 
   status=$(echo "${response}" | grep "^{" | jq -r '.status')
@@ -233,7 +233,7 @@ create_rolemapping() {
   rolemapping_name="$1"; role_definition="$2"
   response=$(curl --insecure -X PUT "${os_url}/_plugins/_security/api/rolesmapping/${rolemapping_name}" \
     -H 'Content-Type: application/json' \
-    -k -s -u "${auth}" \
+    --insecure -s -u "${auth}" \
     -d "${role_definition}")
 
   status=$(echo "${response}" | grep "^{" | jq -r '.status')
@@ -252,7 +252,7 @@ create_user() {
   user_name="$1"; user_info="$2"
   response=$(curl --insecure -X PUT "${os_url}/_plugins/_security/api/internalusers/${user_name}" \
     -H 'Content-Type: application/json' \
-    -k -s -u "${auth}" \
+    --insecure -s -u "${auth}" \
     -d "${user_info}")
 
   status=$(echo "${response}" | grep "^{" | jq -r '.status')
@@ -270,14 +270,14 @@ create_user() {
 create_update_snapshot_policy() {
   echo
   echo "Checking if snapshot policy exists"
-  policy_resp=$(curl --insecure -X GET "${os_url}/_plugins/_sm/policies/snapshot_management_policy" -s -k -u "${auth}")
+  policy_resp=$(curl --insecure -X GET "${os_url}/_plugins/_sm/policies/snapshot_management_policy" -s --insecure -u "${auth}")
   seq_no=$(echo "${policy_resp}" | grep "^{" | jq -r '._seq_no')
   primary_term=$(echo "${policy_resp}" | grep "^{" | jq -r '._primary_term')
   if [ "${seq_no}" != "null" ] && [ "${primary_term}" != "null" ]; then
     echo "Updating snapshot policy"
     resp=$(curl --insecure -X PUT "${os_url}/_plugins/_sm/policies/snapshot_management_policy?if_seq_no=${seq_no}&if_primary_term=${primary_term}" \
     -H 'Content-Type: application/json' \
-    -s -k -u "${auth}" \
+    -s --insecure -u "${auth}" \
     -d '{
       "description": "Snapshot Management Policy",
       "creation": {
@@ -315,7 +315,7 @@ create_update_snapshot_policy() {
     echo "Creating snapshot policy"
     resp=$(curl --insecure -X POST "${os_url}/_plugins/_sm/policies/snapshot_management_policy" \
       -H 'Content-Type: application/json' \
-      -s -k -u "${auth}" \
+      -s --insecure -u "${auth}" \
       -d '{
         "description": "Snapshot Management Policy",
         "creation": {

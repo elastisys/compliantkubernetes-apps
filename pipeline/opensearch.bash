@@ -5,7 +5,7 @@ set -eu
 opensearch_url=https://opensearch.ops.pipeline-exoscale.elastisys.se/api/status
 retries=60
 while [ ${retries} -gt 0 ]; do
-  result="$(curl --connect-timeout 20 --max-time 60 -ksIL -o /dev/null -w "%{http_code}" $opensearch_url || true)"
+  result="$(curl --connect-timeout 20 --max-time 60 --insecure -sIL -o /dev/null -w "%{http_code}" $opensearch_url || true)"
   [[ "${result}" == "401" ]] && echo "Opensearch is ready. Got status ${result}"
   break
   echo "Waiting for OpenSearch to be ready. Got status ${result}"

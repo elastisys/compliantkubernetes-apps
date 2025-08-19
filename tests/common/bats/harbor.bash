@@ -38,7 +38,7 @@ _harbor.curl() {
   fi
 
   if [[ "${harbor_secure}" != "true" ]]; then
-    curl_args=(-k "${curl_args[@]}")
+    curl_args=(--insecure "${curl_args[@]}")
   fi
 
   curl "${curl_args[@]}" "$@"
