@@ -2,11 +2,7 @@
 
 set -e
 
-if [ -z "$CK8S_CONFIG_PATH" ]; then
-  log "ERROR: CK8S_CONFIG_PATH is not set."
-  log "Please set and export the variable before running the script."
-  exit 1
-fi
+: "${CK8S_CONFIG_PATH:?Missing CK8S_CONFIG_PATH}"
 
 usage() {
   echo "Usage: $0 <action> <target>"
@@ -19,11 +15,11 @@ usage() {
 PURPLE='\033[0;35m'
 NOCOLOR='\033[0m'
 log() {
-  echo -e "[${PURPLE}$(date +'%Y-%m-%d %H:%M:%S')${NOCOLOR}]: $1"
+  echo -e "[${PURPLE}$(date --utc +'%Y-%m-%d %H:%M:%S')${NOCOLOR}]: $1"
 }
 
 # allows the script to be run from anywhere
-SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
+SCRIPT_DIR="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
 REPO_ROOT=$(realpath "$SCRIPT_DIR/..")
 CK8S_CMD="$REPO_ROOT/bin/ck8s"
 
@@ -35,7 +31,8 @@ ACTION="$1"
 TARGET="$2"
 
 run_backup() {
-  case "$1" in
+  local backup_target="${1}"
+  case "${backup_target}" in
   opensearch)
     log "Starting OpenSearch backup..."
 
@@ -48,7 +45,7 @@ run_backup() {
 
     log "Discovering snapshot repository name..."
     local snapshot_repo
-    snapshot_repo=$(curl -kL -s -u "${user}:${password}" "${os_url}/_cat/repositories?v" | awk 'NR==2 {print $1}')
+    snapshot_repo=$(curl --insecure --location --silent --user "${user}:${password}" "${os_url}/_cat/repositories?v" | awk 'NR==2 {print $1}')
     if [ -z "$snapshot_repo" ]; then
       log "ERROR: Could not find OpenSearch snapshot repository."
       exit 1
@@ -56,7 +53,7 @@ run_backup() {
     log "Found snapshot repository: ${snapshot_repo}"
 
     local snapshot_name
-    snapshot_name="manual-snapshot-$(date +%Y%m%d%H%M%S)"
+    snapshot_name="manual-snapshot-$(date --utc +%Y%m%d%H%M%S)"
     log "Taking snapshot: ${snapshot_name}"
     curl -kL -u "${user}:${password}" -X PUT "${os_url}/_snapshot/${snapshot_repo}/${snapshot_name}" -H 'Content-Type: application/json' -d'
       {
@@ -69,7 +66,7 @@ run_backup() {
     local status=""
     local retries=60 # 30 min timeout
     while [ $retries -gt 0 ]; do
-      status=$(curl -kL -s -u "${user}:${password}" "${os_url}/_snapshot/${snapshot_repo}/${snapshot_name}" | jq -r '.snapshots[0].state')
+      status=$(curl --insecure --location --silent --user "${user}:${password}" "${os_url}/_snapshot/${snapshot_repo}/${snapshot_name}" | jq -r '.snapshots[0].state')
       log "Current snapshot status: ${status}"
 
       if [ "$status" = "SUCCESS" ]; then
@@ -90,13 +87,16 @@ run_backup() {
   harbor)
     log "Starting Harbor backup..."
     local backup_job_name
-    backup_job_name="harbor-backup-manual-$(date +%Y%m%d%H%M%S)"
+    backup_job_name="harbor-backup-manual-$(date --utc +%Y%m%d%H%M%S)"
     log "Creating on-demand backup job: $backup_job_name"
 
     "$CK8S_CMD" ops kubectl sc -n harbor create job "$backup_job_name" --from=cronjob/harbor-backup-cronjob
 
     log "Waiting for backup job to complete..."
-    "$CK8S_CMD" ops kubectl sc -n harbor wait --for=condition=complete "job/$backup_job_name" --timeout=30m
+    if ! "$CK8S_CMD" ops kubectl sc -n harbor wait --for=condition=complete "job/$backup_job_name" --timeout=30m; then
+      log "ERROR: Harbor backup job failed or timed out."
+      exit 1
+    fi
 
     log "Backup complete. Deleting job: $backup_job_name"
     "$CK8S_CMD" ops kubectl sc -n harbor delete job "$backup_job_name"
@@ -124,7 +124,7 @@ run_backup() {
     for cronjob in $cronjob_list; do
       "$CK8S_CMD" ops kubectl sc -n rclone create job --from "${cronjob}" "${cronjob/#cronjob.batch\//}"
       local job_name=${cronjob/#cronjob.batch\//}
-      log "Creating job '${job_name}' from '${cronjob}' cronjob..."
+      log "Created job '${job_name}' from '${cronjob}' cronjob..."
     done
 
     job_list=$("$CK8S_CMD" ops kubectl sc -n rclone get jobs -lapp.kubernetes.io/instance=rclone-sync -oname)
@@ -170,7 +170,7 @@ run_backup() {
     log "Starting Velero backup..."
 
     local backup_name
-    backup_name="manual-backup-$(date +%Y%m%d%H%M%S)"
+    backup_name="manual-backup-$(date --utc +%Y%m%d%H%M%S)"
     log "Creating Velero backup: ${backup_name}"
 
     "$CK8S_CMD" ops velero wc backup create "$backup_name" --from-schedule velero-daily-backup
@@ -198,14 +198,15 @@ run_backup() {
     exit 1
     ;;
   *)
-    log "Error: Invalid backup target '$1'."
+    log "Error: Invalid backup target: '$backup_target'."
     usage
     ;;
   esac
 }
 
 run_restore() {
-  case "$1" in
+  local restore_target="${1}"
+  case "${restore_target}" in
   opensearch)
     log "Starting OpenSearch restore..."
 
@@ -218,7 +219,7 @@ run_restore() {
 
     log "Discovering snapshot repository name..."
     local snapshot_repo
-    snapshot_repo=$(curl -kL -s -u "${user}:${password}" "${os_url}/_cat/repositories?v" | awk 'NR==2 {print $1}')
+    snapshot_repo=$(curl --insecure --location --silent --user "${user}:${password}" "${os_url}/_cat/repositories?v" | awk 'NR==2 {print $1}')
     if [ -z "$snapshot_repo" ]; then
       log "ERROR: Could not find OpenSearch snapshot repository."
       exit 1
@@ -227,21 +228,33 @@ run_restore() {
 
     log "Finding latest successful snapshot..."
     local latest_snapshot
-    latest_snapshot=$(curl -kL -s -u "${user}:${password}" -X GET "${os_url}/_snapshot/${snapshot_repo}/_all" | jq -r '.snapshots | map(select(.state == "SUCCESS")) | sort_by(.start_time_in_millis) | .[-1].snapshot')
+    latest_snapshot=$(curl --insecure --location --silent --user "${user}:${password}" -X GET "${os_url}/_snapshot/${snapshot_repo}/_all" | jq -r '.snapshots | map(select(.state == "SUCCESS")) | sort_by(.start_time_in_millis) | .[-1].snapshot')
     if [ -z "$latest_snapshot" ] || [ "$latest_snapshot" = "null" ]; then
       log "ERROR: No successful snapshots found to restore."
       exit 1
     fi
     log "Found latest snapshot to restore: ${latest_snapshot}"
 
-    local indices_to_restore="kubernetes-*,kubeaudit-*,other-*,authlog-*"
+    log "Checking if index-per-namespace is enabled..."
+    local index_per_namespace_enabled
+    index_per_namespace_enabled=$(yq '.opensearch.indexPerNamespace' "${CK8S_CONFIG_PATH}/common-config.yaml")
+
+    local indices_to_restore
+    if [ "$index_per_namespace_enabled" = true ]; then
+      log "Index-per-namespace is enabled, adjusted indices..."
+      indices_to_restore="-.*"
+    else
+      log "Index-per-namespace is disabled, using default indices..."
+      indices_to_restore="kubernetes-*,kubeaudit-*,other-*,authlog-*"
+    fi
+
     log "Will restore indices matching pattern: ${indices_to_restore}"
 
     log "Closing existing indices matching the restore pattern..."
-    curl -kL -s -u "${user}:${password}" -X POST "${os_url}/${indices_to_restore}/_close?pretty"
+    curl --insecure --location --silent --user "${user}:${password}" -X POST "${os_url}/${indices_to_restore}/_close?pretty"
 
     log "Starting restore from snapshot ${latest_snapshot}..."
-    curl -kL -s -u "${user}:${password}" -X POST "${os_url}/_snapshot/${snapshot_repo}/${latest_snapshot}/_restore?pretty" -H 'Content-Type: application/json' -d'
+    curl --insecure --location --silent --user "${user}:${password}" -X POST "${os_url}/_snapshot/${snapshot_repo}/${latest_snapshot}/_restore?pretty" -H 'Content-Type: application/json' -d'
       {
         "indices": "'"${indices_to_restore}"'"
       }
@@ -251,7 +264,7 @@ run_restore() {
     local status=""
     local retries=60 # 30 min timeout
     while [ $retries -gt 0 ]; do
-      status=$(curl -kL -s -u "${user}:${password}" "${os_url}/_cluster/health" | jq -r '.status')
+      status=$(curl --insecure --location --silent --user "${user}:${password}" "${os_url}/_cluster/health" | jq -r '.status')
       log "Current cluster status: ${status}"
 
       if [ "$status" = "green" ]; then
@@ -294,7 +307,7 @@ run_restore() {
     for cronjob in $cronjob_list; do
       "$CK8S_CMD" ops kubectl sc -n rclone create job --from "${cronjob}" "${cronjob/#cronjob.batch\//}"
       local job_name=${cronjob/#cronjob.batch\//}
-      log "Creating job '${job_name}' from '${cronjob}' cronjob..."
+      log "Created job '${job_name}' from '${cronjob}' cronjob..."
     done
 
     local job_list
@@ -354,7 +367,7 @@ run_restore() {
     "$CK8S_CMD" ops kubectl wc delete secret -n alertmanager alertmanager-kube-prometheus-stack-alertmanager --ignore-not-found=true
 
     local restore_name
-    restore_name="restore-$(date +%Y%m%d%H%M%S)"
+    restore_name="restore-$(date --utc +%Y%m%d%H%M%S)"
     log "Creating restore '${restore_name}' from backup '${latest_backup}'"
     "$CK8S_CMD" ops velero wc restore create "$restore_name" --from-backup "$latest_backup"
 
@@ -381,7 +394,7 @@ run_restore() {
     exit 1
     ;;
   *)
-    log "Error: Invalid restore target '$1'."
+    log "Error: Invalid restore target '$restore_target'."
     usage
     ;;
   esac
