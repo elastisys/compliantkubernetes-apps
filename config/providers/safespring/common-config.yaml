@@ -25,9 +25,9 @@ ingressNginx:
   controller:
     config:
       useProxyProtocol: false
-    useHostPort: false
+    useHostPort: true
     service:
-      enabled: true
+      enabled: false
       allocateLoadBalancerNodePorts: true
       annotations: {}
       type: NodePort
