@@ -11,6 +11,7 @@ It can be installed normally.
 
 - Ensure `yq`, `sops`, `envsubst`and `kubectl` are installed and configured.
 - Ensure `CK8S_CONFIG_PATH` is set correctly.
+- Ensure the Harbor admin password is the same as in the old environment (needed by the init job).
 
 ## Usage
 
@@ -86,39 +87,9 @@ The script will provide reminders for these, but refer to the sections below if 
 <details>
     <summary>Restore to a different domain</summary>
 
-If you are restoring harbor to a new environment with a different domain, you need to re-run the init job. First, make sure the harbor admin password is the same as in the old environment:
-
-```bash
-# Edit harbor.password
-sops ${CK8S_CONFIG_PATH}/secrets.yaml
-```
-
-Then, re-run the init job:
-
-```bash
-./bin/ck8s ops kubectl sc delete job -n harbor init-harbor-job
-./bin/ck8s ops helmfile sc -l app=harbor sync
-```
-
 If the new harbor is using a dex instance with a different domain compared to the dex the old harbor was using, then when users login via dex harbor will not recognize them as the same user. Harbor will have the old OIDC users in the database, but when the new ones are created at first login they will conflict with the old ones and you will get a error like `failed to create user record: user <user> or email <email> already exists`.
 
 To fix this you need to login as an admin user (you can login with the default, non-oidc admin at the URL `/account/sign-in`) and then delete the old users in the list of users. Users can then create new users again by logging. Then you need to set their permissions again.
-
-</details>
-
-<details>
-<summary>Login with Dex fails</summary>
-
-Symptom: Login fails and Dex logs shows `level=INFO msg="invalid client_secret on token request" client_id=harbor`.
-
-Possible cause: Harbors OIDC Client Secret changed, but was reverted to the previous version by the restore job.
-
-Solution: Re-run the init job to refresh the OIDC client details.
-
-```bash
-./bin/ck8s ops kubectl sc delete job -n harbor init-harbor-job
-./bin/ck8s ops helmfile sc -l app=harbor sync
-```
 
 </details>
 
