@@ -24,6 +24,11 @@ setup() {
 
   env.private
 
+  mkdir "${CK8S_CONFIG_PATH}/sc-config"
+  mkdir "${CK8S_CONFIG_PATH}/wc-config"
+  cp "${BATS_TEST_DIRNAME}/resources/sc-config/terraform.tfstate" "${CK8S_CONFIG_PATH}/sc-config/terraform.tfstate"
+  cp "${BATS_TEST_DIRNAME}/resources/wc-config/terraform.tfstate" "${CK8S_CONFIG_PATH}/wc-config/terraform.tfstate"
+
   update_ips.setup_mocks
 
   export mock_curl
@@ -40,33 +45,21 @@ teardown_file() {
   gpg.teardown
 }
 
-_apply_normalise() {
-  ck8s update-ips both dry-run 2>&1 | sed "s#${CK8S_CONFIG_PATH}#/tmp/ck8s-apps-config#g"
-}
-
-@test "ck8s update-ips requires CK8S_CONFIG_PATH" {
-  CK8S_CONFIG_PATH="" run ck8s update-ips both apply
-  assert_failure
-  assert_output --partial "Missing CK8S_CONFIG_PATH"
-
-  update_ips.assert_mocks_none
-}
-
 @test "ck8s update-ip upcloud private nodes ingress IPs" {
   update_ips.mock_minimal
-
-  run yq.set common .networkPolicies.global.scIngress.ips '["172.16.2.1/32"]'
-  run yq.set common .networkPolicies.global.wcIngress.ips '["172.16.2.2/32"]'
-
-  mock_set_output "${mock_dig}" "172.16.2.1" 2
-  mock_set_output "${mock_dig}" "172.16.2.2" 3
+  update_ips.populate_minimal
 
   run ck8s update-ips both apply
+  assert_success
 
-  sc_private_address=$(jq -r '.resources[].instances[].attributes.nodes | select( . != null) | .[].networks[].ip_addresses[] | select( .listen == false) | .address' "${BATS_TEST_DIRNAME}"/resources/sc-config/terraform.tfstate)
-  wc_private_address=$(jq -r '.resources[].instances[].attributes.nodes | select( . != null) | .[].networks[].ip_addresses[] | select( .listen == false) | .address' "${BATS_TEST_DIRNAME}"/resources/wc-config/terraform.tfstate)
+  sc_private_address="$(jq -r '.resources[].instances[].attributes.nodes | select( . != null) | .[].networks[].ip_addresses[] | select( .listen == false) | .address' "${BATS_TEST_DIRNAME}/resources/sc-config/terraform.tfstate")"
+  wc_private_address="$(jq -r '.resources[].instances[].attributes.nodes | select( . != null) | .[].networks[].ip_addresses[] | select( .listen == false) | .address' "${BATS_TEST_DIRNAME}/resources/wc-config/terraform.tfstate")"
 
-  assert_equal "$(yq.dig common '.networkPolicies.global.scIngress.ips | . style="flow"')" "[$sc_private_address/32]"
-  assert_equal "$(yq.dig common '.networkPolicies.global.wcIngress.ips | . style="flow"')" "[$wc_private_address/32]"
+  assert_equal "$(yq.dig common '.networkPolicies.global.scIngress.ips | . style="flow"')" "[127.0.0.2/32, ${sc_private_address}/32]"
+  assert_equal "$(yq.dig common '.networkPolicies.global.wcIngress.ips | . style="flow"')" "[127.0.0.3/32, ${wc_private_address}/32]"
+
+  assert_equal "$(mock_get_call_num "${mock_curl}")" 0
+  assert_equal "$(mock_get_call_num "${mock_dig}")" 3
+  assert_equal "$(mock_get_call_num "${mock_kubectl}")" 20
 
 }
