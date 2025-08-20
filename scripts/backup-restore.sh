@@ -36,24 +36,20 @@ run_backup() {
   opensearch)
     log "Starting OpenSearch backup..."
 
-    local user="admin"
-    local password
-    password=$(sops -d "${CK8S_CONFIG_PATH}/secrets.yaml" | yq '.opensearch.adminPassword')
-    local os_url
-    os_url="https://opensearch.$(yq '.global.opsDomain' "${CK8S_CONFIG_PATH}/common-config.yaml")"
+    local -r user="admin"
+    local -r password=$(sops -d "${CK8S_CONFIG_PATH}/secrets.yaml" | yq '.opensearch.adminPassword')
+    local -r os_url="https://opensearch.$(yq '.global.opsDomain' "${CK8S_CONFIG_PATH}/common-config.yaml")"
     log "OpenSearch URL: ${os_url}"
 
     log "Discovering snapshot repository name..."
-    local snapshot_repo
-    snapshot_repo=$(curl --location --silent --user "${user}:${password}" "${os_url}/_cat/repositories?v" | awk 'NR==2 {print $1}')
+    local -r snapshot_repo=$(curl --location --silent --user "${user}:${password}" "${os_url}/_cat/repositories?v" | awk 'NR==2 {print $1}')
     if [ -z "$snapshot_repo" ]; then
       log "ERROR: Could not find OpenSearch snapshot repository."
       exit 1
     fi
     log "Found snapshot repository: ${snapshot_repo}"
 
-    local snapshot_name
-    snapshot_name="manual-snapshot-$(date --utc +%Y%m%d%H%M%S)z"
+    local -r snapshot_name="manual-snapshot-$(date --utc +%Y%m%d%H%M%S)z"
     log "Taking snapshot: ${snapshot_name}"
     curl -kL -u "${user}:${password}" -X PUT "${os_url}/_snapshot/${snapshot_repo}/${snapshot_name}" -H 'Content-Type: application/json' -d'
       {
@@ -86,8 +82,7 @@ run_backup() {
     ;;
   harbor)
     log "Starting Harbor backup..."
-    local backup_job_name
-    backup_job_name="harbor-backup-manual-$(date --utc +%Y%m%d%H%M%S)z"
+    local -r backup_job_name="harbor-backup-manual-$(date --utc +%Y%m%d%H%M%S)z"
     log "Creating on-demand backup job: $backup_job_name"
 
     "$CK8S_CMD" ops kubectl sc -n harbor create job "$backup_job_name" --from=cronjob/harbor-backup-cronjob
@@ -108,16 +103,14 @@ run_backup() {
 
     # Check if rclone-sync is enabled before continuing
     log "Checking for rclone-sync cronjobs"
-    local cronjob_list
-    cronjob_list=$("$CK8S_CMD" ops kubectl sc -n rclone get cronjobs -lapp.kubernetes.io/instance=rclone-sync -oname)
+    local -r cronjob_list=$("$CK8S_CMD" ops kubectl sc -n rclone get cronjobs -lapp.kubernetes.io/instance=rclone-sync -oname)
 
     if [ -z "$cronjob_list" ]; then
       log "ERROR: No rclone-sync cronjobs found."
       log "Please ensure rclone sync is enabled in your configuration and has been applied."
       exit 1
     fi
-    local total_jobs
-    total_jobs=$(echo "$cronjob_list" | wc -w)
+    local -r total_jobs=$(echo "$cronjob_list" | wc -w)
     log "Found ${total_jobs} cronjobs."
 
     # Create jobs from cronjobs
@@ -169,8 +162,7 @@ run_backup() {
   velero)
     log "Starting Velero backup..."
 
-    local backup_name
-    backup_name="manual-backup-$(date --utc +%Y%m%d%H%M%S)z"
+    local -r backup_name="manual-backup-$(date --utc +%Y%m%d%H%M%S)z"
     log "Creating Velero backup: ${backup_name}"
 
     "$CK8S_CMD" ops velero wc backup create "$backup_name" --from-schedule velero-daily-backup
@@ -210,16 +202,13 @@ run_restore() {
   opensearch)
     log "Starting OpenSearch restore..."
 
-    local user="admin"
-    local password
-    password=$(sops -d "${CK8S_CONFIG_PATH}/secrets.yaml" | yq '.opensearch.adminPassword')
-    local os_url
-    os_url="https://opensearch.$(yq '.global.opsDomain' "${CK8S_CONFIG_PATH}/common-config.yaml")"
+    local -r user="admin"
+    local -r password=$(sops -d "${CK8S_CONFIG_PATH}/secrets.yaml" | yq '.opensearch.adminPassword')
+    local -r os_url="https://opensearch.$(yq '.global.opsDomain' "${CK8S_CONFIG_PATH}/common-config.yaml")"
     log "OpenSearch URL: ${os_url}"
 
     log "Discovering snapshot repository name..."
-    local snapshot_repo
-    snapshot_repo=$(curl --location --silent --user "${user}:${password}" "${os_url}/_cat/repositories?v" | awk 'NR==2 {print $1}')
+    local -r snapshot_repo=$(curl --location --silent --user "${user}:${password}" "${os_url}/_cat/repositories?v" | awk 'NR==2 {print $1}')
     if [ -z "$snapshot_repo" ]; then
       log "ERROR: Could not find OpenSearch snapshot repository."
       exit 1
@@ -227,8 +216,7 @@ run_restore() {
     log "Found snapshot repository: ${snapshot_repo}"
 
     log "Finding latest successful snapshot..."
-    local latest_snapshot
-    latest_snapshot=$(curl --location --silent --user "${user}:${password}" -X GET "${os_url}/_snapshot/${snapshot_repo}/_all" | jq -r '.snapshots | map(select(.state == "SUCCESS")) | sort_by(.start_time_in_millis) | .[-1].snapshot')
+    local -r latest_snapshot=$(curl --location --silent --user "${user}:${password}" -X GET "${os_url}/_snapshot/${snapshot_repo}/_all" | jq -r '.snapshots | map(select(.state == "SUCCESS")) | sort_by(.start_time_in_millis) | .[-1].snapshot')
     if [ -z "$latest_snapshot" ] || [ "$latest_snapshot" = "null" ]; then
       log "ERROR: No successful snapshots found to restore."
       exit 1
@@ -236,8 +224,7 @@ run_restore() {
     log "Found latest snapshot to restore: ${latest_snapshot}"
 
     log "Checking if index-per-namespace is enabled..."
-    local index_per_namespace_enabled
-    index_per_namespace_enabled=$(yq '.opensearch.indexPerNamespace' "${CK8S_CONFIG_PATH}/common-config.yaml")
+    local -r index_per_namespace_enabled=$(yq '.opensearch.indexPerNamespace' "${CK8S_CONFIG_PATH}/common-config.yaml")
 
     local indices_to_restore
     if [ "$index_per_namespace_enabled" = true ]; then
@@ -291,16 +278,14 @@ run_restore() {
 
     # Check if rclone-restore is enabled before continuing
     log "Checking for rclone-restore cronjobs"
-    local cronjob_list
-    cronjob_list=$("$CK8S_CMD" ops kubectl sc -n rclone get cronjobs -lapp.kubernetes.io/instance=rclone-restore -oname)
+    local -r cronjob_list=$("$CK8S_CMD" ops kubectl sc -n rclone get cronjobs -lapp.kubernetes.io/instance=rclone-restore -oname)
 
     if [ -z "$cronjob_list" ]; then
       log "ERROR: No rclone-restore cronjobs found."
       log "Please ensure rclone restore is enabled in your configuration and has been applied."
       exit 1
     fi
-    local total_jobs
-    total_jobs=$(echo "$cronjob_list" | wc -w)
+    local -r total_jobs=$(echo "$cronjob_list" | wc -w)
     log "Found ${total_jobs} cronjobs."
 
     # Create jobs from cronjobs
@@ -354,8 +339,7 @@ run_restore() {
     log "Starting Velero restore..."
 
     log "Finding latest completed Velero backup..."
-    local latest_backup
-    latest_backup=$("$CK8S_CMD" ops velero wc backup get -o json | jq -r '.items | map(select(.status.phase == "Completed")) | sort_by(.metadata.creationTimestamp) | .[-1].metadata.name')
+    local -r latest_backup=$("$CK8S_CMD" ops velero wc backup get -o json | jq -r '.items | map(select(.status.phase == "Completed")) | sort_by(.metadata.creationTimestamp) | .[-1].metadata.name')
 
     if [ -z "$latest_backup" ] || [ "$latest_backup" = "null" ]; then
       log "ERROR: No completed Velero backups found to restore from."
@@ -366,8 +350,7 @@ run_restore() {
     log "Deleting Alertmanager secret..."
     "$CK8S_CMD" ops kubectl wc delete secret -n alertmanager alertmanager-kube-prometheus-stack-alertmanager --ignore-not-found=true
 
-    local restore_name
-    restore_name="restore-$(date --utc +%Y%m%d%H%M%S)z"
+    local -r restore_name="restore-$(date --utc +%Y%m%d%H%M%S)z"
     log "Creating restore '${restore_name}' from backup '${latest_backup}'"
     "$CK8S_CMD" ops velero wc restore create "$restore_name" --from-backup "$latest_backup"
 
