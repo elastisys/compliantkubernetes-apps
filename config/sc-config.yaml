@@ -793,6 +793,8 @@ opensearch:
     # cookieTtl: 3600000
     # sessionTtl: 3600000
     # sessionKeepalive: true
+    # If opensearch warns to adjust the autocomplete settings, set this to more than the largest number of documents in any shard.
+    # autocompleteTerminateAfter: 100000
 
   # Single-sign-on using OIDC, note this requires LetsEncrypt Production
   sso:
