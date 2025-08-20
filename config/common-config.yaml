@@ -710,6 +710,24 @@ velero:
   useVolumeSnapshots: true
   schedule: 0 0 * * * # once per day
   retentionPeriod: 720h0m0s
+  restoreResourcePriorities: []
+  ## Default resource priority
+  #  - customresourcedefinitions
+  #  - namespaces
+  #  - storageclasses
+  #  - volumesnapshotclass.snapshot.storage.k8s.io
+  #  - volumesnapshotcontents.snapshot.storage.k8s.io
+  #  - volumesnapshots.snapshot.storage.k8s.io
+  #  - persistentvolumes
+  #  - persistentvolumeclaims
+  #  - secrets
+  #  - configmaps
+  #  - serviceaccounts
+  #  - limitranges
+  #  - pods
+  #  - replicasets.apps
+  #  - clusters.cluster.x-k8s.io
+  #  - clusterresourcesets.addons.cluster.x-k8s.io
   resources:
     limits:
       cpu: 500m
