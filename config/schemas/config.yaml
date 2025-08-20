@@ -5877,6 +5877,9 @@ properties:
             $ref: '#/$defs/kubernetesNodeSelector'
           affinity:
             $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+          autocompleteTerminateAfter:
+            title: Autocomplete setting for number of documents to query in Dashboards
+            type: number
       masterNode:
         title: OpenSearch Master Node
         description: |-

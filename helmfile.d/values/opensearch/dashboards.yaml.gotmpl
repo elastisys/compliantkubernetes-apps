@@ -32,6 +32,10 @@ config:
       # Use this setting if you are running opensearch-dashboards without https
       cookie:
         secure: false
+    {{- with .Values.opensearch.dashboards.autocompleteTerminateAfter }}
+    opensearchDashboards:
+      autocompleteTerminateAfter: {{ . }}
+    {{- end }}
 
 opensearchAccount:
   secret: opensearch-dashboards-user
