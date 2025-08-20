@@ -2958,6 +2958,17 @@ properties:
         items:
           title: Namespace
           type: string
+      restoreResourcePriorities:
+        title: Velero Restore Resource Priority
+        description: |-
+          Configure restore order for resources
+
+          > [!note]
+          > See [upstream documentation for reference](https://velero.io/docs/main/restore-reference/#restore-order)
+        type: array
+        items:
+          title: Resource
+          type: string
       storagePrefix:
         title: Velero Storage Prefix
         description: |-

@@ -156,6 +156,27 @@ velero:
   ## Extra excluded namespace, here we should add the namespaces that are more likely to change
   excludedExtraNamespaces: []
 
+  ## Restore Order
+  ## https://velero.io/docs/main/restore-reference/#restore-order
+  restoreResourcePriorities:
+    - customresourcedefinitions
+    - subnamespaceanchors
+    - namespaces
+    - storageclasses
+    - volumesnapshotclass.snapshot.storage.k8s.io
+    - volumesnapshotcontents.snapshot.storage.k8s.io
+    - volumesnapshots.snapshot.storage.k8s.io
+    - persistentvolumes
+    - persistentvolumeclaims
+    - secrets
+    - configmaps
+    - serviceaccounts
+    - limitranges
+    - pods
+    - replicasets.apps
+    - clusters.cluster.x-k8s.io
+    - clusterresourcesets.addons.cluster.x-k8s.io
+
 ## Hierarchical namespace controller configuration, enable in common-config.yaml
 hnc:
   ## Included namespaces, empty string will include all

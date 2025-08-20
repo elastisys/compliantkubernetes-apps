@@ -99,6 +99,9 @@ configuration:
     {{- end }}
   {{- end }}
 
+  # https://velero.io/docs/main/restore-reference/#restore-order
+  restoreResourcePriorities: {{ .Values.velero.restoreResourcePriorities | join "," | quote }}
+
 credentials:
   # Create secret with credentials
   secretContents:
