@@ -147,8 +147,17 @@ run_backup() {
     done
 
     # check if all jobs succeeded or not
-    if [ "$(echo "$job_statuses" | jq '[.items[] | select(.status.succeeded == 1)] | length')" -ne "$total_jobs" ]; then
-      log "ERROR: Not all rclone jobs succeeded. Please check the logs for failed jobs."
+    local -r succeeded_count=$(echo "$job_statuses" | jq '[.items[] | select(.status.succeeded == 1)] | length')
+    if [ "$succeeded_count" -ne "$total_jobs" ]; then
+      log "ERROR: Not all rclone jobs succeeded."
+      local -r failed_jobs=$(echo "$job_statuses" | jq -r '.items[] | select(.status.failed > 0) | .metadata.name')
+
+      if [ -n "$failed_jobs" ]; then
+        log "The following jobs reported a FAILED status:"
+        echo "$failed_jobs" | while IFS= read -r job; do
+          log "- ${job}"
+        done
+      fi
       exit 1
     fi
 
@@ -322,9 +331,18 @@ run_restore() {
       retries=$((retries - 1))
     done
 
-    # Check if all jobs succeeded
-    if [ "$(echo "$job_statuses" | jq '[.items[] | select(.status.succeeded == 1)] | length')" -ne "$total_jobs" ]; then
-      log "ERROR: Not all rclone jobs succeeded. Please check the logs for failed jobs."
+    # check if all jobs succeeded or not
+    local -r succeeded_count=$(echo "$job_statuses" | jq '[.items[] | select(.status.succeeded == 1)] | length')
+    if [ "$succeeded_count" -ne "$total_jobs" ]; then
+      log "ERROR: Not all rclone jobs succeeded."
+      local -r failed_jobs=$(echo "$job_statuses" | jq -r '.items[] | select(.status.failed > 0) | .metadata.name')
+
+      if [ -n "$failed_jobs" ]; then
+        log "The following jobs reported a FAILED status:"
+        echo "$failed_jobs" | while IFS= read -r job; do
+          log "- ${job}"
+        done
+      fi
       exit 1
     fi
 
