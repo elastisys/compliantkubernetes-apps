@@ -67,7 +67,7 @@ extraArgs:
 {{- if .Values.externalDns.endpoints }}
 endpoints:
   {{- range .Values.externalDns.endpoints }}
-  - dnsName: {{ .dnsName }}.{{ $.Values.global.baseDomain }}
+  - dnsName: "{{ .dnsName }}.{{ $.Values.global.baseDomain }}"
     recordTTL: {{ .recordTTL }}
     recordType: {{ .recordType }}
     targets:
