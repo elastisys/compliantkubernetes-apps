@@ -1,0 +1,428 @@
+#!/usr/bin/env bash
+
+set -e
+
+: "${CK8S_CONFIG_PATH:?Missing CK8S_CONFIG_PATH}"
+
+usage() {
+  echo "Usage: $0 <action> <target>"
+  echo "Actions: backup | restore"
+  echo "Targets: opensearch | harbor | rclone | velero"
+  exit 1
+}
+
+# Sets a timestamp log before every message, also colors it purple to make it easier to distinct from rest of the text because why not
+PURPLE='\033[0;35m'
+NOCOLOR='\033[0m'
+log() {
+  echo -e "[${PURPLE}$(date +'%Y-%m-%d %H:%M:%S')${NOCOLOR}]: $1"
+}
+
+# allows the script to be run from anywhere
+SCRIPT_DIR="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
+REPO_ROOT=$(realpath "$SCRIPT_DIR/..")
+CK8S_CMD="$REPO_ROOT/bin/ck8s"
+
+if [ "$#" -ne 2 ]; then
+  usage
+fi
+
+ACTION="$1"
+TARGET="$2"
+
+run_backup() {
+  local backup_target="${1}"
+  case "${backup_target}" in
+  opensearch)
+    log "Starting OpenSearch backup..."
+
+    local -r user="admin"
+    local -r password=$(sops -d "${CK8S_CONFIG_PATH}/secrets.yaml" | yq '.opensearch.adminPassword')
+    local -r os_url="https://opensearch.$(yq '.global.opsDomain' "${CK8S_CONFIG_PATH}/common-config.yaml")"
+    log "OpenSearch URL: ${os_url}"
+
+    log "Discovering snapshot repository name..."
+    local -r snapshot_repo=$(curl --location --silent --user "${user}:${password}" "${os_url}/_cat/repositories?v" | awk 'NR==2 {print $1}')
+    if [ -z "$snapshot_repo" ]; then
+      log "ERROR: Could not find OpenSearch snapshot repository."
+      exit 1
+    fi
+    log "Found snapshot repository: ${snapshot_repo}"
+
+    local -r snapshot_name="manual-snapshot-$(date --utc +%Y%m%d%H%M%S)z"
+    log "Taking snapshot: ${snapshot_name}"
+    curl --location --user "${user}:${password}" -X PUT "${os_url}/_snapshot/${snapshot_repo}/${snapshot_name}" -H 'Content-Type: application/json' -d'
+      {
+        "indices": "*,-.opendistro_security",
+        "include_global_state": false
+      }
+      '
+
+    log "Waiting for snapshot to complete..."
+    local status=""
+    local retries=60 # 30 min timeout
+    while [ $retries -gt 0 ]; do
+      status=$(curl --location --silent --user "${user}:${password}" "${os_url}/_snapshot/${snapshot_repo}/${snapshot_name}" | jq -r '.snapshots[0].state')
+      log "Current snapshot status: ${status}"
+
+      if [ "$status" = "SUCCESS" ]; then
+        log "OpenSearch backup successfully completed."
+        return
+      elif [ "$status" = "FAILED" ] || [ "$status" = "PARTIAL" ]; then
+        log "ERROR: OpenSearch snapshot failed with status: ${status}"
+        exit 1
+      fi
+
+      sleep 30
+      retries=$((retries - 1))
+    done
+
+    log "ERROR: Timeout waiting for OpenSearch snapshot to complete."
+    exit 1
+    ;;
+  harbor)
+    log "Starting Harbor backup..."
+    local -r backup_job_name="harbor-backup-manual-$(date --utc +%Y%m%d%H%M%S)z"
+    log "Creating on-demand backup job: $backup_job_name"
+
+    "$CK8S_CMD" ops kubectl sc -n harbor create job "$backup_job_name" --from=cronjob/harbor-backup-cronjob
+
+    log "Waiting for backup job to complete..."
+    if ! "$CK8S_CMD" ops kubectl sc -n harbor wait --for=condition=complete "job/$backup_job_name" --timeout=30m; then
+      log "ERROR: Harbor backup job failed or timed out."
+      exit 1
+    fi
+
+    log "Backup complete. Deleting job: $backup_job_name"
+    "$CK8S_CMD" ops kubectl sc -n harbor delete job "$backup_job_name"
+
+    log "Harbor backup successfully completed."
+    ;;
+  rclone)
+    log "Starting Rclone backup..."
+
+    # Check if rclone-sync is enabled before continuing
+    log "Checking for rclone-sync cronjobs"
+    local cronjob_list=()
+    mapfile -t cronjob_list < <("$CK8S_CMD" ops kubectl sc -n rclone get cronjobs -lapp.kubernetes.io/instance=rclone-sync -oname)
+    readonly cronjob_list
+
+    if [ ${#cronjob_list[@]} -eq 0 ]; then
+      log "ERROR: No rclone-sync cronjobs found."
+      log "Please ensure rclone sync is enabled in your configuration and has been applied."
+      exit 1
+    fi
+    local -r total_jobs=${#cronjob_list[@]}
+    log "Found ${total_jobs} cronjobs."
+
+    # Create jobs from cronjobs
+    local -r timestamp="$(date --utc +%Y%m%d%H%M%S)z"
+    local job_names=()
+    for cronjob in "${cronjob_list[@]}"; do
+      local base_name=${cronjob/#cronjob.batch\//}
+      local job_name="${base_name}-${timestamp}"
+      "$CK8S_CMD" ops kubectl sc -n rclone create job --from "${cronjob}" "${job_name}"
+      log "Created job '${job_name}' from '${cronjob}' cronjob..."
+      job_names+=("${job_name}")
+    done
+
+    log "Waiting for all ${total_jobs} rclone jobs to complete..."
+    local retries=480 # these can take a really long time depending on content, so the timeout is set to 4 hours
+    while [ $retries -gt 0 ]; do
+
+      local job_statuses
+      job_statuses=$("$CK8S_CMD" ops kubectl sc -n rclone get jobs "${job_names[@]}" -o json)
+
+      local succeeded
+      succeeded=$(echo "$job_statuses" | jq '[.items[] | select(.status.succeeded == 1)] | length')
+      local failed
+      failed=$(echo "$job_statuses" | jq '[.items[] | select(.status.failed > 0)] | length')
+      local active
+      active=$(echo "$job_statuses" | jq '[.items[] | select(.status.active == 1)] | length')
+
+      log "Job Status -> Total: ${total_jobs} | Succeeded: ${succeeded} | Failed: ${failed} | Active: ${active} | Retries left: ${retries}"
+
+      if [ "$active" -eq 0 ]; then
+        break
+      fi
+
+      sleep 30
+      retries=$((retries - 1))
+    done
+
+    # check if all jobs succeeded or not
+    local -r succeeded_count=$(echo "$job_statuses" | jq '[.items[] | select(.status.succeeded == 1)] | length')
+    if [ "$succeeded_count" -ne "$total_jobs" ]; then
+      log "ERROR: Not all rclone jobs succeeded."
+      local -r failed_jobs=$(echo "$job_statuses" | jq -r '.items[] | select(.status.failed > 0) | .metadata.name')
+
+      if [ -n "$failed_jobs" ]; then
+        log "The following jobs reported a FAILED status:"
+        echo "$failed_jobs" | while IFS= read -r job; do
+          log "- ${job}"
+        done
+      fi
+      exit 1
+    fi
+
+    log "Cleaning up..."
+    "$CK8S_CMD" ops kubectl sc -n rclone delete jobs "${job_names[@]}" --ignore-not-found=true
+
+    log "Rclone backup successfully completed."
+    ;;
+  velero)
+    log "Starting Velero backup..."
+
+    local -r backup_name="manual-backup-$(date --utc +%Y%m%d%H%M%S)z"
+    log "Creating Velero backup: ${backup_name}"
+
+    "$CK8S_CMD" ops velero wc backup create "$backup_name" --from-schedule velero-daily-backup
+
+    log "Waiting for backup to complete..."
+    local phase=""
+    local retries=90
+    while [ $retries -gt 0 ]; do
+      phase=$("$CK8S_CMD" ops velero wc backup describe "$backup_name" -o json | jq -r .phase)
+      log "Current backup phase: ${phase}"
+
+      if [ "$phase" = "Completed" ]; then
+        log "Velero backup successfully completed."
+        return
+      elif [[ "$phase" =~ Failed|PartiallyFailed|Deleting ]]; then
+        log "ERROR: Velero backup failed or was deleted with phase: ${phase}"
+        exit 1
+      fi
+
+      sleep 30
+      retries=$((retries - 1))
+    done
+
+    log "ERROR: Timeout waiting for Velero backup to complete."
+    exit 1
+    ;;
+  *)
+    log "Error: Invalid backup target: '$backup_target'."
+    usage
+    ;;
+  esac
+}
+
+run_restore() {
+  local restore_target="${1}"
+  case "${restore_target}" in
+  opensearch)
+    log "Starting OpenSearch restore..."
+
+    local -r user="admin"
+    local -r password=$(sops -d "${CK8S_CONFIG_PATH}/secrets.yaml" | yq '.opensearch.adminPassword')
+    local -r os_url="https://opensearch.$(yq '.global.opsDomain' "${CK8S_CONFIG_PATH}/common-config.yaml")"
+    log "OpenSearch URL: ${os_url}"
+
+    log "Checking if health is green on the OpenSearch cluster..."
+    local -r initial_status=$(curl --location --silent --user "${user}:${password}" "${os_url}/_cluster/health" | jq -r '.status')
+
+    if [ "$initial_status" != "green" ]; then
+      log "ERROR: Health check failed. The cluster is not in a 'green' state (current status: '${initial_status}')."
+      log "Please resolve the cluster health issue before attempting a restore."
+      exit 1
+    fi
+    log "OpenSearch cluster health is green. Proceeding with restore."
+
+    log "Discovering snapshot repository name..."
+    local -r snapshot_repo=$(curl --location --silent --user "${user}:${password}" "${os_url}/_cat/repositories?v" | awk 'NR==2 {print $1}')
+    if [ -z "$snapshot_repo" ]; then
+      log "ERROR: Could not find OpenSearch snapshot repository."
+      exit 1
+    fi
+    log "Found snapshot repository: ${snapshot_repo}"
+
+    log "Finding latest successful snapshot..."
+    local -r latest_snapshot=$(curl --location --silent --user "${user}:${password}" -X GET "${os_url}/_snapshot/${snapshot_repo}/_all" | jq -r '.snapshots | map(select(.state == "SUCCESS")) | sort_by(.start_time_in_millis) | .[-1].snapshot')
+    if [ -z "$latest_snapshot" ] || [ "$latest_snapshot" = "null" ]; then
+      log "ERROR: No successful snapshots found to restore."
+      exit 1
+    fi
+    log "Found latest snapshot to restore: ${latest_snapshot}"
+
+    log "Checking if index-per-namespace is enabled..."
+    local -r index_per_namespace_enabled=$(yq '.opensearch.indexPerNamespace' "${CK8S_CONFIG_PATH}/common-config.yaml")
+
+    local indices_to_restore
+    if [ "$index_per_namespace_enabled" = true ]; then
+      log "Index-per-namespace is enabled, adjusted indices..."
+      indices_to_restore="-.*"
+    else
+      log "Index-per-namespace is disabled, using default indices..."
+      indices_to_restore="kubernetes-*,kubeaudit-*,other-*,authlog-*"
+    fi
+
+    log "Will restore indices matching pattern: ${indices_to_restore}"
+
+    log "Closing existing indices matching the restore pattern..."
+    curl --location --silent --user "${user}:${password}" -X POST "${os_url}/${indices_to_restore}/_close?pretty"
+
+    log "Starting restore from snapshot ${latest_snapshot}..."
+    curl --location --silent --user "${user}:${password}" -X POST "${os_url}/_snapshot/${snapshot_repo}/${latest_snapshot}/_restore?pretty" -H 'Content-Type: application/json' -d'
+      {
+        "indices": "'"${indices_to_restore}"'"
+      }
+      '
+
+    log "Waiting for cluster health to become green..."
+    local status=""
+    local retries=60 # 30 min timeout
+    while [ $retries -gt 0 ]; do
+      status=$(curl --location --silent --user "${user}:${password}" "${os_url}/_cluster/health" | jq -r '.status')
+      log "Current cluster status: ${status}"
+
+      if [ "$status" = "green" ]; then
+        log "OpenSearch restore complete and cluster is healthy."
+        return
+      fi
+
+      sleep 30
+      retries=$((retries - 1))
+    done
+
+    log "ERROR: Timeout waiting for OpenSearch cluster to become healthy after restore."
+    exit 1
+    ;;
+  harbor)
+    log "Starting Harbor restore..."
+
+    "$CK8S_CMD" harbor-restore
+
+    log "Harbor restore successfully completed."
+    ;;
+  rclone)
+    log "Starting Rclone restore..."
+
+    # Check if rclone-restore is enabled before continuing
+    log "Checking for rclone-restore cronjobs"
+    local cronjob_list=()
+    mapfile -t cronjob_list < <("$CK8S_CMD" ops kubectl sc -n rclone get cronjobs -lapp.kubernetes.io/instance=rclone-restore -oname)
+    readonly cronjob_list
+
+    if [ ${#cronjob_list[@]} -eq 0 ]; then
+      log "ERROR: No rclone-restore cronjobs found."
+      log "Please ensure rclone restore is enabled in your configuration and has been applied."
+      exit 1
+    fi
+    local -r total_jobs=${#cronjob_list[@]}
+    log "Found ${total_jobs} cronjobs."
+
+    # Create jobs from cronjobs
+    local -r timestamp="$(date --utc +%Y%m%d%H%M%S)z"
+    local job_names=()
+    for cronjob in "${cronjob_list[@]}"; do
+      local base_name=${cronjob/#cronjob.batch\//}
+      local job_name="${base_name}-${timestamp}"
+      "$CK8S_CMD" ops kubectl sc -n rclone create job --from "${cronjob}" "${job_name}"
+      log "Created job '${job_name}' from '${cronjob}' cronjob..."
+      job_names+=("${job_name}")
+    done
+
+    log "Waiting for all ${total_jobs} rclone jobs to complete..."
+    local retries=480 # 4 hour timeout
+    while [ $retries -gt 0 ]; do
+
+      local job_statuses
+      job_statuses=$("$CK8S_CMD" ops kubectl sc -n rclone get jobs "${job_names[@]}" -o json)
+
+      local succeeded
+      succeeded=$(echo "$job_statuses" | jq '[.items[] | select(.status.succeeded == 1)] | length')
+      local failed
+      failed=$(echo "$job_statuses" | jq '[.items[] | select(.status.failed > 0)] | length')
+      local active
+      active=$(echo "$job_statuses" | jq '[.items[] | select(.status.active == 1)] | length')
+
+      log "Job Status -> Total: ${total_jobs} | Succeeded: ${succeeded} | Failed: ${failed} | Active: ${active} | Retries left: ${retries}"
+
+      if [ "$active" -eq 0 ]; then
+        break
+      fi
+
+      sleep 30
+      retries=$((retries - 1))
+    done
+
+    # check if all jobs succeeded or not
+    local -r succeeded_count=$(echo "$job_statuses" | jq '[.items[] | select(.status.succeeded == 1)] | length')
+    if [ "$succeeded_count" -ne "$total_jobs" ]; then
+      log "ERROR: Not all rclone jobs succeeded."
+      local -r failed_jobs=$(echo "$job_statuses" | jq -r '.items[] | select(.status.failed > 0) | .metadata.name')
+
+      if [ -n "$failed_jobs" ]; then
+        log "The following jobs reported a FAILED status:"
+        echo "$failed_jobs" | while IFS= read -r job; do
+          log "- ${job}"
+        done
+      fi
+      exit 1
+    fi
+
+    log "Cleaning up..."
+    "$CK8S_CMD" ops kubectl sc -n rclone delete jobs "${job_names[@]}" --ignore-not-found=true
+
+    log "Rclone restore successfully completed."
+    ;;
+  velero)
+    log "Starting Velero restore..."
+
+    log "Finding latest completed Velero backup..."
+    local -r latest_backup=$("$CK8S_CMD" ops velero wc backup get -o json | jq -r '.items | map(select(.status.phase == "Completed")) | sort_by(.metadata.creationTimestamp) | .[-1].metadata.name')
+
+    if [ -z "$latest_backup" ] || [ "$latest_backup" = "null" ]; then
+      log "ERROR: No completed Velero backups found to restore from."
+      exit 1
+    fi
+    log "Found latest backup to restore: ${latest_backup}"
+
+    log "Deleting Alertmanager secret..."
+    "$CK8S_CMD" ops kubectl wc delete secret -n alertmanager alertmanager-kube-prometheus-stack-alertmanager --ignore-not-found=true
+
+    local -r restore_name="restore-$(date --utc +%Y%m%d%H%M%S)z"
+    log "Creating restore '${restore_name}' from backup '${latest_backup}'"
+    "$CK8S_CMD" ops velero wc restore create "$restore_name" --from-backup "$latest_backup"
+
+    log "Waiting for restore to complete..."
+    local phase=""
+    local retries=60 # 30 min timeout
+    while [ $retries -gt 0 ]; do
+      phase=$("$CK8S_CMD" ops velero wc restore get "$restore_name" -o json | jq -r .status.phase)
+      log "Current restore phase: ${phase}"
+
+      if [ "$phase" = "Completed" ]; then
+        log "Velero restore successfully completed."
+        return
+      elif [[ "$phase" =~ Failed|PartiallyFailed ]]; then
+        log "ERROR: Velero restore failed with phase: ${phase}"
+        exit 1
+      fi
+
+      sleep 30
+      retries=$((retries - 1))
+    done
+
+    log "ERROR: Timeout waiting for Velero restore to complete."
+    exit 1
+    ;;
+  *)
+    log "Error: Invalid restore target '$restore_target'."
+    usage
+    ;;
+  esac
+}
+
+case "$ACTION" in
+backup)
+  run_backup "$TARGET"
+  ;;
+restore)
+  run_restore "$TARGET"
+  ;;
+*)
+  log "Error: Invalid action '$ACTION'."
+  usage
+  ;;
+esac
