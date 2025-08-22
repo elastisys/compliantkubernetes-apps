@@ -29,6 +29,12 @@ Follow the instruction that matches the scenario:
 >
 > _Restoring all object storage data from the off-site backup._
 
+> [!note]
+> This method normally requires that the buckets or containers that you are restoring into have the same name, however if you want to change it you can augment some of the steps:
+>
+> - Disable `objectStorage.restore.addTargetsFromSync` instead of enabling it as noted below.
+> - Configure `objectStorage.restore.targets` manually as noted in the next section.
+
 Enable `rclone-restore` via the config:
 
 ```yaml
@@ -70,7 +76,7 @@ objectStorage:
     enabled: true
 ```
 
-Specify destinations and sources you want to use, follows the same structure as `.objectStorage.type` does ([config schema](https://elastisys.io/welkin/operator-manual/schema/config-properties-object-storage-config-properties-rclone-restore-config)) ([secrets schema](https://elastisys.io/welkin/operator-manual/schema/secrets-properties-object-storage-secrets-properties-rclone-restore-secrets/)):
+Specify destinations and sources (the backend object storage services) you want to use, follows the same structure as `.objectStorage.type` does ([config schema](https://elastisys.io/welkin/operator-manual/schema/config-properties-object-storage-config-properties-rclone-restore-config)) ([secrets schema](https://elastisys.io/welkin/operator-manual/schema/secrets-properties-object-storage-secrets-properties-rclone-restore-secrets/)):
 
 ```yaml
 # file: sc-config.yaml
@@ -108,7 +114,7 @@ objectStorage:
       directoryName: false # decrypt directory names
 ```
 
-Finally specify the targets you want to restore ([config schema](https://elastisys.io/welkin/operator-manual/schema/config-properties-object-storage-config-properties-rclone-restore-config-properties-rclone-restore-targets-rclone-restore-target/)):
+Finally specify the targets (buckets and containers) you want to restore ([config schema](https://elastisys.io/welkin/operator-manual/schema/config-properties-object-storage-config-properties-rclone-restore-config-properties-rclone-restore-targets-rclone-restore-target/)):
 
 ```yaml
 objectStorage:
