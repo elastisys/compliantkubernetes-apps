@@ -166,7 +166,7 @@ run_backup() {
     fi
 
     log "Cleaning up..."
-    "$CK8S_CMD" ops kubectl sc -n rclone delete "${job_names[@]}" --ignore-not-found=true
+    "$CK8S_CMD" ops kubectl sc -n rclone delete jobs "${job_names[@]}" --ignore-not-found=true
 
     log "Rclone backup successfully completed."
     ;;
@@ -362,7 +362,7 @@ run_restore() {
     fi
 
     log "Cleaning up..."
-    "$CK8S_CMD" ops kubectl sc -n rclone delete "${job_names[@]}" --ignore-not-found=true
+    "$CK8S_CMD" ops kubectl sc -n rclone delete jobs "${job_names[@]}" --ignore-not-found=true
 
     log "Rclone restore successfully completed."
     ;;
