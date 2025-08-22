@@ -51,7 +51,7 @@ run_backup() {
 
     local -r snapshot_name="manual-snapshot-$(date --utc +%Y%m%d%H%M%S)z"
     log "Taking snapshot: ${snapshot_name}"
-    curl -kL -u "${user}:${password}" -X PUT "${os_url}/_snapshot/${snapshot_repo}/${snapshot_name}" -H 'Content-Type: application/json' -d'
+    curl --location --user "${user}:${password}" -X PUT "${os_url}/_snapshot/${snapshot_repo}/${snapshot_name}" -H 'Content-Type: application/json' -d'
       {
         "indices": "*,-.opendistro_security",
         "include_global_state": false
@@ -103,31 +103,35 @@ run_backup() {
 
     # Check if rclone-sync is enabled before continuing
     log "Checking for rclone-sync cronjobs"
-    local -r cronjob_list=$("$CK8S_CMD" ops kubectl sc -n rclone get cronjobs -lapp.kubernetes.io/instance=rclone-sync -oname)
+    local cronjob_list=()
+    mapfile -t cronjob_list < <("$CK8S_CMD" ops kubectl sc -n rclone get cronjobs -lapp.kubernetes.io/instance=rclone-sync -oname)
+    readonly cronjob_list
 
-    if [ -z "$cronjob_list" ]; then
+    if [ ${#cronjob_list[@]} -eq 0 ]; then
       log "ERROR: No rclone-sync cronjobs found."
       log "Please ensure rclone sync is enabled in your configuration and has been applied."
       exit 1
     fi
-    local -r total_jobs=$(echo "$cronjob_list" | wc -w)
+    local -r total_jobs=${#cronjob_list[@]}
     log "Found ${total_jobs} cronjobs."
 
     # Create jobs from cronjobs
-    for cronjob in $cronjob_list; do
-      local job_name=${cronjob/#cronjob.batch\//}
+    local -r timestamp="$(date --utc +%Y%m%d%H%M%S)z"
+    local job_names=()
+    for cronjob in "${cronjob_list[@]}"; do
+      local base_name=${cronjob/#cronjob.batch\//}
+      local job_name="${base_name}-${timestamp}"
       "$CK8S_CMD" ops kubectl sc -n rclone create job --from "${cronjob}" "${job_name}"
       log "Created job '${job_name}' from '${cronjob}' cronjob..."
+      job_names+=("${job_name}")
     done
-
-    job_list=$("$CK8S_CMD" ops kubectl sc -n rclone get jobs -lapp.kubernetes.io/instance=rclone-sync -oname)
 
     log "Waiting for all ${total_jobs} rclone jobs to complete..."
     local retries=480 # these can take a really long time depending on content, so the timeout is set to 4 hours
     while [ $retries -gt 0 ]; do
 
       local job_statuses
-      job_statuses=$("$CK8S_CMD" ops kubectl sc -n rclone get jobs -lapp.kubernetes.io/instance=rclone-sync -o json)
+      job_statuses=$("$CK8S_CMD" ops kubectl sc -n rclone get jobs "${job_names[@]}" -o json)
 
       local succeeded
       succeeded=$(echo "$job_statuses" | jq '[.items[] | select(.status.succeeded == 1)] | length')
@@ -136,7 +140,7 @@ run_backup() {
       local active
       active=$(echo "$job_statuses" | jq '[.items[] | select(.status.active == 1)] | length')
 
-      log "Job Status -> Total: ${total_jobs} | Succeeded: ${succeeded} | Failed: ${failed} | Active: ${active}"
+      log "Job Status -> Total: ${total_jobs} | Succeeded: ${succeeded} | Failed: ${failed} | Active: ${active} | Retries left: ${retries}"
 
       if [ "$active" -eq 0 ]; then
         break
@@ -162,9 +166,7 @@ run_backup() {
     fi
 
     log "Cleaning up..."
-    for job in $job_list; do
-      "$CK8S_CMD" ops kubectl sc -n rclone delete "$job" --ignore-not-found=true
-    done
+    "$CK8S_CMD" ops kubectl sc -n rclone delete "${job_names[@]}" --ignore-not-found=true
 
     log "Rclone backup successfully completed."
     ;;
@@ -287,32 +289,35 @@ run_restore() {
 
     # Check if rclone-restore is enabled before continuing
     log "Checking for rclone-restore cronjobs"
-    local -r cronjob_list=$("$CK8S_CMD" ops kubectl sc -n rclone get cronjobs -lapp.kubernetes.io/instance=rclone-restore -oname)
+    local cronjob_list=()
+    mapfile -t cronjob_list < <("$CK8S_CMD" ops kubectl sc -n rclone get cronjobs -lapp.kubernetes.io/instance=rclone-restore -oname)
+    readonly cronjob_list
 
-    if [ -z "$cronjob_list" ]; then
+    if [ ${#cronjob_list[@]} -eq 0 ]; then
       log "ERROR: No rclone-restore cronjobs found."
       log "Please ensure rclone restore is enabled in your configuration and has been applied."
       exit 1
     fi
-    local -r total_jobs=$(echo "$cronjob_list" | wc -w)
+    local -r total_jobs=${#cronjob_list[@]}
     log "Found ${total_jobs} cronjobs."
 
     # Create jobs from cronjobs
-    for cronjob in $cronjob_list; do
-      local job_name=${cronjob/#cronjob.batch\//}
+    local -r timestamp="$(date --utc +%Y%m%d%H%M%S)z"
+    local job_names=()
+    for cronjob in "${cronjob_list[@]}"; do
+      local base_name=${cronjob/#cronjob.batch\//}
+      local job_name="${base_name}-${timestamp}"
       "$CK8S_CMD" ops kubectl sc -n rclone create job --from "${cronjob}" "${job_name}"
       log "Created job '${job_name}' from '${cronjob}' cronjob..."
+      job_names+=("${job_name}")
     done
-
-    local job_list
-    job_list=$("$CK8S_CMD" ops kubectl sc -n rclone get jobs -lapp.kubernetes.io/instance=rclone-restore -oname)
 
     log "Waiting for all ${total_jobs} rclone jobs to complete..."
     local retries=480 # 4 hour timeout
     while [ $retries -gt 0 ]; do
 
       local job_statuses
-      job_statuses=$("$CK8S_CMD" ops kubectl sc -n rclone get jobs -lapp.kubernetes.io/instance=rclone-restore -o json)
+      job_statuses=$("$CK8S_CMD" ops kubectl sc -n rclone get jobs "${job_names[@]}" -o json)
 
       local succeeded
       succeeded=$(echo "$job_statuses" | jq '[.items[] | select(.status.succeeded == 1)] | length')
@@ -321,7 +326,7 @@ run_restore() {
       local active
       active=$(echo "$job_statuses" | jq '[.items[] | select(.status.active == 1)] | length')
 
-      log "Job Status -> Total: ${total_jobs} | Succeeded: ${succeeded} | Failed: ${failed} | Active: ${active}"
+      log "Job Status -> Total: ${total_jobs} | Succeeded: ${succeeded} | Failed: ${failed} | Active: ${active} | Retries left: ${retries}"
 
       if [ "$active" -eq 0 ]; then
         break
@@ -347,9 +352,7 @@ run_restore() {
     fi
 
     log "Cleaning up..."
-    for job in $job_list; do
-      "$CK8S_CMD" ops kubectl sc -n rclone delete "$job" --ignore-not-found=true
-    done
+    "$CK8S_CMD" ops kubectl sc -n rclone delete "${job_names[@]}" --ignore-not-found=true
 
     log "Rclone restore successfully completed."
     ;;
