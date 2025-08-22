@@ -5,10 +5,7 @@ storageClasses:
 networkPolicies:
   global:
     externalLoadBalancer: true
-    ingressUsingHostNetwork: true
-  ingressNginx:
-    ingressOverride:
-      enabled: false
+    ingressUsingHostNetwork: false
   kubeSystem:
     openstack:
       enabled: true
@@ -32,6 +29,8 @@ ingressNginx:
     service:
       enabled: false
       allocateLoadBalancerNodePorts: true
+      annotations: {}
+      type: NodePort
 opa:
   rejectLoadBalancerService:
     enabled: true

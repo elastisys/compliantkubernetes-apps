@@ -21,9 +21,6 @@ networkPolicies:
   global:
     externalLoadBalancer: false
     ingressUsingHostNetwork: false
-  ingressNginx:
-    ingressOverride:
-      enabled: false
 opa:
   rejectLoadBalancerService:
     enabled: false
