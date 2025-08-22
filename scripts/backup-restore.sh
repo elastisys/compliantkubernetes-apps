@@ -218,6 +218,16 @@ run_restore() {
     local -r os_url="https://opensearch.$(yq '.global.opsDomain' "${CK8S_CONFIG_PATH}/common-config.yaml")"
     log "OpenSearch URL: ${os_url}"
 
+    log "Checking if health is green on the OpenSearch cluster..."
+    local -r initial_status=$(curl --location --silent --user "${user}:${password}" "${os_url}/_cluster/health" | jq -r '.status')
+
+    if [ "$initial_status" != "green" ]; then
+      log "ERROR: Health check failed. The cluster is not in a 'green' state (current status: '${initial_status}')."
+      log "Please resolve the cluster health issue before attempting a restore."
+      exit 1
+    fi
+    log "OpenSearch cluster health is green. Proceeding with restore."
+
     log "Discovering snapshot repository name..."
     local -r snapshot_repo=$(curl --location --silent --user "${user}:${password}" "${os_url}/_cat/repositories?v" | awk 'NR==2 {print $1}')
     if [ -z "$snapshot_repo" ]; then
