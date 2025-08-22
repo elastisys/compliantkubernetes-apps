@@ -155,7 +155,7 @@ run_diagnostics() {
   # -- DS and Deployments --
   printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
   echo -e "\nFetching Deployments without desired number of ready pods (<deployment>)"
-  deployments=$("${here}"/ops.bash kubectl "${cluster}" get deployments -A -o=yaml | yq '.items[] | select(.status.conditions[] | select((.type == "Progressing" and .status != "True") or (.type == "Available" and .status != "True")))')
+  deployments=$("${here}"/ops.bash kubectl "${cluster}" get deployments --all-namespaces -o=yaml | yq '.items[] | select(.status.conditions[] | select((.type == "Progressing" and .status != "True") or (.type == "Available" and .status != "True")))')
   if [ -z "${deployments}" ]; then
     echo -e "All Deployments are ready"
   else
@@ -164,7 +164,7 @@ run_diagnostics() {
   printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 
   echo -e "\nFetching DaemonSets without desired number of ready pods (<daemonset>)"
-  daemonsets=$("${here}"/ops.bash kubectl "${cluster}" get daemonsets -A -o=yaml | yq '.items[] | select(.status.numberMisscheduled != 0)')
+  daemonsets=$("${here}"/ops.bash kubectl "${cluster}" get daemonsets --all-namespaces -o=yaml | yq '.items[] | select(.status.numberMisscheduled != 0)')
   if [ -z "${daemonsets}" ]; then
     echo -e "All daemonsets are ready"
   else
@@ -173,7 +173,7 @@ run_diagnostics() {
   printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 
   echo -e "\nFetching StatefulSets without desired number of ready pods (<statefulset>)"
-  statefulsets=$("${here}"/ops.bash kubectl "${cluster}" get statefulsets -A -o=yaml | yq '.items[] | select(.status.collisionCount != 0 and .status.readyReplicas != .status.updatedReplicas and .status.replicas != .status.readyReplicas)')
+  statefulsets=$("${here}"/ops.bash kubectl "${cluster}" get statefulsets --all-namespaces -o=yaml | yq '.items[] | select(.status.collisionCount != 0 and .status.readyReplicas != .status.updatedReplicas and .status.replicas != .status.readyReplicas)')
   if [ -z "${statefulsets}" ]; then
     echo -e "All statefulsets are ready"
   else
@@ -183,7 +183,7 @@ run_diagnostics() {
 
   # -- Pods --
   echo -e "\nFetching Pods that are NotReady (<pod>)"
-  pods=$("${here}/ops.bash" kubectl "${cluster}" get pod -A -o=yaml | yq '.items[] | select(.status.conditions[] | select(.type == "Ready" and .status != "True" and .reason != "PodCompleted")) | [{"name": .metadata.name, "namespace": .metadata.namespace}]')
+  pods=$("${here}/ops.bash" kubectl "${cluster}" get pod --all-namespaces -o=yaml | yq '.items[] | select(.status.conditions[] | select(.type == "Ready" and .status != "True" and .reason != "PodCompleted")) | [{"name": .metadata.name, "namespace": .metadata.namespace}]')
   readarray pod_arr < <(echo "$pods" | yq e -o=j -I=0 '.[]')
 
   if [ "${pods}" == '[]' ]; then
@@ -223,7 +223,7 @@ run_diagnostics() {
   # -- Helm --
   printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
   echo -e "\nFetching Helm releases that are not deployed (<helm>)"
-  helm=$("${here}"/ops.bash helm "${cluster}" list -A --all -o yaml | yq '.[] | select(.status != "deployed")')
+  helm=$("${here}"/ops.bash helm "${cluster}" list --all-namespaces --all -o yaml | yq '.[] | select(.status != "deployed")')
   if [ -z "${helm}" ]; then
     echo -e "All charts are deployed"
   else
@@ -238,7 +238,7 @@ run_diagnostics() {
 
   printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
   echo -e "\nDescribing failed Challenges (<challenge>)"
-  challenges=$("${here}/ops.bash" kubectl "${cluster}" get challenge -A -o=yaml | yq '.items[] | select(.status.state != "valid") | [{"name": .metadata.name, "namespace": .metadata.namespace}]')
+  challenges=$("${here}/ops.bash" kubectl "${cluster}" get challenge --all-namespaces -o=yaml | yq '.items[] | select(.status.state != "valid") | [{"name": .metadata.name, "namespace": .metadata.namespace}]')
   readarray challenge_arr < <(echo "$challenges" | yq e -o=j -I=0 '.[]')
   if [ "${challenges}" == '[]' ]; then
     echo -e "All challenges are valid"
@@ -254,7 +254,7 @@ run_diagnostics() {
   # -- Events --
   printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
   echo -e "\nFetching all Events (<event>)"
-  "${here}/ops.bash" kubectl "${cluster}" get events -A --sort-by=.metadata.creationTimestamp
+  "${here}/ops.bash" kubectl "${cluster}" get events --all-namespaces --sort-by=.metadata.creationTimestamp
   printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 
   # # -- Test --
