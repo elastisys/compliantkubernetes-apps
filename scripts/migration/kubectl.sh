@@ -6,7 +6,7 @@ kubectl_do() {
   fi
 
   if [ "${CONFIG["${1}-kubeconfig"]}" = "encrypted" ]; then
-    kubectl --kubeconfig <(sops -d "${CK8S_CONFIG_PATH}/.state/kube_config_${1}.yaml") "${@:2}"
+    kubectl --kubeconfig <(sops --decrypt "${CK8S_CONFIG_PATH}/.state/kube_config_${1}.yaml") "${@:2}"
   else
     kubectl --kubeconfig "${CK8S_CONFIG_PATH}/.state/kube_config_${1}.yaml" "${@:2}"
   fi

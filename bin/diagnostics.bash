@@ -108,7 +108,7 @@ sops_encrypt_file() {
 
   log_info "Encrypting ${file}"
 
-  sops --pgp "${CK8S_PGP_FP}" -e -i "${file}"
+  sops --pgp "${CK8S_PGP_FP}" --encrypt --in-place "${file}"
 }
 
 fetch_oidc_token() {

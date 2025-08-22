@@ -102,7 +102,7 @@ sops_rotate_data_key() {
     fi
 
     log_info "Rotating data key and reencrypting: ${secret}"
-    sops --config "${sops_config}" -r -i "${secret}"
+    sops --config "${sops_config}" --rotate --in-place "${secret}"
   done
 }
 

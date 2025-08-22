@@ -550,7 +550,7 @@ sops_config_write_fingerprints() {
 
 # Encrypt stdin to file. If the file already exists it's overwritten.
 sops_encrypt_stdin() {
-  sops --config "${sops_config}" -e --input-type "${1}" --output-type "${1}" /dev/stdin >"${2}"
+  sops --config "${sops_config}" --encrypt --input-type "${1}" --output-type "${1}" /dev/stdin >"${2}"
 }
 
 # Encrypt a file in place.
@@ -563,7 +563,7 @@ sops_encrypt() {
 
   log_info "Encrypting ${1}"
 
-  sops --config "${sops_config}" -e -i "${1}"
+  sops --config "${sops_config}" --encrypt --in-place "${1}"
 }
 
 # Check that a file exists and is actually encrypted using SOPS.
@@ -595,7 +595,7 @@ sops_decrypt() {
 
   sops_decrypt_verify "${1}"
 
-  sops --config "${sops_config}" -d -i "${1}"
+  sops --config "${sops_config}" --decrypt --in-place "${1}"
   append_trap "sops_encrypt ${1}" EXIT
 }
 

@@ -61,7 +61,7 @@ yq_read_secret() {
   local default_value="${2}"
 
   local value
-  value=$(sops -d "${secrets["secrets_file"]}" | yq "${config_option}")
+  value=$(sops --decrypt "${secrets["secrets_file"]}" | yq "${config_option}")
 
   if [[ "${value}" != "null" ]]; then
     echo "${value}"
