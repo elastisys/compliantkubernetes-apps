@@ -1,0 +1,17 @@
+---
+apiVersion: projectcalico.org/v3
+kind: GlobalNetworkPolicy
+metadata:
+  name: global-allow-all-traffic
+  namespace: calico-system
+spec:
+  selector: all()
+  ingress:
+  - action: Allow
+  egress:
+  - action: Allow
+  types:
+  - Ingress
+  - Egress
+  # High priority to override other policies
+  order: 100
