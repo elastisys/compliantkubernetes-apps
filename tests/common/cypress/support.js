@@ -79,7 +79,9 @@ Cypress.Commands.add('retryRequest', (options) => {
 
   cy.request(request).then((response) => {
     if (condition(response)) {
-      body(response)
+      if (body) {
+        body(response)
+      }
     } else {
       if (attempts > 0) {
         cy.wait(waitTime)

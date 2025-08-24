@@ -227,9 +227,6 @@ describe('Create a manual snapshot', function () {
           )
         )
       },
-      body: () => {
-        cy.log(`Found snapshot with ID ${snapshotName} in API response!`)
-      },
       attempts: 10,
     })
   })
