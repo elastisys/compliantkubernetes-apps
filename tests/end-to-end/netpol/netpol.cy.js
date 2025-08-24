@@ -11,20 +11,14 @@ function makePrometheusURL(/** @type {Cluster} */ cluster) {
 }
 
 describe('workload cluster network policies', function () {
-  before(function () {
-    cy.request('GET', `${makePrometheusURL('wc')}/api/v1/status/runtimeinfo`)
-      .then(assertServerTime)
-      .as('serverTime')
-  })
-
   it('are not dropping any packets from workloads', function () {
-    cy.request('GET', makeQueryURL('wc', DROP_QUERY, this.serverTime)).then((response) => {
+    cy.request('GET', makeQueryURL('wc', DROP_QUERY)).then((response) => {
       assertNoDrops(response, 'fw', 'from')
     })
   })
 
   it('are not dropping any packets to workloads', function () {
-    cy.request('GET', makeQueryURL('wc', DROP_QUERY, this.serverTime)).then((response) => {
+    cy.request('GET', makeQueryURL('wc', DROP_QUERY)).then((response) => {
       assertNoDrops(response, 'tw', 'to')
     })
   })
@@ -35,20 +29,14 @@ describe('workload cluster network policies', function () {
 })
 
 describe('service cluster network policies', function () {
-  before(function () {
-    cy.request('GET', `${makePrometheusURL('sc')}/api/v1/status/runtimeinfo`)
-      .then(assertServerTime)
-      .as('serverTime')
-  })
-
   it('are not dropping any packets from workloads', function () {
-    cy.request('GET', makeQueryURL('sc', DROP_QUERY, this.serverTime)).then((response) => {
+    cy.request('GET', makeQueryURL('sc', DROP_QUERY)).then((response) => {
       assertNoDrops(response, 'fw', 'from')
     })
   })
 
   it('are not dropping any packets to workloads', function () {
-    cy.request('GET', makeQueryURL('sc', DROP_QUERY, this.serverTime)).then((response) => {
+    cy.request('GET', makeQueryURL('sc', DROP_QUERY)).then((response) => {
       assertNoDrops(response, 'tw', 'to')
     })
   })
@@ -58,19 +46,13 @@ describe('service cluster network policies', function () {
   })
 })
 
-const assertServerTime = (response) => {
-  expect(response.status).to.eq(200)
-
-  const runtimeInfo = response.body
-  expect(runtimeInfo.status).to.eq('success')
-  expect(runtimeInfo.data.serverTime).to.be.a('string')
-
-  return runtimeInfo.data.serverTime
-}
-
-const makeQueryURL = (/** @type {Cluster} */ cluster, query, serverTime) => {
+const makeQueryURL = (/** @type {Cluster} */ cluster, query, serverTime = '') => {
   const metric = encodeURI(query)
-  return `${makePrometheusURL(cluster)}/api/v1/query?query=${metric}&${new URLSearchParams({ time: serverTime })}`
+  let returnValue = `${makePrometheusURL(cluster)}/api/v1/query?query=${metric}`
+  if (serverTime !== '') {
+    returnValue = `${returnValue}&${new URLSearchParams({ time: serverTime })}`
+  }
+  return returnValue
 }
 
 const assertNoDrops = (response, metricType, direction) => {
