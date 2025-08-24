@@ -24,7 +24,12 @@ describe('workload cluster network policies', function () {
   })
 
   it('are accepting allowed traffic', function () {
-    cy.request('GET', makeQueryURL('wc', ACCEPT_QUERY, this.serverTime)).then(assertAccepts)
+    cy.retryRequest({
+      request: { method: 'GET', url: makeQueryURL('wc', ACCEPT_QUERY) },
+      condition: acceptCondition,
+      waitTime: 10000,
+      attempts: 30,
+    })
   })
 })
 
@@ -42,7 +47,12 @@ describe('service cluster network policies', function () {
   })
 
   it('are accepting allowed traffic', function () {
-    cy.request('GET', makeQueryURL('sc', ACCEPT_QUERY, this.serverTime)).then(assertAccepts)
+    cy.retryRequest({
+      request: { method: 'GET', url: makeQueryURL('sc', ACCEPT_QUERY) },
+      condition: acceptCondition,
+      waitTime: 10000,
+      attempts: 30,
+    })
   })
 })
 
@@ -68,25 +78,24 @@ const assertNoDrops = (response, metricType, direction) => {
   }
 }
 
-const assertAccepts = (response) => {
-  expect(response.status).to.eq(200)
-  expect(response.body.data.result).to.be.a('array')
+const acceptCondition = (response) => {
+  try {
+    expect(response.status).to.eq(200)
+    expect(response.body.data.result).to.be.a('array')
 
-  const result = response.body.data.result
+    const result = response.body.data.result
 
-  const innerAssert = (values) => {
-    cy.wrap(values)
-      .should('be.an', 'array')
-      .its('[0]')
-      .should('be.a', 'number')
-      .should('be.greaterThan', 0)
+    const innerAssert = (values) => {
+      expect(values).to.be.an('array')
+      expect(values).to.have.property('0').that.is.a('number').and.is.greaterThan(0)
+    }
+
+    innerAssert(result.filter(filterNonZero('fw')).map((item) => Number.parseInt(item.value[1])))
+    innerAssert(result.filter(filterNonZero('tw')).map((item) => Number.parseInt(item.value[1])))
+    return true
+  } catch {
+    return false
   }
-
-  const fwAccept = result.filter(filterNonZero('fw')).map((item) => Number.parseInt(item.value[1]))
-  innerAssert(fwAccept)
-
-  const twAccept = result.filter(filterNonZero('tw')).map((item) => Number.parseInt(item.value[1]))
-  innerAssert(twAccept)
 }
 
 const filterNonZero = (metricType) => {
