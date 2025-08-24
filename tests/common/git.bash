@@ -7,7 +7,7 @@ git.is_tracked() {
   local work_tree
   work_tree="$(git.parent_dir "${path}")"
 
-  if git -C "${work_tree}" ls-files --error-unmatch "${path}" >/dev/null; then
+  if git -C "${work_tree}" ls-files --error-unmatch "${path}" >/dev/null 2>&1; then
     return 0
   else
     return 1
