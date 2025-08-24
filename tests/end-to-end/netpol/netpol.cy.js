@@ -1,5 +1,5 @@
-const DROP_QUERY = 'round(increase(no_policy_drop_counter[15m]))'
-const ACCEPT_QUERY = 'sum by (type) (round(increase(policy_accept_counter[15m])))'
+const DROP_QUERY = 'round(increase(no_policy_drop_counter[5m]))'
+const ACCEPT_QUERY = 'sum by (type) (round(increase(policy_accept_counter[5m])))'
 
 function makePrometheusURL(/** @type {Cluster} */ cluster) {
   const port = cluster === 'wc' ? Cypress.env('WC_PROXY_PORT') : Cypress.env('SC_PROXY_PORT')
