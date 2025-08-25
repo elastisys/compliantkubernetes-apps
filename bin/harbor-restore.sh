@@ -168,6 +168,7 @@ log_info "Cleaning up restore artifacts..."
 # Reinitialize
 "${root_path}/bin/ck8s" ops kubectl sc delete job -n harbor init-harbor-job
 "${root_path}/bin/ck8s" ops helmfile sc sync -l app=harbor
+"${root_path}/bin/ck8s" ops kubectl sc wait --for=condition=complete job -n harbor init-harbor-job --timeout=-1s
 
 log_info "Harbor restore from ${STORAGE_TYPE} completed successfully."
 log_info "Post-restore steps from documentation (manual intervention may be required):"
