@@ -172,9 +172,10 @@ if [[ "${FORWARD_ENVIRONMENT:-false}" == "true" ]]; then
 
   # Auto-open localhost:8000 for auth
   socat_run="${root}/tests/end-to-end/.run"
+  socat_socket_dir="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
   socat_bin="${root}/tests/end-to-end/.bin"
   if [[ -f "${socat_run}/socat.pid" ]] && kill -0 "$(cat "${socat_run}/socat.pid")" 2>/dev/null; then
-    args+=("-v" "${socat_run}/open-browser.sock:/run/user/$(id -u)/open-browser.sock")
+    args+=("-v" "${socat_socket_dir}/ck8s-apps-browser.sock:/run/user/$(id -u)/open-browser.sock")
     args+=("-v" "${socat_bin}/x-www-browser:/usr/bin/x-www-browser:ro")
   fi
 fi
