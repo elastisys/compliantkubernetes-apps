@@ -166,9 +166,11 @@ log_info "Cleaning up restore artifacts..."
 "${root_path}/bin/ck8s" ops kubectl sc delete configmap -n harbor restore-harbor
 
 # Reinitialize
+log_info "Re-initializing..."
 "${root_path}/bin/ck8s" ops kubectl sc delete job -n harbor init-harbor-job
 "${root_path}/bin/ck8s" ops helmfile sc sync -l app=harbor
-"${root_path}/bin/ck8s" ops kubectl sc wait --for=condition=complete job -n harbor init-harbor-job --timeout=-1s
+"${root_path}/bin/ck8s" ops kubectl sc wait --for=condition=complete job -n harbor init-harbor-job --timeout=5m ||
+  log_fatal "Harbor initialization job has not completed, please check 'ck8s ops kubectl sc logs -n harbor job/init-harbor-job'"
 
 log_info "Harbor restore from ${STORAGE_TYPE} completed successfully."
 log_info "Post-restore steps from documentation (manual intervention may be required):"
