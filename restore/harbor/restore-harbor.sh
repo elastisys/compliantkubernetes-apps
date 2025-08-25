@@ -42,7 +42,7 @@ wait_for_db_ready() {
     sleep 5
   done
   if [ $TIMEOUT -eq 0 ]; then
-    echo "Harbor DB cannot reach within one minute."
+    echo "Harbor DB cannot be reached within one minute."
     exit 1
   fi
 }
