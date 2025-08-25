@@ -253,6 +253,26 @@ test_run_cronjob() {
   test_job_complete "${job_name}" "${2}"
 }
 
+# usage: terminate_cronjob_jobs <cronjob name> <timeout>
+terminate_cronjob_jobs() {
+  local -r cronjob_name="${1}"
+  local -r timeout="${2}"
+
+  kubectl -n "${NAMESPACE}" get jobs -o json |
+    jq -r --arg cronjob "${cronjob_name}" '
+      .items[] |
+      select(
+        .status.active > 0 and
+        (.metadata.ownerReferences[]?.name == $cronjob)
+      ) |
+      "\(.metadata.name)\t\(.metadata.uid)"' |
+    while IFS=$'\t' read -r job_name job_uid; do
+      echo "Found running job=${job_name} of cronjob=${cronjob_name}. Deleting it and waiting for all its pods to exit." >&3
+      kubectl -n "${NAMESPACE}" delete job "${job_name}"
+      kubectl -n "${NAMESPACE}" wait --for=delete pod -l "batch.kubernetes.io/controller-uid=${job_uid}" --timeout="${timeout}s"
+    done
+}
+
 auto_setup() {
   export CK8S_AUTO_APPROVE="true"
 

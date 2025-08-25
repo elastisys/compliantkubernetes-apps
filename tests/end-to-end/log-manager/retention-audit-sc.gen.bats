@@ -23,8 +23,8 @@ setup_file() {
   CRONJOB_NAME="audit-$(yq.get sc '.global.ck8sEnvironmentName')-sc-retention"
   export CRONJOB_NAME
 
-  # TODO: Should probably make sure that the cronjob isn't currently running.
   kubectl -n "${NAMESPACE}" patch cronjob "${CRONJOB_NAME}" -p '{"spec" : {"suspend" : true}}'
+  terminate_cronjob_jobs "${CRONJOB_NAME}" 300
 
   local cronjob_env_bucket
   local cronjob_env_prefix
@@ -91,7 +91,7 @@ setup() {
 }
 
 @test "audit-sc - log-manager retention job runs fine when no logs needs to be deleted" {
-  test_run_cronjob "${CRONJOB_NAME}" 60
+  test_run_cronjob "${CRONJOB_NAME}" 120
 }
 
 _get_cronjob_env() {

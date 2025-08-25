@@ -23,8 +23,8 @@ setup_file() {
   CRONJOB_NAME="sc-logs-logs-compaction"
   export CRONJOB_NAME
 
-  # TODO: Should probably make sure that the cronjob isn't currently running.
   kubectl -n "${NAMESPACE}" patch cronjob "${CRONJOB_NAME}" -p '{"spec" : {"suspend" : true}}'
+  terminate_cronjob_jobs "${CRONJOB_NAME}" 300
 
   local cronjob_env_bucket
   local cronjob_env_prefix
@@ -91,7 +91,7 @@ setup() {
 @test "sc-logs - log-manager compaction job runs fine when no logs needs compaction" {
   object_storage.is_compacted "${BUCKET}" "${PREFIX}"
 
-  test_run_cronjob "${CRONJOB_NAME}" 60
+  test_run_cronjob "${CRONJOB_NAME}" 120
 }
 
 _create_uncompacted_objects() {
