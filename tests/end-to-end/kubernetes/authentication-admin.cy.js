@@ -11,7 +11,7 @@ describe('kubernetes authentication', function () {
     cy.continueOn('sc', '.dex.enableStaticLogin')
 
     cy.task('kubectlLogin', Cypress.env('KUBECONFIG'))
-    cy.visit('http://localhost:8000')
+    cy.visit('http://localhost:8000', { retryOnNetworkFailure: true })
 
     cy.dexStaticLogin()
 
