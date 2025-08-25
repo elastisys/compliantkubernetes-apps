@@ -15,8 +15,6 @@ setup_suite() {
     sleep 15
   fi
 
-  kctl="kubectl -n ${NAMESPACE}"
-
   # -> downscale monitoring the blackbox exporter to 0
   blackbox_exporter_replicas="$(scale_down monitoring deployment/prometheus-blackbox-exporter)"
   prom="kube-prometheus-stack-prometheus"
@@ -26,8 +24,8 @@ setup_suite() {
   # Pause logs being flushed to object storage:
   # -> remove output config from forwarders, otherwise they'll try to reach inexisting pods
   mkdir -p "${BATS_SUITE_TMPDIR}"
-  $kctl get configmap fluentd-forwarder -o yaml >"${BATS_SUITE_TMPDIR}/fluentd-forwarder-cm.yaml"
-  $kctl patch configmap fluentd-forwarder --type json \
+  kubectl -n "${NAMESPACE}" get configmap fluentd-forwarder -o yaml >"${BATS_SUITE_TMPDIR}/fluentd-forwarder-cm.yaml"
+  kubectl -n "${NAMESPACE}" patch configmap fluentd-forwarder --type json \
     --patch="[{\"op\": \"remove\", \"path\": \"/data/30-output.conf\"}]" >&3 2>&1 || true
   rollout_forwarder
 
@@ -40,12 +38,12 @@ teardown_suite() {
 
   # Unpause logs being flushed to object storage:
   # -> scale the aggregator back up
-  $kctl scale statefulset fluentd-aggregator --replicas "${fluentd_aggregator_replicas}" --timeout 5m
-  $kctl wait --for=condition=ready pod -l app=aggregator --timeout 5m
+  kubectl -n "${NAMESPACE}" scale statefulset fluentd-aggregator --replicas "${fluentd_aggregator_replicas}" --timeout 5m
+  kubectl -n "${NAMESPACE}" wait --for=condition=ready pod -l app=aggregator --timeout 5m
   echo 'pod/app=aggregator ready' >&3
 
   # -> restore the forwarder output config
-  $kctl replace --force -f "${BATS_SUITE_TMPDIR}/fluentd-forwarder-cm.yaml" >&3 2>&1
+  kubectl -n "${NAMESPACE}" replace --force -f "${BATS_SUITE_TMPDIR}/fluentd-forwarder-cm.yaml" >&3 2>&1
   rollout_forwarder
 
   # -> scale monitoring back up
@@ -74,7 +72,7 @@ scale_up() {
 }
 
 rollout_forwarder() {
-  $kctl rollout restart daemonset/fluentd-forwarder
-  $kctl rollout status daemonset/fluentd-forwarder --timeout 5m
+  kubectl -n "${NAMESPACE}" rollout restart daemonset/fluentd-forwarder
+  kubectl -n "${NAMESPACE}" rollout status daemonset/fluentd-forwarder --timeout 5m
   echo 'statefulset/fluentd-forwarder rolled out' >&3
 }
