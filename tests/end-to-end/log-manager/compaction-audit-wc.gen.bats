@@ -23,8 +23,8 @@ setup_file() {
   CRONJOB_NAME="audit-$(yq.get sc '.global.ck8sEnvironmentName')-wc-compaction"
   export CRONJOB_NAME
 
-  # TODO: Should probably make sure that the cronjob isn't currently running.
   kubectl -n "${NAMESPACE}" patch cronjob "${CRONJOB_NAME}" -p '{"spec" : {"suspend" : true}}'
+  terminate_cronjob_jobs "${CRONJOB_NAME}" 300
 
   local cronjob_env_bucket
   local cronjob_env_prefix
