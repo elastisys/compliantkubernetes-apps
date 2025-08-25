@@ -8,21 +8,24 @@ setup_suite() {
   with_kubeconfig sc
   with_namespace fluentd-system
 
-  # Temporarily allow all traffic
+  # Temporarily allow all traffic to not cause dropped packets and fail the Network Policy test suite.
   if kubectl get crd globalnetworkpolicies.crd.projectcalico.org; then
     kubectl apply -f "${BATS_CWD}/end-to-end/log-manager/resources/calico-allow-all.yaml" >&3 2>&1
     # Give the CNI a bit of time to settle (arbitrary, I know..)
     sleep 15
   fi
 
-  # -> downscale monitoring the blackbox exporter to 0
+  # Both Prometheus and the blackbox exporter will attempt to reach inexisting pods if they aren't
+  # scaled down, causing dropped packets and failing the Network Policy test suite.
+  # -> downscale prometheus and its blackbox exporter
   blackbox_exporter_replicas="$(scale_down monitoring deployment/prometheus-blackbox-exporter)"
   prom="kube-prometheus-stack-prometheus"
   kubectl patch prometheus "${prom}" -n monitoring --type='merge' --patch='{"spec": {"paused": true}}'
   scale_down monitoring "sts/prometheus-${prom}"
 
-  # Pause logs being flushed to object storage:
-  # -> remove output config from forwarders, otherwise they'll try to reach inexisting pods
+  # Pause logs being flushed to object storage.
+  # -> remove output configuration from forwarders, otherwise they'll try to reach the inexisting
+  # aggregator pods
   mkdir -p "${BATS_SUITE_TMPDIR}"
   kubectl -n "${NAMESPACE}" get configmap fluentd-forwarder -o yaml >"${BATS_SUITE_TMPDIR}/fluentd-forwarder-cm.yaml"
   kubectl -n "${NAMESPACE}" patch configmap fluentd-forwarder --type json \
@@ -51,7 +54,7 @@ teardown_suite() {
   kubectl -n monitoring patch prometheus "${prom}" --type='merge' --patch='{"spec": {"paused":false}}'
   kubectl -n monitoring wait --for=jsonpath='{.subsets[*].addresses[*].ip}' endpoints "${prom}"
 
-  # Delete allow-all policy
+  # Delete the allow-all policy
   if kubectl get crd globalnetworkpolicies.crd.projectcalico.org; then
     kubectl delete -f "${BATS_CWD}/end-to-end/log-manager/resources/calico-allow-all.yaml" --ignore-not-found >&3 2>&1
   fi
