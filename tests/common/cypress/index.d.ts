@@ -61,7 +61,7 @@ declare namespace Cypress {
     retryRequest(arguments_: {
       request: Partial<RequestOptions>
       condition: (Response) => bool
-      body: (Response) => void
+      body?: (Response) => void
       attempts?: number
       waitTime?: number
     }): Chainable<any>

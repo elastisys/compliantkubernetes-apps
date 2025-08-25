@@ -146,6 +146,7 @@ end_to_end.socat_up() {
   if ! command -v socat >/dev/null; then
     echo "error: the end-to-end suites require the socat binary be present on your system" >&2
     echo "tip: run './bin/ck8s install-requirements' to update your requirements" >&2
+    return 1
   fi
 
   mkdir -p "${tests}/end-to-end/.run"
