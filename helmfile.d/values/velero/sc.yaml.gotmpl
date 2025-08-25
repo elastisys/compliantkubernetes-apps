@@ -108,8 +108,8 @@ credentials:
     cloud: |
     {{- if eq .Values.objectStorage.type "s3" }}
       [default]
-      aws_access_key_id: {{ .Values.objectStorage.s3.accessKey }}
-      aws_secret_access_key: {{ .Values.objectStorage.s3.secretKey }}
+      aws_access_key_id: {{ include "componentObjectStorage" (list "velero" "accessKey" .) }}
+      aws_secret_access_key: {{ include "componentObjectStorage" (list "velero" "secretKey" .) }}
     {{- else if eq .Values.objectStorage.type "gcs" }}
       {{ .Values.objectStorage.gcs.keyfileData | nindent 6 }}
     {{- else if eq .Values.objectStorage.type "azure" }}
