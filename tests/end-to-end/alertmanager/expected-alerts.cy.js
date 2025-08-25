@@ -1,4 +1,10 @@
-const EXPECTED_ALERTS = new Set(['Watchdog', 'CPUThrottlingHigh', 'FalcoAlert'])
+const EXPECTED_ALERTS = new Set([
+  'Watchdog',
+  'CPUThrottlingHigh',
+  'FalcoAlert',
+  'ThanosCompactHasNotRun',
+  'PersistentVolume75PercentInThreeDays',
+])
 
 describe('workload cluster alertmanager', function () {
   it('should validate all alert names are from expected set', function () {
