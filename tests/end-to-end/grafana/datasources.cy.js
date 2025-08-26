@@ -41,7 +41,7 @@ describe('grafana admin datasources', function () {
       .as('ingress')
 
     // Cypress does not like trailing dots
-    cy.yqDig('sc', '.grafana.ops.trailingDots').should((value) =>
+    cy.yqDig('sc', '.grafana.ops.trailingDots').then((value) =>
       assert(value !== 'true', ".grafana.ops.trailingDots in sc config must not be 'true'")
     )
   })
@@ -50,7 +50,7 @@ describe('grafana admin datasources', function () {
     loginNavigate(cy, this.ingress, '.grafana.password')
   })
 
-  after(() => {
+  after(function () {
     Cypress.session.clearAllSavedSessions()
   })
 
@@ -96,7 +96,7 @@ describe('grafana dev datasources', () => {
     loginNavigate(cy, this.ingress, '.user.grafanaPassword')
   })
 
-  after(() => {
+  after(function () {
     Cypress.session.clearAllSavedSessions()
   })
 

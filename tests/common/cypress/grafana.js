@@ -60,7 +60,7 @@ Cypress.Commands.add('grafanaDexStaticLogin', (ingress, cacheSession = true) => 
 
     cy.dexStaticLogin()
 
-    cy.getCookie('grafana_session_expiry').should('exist')
+    return cy.getCookie('grafana_session_expiry').should('exist')
   }
 
   if (cacheSession) {
@@ -69,6 +69,7 @@ Cypress.Commands.add('grafanaDexStaticLogin', (ingress, cacheSession = true) => 
   } else {
     login()
   }
+  return cy.wrap(true)
 })
 
 // Available as cy.grafanaDexStaticLogin("grafana.example.com", "dev@example.com")
@@ -80,21 +81,28 @@ Cypress.Commands.add('grafanaDexExtraStaticLogin', (ingress, staticUser) => {
   cy.dexExtraStaticLogin(staticUser)
 
   cy.getCookie('grafana_session_expiry').should('exist')
+
+  return cy.wrap(true)
 })
 
 // Available as cy.grafanaSetRole(ingress, '.user.grafanaPassword', 'dev@example.com', 'Viewer')
 Cypress.Commands.add('grafanaSetRole', (ingress, adminPasswordKey, user, role) => {
   // Log in as the grafana admin and change the role
-  cy.visit(`https://${ingress}/admin/users`)
+  cy.session([`${ingress}/admin/users`], function () {
+    cy.visit(`https://${ingress}`)
 
-  cy.yqSecrets(adminPasswordKey).then((password) => {
-    cy.get('input[placeholder*="username"]').type('admin', { log: false })
+    cy.yqSecrets(adminPasswordKey).then((password) => {
+      cy.get('input[placeholder*="username"]').type('admin', { log: false })
 
-    cy.get('input[placeholder*="password"]').type(password, { log: false })
+      cy.get('input[placeholder*="password"]').type(password, { log: false })
 
-    cy.get('button').contains('Log in').click()
+      cy.get('button').contains('Log in').click()
+    })
+
+    cy.visit(`https://${ingress}/admin/users`)
   })
 
+  cy.visit(`https://${ingress}/admin/users`)
   cy.contains('Organization users').should('be.visible').click()
 
   // remove TLD, form doesn't seem to like it
@@ -104,9 +112,9 @@ Cypress.Commands.add('grafanaSetRole', (ingress, adminPasswordKey, user, role) =
     .type(`${searchString}{enter}`)
 
   cy.get('[aria-label="Role"]').as('role').focus()
-  cy.get('@role').should('not.be.disabled').type(`${role}{enter}`, { force: true })
+  cy.get('@role').type(`${role}{enter}`)
 
-  cy.contains('Organization user updated').should('be.visible')
+  return cy.contains('Organization user updated').should('be.visible')
 })
 
 // Available as cy.grafanaCheckRole(ingress, 'dev@example.com', 'Admin')
@@ -121,5 +129,5 @@ Cypress.Commands.add('grafanaCheckRole', (ingress, user, role) => {
 
   cy.wait(['@userOrgs'])
 
-  cy.get('[data-testid="data-testid-user-orgs-table"]').contains(role).should('exist')
+  return cy.get('[data-testid="data-testid-user-orgs-table"]').contains(role).should('exist')
 })

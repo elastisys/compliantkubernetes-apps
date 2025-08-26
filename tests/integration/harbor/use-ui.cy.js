@@ -39,7 +39,7 @@ describe('harbor ui', function () {
     cy.viewport(1280, 720)
   })
 
-  after(() => {
+  after(function () {
     Cypress.session.clearAllSavedSessions()
   })
 
