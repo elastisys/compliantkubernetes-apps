@@ -112,7 +112,7 @@ Cypress.Commands.add('grafanaSetRole', (ingress, adminPasswordKey, user, role) =
     .type(`${searchString}{enter}`)
 
   cy.get('[aria-label="Role"]').as('role').focus()
-  cy.get('@role').should('not.be.disabled').type(`${role}{enter}`, { force: true })
+  cy.get('@role').type(`${role}{enter}`)
 
   return cy.contains('Organization user updated').should('be.visible')
 })
