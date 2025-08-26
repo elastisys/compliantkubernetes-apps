@@ -159,7 +159,7 @@ check_tools() {
   if [[ "${warn}" != 0 ]]; then
     if [[ -t 1 ]]; then
       log_warning "Run the following command to update: ./bin/ck8s install-requirements"
-      if [[ "${just_check}" != 1 ]]; then
+      if [[ "${just_check}" != 1 ]] && [[ "${CK8S_AUTO_APPROVE:-false}" != "true" ]]; then
         ask_abort
       fi
     fi
