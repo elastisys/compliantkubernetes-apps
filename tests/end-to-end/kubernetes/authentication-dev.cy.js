@@ -9,7 +9,7 @@ describe('kubernetes authentication', function () {
 
   it('can login via extra static dex user', function () {
     cy.task('kubectlLogin', Cypress.env('KUBECONFIG'))
-    cy.visit('http://localhost:8000')
+    cy.visit('http://localhost:8000', { retryOnNetworkFailure: true })
 
     cy.dexExtraStaticLogin('dev@example.com')
 
