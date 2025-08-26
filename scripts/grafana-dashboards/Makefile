@@ -43,7 +43,7 @@ alertmanager-mixin: # Clone the alertmanager-mixin repo and build the dashboards
 	@$(call clone_mixin_repo,$@,"github.com/prometheus/alertmanager/doc/alertmanager-mixin@main")
 	@$(call create_dashboards,$@)
 
-cert-manager-mixin:
+cert-manager-mixin: # Clone the cert-manager-mixin repo and build the dashboard
 	@$(call clone_mixin_repo,$@,"gitlab.com/uneeq-oss/cert-manager-mixin@master")
 	@$(call create_dashboards,$@)
 
