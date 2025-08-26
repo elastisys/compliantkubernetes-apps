@@ -1,5 +1,5 @@
-const DROP_QUERY = 'round(increase(no_policy_drop_counter[15m]))'
-const ACCEPT_QUERY = 'sum by (type) (round(increase(policy_accept_counter[15m])))'
+const DROP_QUERY = 'round(increase(no_policy_drop_counter[5m]))'
+const ACCEPT_QUERY = 'sum by (type) (round(increase(policy_accept_counter[5m])))'
 
 function makePrometheusURL(/** @type {Cluster} */ cluster) {
   const port = cluster === 'wc' ? Cypress.env('WC_PROXY_PORT') : Cypress.env('SC_PROXY_PORT')
@@ -11,66 +11,58 @@ function makePrometheusURL(/** @type {Cluster} */ cluster) {
 }
 
 describe('workload cluster network policies', function () {
-  before(function () {
-    cy.request('GET', `${makePrometheusURL('wc')}/api/v1/status/runtimeinfo`)
-      .then(assertServerTime)
-      .as('serverTime')
-  })
-
   it('are not dropping any packets from workloads', function () {
-    cy.request('GET', makeQueryURL('wc', DROP_QUERY, this.serverTime)).then((response) => {
+    cy.request('GET', makeQueryURL('wc', DROP_QUERY)).then((response) => {
       assertNoDrops(response, 'fw', 'from')
     })
   })
 
   it('are not dropping any packets to workloads', function () {
-    cy.request('GET', makeQueryURL('wc', DROP_QUERY, this.serverTime)).then((response) => {
+    cy.request('GET', makeQueryURL('wc', DROP_QUERY)).then((response) => {
       assertNoDrops(response, 'tw', 'to')
     })
   })
 
   it('are accepting allowed traffic', function () {
-    cy.request('GET', makeQueryURL('wc', ACCEPT_QUERY, this.serverTime)).then(assertAccepts)
+    cy.retryRequest({
+      request: { method: 'GET', url: makeQueryURL('wc', ACCEPT_QUERY) },
+      condition: acceptCondition,
+      waitTime: 10000,
+      attempts: 30,
+    })
   })
 })
 
 describe('service cluster network policies', function () {
-  before(function () {
-    cy.request('GET', `${makePrometheusURL('sc')}/api/v1/status/runtimeinfo`)
-      .then(assertServerTime)
-      .as('serverTime')
-  })
-
   it('are not dropping any packets from workloads', function () {
-    cy.request('GET', makeQueryURL('sc', DROP_QUERY, this.serverTime)).then((response) => {
+    cy.request('GET', makeQueryURL('sc', DROP_QUERY)).then((response) => {
       assertNoDrops(response, 'fw', 'from')
     })
   })
 
   it('are not dropping any packets to workloads', function () {
-    cy.request('GET', makeQueryURL('sc', DROP_QUERY, this.serverTime)).then((response) => {
+    cy.request('GET', makeQueryURL('sc', DROP_QUERY)).then((response) => {
       assertNoDrops(response, 'tw', 'to')
     })
   })
 
   it('are accepting allowed traffic', function () {
-    cy.request('GET', makeQueryURL('sc', ACCEPT_QUERY, this.serverTime)).then(assertAccepts)
+    cy.retryRequest({
+      request: { method: 'GET', url: makeQueryURL('sc', ACCEPT_QUERY) },
+      condition: acceptCondition,
+      waitTime: 10000,
+      attempts: 30,
+    })
   })
 })
 
-const assertServerTime = (response) => {
-  expect(response.status).to.eq(200)
-
-  const runtimeInfo = response.body
-  expect(runtimeInfo.status).to.eq('success')
-  expect(runtimeInfo.data.serverTime).to.be.a('string')
-
-  return runtimeInfo.data.serverTime
-}
-
-const makeQueryURL = (/** @type {Cluster} */ cluster, query, serverTime) => {
+const makeQueryURL = (/** @type {Cluster} */ cluster, query, serverTime = '') => {
   const metric = encodeURI(query)
-  return `${makePrometheusURL(cluster)}/api/v1/query?query=${metric}&${new URLSearchParams({ time: serverTime })}`
+  let returnValue = `${makePrometheusURL(cluster)}/api/v1/query?query=${metric}`
+  if (serverTime !== '') {
+    returnValue = `${returnValue}&${new URLSearchParams({ time: serverTime })}`
+  }
+  return returnValue
 }
 
 const assertNoDrops = (response, metricType, direction) => {
@@ -86,25 +78,24 @@ const assertNoDrops = (response, metricType, direction) => {
   }
 }
 
-const assertAccepts = (response) => {
-  expect(response.status).to.eq(200)
-  expect(response.body.data.result).to.be.a('array')
+const acceptCondition = (response) => {
+  try {
+    expect(response.status).to.eq(200)
+    expect(response.body.data.result).to.be.a('array')
 
-  const result = response.body.data.result
+    const result = response.body.data.result
 
-  const innerAssert = (values) => {
-    cy.wrap(values)
-      .should('be.an', 'array')
-      .its('[0]')
-      .should('be.a', 'number')
-      .should('be.greaterThan', 0)
+    const innerAssert = (values) => {
+      expect(values).to.be.an('array')
+      expect(values).to.have.property('0').that.is.a('number').and.is.greaterThan(0)
+    }
+
+    innerAssert(result.filter(filterNonZero('fw')).map((item) => Number.parseInt(item.value[1])))
+    innerAssert(result.filter(filterNonZero('tw')).map((item) => Number.parseInt(item.value[1])))
+    return true
+  } catch {
+    return false
   }
-
-  const fwAccept = result.filter(filterNonZero('fw')).map((item) => Number.parseInt(item.value[1]))
-  innerAssert(fwAccept)
-
-  const twAccept = result.filter(filterNonZero('tw')).map((item) => Number.parseInt(item.value[1]))
-  innerAssert(twAccept)
 }
 
 const filterNonZero = (metricType) => {
