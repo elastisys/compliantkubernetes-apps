@@ -151,14 +151,19 @@ end_to_end.socat_up() {
 
   mkdir -p "${tests}/end-to-end/.run"
   if [[ ! -f "${pid_file}" ]] || ! kill -0 "$(<"${pid_file}")" 2>/dev/null; then
-    local -r sock_dir="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
-    mkdir -p "${sock_dir}"
+    {
+      flock -x 200
 
-    local -r sock_file="${sock_dir}/ck8s-apps-browser.sock"
-    rm -f "${sock_file}"
+      local -r sock_dir="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
+      mkdir -p "${sock_dir}"
 
-    socat -lf "${tests}/end-to-end/.run/socat.log" unix-listen:"${sock_file}",fork system:'xargs xdg-open' &
-    echo "$!" >"${pid_file}"
+      local -r sock_file="${sock_dir}/ck8s-apps-browser.sock"
+      rm -f "${sock_file}"
+
+      socat -lf "${tests}/end-to-end/.run/socat.log" unix-listen:"${sock_file}",fork system:'xargs xdg-open' &
+      echo "$!" >"${pid_file}"
+
+    } 200>"${tests}/end-to-end/.run/socat.lock"
   fi
 }
 
