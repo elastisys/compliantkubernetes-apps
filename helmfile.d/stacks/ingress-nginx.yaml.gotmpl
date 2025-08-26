@@ -8,6 +8,8 @@ templates:
 
   file-copier:
     inherit: [ template: ingress-nginx ]
+    labels:
+      bootstrap: ingress-nginx
     installed: {{ .Values | get "ingressNginx.controller.chroot" false }}
     namespace: kube-system
     name: file-copier
@@ -31,6 +33,8 @@ templates:
     inherit:
       - template: ingress-nginx
       - template: ingress-nginx-chart
+    labels:
+      bootstrap: ingress-nginx
     installed: {{ .Values | get "ck8sAnyCluster.enabled" false }}
     name: ingress-nginx
     needs:
