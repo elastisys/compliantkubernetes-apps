@@ -6955,33 +6955,141 @@ properties:
           topologySpreadConstraints:
             $ref: '#/$defs/kubernetesTopologySpreadConstraints'
   issuers:
-    title: Issuers Config
-    description: Configure issuers for cert-manager.
-    type: object
-    additionalProperties: false
-    properties:
+    $defs:
+      secretAccessKeySecretRef:
+        type: object
+        title: Secret Access Key Reference
+        description: Configure a reference to a Kubernetes Secret holding route53 auth credentials.
+        additionalProperties: false
+        properties:
+          name:
+            type: string
+          key:
+            type: string
+        required:
+          - name
+          - key
+      ingress:
+        type: object
+        title: Ingress
+        description: Configure ingress for http01 solvers.
+        additionalProperties: false
+        properties:
+          ingressClassName:
+            type: string
+          name:
+            type: string
+      dns01Solver:
+        type: object
+        title: Solver
+        description: Set a dns01 solver with a selector.
+        additionalProperties: false
+        properties:
+          selector:
+            $ref: "#/properties/issuers/$defs/selector"
+          dns01:
+            $ref: "#/properties/issuers/$defs/dns01Config"
+        required:
+            - dns01
+      http01Solver:
+        type: object
+        title: Solver
+        description: Set a http01 solver with a selector.
+        additionalProperties: false
+        properties:
+          selector:
+            $ref: "#/properties/issuers/$defs/selector"
+          dns01:
+            $ref: "#/properties/issuers/$defs/http01Config"
+        required:
+            - http01
+      dns01Config:
+        type: object
+        title: DNS01 Configuration
+        description: Configure a dns01 challenge solver.
+        additionalProperties: false
+        properties:
+          route53:
+            $ref: "#/properties/issuers/$defs/route53"
+      http01Config:
+        type: object
+        title: HTTP01 Configuration
+        description: Configure a http01 challenge solver.
+        additionalProperties: false
+        properties:
+          ingress:
+            $ref: "#/properties/issuers/$defs/ingress"
+      route53:
+        type: object
+        title: Route53
+        description: Route53 configuration for dns01 solvers.
+        additionalProperties: false
+        properties:
+          region:
+            type: string
+            title: Region
+          hostedZoneID:
+            type: string
+            title: Hosted Zone ID
+          accessKeyID:
+            type: string
+            title: Access Key ID
+          secretAccessKeySecretRef:
+            $ref: "#/properties/issuers/$defs/secretAccessKeySecretRef"
+        required:
+          - region
+          - hostedZoneID
+          - accessKeyID
+          - secretAccessKeySecretRef
+      selector:
+        type: object
+        title: Selector
+        description: Configure a selector for the solver.
+        additionalProperties: false
+        properties:
+          dnsZones:
+            type: array
+            title: DNS Zones
+            description: Array of DNS zones for which the solver applies.
+            items:
+              type: string
+            minItems: 1
+      environment:
+        type: object
+        additionalProperties: false
+        examples:
+          - prod:
+              email: letsencrypt@elastisys.com
+              solvers:
+                - selector:
+                    dnsZones:
+                      - yourdomain.com
+                  dns01:
+                    route53:
+                      region: eu-north-1
+                      hostedZoneID: yourzoneid
+                      accessKeyID: youraccessid
+                      secretAccessKeySecretRef:
+                        name: route53-credentials-secret
+                        key: secretKey
+        properties:
+          email:
+            title: Issuer Email
+            type: string
+          solvers:
+            title: Issuer Solvers
+            type: array
+            description: Array of challenge solvers for lets-encrypt.
+            items:
+              oneOf:
+                - $ref: "#/properties/issuers/$defs/http01Solver"
+                - $ref: "#/properties/issuers/$defs/dns01Solver"
+              default: {}
       letsencrypt:
         title: Issuers Let's Encrypt
         description: Configure issuers for cert-manager using Let's Encrypt.
         type: object
         additionalProperties: false
-        if:
-          properties:
-            enabled:
-              type: boolean
-              const: true
-        then:
-          properties:
-            prod:
-              properties:
-                email:
-                  title: Issuer Email
-                  type: string
-            staging:
-              properties:
-                email:
-                  title: Issuer Email
-                  type: string
         properties:
           enabled:
             title: Let's Encrypt Enabled
@@ -6990,23 +7098,30 @@ properties:
           prod:
             title: Let's Encrypt Prod
             description: Configure Let's Encrypt production issuer.
-            type: object
-            additionalProperties: false
-            properties:
-              email: true
-              solvers:
-                title: Issuer Solver
-                type: array
+            $ref: "#/properties/issuers/$defs/environment"
           staging:
             title: Let's Encrypt Staging
             description: Configure Let's Encrypt staging issuer.
-            type: object
-            additionalProperties: false
-            properties:
-              email: true
-              solvers:
-                title: Issuer Solver
-                type: array
+            $ref: "#/properties/issuers/$defs/environment"
+    title: Issuers Config
+    description: Configure issuers for cert-manager.
+    type: object
+    additionalProperties: false
+    properties:
+      letsencrypt:
+        $ref: "#/properties/issuers/$defs/letsencrypt"
+        if:
+          properties:
+            enabled:
+              const: true
+        then:
+          properties:
+            prod:
+              required:
+                - email
+            staging:
+              required:
+                - email
       extraIssuers:
         title: Extra Issuers
         type: array
