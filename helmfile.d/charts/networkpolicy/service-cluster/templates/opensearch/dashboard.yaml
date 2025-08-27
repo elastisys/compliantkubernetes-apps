@@ -10,7 +10,7 @@ spec:
     - Egress
   podSelector:
     matchLabels:
-      app: opensearch-dashboards
+      app.kubernetes.io/name: opensearch-dashboards
   ingress:
     - from:
       {{- if and .Values.global.ingressUsingHostNetwork .Values.global.scNodes.ips }}

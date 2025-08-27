@@ -47,7 +47,7 @@ spec:
               kubernetes.io/metadata.name: opensearch-system
         - podSelector:
             matchLabels:
-              app: opensearch-dashboards
+              app.kubernetes.io/name: opensearch-dashboards
           namespaceSelector:
             matchLabels:
               kubernetes.io/metadata.name: opensearch-system

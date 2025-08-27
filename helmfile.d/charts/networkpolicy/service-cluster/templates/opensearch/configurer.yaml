@@ -20,7 +20,7 @@ spec:
     - to:
         - podSelector:
             matchLabels:
-              app: opensearch-dashboards
+              app.kubernetes.io/name: opensearch-dashboards
       ports:
         - port: 5601
     - ports:
