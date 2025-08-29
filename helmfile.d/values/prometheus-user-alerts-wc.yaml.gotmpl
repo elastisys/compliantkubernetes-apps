@@ -8,6 +8,8 @@
 {{- $groupLabelValueArray := .Values.prometheus.autoscaledNodeGroupAlerts.groupLabelValues -}}
 {{- $groupLabelValueArrayRegex := join "|" $groupLabelValueArray -}}
 
+osMaxShardsPerNode: 0
+osDataNodeCount: 0
 osNodeCount: 0
 alertmanagerJob: alertmanager-operated
 alertmanagerNamespace: alertmanager

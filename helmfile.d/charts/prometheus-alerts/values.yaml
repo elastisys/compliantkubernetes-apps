@@ -2,6 +2,8 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 osNodeCount: 3
+osDataNodeCount: 3
+osMaxShardsPerNode: 1000
 alertmanagerJob: kube-prometheus-stack-alertmanager
 alertmanagerNamespace: monitoring
 prometheusJob: kube-prometheus-stack-prometheus

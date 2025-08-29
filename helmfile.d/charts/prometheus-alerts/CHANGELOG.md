@@ -1,5 +1,10 @@
 # Changelog
 
+## 2025.08.29
+
+1. helmfile/charts/prometheus-alerts/templates/alerts/opensearch.yaml
+    - ADDED - OpenSearchTotalSHardsTooHigh alert
+
 ## 2025.01.03
 
 1. helmfile.d/charts/prometheus-alerts/templates/alerts/alertmanager.rules.yaml
