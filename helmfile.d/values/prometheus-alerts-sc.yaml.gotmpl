@@ -14,6 +14,7 @@
 
 osNodeCount: {{ add .Values.opensearch.dataNode.count .Values.opensearch.clientNode.count .Values.opensearch.masterNode.count }}
 osIndexAlerts: {{ toYaml .Values.opensearch.promIndexAlerts | nindent 2 }}
+osMaxShardsPerNode: {{ .Values.opensearch.maxShardsPerNode }}
 
 defaultRules:
   create: true

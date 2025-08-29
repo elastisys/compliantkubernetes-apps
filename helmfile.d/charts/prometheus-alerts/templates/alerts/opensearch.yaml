@@ -17,6 +17,15 @@ spec:
   groups:
   - name: opensearch-alerts
     rules:
+    - alert: OpenSearchTotalShardsTooHigh
+      expr: sum(elasticsearch_node_shards_total{namespace="opensearch-system"}) > {{ mulf (mul .Values.osMaxShardsPerNode .Values.osNodeCount) 0.9 }}
+      for: 15m
+      labels:
+        severity: critical
+      annotations:
+        description: Cluster total shards near hard limit
+        summary: The total number of shards across the nodes is {{`{{ $value }}`}} which is above 90% of the combined hard limit {{ mul .Values.osNodeCount .Values.osMaxShardsPerNode }}
+        runbook_url: {{ .Values.runbookUrls.opensearch.OpenSearchTotalShardsTooHigh }}
     - alert: OpenSearchTooFewNodesRunning
       expr: elasticsearch_cluster_health_number_of_nodes{namespace="opensearch-system"} < {{ .Values.osNodeCount }}
       for: 15m
