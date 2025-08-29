@@ -18,7 +18,7 @@ spec:
               app.kubernetes.io/instance: opensearch-curator
         - podSelector:
             matchLabels:
-              app: opensearch-dashboards
+              app.kubernetes.io/name: opensearch-dashboards
         - podSelector:
             matchLabels:
               app.kubernetes.io/name: prometheus-elasticsearch-exporter
