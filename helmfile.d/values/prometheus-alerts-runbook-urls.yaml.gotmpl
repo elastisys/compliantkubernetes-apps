@@ -193,6 +193,7 @@ runbookUrls:
   nodeNetwork:
     {{- dict "name" "NodeNetworkInterfaceFlapping" "subpath" "general" "config" .nodeNetwork | include "tpl.prometheus-operator" }}
   opensearch:
+    {{- dict "name" "OpenSearchTotalShardsTooHigh" "config" .opensearch | include "tpl.missing-runbook" }}
     {{- dict "name" "OpenSearchTooFewNodesRunning" "config" .opensearch | include "tpl.missing-runbook" }}
     {{- dict "name" "OpenSearchHeapTooHigh" "config" .opensearch | include "tpl.missing-runbook" }}
     {{- dict "name" "OpenSearchFieldLimit" "config" .opensearch | include "tpl.missing-runbook" }}
