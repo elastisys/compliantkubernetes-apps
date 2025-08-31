@@ -112,6 +112,36 @@ If a migration document already exists, make sure that it follows [this template
 Perform QA on the staging branch.
 If any fixes are necessary, add a manual changelog entry and push them to the staging branch.
 
+### Generate SBOM
+
+Produce and commit a CycloneDX SBOM for the release candidate.
+
+See configuration and overrides in `sbom/` (e.g., `sbom.config.yaml`, `overrides.yaml`).
+
+Generation runs in a container via `scripts/run-from-container.sh` using the `ghcr.io/elastisys/sbom-generator` image.
+Refer to the [sbom-generator documentation](https://github.com/elastisys/sbom-generator) for more details.
+
+Prerequisites:
+
+- Docker or Podman installed.
+- Optional: set `CK8S_GITHUB_TOKEN` to avoid GitHub API rate limiting (forwarded to the container if set). This should not be required by default behaviour.
+
+Use the script (version is optional; defaults to `latest`).
+Any additional flags are forwarded to the `sbom-generator` image:
+
+```bash
+./sbom/generate.sh X.Y.Z --require-evaluation
+# Then commit and push the SBOM artifact
+git add sbom/sbom.cdx.json
+git commit -m "docs: update SBOM for vX.Y.Z"
+git push
+```
+
+If `--require-evaluation` fails, it lists the components still marked with the default evaluation (from `sbom/sbom.config.yaml`).
+Update `sbom/overrides.yaml` with an `evaluation` for each listed path, then rerun the command.
+
+Tip: to verify drift without updating files, run `sbom/diff.sh`.
+
 ## Code freeze
 
 When the QA process is finished the code should be in a state where it's ready to be released.
