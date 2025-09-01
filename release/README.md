@@ -28,21 +28,21 @@ The following constraints apply on releases:
 
     - May **only** perform minor additions, modifications, or deletions to the application and command line interfaces.
 
-          The interfaces _should_ keep similar behaviour between different minor releases to ensure that they work with similar sets of features and tools on the same major version.
+                The interfaces _should_ keep similar behaviour between different minor releases to ensure that they work with similar sets of features and tools on the same major version.
 
-          Example of minor change would be to change the way commands are processed in a backwards compatible way.
+                Example of minor change would be to change the way commands are processed in a backwards compatible way.
 
     - May **only** perform minor additions, modifications, or deletions to the configuration structure.
 
-          The configuration _should_ keep similar management and structure between different minor releases to ensure that they work with similar sets of features and tools on the same major version.
+                The configuration _should_ keep similar management and structure between different minor releases to ensure that they work with similar sets of features and tools on the same major version.
 
-          Example of minor change would be to change parts of the configuration for services and components in a backwards compatible way.
+                Example of minor change would be to change parts of the configuration for services and components in a backwards compatible way.
 
     - May **only** perform minor upgrades or updates to the deployed services and third party tools.
 
-          The deployed services _should_ be the same between different minor releases to ensure that they work with similar sets of features and tools on the same major version.
+                The deployed services _should_ be the same between different minor releases to ensure that they work with similar sets of features and tools on the same major version.
 
-          Example of minor change would be to upgrade or change minor services or components.
+                Example of minor change would be to upgrade or change minor services or components.
 
 1. Patch releases (vX.Y.**Z**):
 
@@ -50,21 +50,21 @@ The following constraints apply on releases:
 
     - May **only** perform patch additions or modifications to the application and command line interfaces.
 
-          The interfaces **must** keep similar behaviour between different patch releases to ensure that they work with the same sets of features and tools, and can be applied over any patch version on the same minor version.
+                The interfaces **must** keep similar behaviour between different patch releases to ensure that they work with the same sets of features and tools, and can be applied over any patch version on the same minor version.
 
-          Example of allowed patches would be to correct faulty behaviour.
+                Example of allowed patches would be to correct faulty behaviour.
 
     - May **only** perform patch additions or modifications to the configuration structure.
 
-          The configuration **must** keep similar management and structure between different patch releases to ensure that they work with the same sets of features and tools, and can be applied over any patch version on the same minor version.
+                The configuration **must** keep similar management and structure between different patch releases to ensure that they work with the same sets of features and tools, and can be applied over any patch version on the same minor version.
 
-          Example of allowed patches would be for missing or invalid configurations.
+                Example of allowed patches would be for missing or invalid configurations.
 
     - May **only** perform patch or security updates to the deployed services or third party tools.
 
-          The deployed services **must** be the same between different patch releases to ensure that they work with the same sets of features and tools, and can be applied over any patch version on the same minor version.
+                The deployed services **must** be the same between different patch releases to ensure that they work with the same sets of features and tools, and can be applied over any patch version on the same minor version.
 
-          Example of allowed patches would be for upgrading patch versions of services and third party tools due to security vulnerabilities.
+                Example of allowed patches would be for upgrading patch versions of services and third party tools due to security vulnerabilities.
 
 ## Feature freeze
 
@@ -112,6 +112,29 @@ If a migration document already exists, make sure that it follows [this template
 Perform QA on the staging branch.
 If any fixes are necessary, add a manual changelog entry and push them to the staging branch.
 
+### Generate SBOM
+
+Produce and commit a CycloneDX SBOM for the release candidate.
+
+@docs/CycloneDX folder has more configuration options and parameters
+
+Refer to the [sbom-generator documentation](https://github.com/elastisys/sbom-generator) for more details.
+
+Prerequisites:
+
+- sbom-generator available in PATH.
+- CK8S_GITHUB_TOKEN set with access to query GitHub. (only required if you get rate limited by GitHub)
+
+Use the script:
+
+```bash
+release/generate-sbom.sh X.Y.Z
+# Then commit and push the SBOM artifact
+git add docs/CycloneDX/sbom.cdx.json
+git commit -m "docs: update SBOM for vX.Y.Z"
+git push
+```
+
 ## Code freeze
 
 When the QA process is finished the code should be in a state where it's ready to be released.
@@ -148,7 +171,7 @@ Remove irrelevant entries and/or reword entries so that they are easy to underst
 This will be done in two steps, first to add it to the main branch, second to create a new release branch.
 
 1. In the [elastisys/welkin](https://github.com/elastisys/welkin) repository, create a new branch `<personal-tag>/release-vX.Y.Z` from the `main` branch.
-    Then add the release notes to the `<personal-tag>/release-vX.Y.Z` and create a pull request to the `main` branch.
+   Then add the release notes to the `<personal-tag>/release-vX.Y.Z` and create a pull request to the `main` branch.
 
 1. When the pull-request is merged create a new branch `release-vX.Y` from the `main` branch and push it to create it.
 
@@ -157,10 +180,10 @@ This will be done in two steps, first to add it to the main branch, second to cr
 This will be done in two steps, first to add it to the release branch, second to add it to the main branch.
 
 1. In the [elastisys/welkin](https://github.com/elastisys/welkin) repository, create a new branch `<personal-tag>/release-vX.Y.Z` from the `release-vX.Y` branch.
-    Then add the release notes to the `<personal-tag>/release-vX.Y.Z` and create a pull request to the `release-vX.Y` branch.
+   Then add the release notes to the `<personal-tag>/release-vX.Y.Z` and create a pull request to the `release-vX.Y` branch.
 
 1. When the first pull-request is merged create a new branch `<personal-tag>/release-vX.Y.Z-main` from the `main` branch.
-    Then cherry-pick the commit you did on the other branch and create pull request to the `main` branch.
+   Then cherry-pick the commit you did on the other branch and create pull request to the `main` branch.
 
 ## Update the main branch
 
