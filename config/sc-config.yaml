@@ -545,10 +545,11 @@ dex:
     # Simply add `serviceAccountFilePath: /etc/dex/google/secret-key` for each google connector.
     # For more details, see https://elastisys.com/elastisys-engineering-how-to-use-dex-with-google-accounts-to-manage-access-in-kubernetes/
     # SASecretName: set-me
-velero:
+
 # Optional: Component-specific S3 configuration for velero.
 # If not set, the global `.objectStorage.s3 configuration will be used instead.
 # Only set if velero needs separate S3 storage configuration.
+#velero:
   #objectStorage:
   #  s3:
   #    region: ""
