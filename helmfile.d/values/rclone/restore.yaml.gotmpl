@@ -89,7 +89,7 @@ providers:
         {{- $providerConfig := dict "type" "s3" "s3" $main.s3 }}
   {{ printf "destination-%s" . }}: {{- include "provider" $providerConfig | nindent 4 }}
       {{- end }}
-    {{- else if ne . "s3" }} 
+    {{- else if ne . "s3" }}
   {{ printf "destination-%s" . }}: {{- set $providers "type" . | include "provider" | nindent 4 }}
     {{- else }}
       {{- $providerConfig := dict "type" "s3" "s3" $main.s3 }}
