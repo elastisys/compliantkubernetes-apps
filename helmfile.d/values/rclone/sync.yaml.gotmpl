@@ -25,12 +25,15 @@ targets:
     {{- $destinationType := $sync.destinationType }}
     {{- $sourceType := $main.type }}
 
-    {{- if eq $key "harbor" }}
-    {{- $destinationType = $.Values.harbor.persistence.type | replace "objectStorage" "" | default $destinationType }}
-    {{- $sourceType = $.Values.harbor.persistence.type | replace "objectStorage" "" | default $sourceType }}
+    {{- $componentConfig := $.Values | dig $key "objectStorage" "s3" dict }}
+    {{- if $componentConfig }}
+      {{- $sourceType = printf "%s-s3" $key }}
+    {{- else if eq $key "harbor" }}
+      {{- $destinationType = $.Values.harbor.persistence.type | replace "objectStorage" "" | default $destinationType }}
+      {{- $sourceType = $.Values.harbor.persistence.type | replace "objectStorage" "" | default $sourceType }}
     {{- else if eq $key "thanos" }}
-    {{- $destinationType = $.Values.thanos.objectStorage.type | default $destinationType }}
-    {{- $sourceType = $.Values.thanos.objectStorage.type | default $sourceType }}
+      {{- $destinationType = $.Values.thanos.objectStorage.type | default $destinationType }}
+      {{- $sourceType = $.Values.thanos.objectStorage.type | default $sourceType }}
     {{- end }}
 
     {{- $destinations = append $destinations $destinationType }}
@@ -42,22 +45,23 @@ targets:
     sourcePath: ""
     nameSuffix: default
   {{- end }}
-  {{- end }}
-
-  {{- range $sync.buckets }}
-  - destinationName: {{ . | get "destination" .source }}
+  {{- else }}
+  {{- range $bucket := $sync.buckets }}
+    {{- $sourceType := $bucket | get "sourceType" $main.type }}
+    {{- $destinations = $bucket | get "destinationType" $sync.destinationType | append $destinations }}
+    {{- $sources = append $sources $sourceType }}
+  - destinationName: {{ $bucket | get "destination" $bucket.source }}
     destinationCrypt: {{ $crypt | get "enabled" false }}
-    {{- $destinations = . | get "destinationType" $sync.destinationType | append $destinations }}
-    destinationType: {{ . | get "destinationType" $sync.destinationType }}
-    destinationPath: {{ . | get "destinationPath" "" }}
-    sourceName: {{ .source }}
-    {{- $sources = . | get "sourceType" $main.type | append $sources }}
-    sourceType: {{ . | get "sourceType" $main.type }}
-    sourcePath: {{ . | get "sourcePath" "" }}
-    {{- with . | get "schedule" "" }}
+    destinationType: {{ $bucket | get "destinationType" $sync.destinationType }}
+    destinationPath: {{ $bucket | get "destinationPath" "" }}
+    sourceName: {{ $bucket.source }}
+    sourceType: {{ $sourceType }}  {{/* Use whatever sourceType is provided */}}
+    sourcePath: {{ $bucket | get "sourcePath" "" }}
+    {{- with $bucket | get "schedule" "" }}
     schedule: {{ . }}
     {{- end }}
-    nameSuffix: {{ . | get "nameSuffix" "custom" }}
+    nameSuffix: {{ $bucket | get "nameSuffix" "custom" }}
+  {{- end }}
   {{- end }}
 
 providers:
@@ -66,7 +70,6 @@ providers:
   {{- end }}
 
   {{- $providers := merge dict $sync }}
-
   {{- range $destinations | uniq | sortAlpha }}
   {{ printf "destination-%s" . }}: {{- set $providers "type" . | include "provider" | nindent 4 }}
   {{- end }}
@@ -75,10 +78,25 @@ providers:
   {{ fail "rclone-sync configured without sources" }}
   {{- end }}
 
-  {{- $providers := merge dict $main }}
-
   {{- range $sources | uniq | sortAlpha }}
-  {{ printf "source-%s" . }}: {{- set $providers "type" . | include "provider" | nindent 4 }}
+    {{- if hasSuffix "-s3" . }}
+      {{- $component := . | replace "-s3" "" }}
+      {{- $componentConfig := $.Values | dig $component "objectStorage" "s3" dict }}
+      {{- if $componentConfig }}
+        {{- $providerConfig := dict "type" "s3" "s3" $componentConfig }}
+  {{ printf "source-%s" . }}: {{- include "provider" $providerConfig | nindent 4 }}
+      {{- else }}
+        {{- $providerConfig := dict "type" "s3" "s3" $main.s3 }}
+  {{ printf "source-%s" . }}: {{- include "provider" $providerConfig | nindent 4 }}
+      {{- end }}
+    {{- else if ne . "s3" }} 
+      {{- $providerConfig := merge dict $main }}
+      {{- $providerConfig = set $providerConfig "type" . }}
+  {{ printf "source-%s" . }}: {{- include "provider" $providerConfig | nindent 4 }}
+    {{- else }}
+      {{- $providerConfig := dict "type" "s3" "s3" $main.s3 }}
+  source-s3: {{- include "provider" $providerConfig | nindent 4 }}
+    {{- end }}
   {{- end }}
 
 resources: {{- toYaml $sync.resources | nindent 2 }}
