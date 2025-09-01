@@ -7,8 +7,8 @@ azure:
   azcopyConcurrency: {{ .Values.fluentd.logManager.compaction.azureCopyConcurrency }}
 {{- else if eq .Values.objectStorage.type "s3"}}
 s3:
-  forcePathStyle: {{ .Values.objectStorage.s3.forcePathStyle }}
-  regionEndpoint: {{ .Values.objectStorage.s3.regionEndpoint }}
+  forcePathStyle: {{ include "componentObjectStorage" (list "fluentd" "forcePathStyle" .) }}
+  regionEndpoint: {{ include "componentObjectStorage" (list "fluentd" "regionEndpoint" .) }}
   accessKey: {{ include "componentObjectStorage" (list "fluentd" "accessKey" .) }}
   secretKey: {{ include "componentObjectStorage" (list "fluentd" "secretKey" .) }}
   enabled: true

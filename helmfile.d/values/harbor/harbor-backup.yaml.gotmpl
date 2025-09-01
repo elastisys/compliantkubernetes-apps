@@ -14,7 +14,7 @@ s3:
   accessKey: {{ include "componentObjectStorage" (list "harbor" "accessKey" .) }}
   secretKey: {{ include "componentObjectStorage" (list "harbor" "secretKey" .) }}
   bucket: {{ .Values.objectStorage.buckets.harbor }}
-  endpoint: {{ .Values.objectStorage.s3.regionEndpoint }}
+  endpoint: {{ include "componentObjectStorage" (list "harbor" "regionEndpoint" .) }}
 {{ else if eq .Values.objectStorage.type "gcs" -}}
 # TODO
 # Fix harbor backup chart to support gcs

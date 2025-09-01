@@ -435,7 +435,14 @@ harbor:
     enabled: true
     maxAgeDays: 7
     schedule: "30 2 * * *"
-
+# Optional: Component-specific S3 configuration for harbor.
+# If not set, the global `.objectStorage.s3 configuration will be used instead.
+# Only set if harbor needs separate S3 storage configuration.
+  #objectStorage:
+  #  s3:
+  #    region: ""
+  #    regionEndpoint: ""
+  #    forcePathStyle: false
 grafanaLabelEnforcer:
   resources:
     limits:
@@ -538,7 +545,15 @@ dex:
     # Simply add `serviceAccountFilePath: /etc/dex/google/secret-key` for each google connector.
     # For more details, see https://elastisys.com/elastisys-engineering-how-to-use-dex-with-google-accounts-to-manage-access-in-kubernetes/
     # SASecretName: set-me
-
+velero:
+# Optional: Component-specific S3 configuration for velero.
+# If not set, the global `.objectStorage.s3 configuration will be used instead.
+# Only set if velero needs separate S3 storage configuration.
+  #objectStorage:
+  #  s3:
+  #    region: ""
+  #    regionEndpoint: ""
+  #    forcePathStyle: false
 thanos:
   query:
     # Enables the query/query-frontend components
@@ -725,7 +740,13 @@ thanos:
     # Available options "s3" or "swift", defaults to "objectStorage.type" when empty
     # Configure the storage credentials in the global "objectStorage"
     type: ""
-
+# Optional: Component-specific S3 configuration for harbor.
+# If not set, the global `.objectStorage.s3 configuration will be used instead.
+# Only set if harbor needs separate S3 storage configuration.
+  # s3:
+  #   region: ""
+  #   regionEndpoint: ""
+  #   forcePathStyle: false
 opensearch:
   # 'subdomain' and 'indexPerNamespace' is set in common-config.yaml
 
@@ -1015,6 +1036,15 @@ opensearch:
   ingress:
     maxbodysize: 32m
 
+# Optional: Component-specific S3 configuration for opensearch.
+# If not set, the global `.objectStorage.s3 configuration will be used instead.
+# Only set if opensearch needs separate S3 storage configuration.
+  #objectStorage:
+  #  s3:
+  #    region: ""
+  #    regionEndpoint: ""
+  #    forcePathStyle: false
+
 opa:
   ## Enable rule that requires pods to come from
   ## the image registry defined by "URL".
@@ -1101,7 +1131,14 @@ fluentd:
     tolerations: []
     nodeSelector: {}
     affinity: {}
-
+# Optional: Component-specific S3 configuration for fluentd.
+# If not set, the global `.objectStorage.s3 configuration will be used instead.
+# Only set if fluentd needs separate S3 storage configuration.
+  #objectStorage:
+  #  s3:
+  #    region: ""
+  #    regionEndpoint: ""
+  #    forcePathStyle: false
 alerts:
   alertTo: "null"
   opsGenieHeartbeat:
