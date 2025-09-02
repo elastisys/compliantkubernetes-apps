@@ -9,7 +9,7 @@ import os
 import sys
 from dataclasses import dataclass, replace
 from pathlib import Path
-from typing import Any, TypedDict, cast, Optional
+from typing import Any, Optional, TypedDict, cast
 
 SCRIPT_DIR: Path = Path(__file__).parent.absolute()
 sys.path.insert(0, SCRIPT_DIR.as_posix())
@@ -42,8 +42,8 @@ class Args:
         return f"{self.environment_name}.{DEV_DOMAIN}"
 
 
-S3Secrets = TypedDict(
-    "S3Secrets",
+AwsSecrets = TypedDict(
+    "AwsSecrets",
     {"accessKey": str, "secretKey": str},
 )
 
@@ -54,18 +54,22 @@ SwiftSecrets = TypedDict(
 
 StorageSecrets = TypedDict(
     "StorageSecrets",
-    {"s3": S3Secrets, "swift": SwiftSecrets},
+    {"s3": AwsSecrets, "swift": SwiftSecrets},
 )
+
+GcpSecrets = TypedDict("GcpSecrets", {"clientID": str, "clientSecret": str})
+
+DexSecrets = TypedDict("DexSecrets", {"gcp": GcpSecrets})
+
+ExternalDnsSecrets = TypedDict("ExternalDnsSecrets", {"aws": AwsSecrets})
 
 
 class Secrets(TypedDict):
     """Holds secrets"""
 
     kubeloginClientSecret: str
-    awsAccessKey: str
-    awsSecretKey: str
-    gcpClientID: str
-    gcpClientSecret: str
+    dex: DexSecrets
+    externalDns: ExternalDnsSecrets
     objectStorage: StorageSecrets
 
 
@@ -104,7 +108,7 @@ def configure_apps(
             "route53": {
                 "region": "eu-north-1",
                 "hostedZoneID": DEV_HOSTED_ZONE,
-                "accessKeyID": args.secrets["awsAccessKey"],
+                "accessKeyID": args.secrets["externalDns"]["aws"]["accessKey"],
                 "secretAccessKeySecretRef": {
                     "name": "route53-credentials-secret",
                     "key": "secretKey",
@@ -245,15 +249,21 @@ def configure_secrets(secrets_path: Path, args: Args) -> None:
     _set_secret_key(
         secrets_path,
         '["issuers"]',
-        {"secrets": {"route53-credentials-secret": {"secretKey": args.secrets["awsSecretKey"]}}},
+        {
+            "secrets": {
+                "route53-credentials-secret": {
+                    "secretKey": args.secrets["externalDns"]["aws"]["secretKey"]
+                }
+            }
+        },
     )
     _set_secret_key(
         secrets_path,
         '["externalDns"]',
         {
             "awsRoute53": {
-                "accessKey": args.secrets["awsAccessKey"],
-                "secretKey": args.secrets["awsSecretKey"],
+                "accessKey": args.secrets["externalDns"]["aws"]["accessKey"],
+                "secretKey": args.secrets["externalDns"]["aws"]["secretKey"],
             }
         },
     )
@@ -265,8 +275,8 @@ def configure_secrets(secrets_path: Path, args: Args) -> None:
             "id": "elastisys-google",
             "type": "google",
             "config": {
-                "clientID": args.secrets["gcpClientID"],
-                "clientSecret": args.secrets["gcpClientSecret"],
+                "clientID": args.secrets["dex"]["gcp"]["clientID"],
+                "clientSecret": args.secrets["dex"]["gcp"]["clientSecret"],
                 "redirectURI": f"https://dex.{args.domain}/callback",
                 "serviceAccountFilePath": "/etc/dex/google/sa.json",
                 "adminEmail": "dex-admin-account@elastisys.com",
