@@ -38,6 +38,8 @@ class Args:
     cloud_provider: str
     environment_name: str
 
+    use_sync: bool
+
     @property
     def domain(self) -> str:
         return f"{self.environment_name}.{DEV_DOMAIN}"
@@ -379,6 +381,11 @@ def sync_apps(cluster: str) -> None:
     _run_ck8s("apply", cluster, "--sync", f"--concurrency={os.cpu_count() or 8}")
 
 
+def apply_apps(cluster: str) -> None:
+    """Apply apps"""
+    _run_ck8s("apply", cluster, f"--concurrency={os.cpu_count() or 8}")
+
+
 def main() -> None:
     """Entrypoint"""
     _check_ck8s_env("CONFIG_PATH", "CLOUD_PROVIDER", "ENVIRONMENT_NAME", "FLAVOR", "K8S_INSTALLER")
@@ -411,8 +418,12 @@ def main() -> None:
     _step(update_ips, doc_suffix="for WC")("wc")
     wc_ingress_ip = _step(install_ingress, doc_suffix="in WC")("wc") or ""
     _step(configure_external_dns, doc_suffix="for WC")(wc_config, ["*"], wc_ingress_ip, args)
-    _step(sync_apps, doc_suffix="in SC")("sc")
-    _step(sync_apps, doc_suffix="in WC")("wc")
+    if args.use_sync:
+        _step(sync_apps, doc_suffix="in SC")("sc")
+        _step(sync_apps, doc_suffix="in WC")("wc")
+    else:
+        _step(apply_apps, doc_suffix="in SC")("sc")
+        _step(apply_apps, doc_suffix="in WC")("wc")
 
 
 def _check_ck8s_env(*var_names: str) -> None:
@@ -435,6 +446,13 @@ def _parse_arguments(**environment: str) -> tuple[StepArgs, Args]:
         required=True,
         help="secrets configuration file.",
     )
+    parser.add_argument(
+        "--sync",
+        action=argparse.BooleanOptionalAction,
+        required=False,
+        default=False,
+        help="Use sync instead of apply for the application install steps.",
+    )
 
     StepArgs.add_parser_args(parser)
 
@@ -445,6 +463,7 @@ def _parse_arguments(**environment: str) -> tuple[StepArgs, Args]:
 
     args = Args(
         config=json.loads(Path(parsed_args.config.name).read_text(encoding="utf-8")),
+        use_sync=parsed_args.sync,
         **environment,
     )
 
