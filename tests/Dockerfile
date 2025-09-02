@@ -18,6 +18,7 @@ ARG TZ="Etc/UTC"
 
 RUN apt-get update && \
     apt-get upgrade -y && \
+    apt-get install -y python3-pip && \
     apt-get install -y apache2-utils curl dnsutils gettext-base parallel git gpg iputils-ping jq locales make net-tools nodejs pwgen s3cmd ssh unzip && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
@@ -98,7 +99,8 @@ RUN git clone --depth 1 https://github.com/bats-core/bats-support.git /usr/local
 
 ENV DOCS_PATH="/usr/local/share/docs"
 RUN git clone --depth 1 https://github.com/elastisys/welkin.git "${DOCS_PATH}" && \
-    chmod --recursive a+w "${DOCS_PATH}"
+    chmod --recursive a+w "${DOCS_PATH}" && \
+    python3 -m pip install --no-cache-dir --break-system-packages jsonref requests pyyaml
 
 ENV PATH="$PATH:/usr/local/lib/node_modules/.bin"
 COPY --from=node-deps /usr/local/lib/node_modules/welkin-test/node_modules /usr/local/lib/node_modules
