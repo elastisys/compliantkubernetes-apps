@@ -11,8 +11,6 @@ templates:
     inherit:
       - template: prometheus
       - template: kube-prometheus-stack-chart
-    labels:
-      bootstrap: prometheus
     installed: {{ .Values | get "ck8sAnyCluster.enabled" false }}
     name: kube-prometheus-stack
     needs:
@@ -106,8 +104,6 @@ templates:
   kube-state-metrics-extra-resources:
     condition: ck8sManagementCluster.enabled
     inherit: [ template: prometheus ]
-    labels:
-      bootstrap: prometheus
     installed: {{ .Values | get "ck8sManagementCluster.enabled" false }}
     chart: charts/kube-state-metrics-extra-resource-metrics
     version: 0.1.0
