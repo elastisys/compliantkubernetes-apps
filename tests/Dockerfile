@@ -18,7 +18,7 @@ ARG TZ="Etc/UTC"
 
 RUN apt-get update && \
     apt-get upgrade -y && \
-    apt-get install -y apache2-utils curl dnsutils gettext-base git gpg iputils-ping jq locales make net-tools nodejs parallel pwgen python3-pip s3cmd ssh unzip && \
+    apt-get install -y apache2-utils curl dnsutils gettext-base git gpg iputils-ping jq locales make net-tools nodejs parallel pwgen python3-venv s3cmd ssh unzip && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
     localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
@@ -97,11 +97,14 @@ RUN git clone --depth 1 https://github.com/grayhemp/bats-mock.git /usr/local/lib
 RUN git clone --depth 1 https://github.com/bats-core/bats-support.git /usr/local/lib/bats/support
 
 ENV DOCS_PATH="/usr/local/share/docs"
-RUN git clone --depth 1 https://github.com/elastisys/welkin.git "${DOCS_PATH}" && \
-    chmod --recursive a+w "${DOCS_PATH}" && \
-    python3 -m pip install --no-cache-dir --break-system-packages jsonref requests pyyaml
+RUN git clone --depth 1 --recurse-submodules --shallow-submodules https://github.com/elastisys/welkin.git "${DOCS_PATH}" && \
+    chmod -R a+w "${DOCS_PATH}" && \
+    python3 -m venv /opt/docs-venv && \
+    /opt/docs-venv/bin/python -m pip install --upgrade pip && \
+    cd "${DOCS_PATH}" && \
+    /opt/docs-venv/bin/pip install --no-cache-dir -r requirements.txt
 
-ENV PATH="$PATH:/usr/local/lib/node_modules/.bin"
+ENV PATH="/opt/docs-venv/bin:${PATH}:/usr/local/lib/node_modules/.bin"
 COPY --from=node-deps /usr/local/lib/node_modules/welkin-test/node_modules /usr/local/lib/node_modules
 
 # Container to run integration and end-to-end tests
