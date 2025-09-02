@@ -18,7 +18,10 @@ from boilerplate import STEP_ARGS, AppsConfig, StepArgs, _get_json, _run, _set_s
 
 BIN_DIR: Path = SCRIPT_DIR / ".." / ".." / "bin"
 
-ADMIN_USERS: list[str] = ["admin@example.com", "dev@example.com"]
+ADMIN_USER: str = "admin@example.com"
+APP_DEV_USER: str = "dev@example.com"
+
+ALL_USERS: list[str] = [ADMIN_USER, APP_DEV_USER]
 ADMIN_GROUP: str = "ck8sdevops@elastisys.com"
 ALL_IPS: dict[str, list[str]] = {"ips": ["0.0.0.0/0"]}
 
@@ -131,7 +134,7 @@ def configure_apps(
     )
 
     # Configure cluster admin
-    common_config.set("clusterAdmin", {"users": [], "groups": [ADMIN_GROUP]})
+    common_config.set("clusterAdmin", {"users": [ADMIN_USER], "groups": [ADMIN_GROUP]})
 
     # Configure allowed OPA registries
     common_config.set(
@@ -213,13 +216,13 @@ def configure_apps(
     for mapping in opensearch_cfg["extraRoleMappings"]:
         if mapping["mapping_name"] == "all_access":
             all_access_found = True
-        mapping["definition"]["users"] = ADMIN_USERS
+        mapping["definition"]["users"] = ALL_USERS
 
     if not all_access_found:
         opensearch_cfg["extraRoleMappings"].append(
             {
                 "mapping_name": "all_access",
-                "definition": {"users": ADMIN_USERS},
+                "definition": {"users": ALL_USERS},
             }
         )
     sc_config.set("opensearch", opensearch_cfg)
@@ -232,7 +235,7 @@ def configure_apps(
         "user",
         {
             "namespaces": ["production", "staging"],
-            "adminUsers": ADMIN_USERS,
+            "adminUsers": ALL_USERS,
             "adminGroups": [],
         },
     )
