@@ -313,11 +313,8 @@ def install_ingress(cluster: str) -> str:
     # fmt: off
     _run_ck8s(
         "ops", "helmfile", cluster,
-        "-l", "app=admin-namespaces",
-        "-l", "app=dev-namespaces",
-        "-l", "bootstrap=prometheus",
-        "-l", "bootstrap=ingress-nginx",
-        "sync",
+        "-l", "app=ingress-nginx",
+        "sync", "--include-transitive-needs"
     )
     # fmt: on
     _run_ck8s(
