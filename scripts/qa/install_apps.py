@@ -7,9 +7,9 @@ import ipaddress
 import json
 import os
 import sys
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Optional, TypedDict, cast
+from typing import Any, TypedDict, cast
 
 SCRIPT_DIR: Path = Path(__file__).parent.absolute()
 sys.path.insert(0, SCRIPT_DIR.as_posix())
@@ -33,12 +33,10 @@ DEV_HOSTED_ZONE: str = "Z1001117397DAU71G3RN2"
 class Args:
     """Holds the parsed arguments"""
 
-    secrets: "Secrets"
+    config: "Config"
 
     cloud_provider: str
     environment_name: str
-    sc_subnet: Optional[str] = None
-    wc_subnet: Optional[str] = None
 
     @property
     def domain(self) -> str:
@@ -66,14 +64,19 @@ DexSecrets = TypedDict("DexSecrets", {"gcp": GcpSecrets})
 
 ExternalDnsSecrets = TypedDict("ExternalDnsSecrets", {"aws": AwsSecrets})
 
+Subnets = TypedDict("Subnets", {"apiServer": list[str], "nodes": list[str], "ingress": list[str]})
 
-class Secrets(TypedDict):
+
+class Config(TypedDict):
     """Holds secrets"""
 
     kubeloginClientSecret: str
     dex: DexSecrets
     externalDns: ExternalDnsSecrets
     objectStorage: StorageSecrets
+
+    wcSubnets: Subnets
+    scSubnets: Subnets
 
 
 def initialize_apps() -> None:
@@ -111,7 +114,7 @@ def configure_apps(
             "route53": {
                 "region": "eu-north-1",
                 "hostedZoneID": DEV_HOSTED_ZONE,
-                "accessKeyID": args.secrets["externalDns"]["aws"]["accessKey"],
+                "accessKeyID": args.config["externalDns"]["aws"]["accessKey"],
                 "secretAccessKeySecretRef": {
                     "name": "route53-credentials-secret",
                     "key": "secretKey",
@@ -160,27 +163,29 @@ def configure_apps(
             "kured": {"notificationSlack": ALL_IPS},
             "falco": {"plugins": ALL_IPS},
             "alertmanager": {"alertReceivers": ALL_IPS},
-            "global": {"trivy": ALL_IPS, "wcIngress": ALL_IPS, "scIngress": ALL_IPS},
+            "global": {
+                "trivy": ALL_IPS,
+                "wcIngress": args.config["wcSubnets"]["ingress"],
+                "scIngress": args.config["scSubnets"]["ingress"],
+            },
         },
     )
 
-    if args.sc_subnet is not None:
-        sc_config.set(
-            "networkPolicies.global",
-            {
-                "scApiserver": {"ips": [args.sc_subnet]},
-                "scNodes": {"ips": [args.sc_subnet]},
-            },
-        )
+    sc_config.set(
+        "networkPolicies.global",
+        {
+            "scApiserver": {"ips": args.config["scSubnets"]["apiServer"]},
+            "scNodes": {"ips": args.config["scSubnets"]["nodes"]},
+        },
+    )
 
-    if args.wc_subnet is not None:
-        wc_config.set(
-            "networkPolicies.global",
-            {
-                "wcApiserver": {"ips": [args.wc_subnet]},
-                "wcNodes": {"ips": [args.wc_subnet]},
-            },
-        )
+    wc_config.set(
+        "networkPolicies.global",
+        {
+            "wcApiserver": {"ips": args.config["wcSubnets"]["apiServer"]},
+            "wcNodes": {"ips": args.config["wcSubnets"]["nodes"]},
+        },
+    )
 
     sc_config.set(
         "networkPolicies",
@@ -246,7 +251,7 @@ def configure_secrets(secrets_path: Path, args: Args) -> None:
     _set_secret_key(
         secrets_path,
         '["dex"]["kubeloginClientSecret"]',
-        args.secrets["kubeloginClientSecret"],
+        args.config["kubeloginClientSecret"],
     )
 
     _set_secret_key(
@@ -255,7 +260,7 @@ def configure_secrets(secrets_path: Path, args: Args) -> None:
         {
             "secrets": {
                 "route53-credentials-secret": {
-                    "secretKey": args.secrets["externalDns"]["aws"]["secretKey"]
+                    "secretKey": args.config["externalDns"]["aws"]["secretKey"]
                 }
             }
         },
@@ -265,8 +270,8 @@ def configure_secrets(secrets_path: Path, args: Args) -> None:
         '["externalDns"]',
         {
             "awsRoute53": {
-                "accessKey": args.secrets["externalDns"]["aws"]["accessKey"],
-                "secretKey": args.secrets["externalDns"]["aws"]["secretKey"],
+                "accessKey": args.config["externalDns"]["aws"]["accessKey"],
+                "secretKey": args.config["externalDns"]["aws"]["secretKey"],
             }
         },
     )
@@ -278,8 +283,8 @@ def configure_secrets(secrets_path: Path, args: Args) -> None:
             "id": "elastisys-google",
             "type": "google",
             "config": {
-                "clientID": args.secrets["dex"]["gcp"]["clientID"],
-                "clientSecret": args.secrets["dex"]["gcp"]["clientSecret"],
+                "clientID": args.config["dex"]["gcp"]["clientID"],
+                "clientSecret": args.config["dex"]["gcp"]["clientSecret"],
                 "redirectURI": f"https://dex.{args.domain}/callback",
                 "serviceAccountFilePath": "/etc/dex/google/sa.json",
                 "adminEmail": "dex-admin-account@elastisys.com",
@@ -394,7 +399,7 @@ def main() -> None:
     secrets_path = config_path / "secrets.yaml"
 
     _step(initialize_apps)()
-    _step(set_objectstorage_secrets)(secrets_path, args.secrets["objectStorage"])
+    _step(set_objectstorage_secrets)(secrets_path, args.config["objectStorage"])
     _step(configure_apps)(common_config, sc_config, wc_config, args)
     _step(configure_secrets)(secrets_path, args)
     _step(update_ips, doc_suffix="for SC")("sc")
@@ -433,19 +438,6 @@ def _parse_arguments(**environment: str) -> tuple[StepArgs, Args]:
         required=True,
         help="secrets configuration file.",
     )
-    if environment["cloud_provider"] == "elastx":
-        parser.add_argument(
-            "--sc-subnet",
-            type=_validate_subnet,
-            required=False,
-            help="subnet for SC nodes.",
-        )
-        parser.add_argument(
-            "--wc-subnet",
-            type=_validate_subnet,
-            required=False,
-            help="subnet for WC nodes.",
-        )
 
     StepArgs.add_parser_args(parser)
 
@@ -455,11 +447,9 @@ def _parse_arguments(**environment: str) -> tuple[StepArgs, Args]:
     parsed_args.config.close()
 
     args = Args(
-        secrets=json.loads(Path(parsed_args.config.name).read_text(encoding="utf-8")),
+        config=json.loads(Path(parsed_args.config.name).read_text(encoding="utf-8")),
         **environment,
     )
-    if environment["cloud_provider"] == "elastx":
-        args = replace(args, sc_subnet=parsed_args.sc_subnet, wc_subnet=parsed_args.wc_subnet)
 
     return StepArgs.from_parsed_args(parsed_args), args
 
