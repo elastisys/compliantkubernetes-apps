@@ -18,8 +18,7 @@ ARG TZ="Etc/UTC"
 
 RUN apt-get update && \
     apt-get upgrade -y && \
-    apt-get install -y python3-pip && \
-    apt-get install -y apache2-utils curl dnsutils gettext-base parallel git gpg iputils-ping jq locales make net-tools nodejs pwgen s3cmd ssh unzip && \
+    apt-get install -y apache2-utils curl dnsutils gettext-base git gpg iputils-ping jq locales make net-tools nodejs parallel pwgen python3-pip s3cmd ssh unzip && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
     localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
