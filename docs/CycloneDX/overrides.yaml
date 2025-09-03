@@ -11,22 +11,22 @@ helmfile.d/upstream/prometheus-community/kube-prometheus-stack/charts/crds:
   licenses:
     - license:
         id: "Apache-2.0"
-  evaluation: "CRDs inherit license from Prometheus Community project"
+  evaluation: "Not evaluated"
 
 helmfile.d/upstream/kyverno/kyverno/charts/crds:
   licenses:
     - license:
         id: "Apache-2.0"
-  evaluation: "CRDs inherit license from Kyverno project"
+  evaluation: "Not evaluated"
 
 helmfile.d/upstream/kyverno/kyverno/charts/grafana:
   licenses:
     - license:
         id: "Apache-2.0"
-  evaluation: "Sub-chart inherits license from Kyverno project"
+  evaluation: "Not evaluated"
 
 helmfile.d/upstream/opensearch-project/opensearch-dashboards:
   licenses:
     - license:
         id: "Apache-2.0"
-  evaluation: "OpenSearch project uses Apache-2.0 license"
+  evaluation: "Not evaluated"
