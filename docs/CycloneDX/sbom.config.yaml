@@ -18,10 +18,7 @@ default_evaluation: "Not evaluated"
 
 # Overrides directory (relative to repo root)
 overrides_path: "docs/CycloneDX"
-
-# Image filtering configuration
-ignored_image_refs:
-  - "your-image"
-  - "your-image:latest"
-  - "example-image"
-  - "placeholder"
+# Exclude images from the SBOM. Patterns: name, name:tag, registry/name, registry/name:tag
+# ignored_image_refs:
+#   - "your-image"
+#   - "your-image:latest"
