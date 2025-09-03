@@ -116,24 +116,27 @@ If any fixes are necessary, add a manual changelog entry and push them to the st
 
 Produce and commit a CycloneDX SBOM for the release candidate.
 
-@docs/CycloneDX folder has more configuration options and parameters
+See configuration and overrides in `docs/CycloneDX` (e.g., `sbom.config.yaml`, `overrides.yaml`).
 
+Generation runs in a container via `scripts/run-from-container.sh` using the `ghcr.io/elastisys/sbom-generator` image.
 Refer to the [sbom-generator documentation](https://github.com/elastisys/sbom-generator) for more details.
 
 Prerequisites:
 
-- sbom-generator available in PATH.
-- CK8S_GITHUB_TOKEN set with access to query GitHub. (only required if you get rate limited by GitHub)
+- Docker or Podman installed.
+- Optional: set `CK8S_GITHUB_TOKEN` to avoid GitHub API rate limiting (forwarded to the container if set). This should not be required by default behaviour.
 
-Use the script:
+Use the script (version is optional; defaults to `latest`):
 
 ```bash
-release/generate-sbom.sh X.Y.Z
+scripts/sbom/generate.sh X.Y.Z
 # Then commit and push the SBOM artifact
 git add docs/CycloneDX/sbom.cdx.json
 git commit -m "docs: update SBOM for vX.Y.Z"
 git push
 ```
+
+Tip: to verify drift without updating files, run `scripts/sbom/diff.sh`.
 
 ## Code freeze
 
