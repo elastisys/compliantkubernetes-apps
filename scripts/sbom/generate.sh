@@ -55,7 +55,7 @@ extra_env=()
 if [[ -n "${CK8S_GITHUB_TOKEN:-}" ]]; then
   extra_env+=(--env CK8S_GITHUB_TOKEN)
 fi
-"${WRAPPER}" --env XDG_CACHE_HOME="${XDG_CACHE_HOME}" ${extra_env[@]:-} \
+"${WRAPPER}" --env XDG_CACHE_HOME="${XDG_CACHE_HOME}" "${extra_env[@]:-}" \
   "${CONTAINER_IMAGE}" generate \
   --config "${CONFIG}" \
   --output-path "${SBOM_OUTPUT}" \
@@ -63,7 +63,7 @@ fi
   --force
 
 echo "Validating SBOM ${SBOM_OUTPUT} ..."
-"${WRAPPER}" --env XDG_CACHE_HOME="${XDG_CACHE_HOME}" ${extra_env[@]:-} \
+"${WRAPPER}" --env XDG_CACHE_HOME="${XDG_CACHE_HOME}" "${extra_env[@]:-}" \
   "${CONTAINER_IMAGE}" validate "${SBOM_OUTPUT}" --config "${CONFIG}"
 
 # Ensure file ends with a single newline to satisfy linters

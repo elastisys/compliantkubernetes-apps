@@ -33,7 +33,7 @@ if [[ -n "${CK8S_GITHUB_TOKEN:-}" ]]; then
   extra_env+=(--env CK8S_GITHUB_TOKEN)
 fi
 set +e
-"${WRAPPER}" --env XDG_CACHE_HOME="${XDG_CACHE_HOME}" --env TMPDIR="${TMPDIR}" ${extra_env[@]:-} \
+"${WRAPPER}" --env XDG_CACHE_HOME="${XDG_CACHE_HOME}" --env TMPDIR="${TMPDIR}" "${extra_env[@]:-}" \
   --env TERM="${TERM:-xterm-256color}" \
   "${IMAGE}" diff \
   --config "${CONFIG}" \
