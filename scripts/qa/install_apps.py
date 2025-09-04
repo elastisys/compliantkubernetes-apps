@@ -157,6 +157,9 @@ def configure_apps(
         ],
     )
 
+    # Use BPF Driver for Falco
+    common_config.set("falco.driver", {"kind": "modern-bpf"})
+
     # Disable Felix metrics
     common_config.set("networkPlugin.calico.calicoFelixMetrics", {"enabled": False})
 
