@@ -185,7 +185,7 @@ def _run(*command: str, **kwargs: Any) -> None:
 
 @_effect
 def _get_json(*command: str, **kwargs: Any) -> list | dict:
-    return json.loads(subprocess.check_output(command, **kwargs).decode().strip())
+    return json.loads(str(subprocess.check_output(command, text=True, **kwargs)).strip())
 
 
 def _set_secret_key(secret_path: Path, key: str, value: Jsonable) -> None:
