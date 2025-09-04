@@ -25,14 +25,12 @@
       "applicationCredentialSecret": "set-me"
     }
   },
-  "wcSubnets": {
-    "apiServer": ["0.0.0.0/0"],
-    "nodes": ["0.0.0.0/0"],
-    "ingress": ["0.0.0.0/0"]
-  },
   "scSubnets": {
-    "apiServer": ["0.0.0.0/0"],
-    "nodes": ["0.0.0.0/0"],
-    "ingress": ["0.0.0.0/0"]
+    "apiServer": ["set-me"],
+    "nodes": ["set-me"]
+  },
+  "wcSubnets": {
+    "apiServer": ["set-me"],
+    "nodes": ["set-me"]
   }
 }
