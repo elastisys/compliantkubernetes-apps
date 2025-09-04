@@ -64,7 +64,14 @@ ExternalDnsConfig = TypedDict(
     "ExternalDnsConfig", {"domain": str, "hostedZone": str, "aws": AwsSecrets}
 )
 
-Subnets = TypedDict("Subnets", {"apiServer": list[str], "nodes": list[str], "ingress": list[str]})
+Subnets = TypedDict(
+    "Subnets",
+    {
+        "apiServer": Optional[list[str]],
+        "nodes": Optional[list[str]],
+        "ingress": Optional[list[str]],
+    },
+)
 
 
 class Config(TypedDict):
@@ -164,29 +171,12 @@ def configure_apps(
             "kured": {"notificationSlack": ALL_IPS},
             "falco": {"plugins": ALL_IPS},
             "alertmanager": {"alertReceivers": ALL_IPS},
-            "global": {
-                "trivy": ALL_IPS,
-                "wcIngress": args.config["wcSubnets"]["ingress"],
-                "scIngress": args.config["scSubnets"]["ingress"],
-            },
+            "global": {"trivy": ALL_IPS, "wcIngress": ALL_IPS, "scIngress": ALL_IPS},
         },
     )
 
-    sc_config.set(
-        "networkPolicies.global",
-        {
-            "scApiserver": {"ips": args.config["scSubnets"]["apiServer"]},
-            "scNodes": {"ips": args.config["scSubnets"]["nodes"]},
-        },
-    )
-
-    wc_config.set(
-        "networkPolicies.global",
-        {
-            "wcApiserver": {"ips": args.config["wcSubnets"]["apiServer"]},
-            "wcNodes": {"ips": args.config["wcSubnets"]["nodes"]},
-        },
-    )
+    sc_config.set("networkPolicies.global", {"scApiserver": ALL_IPS, "scNodes": ALL_IPS})
+    wc_config.set("networkPolicies.global", {"wcApiserver": ALL_IPS, "wcNodes": ALL_IPS})
 
     sc_config.set(
         "networkPolicies",
@@ -375,6 +365,39 @@ def install_dex() -> None:
     )
 
 
+def reconfigure_ips(
+    common_config: AppsConfig, sc_config: AppsConfig, wc_config: AppsConfig, args: Args
+) -> None:
+    """Reconfigure IPs"""
+    if (wc_ingress_subnet := args.config["wcSubnets"].get("ingress")) is not None:
+        common_config.set(
+            "networkPolicies",
+            {"global": {"wcIngress": {"ips": wc_ingress_subnet}}},
+        )
+
+    if (sc_ingress_subnet := args.config["scSubnets"].get("ingress")) is not None:
+        common_config.set(
+            "networkPolicies",
+            {"global": {"wcIngress": {"ips": sc_ingress_subnet}}},
+        )
+
+    sc_config.set(
+        "networkPolicies.global",
+        {
+            "scApiserver": {"ips": args.config["scSubnets"].get("apiServer", ["set-me"])},
+            "scNodes": {"ips": args.config["scSubnets"].get("nodes", ["set-me"])},
+        },
+    )
+
+    wc_config.set(
+        "networkPolicies.global",
+        {
+            "wcApiserver": {"ips": args.config["wcSubnets"].get("apiServer", ["set-me"])},
+            "wcNodes": {"ips": args.config["wcSubnets"].get("nodes", ["set-me"])},
+        },
+    )
+
+
 def sync_apps(cluster: str) -> None:
     """Sync apps"""
     _run_ck8s("apply", cluster, "--sync", f"--concurrency={os.cpu_count() or 8}")
@@ -405,7 +428,7 @@ def main() -> None:
     _step(set_objectstorage_secrets)(secrets_path, args.config["objectStorage"])
     _step(configure_apps)(common_config, sc_config, wc_config, args)
     _step(configure_secrets)(secrets_path, args)
-    _step(update_ips, doc_suffix="for SC")("sc")
+    _step(update_ips, doc_suffix="for both clusters")("both")
     sc_ingress_ip = _step(install_ingress, doc_suffix="in SC")("sc") or ""
     _step(configure_external_dns, doc_suffix="for SC")(
         sc_config,
@@ -414,9 +437,10 @@ def main() -> None:
         args,
     )
     _step(install_dex)()
-    _step(update_ips, doc_suffix="for WC")("wc")
     wc_ingress_ip = _step(install_ingress, doc_suffix="in WC")("wc") or ""
     _step(configure_external_dns, doc_suffix="for WC")(wc_config, ["*"], wc_ingress_ip, args)
+    _step(reconfigure_ips)(common_config, sc_config, wc_config, args)
+    _step(update_ips, doc_suffix="for both clusters")("both")
     if args.use_sync:
         _step(sync_apps, doc_suffix="in SC")("sc")
         _step(sync_apps, doc_suffix="in WC")("wc")
