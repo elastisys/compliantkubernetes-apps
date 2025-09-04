@@ -1,5 +1,6 @@
 {
   "kubeloginClientSecret": "set-me",
+  "adminGroup": "set-me",
   "dex": {
     "gcp": {
       "clientID": "set-me",
@@ -7,6 +8,8 @@
     }
   },
   "externalDns": {
+    "domain": "set-me",
+    "hostedZone": "set-me",
     "aws": {
       "accessKey": "set-me",
       "secretKey": "set-me"
