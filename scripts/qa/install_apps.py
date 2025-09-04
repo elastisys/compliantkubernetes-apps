@@ -9,7 +9,7 @@ import os
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, TypedDict, cast
+from typing import Any, Optional, TypedDict, cast
 
 SCRIPT_DIR: Path = Path(__file__).parent.absolute()
 sys.path.insert(0, SCRIPT_DIR.as_posix())
@@ -22,11 +22,7 @@ ADMIN_USER: str = "admin@example.com"
 APP_DEV_USER: str = "dev@example.com"
 
 ALL_USERS: list[str] = [ADMIN_USER, APP_DEV_USER]
-ADMIN_GROUP: str = "ck8sdevops@elastisys.com"
 ALL_IPS: dict[str, list[str]] = {"ips": ["0.0.0.0/0"]}
-
-DEV_DOMAIN: str = "dev-ck8s.com"
-DEV_HOSTED_ZONE: str = "Z1001117397DAU71G3RN2"
 
 
 @dataclass(frozen=True)
@@ -42,7 +38,7 @@ class Args:
 
     @property
     def domain(self) -> str:
-        return f"{self.environment_name}.{DEV_DOMAIN}"
+        return f"{self.environment_name}.{self.config['externalDns']['domain']}"
 
 
 AwsSecrets = TypedDict(
@@ -64,7 +60,9 @@ GcpSecrets = TypedDict("GcpSecrets", {"clientID": str, "clientSecret": str})
 
 DexSecrets = TypedDict("DexSecrets", {"gcp": GcpSecrets})
 
-ExternalDnsSecrets = TypedDict("ExternalDnsSecrets", {"aws": AwsSecrets})
+ExternalDnsConfig = TypedDict(
+    "ExternalDnsConfig", {"domain": str, "hostedZone": str, "aws": AwsSecrets}
+)
 
 Subnets = TypedDict("Subnets", {"apiServer": list[str], "nodes": list[str], "ingress": list[str]})
 
@@ -73,8 +71,9 @@ class Config(TypedDict):
     """Holds secrets"""
 
     kubeloginClientSecret: str
+    adminGroup: str
     dex: DexSecrets
-    externalDns: ExternalDnsSecrets
+    externalDns: ExternalDnsConfig
     objectStorage: StorageSecrets
 
     wcSubnets: Subnets
@@ -111,11 +110,11 @@ def configure_apps(
 
     # Configure cluster issuers
     dns_solver = {
-        "selector": {"dnsZones": [DEV_DOMAIN]},
+        "selector": {"dnsZones": [args.config["externalDns"]["domain"]]},
         "dns01": {
             "route53": {
                 "region": "eu-north-1",
-                "hostedZoneID": DEV_HOSTED_ZONE,
+                "hostedZoneID": args.config["externalDns"]["hostedZone"],
                 "accessKeyID": args.config["externalDns"]["aws"]["accessKey"],
                 "secretAccessKeySecretRef": {
                     "name": "route53-credentials-secret",
@@ -139,7 +138,7 @@ def configure_apps(
     )
 
     # Configure cluster admin
-    common_config.set("clusterAdmin", {"users": [ADMIN_USER], "groups": [ADMIN_GROUP]})
+    common_config.set("clusterAdmin", {"users": [], "groups": [args.config["adminGroup"]]})
 
     # Configure allowed OPA registries
     common_config.set(
@@ -195,7 +194,7 @@ def configure_apps(
     )
 
     # Configure Harbor in SC
-    sc_config.set("harbor.oidc", {"adminGroupName": ADMIN_GROUP})
+    sc_config.set("harbor.oidc", {"adminGroupName": args.config["adminGroup"]})
     # sc_config.set("harbor.trivy.persistentVolumeClaim", {"size": "10Gi"})
 
     # Configure Dex in SC
@@ -290,7 +289,7 @@ def configure_secrets(secrets_path: Path, args: Args) -> None:
                 "redirectURI": f"https://dex.{args.domain}/callback",
                 "serviceAccountFilePath": "/etc/dex/google/sa.json",
                 "adminEmail": "dex-admin-account@elastisys.com",
-                "groups": [ADMIN_GROUP],
+                "groups": [args.config["adminGroup"]],
                 "hostedDomains": ["elastisys.com"],
             },
         },
@@ -340,7 +339,7 @@ def configure_external_dns(
         "enabled": True,
         "txtOwnerId": args.environment_name,
         "txtPrefix": args.environment_name,
-        "domains": [DEV_DOMAIN],
+        "domains": [args.config["externalDns"]["domain"]],
         "sources": {"crd": True, "ingress": False, "service": False},
         "endpoints": [{**record_common, "dnsName": dns_name} for dns_name in dns_names],
     }
