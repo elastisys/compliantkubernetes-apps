@@ -80,12 +80,12 @@ persistence:
     type: s3
     s3:
       bucket: {{ .Values.objectStorage.buckets.harbor }}
-      region: {{ .Values.objectStorage.s3.region }}
-      regionendpoint: {{ .Values.objectStorage.s3.regionEndpoint }}
-      secure: {{ .Values.objectStorage.s3.regionEndpoint | hasPrefix "https://" }}
-      secretkey: {{ .Values.objectStorage.s3.secretKey }}
-      accesskey: {{ .Values.objectStorage.s3.accessKey }}
-      forcepathstyle: {{ .Values.objectStorage.s3.forcePathStyle }}
+      region: {{ include "componentObjectStorage" (list "harbor" "region" .) }}
+      regionendpoint: {{ include "componentObjectStorage" (list "harbor" "regionEndpoint" .) }}
+      secure: {{ include "componentObjectStorage" (list "harbor" "regionEndpoint" .) | hasPrefix "https://" }}
+      accesskey: {{ include "componentObjectStorage" (list "harbor" "accessKey" .) }}
+      secretkey: {{ include "componentObjectStorage" (list "harbor" "secretKey" .) }}
+      forcepathstyle: {{ include "componentObjectStorage" (list "harbor" "forcePathStyle" .) }}
       multipartcopythresholdsize: {{ int64 .Values.harbor.s3.multipartcopythresholdsize | quote }}
       multipartcopychunksize: {{ int64 .Values.harbor.s3.multipartcopychunksize | quote }}
       multipartcopymaxconcurrency: {{ int64 .Values.harbor.s3.multipartcopymaxconcurrency | quote }}

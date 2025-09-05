@@ -20,12 +20,15 @@ targets:
     {{- $destinationType := $main.type }}
     {{- $sourceType := $sync.destinationType }}
 
-    {{- if eq $key "harbor" }}
-    {{- $destinationType = $.Values.harbor.persistence.type | replace "objectStorage" "" | default $destinationType }}
-    {{- $sourceType = $.Values.harbor.persistence.type | replace "objectStorage" "" | default $sourceType }}
+    {{- $componentConfig := $.Values | dig $key "objectStorage" "s3" dict }}
+    {{- if $componentConfig }}
+      {{- $destinationType = printf "%s-s3" $key }}
+    {{- else if eq $key "harbor" }}
+      {{- $destinationType = $.Values.harbor.persistence.type | replace "objectStorage" "" | default $destinationType }}
+      {{- $sourceType = $.Values.harbor.persistence.type | replace "objectStorage" "" | default $sourceType }}
     {{- else if eq $key "thanos" }}
-    {{- $destinationType = $.Values.thanos.objectStorage.type | default $destinationType }}
-    {{- $sourceType = $.Values.thanos.objectStorage.type | default $sourceType }}
+      {{- $destinationType = $.Values.thanos.objectStorage.type | default $destinationType }}
+      {{- $sourceType = $.Values.thanos.objectStorage.type | default $sourceType }}
     {{- end }}
 
     {{- $destinations = append $destinations $destinationType }}
@@ -40,32 +43,32 @@ targets:
   {{- end }}
   {{- end }}
 
-  {{- range $sync.buckets }}
-  - destinationName: {{ .source }}
-    {{- $destinations = . | get "sourceType" $main.type | append $destinations }}
-    destinationType: {{ . | get "sourceType" $main.type }}
-    destinationPath: {{ . | get "sourcePath" "" }}
-    sourceName: {{ . | get "destination" .source }}
+  {{- range $bucket := $sync.buckets }}
+  - destinationName: {{ $bucket.source }}
+    {{- $destinations = $bucket | get "sourceType" $main.type | append $destinations }}
+    destinationType: {{ $bucket | get "sourceType" $main.type }}
+    destinationPath: {{ $bucket | get "sourcePath" "" }}
+    sourceName: {{ $bucket | get "destination" $bucket.source }}
     sourceCrypt: {{ $crypt | get "enabled" false }}
-    {{- $sources = . | get "destinationType" $sync.destinationType | append $sources }}
-    sourceType: {{ . | get "destinationType" $sync.destinationType }}
-    sourcePath: {{ . | get "destinationPath" "" }}
-    nameSuffix: {{ . | get "nameSuffix" "custom" }}
+    {{- $sources = $bucket | get "destinationType" $sync.destinationType | append $sources }}
+    sourceType: {{ $bucket | get "destinationType" $sync.destinationType }}
+    sourcePath: {{ $bucket | get "destinationPath" "" }}
+    nameSuffix: {{ $bucket | get "nameSuffix" "custom" }}
   {{- end }}
 
   {{- end }}
 
-  {{- range $restore.targets }}
-  - destinationName: {{ .destinationName }}
-    {{- $destinations = . | get "destinationType" $main.type | append $destinations }}
-    destinationType: {{ . | get "destinationType" $main.type }}
-    destinationPath: {{ . | get "destinationPath" "" }}
-    sourceName: {{ . | get "sourceName" .destinationName }}
+  {{- range $bucket := $restore.targets }}
+  - destinationName: {{ $bucket.destinationName }}
+    {{- $destinations = $bucket | get "destinationType" $main.type | append $destinations }}
+    destinationType: {{ $bucket | get "destinationType" $main.type }}
+    destinationPath: {{ $bucket | get "destinationPath" "" }}
+    sourceName: {{ $bucket | get "sourceName" $bucket.destinationName }}
     sourceCrypt: {{ $crypt | get "enabled" false }}
-    {{- $sources = . | get "sourceType" $sync.destinationType | append $sources }}
-    sourceType: {{ . | get "sourceType" $sync.destinationType }}
-    sourcePath: {{ . | get "sourcePath" "" }}
-    nameSuffix: {{ . | get "nameSuffix" "custom" }}
+    {{- $sources = $bucket | get "sourceType" $sync.destinationType | append $sources }}
+    sourceType: {{ $bucket | get "sourceType" $sync.destinationType }}
+    sourcePath: {{ $bucket | get "sourcePath" "" }}
+    nameSuffix: {{ $bucket | get "nameSuffix" "custom" }}
   {{- end }}
 
 providers:
@@ -76,7 +79,22 @@ providers:
   {{- $providers := merge dict $restore.destinations $main }}
 
   {{- range $destinations | uniq | sortAlpha }}
+    {{- if hasSuffix "-s3" . }}
+      {{- $component := . | replace "-s3" "" }}
+      {{- $componentConfig := $.Values | dig $component "objectStorage" "s3" dict }}
+      {{- if $componentConfig }}
+        {{- $providerConfig := dict "type" "s3" "s3" $componentConfig }}
+  {{ printf "destination-%s" . }}: {{- include "provider" $providerConfig | nindent 4 }}
+      {{- else }}
+        {{- $providerConfig := dict "type" "s3" "s3" $main.s3 }}
+  {{ printf "destination-%s" . }}: {{- include "provider" $providerConfig | nindent 4 }}
+      {{- end }}
+    {{- else if ne . "s3" }}
   {{ printf "destination-%s" . }}: {{- set $providers "type" . | include "provider" | nindent 4 }}
+    {{- else }}
+      {{- $providerConfig := dict "type" "s3" "s3" $main.s3 }}
+  destination-s3: {{- include "provider" $providerConfig | nindent 4 }}
+    {{- end }}
   {{- end }}
 
   {{- if not $sources }}

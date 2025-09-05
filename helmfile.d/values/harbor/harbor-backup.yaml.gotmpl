@@ -11,10 +11,10 @@ schedule: {{ .Values.harbor.backup.schedule | quote }}
 {{ if eq .Values.objectStorage.type "s3" -}}
 s3:
   enabled: true
-  accessKey: {{ .Values.objectStorage.s3.accessKey }}
-  secretKey: {{ .Values.objectStorage.s3.secretKey }}
+  accessKey: {{ include "componentObjectStorage" (list "harbor" "accessKey" .) }}
+  secretKey: {{ include "componentObjectStorage" (list "harbor" "secretKey" .) }}
   bucket: {{ .Values.objectStorage.buckets.harbor }}
-  endpoint: {{ .Values.objectStorage.s3.regionEndpoint }}
+  endpoint: {{ include "componentObjectStorage" (list "harbor" "regionEndpoint" .) }}
 {{ else if eq .Values.objectStorage.type "gcs" -}}
 # TODO
 # Fix harbor backup chart to support gcs
