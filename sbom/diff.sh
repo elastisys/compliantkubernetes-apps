@@ -7,12 +7,12 @@ set -euo pipefail
 # it against the existing SBOM at --output-path. Exits non-zero on
 # meaningful differences.
 
-REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd -P)"
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 
-WRAPPER="scripts/run-from-container.sh"
+WRAPPER="${REPO_ROOT}/scripts/run-from-container.sh"
 IMAGE="ghcr.io/elastisys/sbom-generator:latest"
-CONFIG="docs/CycloneDX/sbom.config.yaml"
-COMMITTED_SBOM="docs/CycloneDX/sbom.cdx.json"
+CONFIG="${REPO_ROOT}/sbom/sbom.config.yaml"
+COMMITTED_SBOM="${REPO_ROOT}/sbom/sbom.cdx.json"
 
 if [[ ! -x "${WRAPPER}" ]]; then
   echo "Missing or non-executable ${WRAPPER}." >&2
@@ -45,7 +45,7 @@ if [[ ${status} -eq 0 ]]; then
   echo "[sbom] OK: SBOM is up to date."
 else
   echo "[sbom] Drift detected: SBOM has meaningful changes." >&2
-  echo "[sbom] Hint: run 'scripts/sbom/generate.sh' to update SBOM." >&2
-  echo "[sbom] If charts were updated, review and update evaluations in docs/CycloneDX/overrides.yaml." >&2
+  echo "[sbom] Hint: run 'sbom/generate.sh' to update SBOM." >&2
+  echo "[sbom] If charts were updated, review and update evaluations in sbom/overrides.yaml." >&2
 fi
 exit ${status}

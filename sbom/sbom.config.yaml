@@ -2,7 +2,7 @@
 
 # Repository root
 repository_path: "."
-output_path: "./sbom.json"
+output_path: "./sbom/sbom.cdx.json"
 
 # Metadata
 supplier: "Elastisys"
@@ -17,7 +17,7 @@ evaluation_name: "Elastisys evaluation"
 default_evaluation: "Not evaluated"
 
 # Overrides directory (relative to repo root)
-overrides_path: "docs/CycloneDX"
+overrides_path: "sbom"
 # Exclude images from the SBOM. Patterns: name, name:tag, registry/name, registry/name:tag
 # ignored_image_refs:
 #   - "your-image"

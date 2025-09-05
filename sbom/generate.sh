@@ -3,22 +3,38 @@
 set -euo pipefail
 
 function usage() {
-  echo "Usage: ${0} [VERSION]" >&2
-  echo "Example: ${0} 1.2.3" >&2
+  echo "Usage: ${0} [FLAGS] [VERSION]" >&2
+  echo "Example: ${0} --require-evaluation 1.2.3" >&2
   echo "If omitted, VERSION defaults to 'latest'" >&2
   exit 1
 }
 
-# Accept zero or one argument. Default to 'latest'.
-if [[ ${#} -gt 1 ]]; then
-  usage
-fi
+full_version_raw=""
+forward_args=()
 
-if [[ ${#} -eq 1 ]]; then
-  full_version_raw="${1}"
-else
-  full_version_raw="latest"
-fi
+# Parse flags to forward to the image and optional VERSION
+while [[ ${#} -gt 0 ]]; do
+  case "${1}" in
+  -h | --help)
+    usage
+    ;;
+  -*)
+    forward_args+=("${1}")
+    shift
+    ;;
+  *)
+    if [[ -n "${full_version_raw}" ]]; then
+      echo "Too many positional arguments." >&2
+      usage
+    fi
+    full_version_raw="${1}"
+    shift
+    ;;
+  esac
+done
+
+# Default to 'latest' if VERSION not provided
+full_version_raw="${full_version_raw:-latest}"
 
 # Accept X.Y.Z (preferred) or vX.Y.Z (tolerated), or 'latest'
 full_version="${full_version_raw#v}"
@@ -30,12 +46,15 @@ else
   version_arg="v${full_version}"
 fi
 
-# Paths relative to repository root
-SBOM_OUTPUT="docs/CycloneDX/sbom.cdx.json"
-CONFIG="docs/CycloneDX/sbom.config.yaml"
+# Resolve repository root relative to this script
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+
+# Paths relative to repository root (use absolute for reliability)
+SBOM_OUTPUT="${REPO_ROOT}/sbom/sbom.cdx.json"
+CONFIG="${REPO_ROOT}/sbom/sbom.config.yaml"
 
 # Use container wrapper for consistent docker/podman behavior
-WRAPPER="scripts/run-from-container.sh"
+WRAPPER="${REPO_ROOT}/scripts/run-from-container.sh"
 CONTAINER_IMAGE="ghcr.io/elastisys/sbom-generator:latest"
 
 if [[ ! -x "${WRAPPER}" ]]; then
@@ -43,7 +62,6 @@ if [[ ! -x "${WRAPPER}" ]]; then
   exit 1
 fi
 # Ensure a writable cache directory inside the repo
-REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd -P)"
 XDG_CACHE_HOME="${REPO_ROOT}/.cache"
 mkdir -p "${XDG_CACHE_HOME}"
 # Ensure output directory exists
@@ -56,7 +74,7 @@ if [[ -n "${CK8S_GITHUB_TOKEN:-}" ]]; then
   extra_env+=(--env CK8S_GITHUB_TOKEN)
 fi
 "${WRAPPER}" --env XDG_CACHE_HOME="${XDG_CACHE_HOME}" "${extra_env[@]}" \
-  "${CONTAINER_IMAGE}" generate \
+  "${CONTAINER_IMAGE}" "${forward_args[@]}" generate \
   --config "${CONFIG}" \
   --output-path "${SBOM_OUTPUT}" \
   --version "${version_arg}" \
@@ -64,7 +82,7 @@ fi
 
 echo "Validating SBOM ${SBOM_OUTPUT} ..."
 "${WRAPPER}" --env XDG_CACHE_HOME="${XDG_CACHE_HOME}" "${extra_env[@]}" \
-  "${CONTAINER_IMAGE}" validate "${SBOM_OUTPUT}" --config "${CONFIG}"
+  "${CONTAINER_IMAGE}" "${forward_args[@]}" validate "${SBOM_OUTPUT}" --config "${CONFIG}"
 
 # Ensure file ends with a single newline to satisfy linters
 if [[ -s "${SBOM_OUTPUT}" ]]; then

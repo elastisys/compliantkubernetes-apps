@@ -131,7 +131,7 @@ repos:
         name: check SBOM drift
         language: system
         entry: bash
-        args: [scripts/sbom/diff.sh]
+        args: [sbom/diff.sh]
         pass_filenames: false
         always_run: true
         require_serial: true
