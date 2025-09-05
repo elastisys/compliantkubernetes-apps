@@ -124,3 +124,14 @@ repos:
           - prettier@3.6.2
         files: ^tests/.*\.js$
         args: [--write]
+
+  - repo: local
+    hooks:
+      - id: sbom-diff
+        name: check SBOM drift
+        language: system
+        entry: bash
+        args: [sbom/diff.sh]
+        pass_filenames: false
+        always_run: true
+        require_serial: true

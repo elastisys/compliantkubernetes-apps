@@ -1,0 +1,24 @@
+# SBOM Generator Configuration for compliantkubernetes-apps (CycloneDX)
+
+# Repository root
+repository_path: "."
+output_path: "./sbom/sbom.cdx.json"
+
+# Metadata
+supplier: "Elastisys"
+project_name: "compliantkubernetes-apps"
+
+# Behavior
+log_level: "info"
+skip_validation: false
+
+# Evaluation
+evaluation_name: "Elastisys evaluation"
+default_evaluation: "Not evaluated"
+
+# Overrides directory (relative to repo root)
+overrides_path: "sbom"
+# Exclude images from the SBOM. Patterns: name, name:tag, registry/name, registry/name:tag
+# ignored_image_refs:
+#   - "your-image"
+#   - "your-image:latest"
