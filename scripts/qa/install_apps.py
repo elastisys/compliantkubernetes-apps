@@ -3,7 +3,6 @@
 Configure and install Apps for QA.
 """
 import argparse
-import ipaddress
 import json
 import os
 import sys
@@ -509,14 +508,6 @@ def _get_ingress_ip(args: Args, cluster: str) -> str:
             "loadbalancer.openstack.org/load-balancer-address"
         ]
     return ""
-
-
-def _validate_subnet(subnet: str) -> str:
-    try:
-        ipaddress.ip_network(subnet)
-        return subnet
-    except ValueError as e:
-        raise argparse.ArgumentTypeError(f"Invalid IPv4 subnet: {subnet} ({e})")
 
 
 def _check_ck8s_env(*var_names: str) -> None:
