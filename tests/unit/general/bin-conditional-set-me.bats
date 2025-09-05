@@ -98,7 +98,6 @@ _refute_condition_and_warn() {
   yq.set common .networkPolicies.coredns.enabled 'true'
   yq.set sc .networkPolicies.opensearch.enabled 'true'
   yq.set sc .objectStorage.sync.secondaryUrl \"example.com\"
-  yq.set sc .networkPolicies.ingressNginx.ingressOverride.enabled 'true'
   yq.set sc .networkPolicies.dex.enabled 'true'
 
   run _apply_normalise_sc
@@ -107,7 +106,6 @@ _refute_condition_and_warn() {
   _assert_condition_and_warn .\"networkPolicies\".\"coredns\".\"externalDns\".\"ips\"
   _assert_condition_and_warn .\"networkPolicies\".\"opensearch\".\"plugins\".\"ips\"
   _assert_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"secondaryUrl\".\"ips\"
-  _assert_condition_and_warn .\"networkPolicies\".\"ingressNginx\".\"ingressOverride\".\"ips\"
   _assert_condition_and_warn .\"networkPolicies\".\"dex\".\"connectors\".\"ips\"
 
   yq.set common .trivy.enabled 'false'
@@ -115,7 +113,6 @@ _refute_condition_and_warn() {
   yq.set common .networkPolicies.coredns.enabled 'false'
   yq.set sc .networkPolicies.opensearch.enabled 'false'
   yq.set sc .objectStorage.sync.secondaryUrl \"\"
-  yq.set sc .networkPolicies.ingressNginx.ingressOverride.enabled 'false'
   yq.set sc .networkPolicies.dex.enabled 'false'
 
   run _apply_normalise_sc
@@ -124,7 +121,6 @@ _refute_condition_and_warn() {
   _refute_condition_and_warn .\"networkPolicies\".\"coredns\".\"externalDns\".\"ips\"
   _refute_condition_and_warn .\"networkPolicies\".\"opensearch\".\"plugins\".\"ips\"
   _refute_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"secondaryUrl\".\"ips\"
-  _refute_condition_and_warn .\"networkPolicies\".\"ingressNginx\".\"ingressOverride\".\"ips\"
   _refute_condition_and_warn .\"networkPolicies\".\"dex\".\"connectors\".\"ips\"
 
 }
@@ -135,24 +131,20 @@ _refute_condition_and_warn() {
   yq.set common .trivy.enabled 'true'
   yq.set common .networkPolicies.certManager.enabled 'true'
   yq.set common .networkPolicies.coredns.enabled 'true'
-  yq.set wc .networkPolicies.ingressNginx.ingressOverride.enabled 'true'
 
   run _apply_normalise_wc
   _assert_condition_and_warn .\"networkPolicies\".\"global\".\"trivy\".\"ips\"
   _assert_condition_and_warn .\"networkPolicies\".\"certManager\".\"letsencrypt\".\"ips\"
   _assert_condition_and_warn .\"networkPolicies\".\"coredns\".\"externalDns\".\"ips\"
-  _assert_condition_and_warn .\"networkPolicies\".\"ingressNginx\".\"ingressOverride\".\"ips\"
 
   yq.set common .trivy.enabled 'false'
   yq.set common .networkPolicies.certManager.enabled 'false'
   yq.set common .networkPolicies.coredns.enabled 'false'
-  yq.set wc .networkPolicies.ingressNginx.ingressOverride.enabled 'false'
 
   run _apply_normalise_wc
   _refute_condition_and_warn .\"networkPolicies\".\"global\".\"trivy\".\"ips\"
   _refute_condition_and_warn .\"networkPolicies\".\"certManager\".\"letsencrypt\".\"ips\"
   _refute_condition_and_warn .\"networkPolicies\".\"coredns\".\"externalDns\".\"ips\"
-  _refute_condition_and_warn .\"networkPolicies\".\"ingressNginx\".\"ingressOverride\".\"ips\"
 }
 
 # bats test_tags=conditional_set_me_netpol_kured
