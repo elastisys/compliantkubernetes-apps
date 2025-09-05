@@ -283,15 +283,18 @@ def install_external_dns(
     cluster_config: AppsConfig,
     cluster: str,
     dns_names: list[str],
-    ingress_ip: str,
     args: Args,
 ) -> None:
-    """Configure External DNS"""
-
-    record_common = {"recordTTL": 180, "recordType": "A", "targets": [ingress_ip]}
+    """Install External DNS"""
 
     if (domain_name := dig(args.config, f"externalLoadbalancers.{cluster}DomainName")) is not None:
         record_common = {"recordTTL": 180, "recordType": "CNAME", "targets": [domain_name]}
+    else:
+        record_common = {
+            "recordTTL": 180,
+            "recordType": "A",
+            "targets": [_get_ingress_ip(args, cluster)],
+        }
 
     dns_config = {
         "enabled": True,
@@ -430,18 +433,15 @@ def main() -> None:
     _step(configure_apps)(common_config, sc_config, wc_config, args)
     _step(configure_secrets)(secrets_path, args)
     _step(install_ingress, doc_suffix="in SC")("sc", args)
-    _step(install_external_dns, doc_suffix="for SC")(
+    _step(install_external_dns, doc_suffix="in SC")(
         sc_config,
         "sc",
         ["*.ops", "dex", "grafana", "harbor", "opensearch"],
-        _get_ingress_ip(args, "sc"),
         args,
     )
     _step(install_dex)(args)
     _step(install_ingress, doc_suffix="in WC")("wc", args)
-    _step(install_external_dns, doc_suffix="for WC")(
-        wc_config, "wc", ["*"], _get_ingress_ip(args, "wc"), args
-    )
+    _step(install_external_dns, doc_suffix="in WC")(wc_config, "wc", ["*"], args)
     _step(reconfigure_ips)(common_config, sc_config, wc_config, args)
     _step(update_ips, doc_suffix="for both clusters")("both")
     if args.use_sync:
@@ -516,7 +516,7 @@ def _validate_subnet(subnet: str) -> str:
         ipaddress.ip_network(subnet)
         return subnet
     except ValueError as e:
-        raise argparse.ArgumentTypeError(f"Invalid IP address: {subnet} ({e})")
+        raise argparse.ArgumentTypeError(f"Invalid IPv4 subnet: {subnet} ({e})")
 
 
 def _check_ck8s_env(*var_names: str) -> None:
