@@ -585,6 +585,13 @@ opensearch:
   enabled: true
   subdomain: opensearch
 
+  # IMPORTANT: When enabling indexPerNamespace, you also need to append
+  # the following to your existing opensearch curator retention config in sc-config.yaml:
+  # curator:
+  #   retention:
+  #     - ageDays: 30
+  #       pattern: ^[^.].*
+  #       sizeGB: 5000
   indexPerNamespace: false
 
   dashboards:

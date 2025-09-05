@@ -6209,6 +6209,9 @@ properties:
           When enabled logs are ingested into multiple indices per namespace.
           When disabled logs are ingested into a single `kubernetes` index.
 
+          > [!important]
+          > When enabling this feature, you must also add an entry to `opensearch.curator.retention` in `sc-config.yaml` with `pattern: ^[^.].*` which matches all non-system indices.
+
           > [!note]
           > Must be set for both service and workload cluster.
         type: boolean
