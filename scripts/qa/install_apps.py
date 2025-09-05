@@ -171,7 +171,14 @@ def configure_apps(
     common_config.set(
         "networkPolicies",
         {
-            "global": {"scIngress": ALL_IPS, "wcIngress": ALL_IPS, "trivy": ALL_IPS},
+            "global": {
+                "scIngress": ALL_IPS,
+                "wcIngress": ALL_IPS,
+                "trivy": ALL_IPS,
+                "objectStorage": {**ALL_IPS, "ports": [443]},
+                "objectStorageSwift": ALL_IPS,
+            },
+            "kubeSystem": {"openstack": ALL_IPS},
             "alertmanager": {"alertReceivers": ALL_IPS},
             "coredns": {"externalDns": ALL_IPS},
             "dex": {"connectors": ALL_IPS},
@@ -350,6 +357,16 @@ def reconfigure_ips(
 ) -> None:
     """Reconfigure IPs"""
 
+    common_config.set(
+        "networkPolicies",
+        {
+            "global": {
+                "objectStorage": {"ips": [], "ports": []},
+                "objectStorageSwift": {"ips": []},
+            },
+        },
+    )
+
     if (sc_ingress_subnet := dig(args.config, "scSubnets.ingress")) is not None:
         common_config.set(
             "networkPolicies",
@@ -423,7 +440,6 @@ def main() -> None:
     _step(initialize_apps)()
     _step(configure_apps)(common_config, sc_config, wc_config, args)
     _step(configure_secrets)(secrets_path, args)
-    _step(update_ips, doc_suffix="for both clusters")("both")
     sc_ingress_ip = _step(install_ingress, doc_suffix="in SC")("sc", args) or ""
     _step(install_external_dns, doc_suffix="for SC")(
         sc_config,
