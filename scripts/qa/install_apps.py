@@ -7,6 +7,7 @@ import ipaddress
 import json
 import os
 import sys
+from contextlib import suppress
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, cast
@@ -266,7 +267,7 @@ def configure_secrets(secrets_path: Path, args: Args) -> None:
         _set_secret_key(secrets_path, '["objectStorage"]', cast(dict, object_storage_secrets))
 
 
-def install_ingress(cluster: str, args: Args) -> str:
+def install_ingress(cluster: str, args: Args) -> None:
     """Install Ingress"""
     # fmt: off
     _run_ck8s(
@@ -276,18 +277,6 @@ def install_ingress(cluster: str, args: Args) -> str:
         "--include-transitive-needs",
     )
     # fmt: on
-
-    if dig(args.config, f"externalLoadbalancers.{cluster}DomainName") is not None:
-        return ""
-    if (address := dig(args.config, f"externalLoadbalancers.{cluster}Address")) is not None:
-        return cast(str, address)
-
-    _run_ck8s(
-        *f"ops kubectl {cluster} wait -n ingress-nginx "
-        r"--for=jsonpath={.metadata.annotations.loadbalancer\.openstack\.org/load-balancer-address}"
-        " service/ingress-nginx-controller --timeout=300s".split()
-    )
-    return _get_ingress_ip(cluster)
 
 
 def install_external_dns(
@@ -440,17 +429,19 @@ def main() -> None:
     _step(initialize_apps)()
     _step(configure_apps)(common_config, sc_config, wc_config, args)
     _step(configure_secrets)(secrets_path, args)
-    sc_ingress_ip = _step(install_ingress, doc_suffix="in SC")("sc", args) or ""
+    _step(install_ingress, doc_suffix="in SC")("sc", args)
     _step(install_external_dns, doc_suffix="for SC")(
         sc_config,
         "sc",
         ["*.ops", "dex", "grafana", "harbor", "opensearch"],
-        sc_ingress_ip,
+        _get_ingress_ip(args, "sc"),
         args,
     )
     _step(install_dex)(args)
-    wc_ingress_ip = _step(install_ingress, doc_suffix="in WC")("wc", args) or ""
-    _step(install_external_dns, doc_suffix="for WC")(wc_config, "wc", ["*"], wc_ingress_ip, args)
+    _step(install_ingress, doc_suffix="in WC")("wc", args)
+    _step(install_external_dns, doc_suffix="for WC")(
+        wc_config, "wc", ["*"], _get_ingress_ip(args, "wc"), args
+    )
     _step(reconfigure_ips)(common_config, sc_config, wc_config, args)
     _step(update_ips, doc_suffix="for both clusters")("both")
     if args.use_sync:
@@ -495,7 +486,17 @@ def _parse_arguments(**environment: str) -> tuple[StepArgs, Args]:
     return StepArgs.from_parsed_args(parsed_args), args
 
 
-def _get_ingress_ip(cluster: str) -> str:
+def _get_ingress_ip(args: Args, cluster: str) -> str:
+    if dig(args.config, f"externalLoadbalancers.{cluster}DomainName") is not None:
+        return ""
+    if (address := dig(args.config, f"externalLoadbalancers.{cluster}Address")) is not None:
+        return cast(str, address)
+
+    _run_ck8s(
+        *f"ops kubectl {cluster} wait -n ingress-nginx "
+        r"--for=jsonpath={.metadata.annotations.loadbalancer\.openstack\.org/load-balancer-address}"
+        " service/ingress-nginx-controller --timeout=300s".split()
+    )
     ingress = cast(
         dict,
         _get_ck8s_json(
@@ -503,7 +504,11 @@ def _get_ingress_ip(cluster: str) -> str:
             " service/ingress-nginx-controller -ojson".split()
         ),
     )
-    return ingress["metadata"]["annotations"]["loadbalancer.openstack.org/load-balancer-address"]
+    with suppress(KeyError):
+        return ingress["metadata"]["annotations"][
+            "loadbalancer.openstack.org/load-balancer-address"
+        ]
+    return ""
 
 
 def _validate_subnet(subnet: str) -> str:
