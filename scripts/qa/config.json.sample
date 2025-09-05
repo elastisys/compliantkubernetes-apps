@@ -7,10 +7,10 @@
       "clientSecret": "set-me"
     }
   },
-  "externalDns": {
+  "dnsProvider": {
     "domain": "set-me",
-    "hostedZone": "set-me",
     "aws": {
+      "hostedZone": "set-me",
       "accessKey": "set-me",
       "secretKey": "set-me"
     }
