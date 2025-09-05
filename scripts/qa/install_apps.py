@@ -9,12 +9,14 @@ import os
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Optional, TypedDict, cast
+from typing import Any, cast
 
 SCRIPT_DIR: Path = Path(__file__).parent.absolute()
 sys.path.insert(0, SCRIPT_DIR.as_posix())
 
 from boilerplate import STEP_ARGS, AppsConfig, StepArgs, _get_json, _run, _set_secret_key, _step
+
+from config import Config, dig
 
 BIN_DIR: Path = SCRIPT_DIR / ".." / ".." / "bin"
 
@@ -29,7 +31,7 @@ ALL_IPS: dict[str, list[str]] = {"ips": ["0.0.0.0/0"]}
 class Args:
     """Holds the parsed arguments"""
 
-    config: "Config"
+    config: Config
 
     cloud_provider: str
     environment_name: str
@@ -39,82 +41,6 @@ class Args:
     @property
     def domain(self) -> str:
         return f"{self.environment_name}.{self.config['dnsProvider']['domain']}"
-
-GcpSecrets = TypedDict("GcpSecrets", {"clientID": str, "clientSecret": str})
-
-DexSecrets = TypedDict("DexSecrets", {"gcp": GcpSecrets})
-
-DnsProviderConfig = TypedDict(
-    "DnsProviderConfig",
-    {
-        "domain": str,
-        "aws": {
-            "hostedZone": str,
-            "accessKey": str,
-            "secretKey": str
-        }
-    }
-)
-
-ExternalLoadbalancers = TypedDict(
-    "ExternalLoadbalancers",
-    {
-        "scAddress": Optional[str],
-        "scDomainName": Optional[str],
-        "scProxyProtocol": Optional[bool],
-        "wcAddress": Optional[str],
-        "wcDomainName": Optional[str],
-        "wcProxyProtocol": Optional[bool]
-    }
-)
-
-S3Secrets = TypedDict(
-    "S3Secrets",
-    {
-        "region": Optional[str],
-        "regionEndpoint": Optional[str],
-        "accessKey": str,
-        "secretKey": str
-    }
-)
-
-SwiftSecrets = TypedDict(
-    "SwiftSecrets",
-    {
-        "applicationCredentialID": str,
-        "applicationCredentialSecret": str
-    }
-)
-
-StorageSecrets = TypedDict(
-    "StorageSecrets",
-    {
-        "s3": Optional[S3Secrets],
-        "swift": Optional[SwiftSecrets]
-    }
-)
-
-Subnets = TypedDict(
-    "Subnets",
-    {
-        "apiServer": Optional[list[str]],
-        "nodes": Optional[list[str]],
-        "ingress": Optional[list[str]],
-    },
-)
-
-class Config(TypedDict):
-    """Holds secrets"""
-
-    kubeloginClientSecret: str
-    adminGroup: str
-    dex: DexSecrets
-    dnsProvider: DnsProviderConfig
-    externalLoadbalancers: Optional[ExternalLoadbalancers]
-    objectStorage: StorageSecrets
-
-    wcSubnets: Subnets
-    scSubnets: Subnets
 
 
 def configure_apps(
@@ -142,30 +68,15 @@ def configure_apps(
     )
 
     # Configure external loadbalancer
-    try:
-        cond = args.config["externalLoadbalancers"]["scProxyProtocol"]
+    if (cond := dig(args.config, "externalLoadBalancers.scProxyProtocol")) is not None:
         sc_config.set("ingressNginx.controller.config", {"useProxyProtocol": cond})
-    except KeyError:
-        pass # Use default
-    try:
-        cond = args.config["externalLoadbalancers"]["wcProxyProtocol"]
+
+    if (cond := dig(args.config, "externalLoadBalancers.wcProxyProtocol")) is not None:
         wc_config.set("ingressNginx.controller.config", {"useProxyProtocol": cond})
-    except KeyError:
-        pass # Use default
 
     # Configure object storage
-    try:
-        region = args.config["objectStorage"]["s3"]["region"]
-        if region != "":
-            common_config.set("objectStorage.s3", {"region": region})
-    except KeyError:
-        pass # Use default
-    try:
-        regionEndpoint = args.config["objectStorage"]["s3"]["regionEndpoint"]
-        if region != "":
-            common_config.set("objectStorage.s3", {"regionEndpoint": regionEndpoint})
-    except KeyError:
-        pass # Use default
+    if (object_storage_config := dig(args.config, "objectStorage.config")) is not None:
+        common_config.set("objectStorage", cast(dict, object_storage_config))
 
     # Configure cluster issuers
     dns_solver = {
@@ -174,7 +85,7 @@ def configure_apps(
             "route53": {
                 "region": "eu-north-1",
                 "hostedZoneID": args.config["dnsProvider"]["aws"]["hostedZone"],
-                "accessKeyID": args.config["dnsProvider"]["aws"]["accessKey"],
+                "accessKeyID": args.config["dnsProvider"]["aws"]["secrets"]["accessKey"],
                 "secretAccessKeySecretRef": {
                     "name": "route53-credentials-secret",
                     "key": "secretKey",
@@ -282,12 +193,14 @@ def configure_apps(
 
 def configure_secrets(secrets_path: Path, args: Args) -> None:
     """Configure secrets"""
+
     # Configure Dex client secret for Kubernetes API
     _set_secret_key(
         secrets_path,
         '["dex"]["kubeloginClientSecret"]',
         args.config["kubeloginClientSecret"],
     )
+
     # Configure Dex connector to Google
     _set_secret_key(
         secrets_path,
@@ -307,6 +220,7 @@ def configure_secrets(secrets_path: Path, args: Args) -> None:
             },
         },
     )
+
     # Configure the 'dev@example.com' static user
     _set_secret_key(
         secrets_path,
@@ -327,42 +241,22 @@ def configure_secrets(secrets_path: Path, args: Args) -> None:
         {
             "secrets": {
                 "route53-credentials-secret": {
-                    "secretKey": args.config["dnsProvider"]["aws"]["secretKey"]
+                    "secretKey": args.config["dnsProvider"]["aws"]["secrets"]["secretKey"]
                 }
             }
         },
     )
+
     # Configure ExternalDNS AWS secrets
     _set_secret_key(
         secrets_path,
         '["externalDns"]',
-        {
-            "awsRoute53": {
-                "accessKey": args.config["dnsProvider"]["aws"]["accessKey"],
-                "secretKey": args.config["dnsProvider"]["aws"]["secretKey"],
-            }
-        },
+        {"awsRoute53": args.config["dnsProvider"]["aws"]["secrets"]},
     )
 
     # Configure object storage secrets
-    if "s3" in args.config["objectStorage"]:
-        _set_secret_key(
-            secrets_path,
-            '["objectStorage"]["s3"]',
-            {
-                "accessKey": args.config["objectStorage"]["s3"]["accessKey"],
-                "secretKey": args.config["objectStorage"]["s3"]["secretKey"]
-            }
-        )
-    if "swift" in args.config["objectStorage"]:
-        _set_secret_key(
-            secrets_path,
-            '["objectStorage"]["swift"]',
-            {
-                "applicationCredentialID": args.config["objectStorage"]["swift"]["applicationCredentialID"],
-                "applicationCredentialSecret": args.config["objectStorage"]["swift"]["applicationCredentialSecret"]
-            }
-        )
+    if (object_storage_secrets := dig(args.config, "objectStorage.secrets")) is not None:
+        _set_secret_key(secrets_path, '["objectStorage"]', cast(dict, object_storage_secrets))
 
 
 def install_ingress(cluster: str, args: Args) -> str:
@@ -371,16 +265,16 @@ def install_ingress(cluster: str, args: Args) -> str:
     _run_ck8s(
         "ops", "helmfile", cluster,
         "-l", "app=ingress-nginx",
-        "sync" if args.use_sync else "apply", "--include-transitive-needs"
+        "sync" if args.use_sync else "apply",
+        "--include-transitive-needs",
     )
-
-    if "externalLoadbalancers" in args.config:
-        if f"{cluster}DomainName" in args.config["externalLoadbalancers"]:
-            return ""
-        if f"{cluster}IP" in args.config["externalLoadbalancers"]:
-            return args.config["externalLoadbalancers"][f"{cluster}IP"]
-
     # fmt: on
+
+    if dig(args.config, f"externalLoadbalancers.{cluster}DomainName") is not None:
+        return ""
+    if (address := dig(args.config, f"externalLoadbalancers.{cluster}Address")) is not None:
+        return cast(str, address)
+
     _run_ck8s(
         *f"ops kubectl {cluster} wait -n ingress-nginx "
         r"--for=jsonpath={.metadata.annotations.loadbalancer\.openstack\.org/load-balancer-address}"
@@ -400,12 +294,8 @@ def install_external_dns(
 
     record_common = {"recordTTL": 180, "recordType": "A", "targets": [ingress_ip]}
 
-    try:
-        domain_name = args.config["externalLoadbalancers"][f"{cluster}DomainName"]
-        if domain_name != "":
-            record_common = {"recordTTL": 180, "recordType": "CNAME", "targets": [domain_name]}
-    except KeyError:
-        pass # Use A records
+    if (domain_name := dig(args.config, f"externalLoadbalancers.{cluster}DomainName")) is not None:
+        record_common = {"recordTTL": 180, "recordType": "CNAME", "targets": [domain_name]}
 
     dns_config = {
         "enabled": True,
@@ -427,7 +317,9 @@ def install_external_dns(
 
 def install_dex(args: Args) -> None:
     """Install Dex"""
-    _run_ck8s("ops", "helmfile", "sc", "-l", "app=admin-namespaces", "sync" if args.use_sync else "apply")
+    _run_ck8s(
+        "ops", "helmfile", "sc", "-l", "app=admin-namespaces", "sync" if args.use_sync else "apply"
+    )
     _run(
         "bash",
         "-c",
@@ -458,48 +350,54 @@ def reconfigure_ips(
 ) -> None:
     """Reconfigure IPs"""
 
-    if (sc_ingress_subnet := args.config["scSubnets"].get("ingress")) is not None:
+    if (sc_ingress_subnet := dig(args.config, "scSubnets.ingress")) is not None:
         common_config.set(
             "networkPolicies",
             {"global": {"scIngress": {"ips": sc_ingress_subnet}}},
         )
 
-    if (wc_ingress_subnet := args.config["wcSubnets"].get("ingress")) is not None:
+    if (wc_ingress_subnet := dig(args.config, "wcSubnets.ingress")) is not None:
         common_config.set(
             "networkPolicies",
             {"global": {"wcIngress": {"ips": wc_ingress_subnet}}},
         )
 
-    sc_config.set(
-        "networkPolicies.global",
-        {
-            "scApiserver": {"ips": args.config["scSubnets"].get("apiServer", ["set-me"])},
-            "scNodes": {"ips": args.config["scSubnets"].get("nodes", ["set-me"])},
-        },
-    )
+    if (sc_subnets := args.config.get("scSubnets")) is not None:
+        sc_config.set(
+            "networkPolicies.global",
+            {
+                "scApiserver": {"ips": sc_subnets.get("apiServer") or ["set-me"]},
+                "scNodes": {"ips": sc_subnets.get("nodes") or ["set-me"]},
+            },
+        )
 
-    wc_config.set(
-        "networkPolicies.global",
-        {
-            "wcApiserver": {"ips": args.config["wcSubnets"].get("apiServer", ["set-me"])},
-            "wcNodes": {"ips": args.config["wcSubnets"].get("nodes", ["set-me"])},
-        },
-    )
+    if (wc_subnets := args.config.get("wcSubnets")) is not None:
+        wc_config.set(
+            "networkPolicies.global",
+            {
+                "wcApiserver": {"ips": wc_subnets.get("apiServer") or ["set-me"]},
+                "wcNodes": {"ips": wc_subnets.get("nodes") or ["set-me"]},
+            },
+        )
 
 
 # Apps commands
+
 
 def initialize_apps() -> None:
     """Initialize apps"""
     _run_ck8s("init", "both")
 
+
 def update_ips(cluster: str) -> None:
     """Update IPs"""
     _run_ck8s("update-ips", cluster, "apply")
 
+
 def apply_apps(cluster: str) -> None:
     """Apply apps"""
     _run_ck8s("apply", cluster, f"--concurrency={os.cpu_count() or 8}")
+
 
 def sync_apps(cluster: str) -> None:
     """Sync apps"""

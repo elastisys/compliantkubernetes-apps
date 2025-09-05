@@ -11,26 +11,46 @@
     "domain": "set-me",
     "aws": {
       "hostedZone": "set-me",
-      "accessKey": "set-me",
-      "secretKey": "set-me"
+      "secrets": {
+        "accessKey": "set-me",
+        "secretKey": "set-me"
+      }
     }
+  },
+  "externalLoadbalancers": {
+    "scAddress": "set-me",
+    "scDomainName": "set-me",
+    "scProxyProtocol": false,
+    "wcAddress": "set-me",
+    "wcDomainName": "set-me",
+    "wcProxyProtocol": false
   },
   "objectStorage": {
-    "s3": {
-      "accessKey": "set-me",
-      "secretKey": "set-me"
+    "config": {
+      "s3": {
+        "region": "set-me",
+        "regionEndpoint": "set-me"
+      }
     },
-    "swift": {
-      "applicationCredentialID": "set-me",
-      "applicationCredentialSecret": "set-me"
+    "secrets": {
+      "s3": {
+        "accessKey": "set-me",
+        "secretKey": "set-me"
+      },
+      "swift": {
+        "applicationCredentialID": "set-me",
+        "applicationCredentialSecret": "set-me"
+      }
     }
   },
-  "scSubnets": {
-    "apiServer": ["set-me"],
-    "nodes": ["set-me"]
-  },
   "wcSubnets": {
-    "apiServer": ["set-me"],
-    "nodes": ["set-me"]
+    "apiServer": [],
+    "nodes": [],
+    "ingress": []
+  },
+  "scSubnets": {
+    "apiServer": [],
+    "nodes": [],
+    "ingress": []
   }
 }
