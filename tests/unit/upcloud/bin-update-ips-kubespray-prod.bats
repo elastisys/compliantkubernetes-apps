@@ -11,7 +11,10 @@ setup_file() {
   gpg.setup
   env.setup
 
-  env.init upcloud kubespray prod
+  env.init upcloud kubespray prod --skip-object-storage --skip-network-policies
+
+  yq.set common .objectStorage.type '"s3"'
+  yq.set common .objectStorage.s3.regionEndpoint '"https://s3.foo.dev-ck8s.com:1234"'
 }
 
 setup() {
@@ -45,21 +48,18 @@ teardown_file() {
   gpg.teardown
 }
 
-@test "ck8s update-ip upcloud private nodes ingress IPs" {
-  update_ips.mock_minimal
-  update_ips.populate_minimal
+@test "ck8s update-ips both apply --enable ingress on upcloud gets private nodes ingress IPs from Terraform state file" {
+  mock_set_output "${mock_dig}" "192.0.2.1" 1
+  mock_set_output "${mock_dig}" "192.0.2.2" 2
 
-  run ck8s update-ips both apply
+  run ck8s update-ips both apply --enable ingress
   assert_success
 
-  sc_private_address="$(jq -r '.resources[].instances[].attributes.nodes | select( . != null) | .[].networks[].ip_addresses[] | select( .listen == false) | .address' "${BATS_TEST_DIRNAME}/resources/sc-config/terraform.tfstate")"
-  wc_private_address="$(jq -r '.resources[].instances[].attributes.nodes | select( . != null) | .[].networks[].ip_addresses[] | select( .listen == false) | .address' "${BATS_TEST_DIRNAME}/resources/wc-config/terraform.tfstate")"
-
-  assert_equal "$(yq.dig common '.networkPolicies.global.scIngress.ips | . style="flow"')" "[127.0.0.2/32, ${sc_private_address}/32]"
-  assert_equal "$(yq.dig common '.networkPolicies.global.wcIngress.ips | . style="flow"')" "[127.0.0.3/32, ${wc_private_address}/32]"
+  assert_equal "$(yq.dig common '.networkPolicies.global.scIngress.ips | . style="flow"')" "[192.0.2.1/32, 203.0.113.2/32]"
+  assert_equal "$(yq.dig common '.networkPolicies.global.wcIngress.ips | . style="flow"')" "[192.0.2.2/32, 203.0.113.4/32]"
 
   assert_equal "$(mock_get_call_num "${mock_curl}")" 0
-  assert_equal "$(mock_get_call_num "${mock_dig}")" 3
-  assert_equal "$(mock_get_call_num "${mock_kubectl}")" 20
+  assert_equal "$(mock_get_call_num "${mock_dig}")" 2
+  assert_equal "$(mock_get_call_num "${mock_kubectl}")" 0
 
 }

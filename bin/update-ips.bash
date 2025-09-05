@@ -10,22 +10,9 @@
 set -euo pipefail
 
 here="$(dirname "$(readlink --canonicalize "$0")")"
+
 # shellcheck source=bin/common.bash
 source "${here}/common.bash"
-
-check_cluster="${1}" # sc, wc or both
-dry_run=true
-if [[ "${2}" == "apply" ]]; then
-  dry_run=false
-fi
-has_diff=0
-
-#TODO: To be changed when decision made on networkpolicies for azure storage
-storage_service=$(yq '.objectStorage.type' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml")
-
-cloud_provider=$(yq '.global.ck8sCloudProvider' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml")
-
-CK8S_IPV6_ENABLED="${3:-"false"}"
 
 # Get the value of the config option or the provided default value if the
 # config option is unset.
@@ -737,10 +724,8 @@ validate_config() {
     cluster="sc"
   fi
 
-  #TODO: To be changed when decision made on networkpolicies for azure storage
-  if [ "$storage_service" == "azure" ]; then
-    :
-  else
+  # TODO: To be changed when decision made on networkpolicies for azure storage
+  if [ "${storage_service}" != "azure" ]; then
     yq_read_required "${cluster}" '.objectStorage.s3.regionEndpoint'
   fi
   yq_read_required "${cluster}" '.global.opsDomain'
@@ -798,34 +783,138 @@ validate_config() {
   fi
 }
 
+check_cluster="${1}"
+[[ "${1}" =~ ^(wc|sc|both)$ ]] || log_fatal "first argument must be either wc, sc or both"
+
+dry_run=true
+list_operations=false
+
+case "${2}" in
+"apply")
+  dry_run=false
+  ;;
+"operations")
+  list_operations=true
+  ;;
+esac
+
+shift 2
+
+has_diff=0
+
+# TODO: To be changed when decision made on networkpolicies for azure storage
+storage_service=$(yq '.objectStorage.type' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml")
+
+cloud_provider=$(yq '.global.ck8sCloudProvider' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml")
+
+CK8S_IPV6_ENABLED="false"
+
+declare -A operations=(
+  [objectstorage]=-
+  [ingress]=-
+  [apiserver]=-
+  [nodes]=-
+  [swift]=-
+  [rclone]=-
+)
+
+declare -a enabled_operations=()
+
+while [ -n "${1+x}" ]; do
+  case "${1}" in
+  "--enable")
+    if [ "${#}" -lt 2 ]; then
+      log_fatal "The --enable flag requires an operation, example: --enable ingress"
+    fi
+    enabled_operations+=("${2}")
+    shift
+    ;;
+  "--disable")
+    if [ "${#}" -lt 2 ]; then
+      log_fatal "The --disable flag requires an operation, example: --disable ingress"
+    fi
+    unset 'operations[${2}]'
+    shift
+    ;;
+  "--ipv6")
+    CK8S_IPV6_ENABLED="true"
+    ;;
+  *)
+    log_fatal "Unsupported update-ips flag: ${1}"
+    ;;
+  esac
+  shift
+done
+
+if [ "${#enabled_operations[@]}" -ne 0 ]; then
+  for op1 in "${!operations[@]}"; do
+    enabled=false
+    for op2 in "${enabled_operations[@]}"; do
+      [ "${op1}" = "${op2}" ] && enabled=true
+    done
+    ${enabled} || unset 'operations[${op1}]'
+  done
+fi
+
+if ${list_operations}; then
+  echo "${!operations[@]}"
+  exit
+fi
+
 validate_config
-#TODO: To be changed when decision made on networkpolicies for azure storage
-if [ "$storage_service" == "azure" ]; then
-  :
-else
-  allow_object_storage
-fi
-allow_ingress
 
-if [[ "${check_cluster}" =~ ^(sc|both)$ ]]; then
-  allow_subnet "sc" '.networkPolicies.global.scApiserver.ips' "node-role.kubernetes.io/control-plane="
-  allow_subnet "sc" '.networkPolicies.global.scNodes.ips' ""
+for op in "${!operations[@]}"; do
+  case "${op}" in
+  "objectstorage")
+    # TODO: To be changed when decision made on networkpolicies for azure storage
+    if [ "${storage_service}" != "azure" ]; then
+      allow_object_storage
+    fi
+    ;;
 
-  if swift_enabled; then
-    sync_swift '.objectStorage.swift' '.networkPolicies.global.objectStorageSwift'
-  fi
-fi
+  "ingress")
+    allow_ingress
+    ;;
 
-if [[ "${check_cluster}" =~ ^(wc|both)$ ]]; then
-  allow_subnet "wc" '.networkPolicies.global.wcApiserver.ips' "node-role.kubernetes.io/control-plane="
-  allow_subnet "wc" '.networkPolicies.global.wcNodes.ips' ""
-fi
+  "apiserver")
+    if [[ "${check_cluster}" =~ ^(sc|both)$ ]]; then
+      allow_subnet "sc" '.networkPolicies.global.scApiserver.ips' "node-role.kubernetes.io/control-plane="
+    fi
+    if [[ "${check_cluster}" =~ ^(wc|both)$ ]]; then
+      allow_subnet "wc" '.networkPolicies.global.wcApiserver.ips' "node-role.kubernetes.io/control-plane="
+    fi
+    ;;
 
-if rclone_enabled; then
-  sync_rclone '.objectStorage.sync.s3.regionEndpoint' '.networkPolicies.rclone.sync.objectStorage'
-  sync_swift '.objectStorage.sync.swift' '.networkPolicies.rclone.sync.objectStorageSwift'
-  sync_rclone '.objectStorage.sync.secondaryUrl' '.networkPolicies.rclone.sync.secondaryUrl'
-fi
+  "nodes")
+    if [[ "${check_cluster}" =~ ^(sc|both)$ ]]; then
+      allow_subnet "sc" '.networkPolicies.global.scNodes.ips' ""
+    fi
+    if [[ "${check_cluster}" =~ ^(wc|both)$ ]]; then
+      allow_subnet "wc" '.networkPolicies.global.wcNodes.ips' ""
+    fi
+    ;;
+
+  "swift")
+    if [[ "${check_cluster}" =~ ^(sc|both)$ ]]; then
+      if swift_enabled; then
+        sync_swift '.objectStorage.swift' '.networkPolicies.global.objectStorageSwift'
+      fi
+    fi
+    ;;
+
+  "rclone")
+    if rclone_enabled; then
+      sync_rclone '.objectStorage.sync.s3.regionEndpoint' '.networkPolicies.rclone.sync.objectStorage'
+      sync_swift '.objectStorage.sync.swift' '.networkPolicies.rclone.sync.objectStorageSwift'
+      sync_rclone '.objectStorage.sync.secondaryUrl' '.networkPolicies.rclone.sync.secondaryUrl'
+    fi
+    ;;
+
+  *)
+    log_fatal "Unsupported operation: ${op}"
+    ;;
+  esac
+done
 
 if ${dry_run}; then
   exit ${has_diff}
