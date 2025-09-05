@@ -40,7 +40,19 @@ class AppsConfig:
 
     def get(self, key: str) -> list | dict:
         """Get a config key"""
-        return _get_json("yq", "-oj", f".{key}", self.path.resolve().as_posix()) or {}
+        # fmt: off
+        return (
+            _get_json(
+                "yq",
+                "--output-format", "json",
+                "--nul-output",
+                "--indent", "0",
+                f".{key}",
+                self.path.resolve().as_posix(),
+            )
+            or {}
+        )
+        # fmt: on
 
 
 @dataclass(frozen=True)
@@ -185,7 +197,8 @@ def _run(*command: str, **kwargs: Any) -> None:
 
 @_effect
 def _get_json(*command: str, **kwargs: Any) -> list | dict:
-    return json.loads(str(subprocess.check_output(command, text=True, **kwargs)).strip())
+    stripped = str(subprocess.check_output(command, text=True, **kwargs)).strip(" \x00")
+    return json.loads(stripped)
 
 
 def _set_secret_key(secret_path: Path, key: str, value: Jsonable) -> None:
