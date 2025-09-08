@@ -50,6 +50,11 @@ Elastisys Welkin® Apps
 - [ ] Cluster API (beta)
 - [ ] Kubespray (prod)
 
+**Network Plugin**:
+
+- [ ] Calico (prod)
+- [ ] Cilium (alpha)
+
 **Configuration**:
 
 - [ ] Flavor - Prod
@@ -350,6 +355,7 @@ Elastisys Welkin® Apps
 - [ ] Can login to platform administrator Grafana via Dex with IdP
 - [ ] Dashboards are available and viewable
 - [ ] Metrics are available from all clusters
+- [ ] Cilium related dashboards are available and working
 
 > [!note]
 > As application developer `admin@example.com`
@@ -667,6 +673,11 @@ Follow the public disaster recovery documentation to perform restores from the p
 
 - [ ] Cluster API (beta)
 - [ ] Kubespray (prod)
+
+**Network Plugin**:
+
+- [ ] Calico (prod)
+- [ ] Cilium (alpha)
 
 **Configuration**:
 
@@ -1095,6 +1106,7 @@ Follow the public disaster recovery documentation to take backups:
 - [ ] Can login to platform administrator Grafana via Dex with IdP
 - [ ] Dashboards are available and viewable
 - [ ] Metrics are available from all clusters
+- [ ] Cilium related dashboards are available and working
 - [ ] Check the volume of metrics scraped by Prometheus and ingested by Thanos and compare it to before the upgrade
     <!-- TODO: Create a Grafana dashboard to assist in measuring metrics for QA --->
     If there is a large change compared to before the upgrade that cannot be supported by the changes done in the release then this should be investigated as this may point towards:
