@@ -6550,24 +6550,14 @@ properties:
       - calico
     if:
       properties:
-        calico:
-          anyOf:
-          - properties:
-              calicoAccountant:
-                properties:
-                  enabled:
-                    type: boolean
-                    const: true
-          - properties:
-              calicoFelixMetrics:
-                properties:
-                  enabled:
-                    type: boolean
-                    const: true
-    then:
-      properties:
         type:
           const: "calico"
+    then:
+      properties:
+        calico:
+          required:
+            - calicoAccountant
+            - calicoFelixMetrics
   certmanager:
     title: cert-manager Config
     description: Configure cert-manager, used to provision certificates either self-signed or via Let's Encrypt.
