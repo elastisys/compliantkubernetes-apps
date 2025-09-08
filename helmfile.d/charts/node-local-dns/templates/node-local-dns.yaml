@@ -107,6 +107,9 @@ data:
       {{- with .Values.hostZone.extraConfig }}
       {{- . | nindent 6 }}
       {{- end }}
+      log . {combined} {
+        class denial error
+      }
       cache 30
       reload
       loop
