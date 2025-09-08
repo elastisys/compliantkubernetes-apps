@@ -94,15 +94,18 @@ def _instantiate_typeddict(
     Instantiate a TypedDict class, filling all str leaf values with default_str.
     """
 
+    def get_non_none_types(f_type: Type) -> list[Type]:
+        args = get_args(f_type)
+        return [arg for arg in args if arg is not type(None)]
+
     def get_default_value(f_type: Type) -> Any:
         """Recursively determine the default value for a given type."""
 
         # Handle Union types (including Optional which is Union[T, None])
         origin = get_origin(f_type)
         if origin is Union:
-            args = get_args(f_type)
             # For Optional types, use the non-None type
-            non_none_types = [arg for arg in args if arg is not type(None)]
+            non_none_types = get_non_none_types(f_type)
             return get_default_value(non_none_types[0]) if non_none_types else None
 
         # Handle basic types
@@ -115,7 +118,8 @@ def _instantiate_typeddict(
         if f_type is bool:
             return False
         if f_type is list or origin is list:
-            return []
+            non_none_types = get_non_none_types(f_type)
+            return [get_default_value(non_none_types[0])] if non_none_types else []
         if f_type is dict or origin is dict:
             return {}
 
