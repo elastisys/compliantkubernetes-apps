@@ -268,7 +268,7 @@ customRules:
     - macro: user_shell_container_exclusions
       condition: ( container.image.repository in (trusted_image_repositories) )
 
-    {{- if and .Values.networkPlugin.calico.calicoAccountant.enabled (eq .Values.networkPlugin.calico.calicoAccountant.backend "nftables") }}
+    {{- if and (eq .Values.networkPlugin.type "calico") .Values.networkPlugin.calico.calicoAccountant.enabled (eq .Values.networkPlugin.calico.calicoAccountant.backend "nftables") }}
     # Drop and execute new binary in container
     - list: known_drop_and_execute_containers
       items:
