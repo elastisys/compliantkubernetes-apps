@@ -3052,6 +3052,14 @@ properties:
           format: uri
           examples:
             - http://localhost:8080/redirect
+      contentSecurityPolicy:
+        $ref: '#/$defs/contentSecurityPolicy'
+        default:
+          default-src: 'none'
+          style-src: 'self'
+          img-src: 'self'
+          frame-ancestors: 'none'
+          require-trusted-types-for: 'script'
       enableStaticLogin:
         title: Dex Static Login
         description: Configure Dex with a static password login `admin@example.com`.

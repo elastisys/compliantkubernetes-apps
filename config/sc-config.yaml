@@ -519,6 +519,12 @@ dex:
   replicaCount: 2
   # subdomain moved to common-config
   additionalKubeloginRedirects: []
+  contentSecurityPolicy:
+    default-src: "'none'"
+    style-src: "'self'"
+    img-src: "'self'"
+    frame-ancestors: "'none'"
+    require-trusted-types-for: "'script'"
   enableStaticLogin: true
   serviceMonitor:
     enabled: true
