@@ -4,7 +4,7 @@ FROM ubuntu:rolling as download
 RUN apt-get update && apt-get install -y curl unzip
 
 # Install rclone
-ENV RCLONE_VERSION="v1.63.0"
+ENV RCLONE_VERSION="v1.70.3"
 RUN curl -O https://downloads.rclone.org/${RCLONE_VERSION}/rclone-${RCLONE_VERSION}-linux-amd64.zip && \
     unzip rclone-${RCLONE_VERSION}-linux-amd64.zip && \
     cd rclone-*-linux-amd64 && \
