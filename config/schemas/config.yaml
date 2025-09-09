@@ -3043,6 +3043,15 @@ properties:
           format: uri
           examples:
             - http://localhost:8080/redirect
+      contentSecurityPolicy:
+        title: Dex Content-Security-Policy
+        description: |-
+          Configure Content-Security-Policy header for Dex
+
+          Reference: https://content-security-policy.com/
+        type: string
+        examples:
+          - default-src 'self' example.com;
       enableStaticLogin:
         title: Dex Static Login
         description: Configure Dex with a static password login `admin@example.com`.

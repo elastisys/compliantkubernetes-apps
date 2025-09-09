@@ -43,6 +43,11 @@ config:
     config:
       inCluster: true
   issuer: https://{{ .Values.dex.subdomain }}.{{ .Values.global.baseDomain }}
+  {{- with .Values.dex.contentSecurityPolicy }}
+  web:
+    headers:
+      Content-Security-Policy: {{ . }}
+  {{- end }}
   connectors:
   {{- toYaml .Values.dex.connectors | nindent 4 }}
   staticClients:

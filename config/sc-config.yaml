@@ -508,6 +508,7 @@ dex:
   replicaCount: 2
   # subdomain moved to common-config
   additionalKubeloginRedirects: []
+  contentSecurityPolicy: "" # "default-src 'self' example.com;"
   enableStaticLogin: true
   serviceMonitor:
     enabled: true
