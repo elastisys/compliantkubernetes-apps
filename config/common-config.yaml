@@ -265,6 +265,14 @@ fluentd:
       #       tag audit.${tag}
       #     </rule>
       #   </match>
+  # Optional: Component-specific S3 configuration for fluentd.
+  # If not set, the global `.objectStorage.s3 configuration will be used instead.
+  # Only set if fluentd needs separate S3 storage configuration.
+  #objectStorage:
+  #  s3:
+  #    region: ""
+  #    regionEndpoint: ""
+  #    forcePathStyle: false
 
   aggregator:
     # All buffer settings are available, keys are transformed to snake_case as required by fluentd config
@@ -745,6 +753,14 @@ velero:
       requests:
         cpu: 50m
         memory: 100Mi
+  # Optional: Component-specific S3 configuration for velero.
+  # If not set, the global `.objectStorage.s3 configuration will be used instead.
+  # Only set if velero needs separate S3 storage configuration.
+  #objectStorage:
+  #  s3:
+  #    region: ""
+  #    regionEndpoint: ""
+  #    forcePathStyle: false
 
 ## Configuration for cert-manager issuers.
 issuers:

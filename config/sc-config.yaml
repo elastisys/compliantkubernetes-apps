@@ -545,16 +545,6 @@ dex:
     # Simply add `serviceAccountFilePath: /etc/dex/google/secret-key` for each google connector.
     # For more details, see https://elastisys.com/elastisys-engineering-how-to-use-dex-with-google-accounts-to-manage-access-in-kubernetes/
     # SASecretName: set-me
-
-# Optional: Component-specific S3 configuration for velero.
-# If not set, the global `.objectStorage.s3 configuration will be used instead.
-# Only set if velero needs separate S3 storage configuration.
-#velero:
-  #objectStorage:
-  #  s3:
-  #    region: ""
-  #    regionEndpoint: ""
-  #    forcePathStyle: false
 thanos:
   query:
     # Enables the query/query-frontend components
@@ -741,9 +731,9 @@ thanos:
     # Available options "s3" or "swift", defaults to "objectStorage.type" when empty
     # Configure the storage credentials in the global "objectStorage"
     type: ""
-# Optional: Component-specific S3 configuration for harbor.
-# If not set, the global `.objectStorage.s3 configuration will be used instead.
-# Only set if harbor needs separate S3 storage configuration.
+  # Optional: Component-specific S3 configuration for thanos.
+  # If not set, the global `.objectStorage.s3 configuration will be used instead.
+  # Only set if thanos needs separate S3 storage configuration.
   # s3:
   #   region: ""
   #   regionEndpoint: ""
@@ -1132,14 +1122,6 @@ fluentd:
     tolerations: []
     nodeSelector: {}
     affinity: {}
-# Optional: Component-specific S3 configuration for fluentd.
-# If not set, the global `.objectStorage.s3 configuration will be used instead.
-# Only set if fluentd needs separate S3 storage configuration.
-  #objectStorage:
-  #  s3:
-  #    region: ""
-  #    regionEndpoint: ""
-  #    forcePathStyle: false
 alerts:
   alertTo: "null"
   opsGenieHeartbeat:
