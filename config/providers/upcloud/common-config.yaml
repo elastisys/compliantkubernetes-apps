@@ -27,8 +27,6 @@ ingressNginx:
       allocateLoadBalancerNodePorts: true
       type: NodePort
       annotations: {}
-externalTrafficPolicy:
-  local: true
 opa:
   rejectLoadBalancerService:
     enabled: true
