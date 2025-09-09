@@ -6890,6 +6890,9 @@ properties:
                   Configure Content-Security-Policy header to be added before sending response traffic to clients
 
                   Reference: https://content-security-policy.com/
+
+                  > [!warning]
+                  > Enabling this in the Ingress-NGINX controller will override any Content-Security-Policies configured in the target service.
                 examples:
                   - default-src 'self' example.com;
               additionalHeaders:
