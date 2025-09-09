@@ -702,6 +702,13 @@ ingressNginx:
     # as well as changing the ingress-nginx namespace to privileged.
     chroot: true
 
+    addHeaders:
+      # Configure a Content-Security-Policy header which will be added before sending response traffic to clients
+      contentSecurityPolicy: "" # "default-src 'self' example.com;"
+
+      # Configure additional headers to be added before sending response traffic to clients
+      additionalHeaders: {}
+
   defaultBackend:
     resources:
       requests:

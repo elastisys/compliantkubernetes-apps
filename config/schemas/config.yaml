@@ -6873,6 +6873,37 @@ properties:
               This is disabled by default due to the maturity of the feature and lack of documentation.
             type: boolean
             default: true
+          addHeaders:
+            title: Ingress-NGINX Headers
+            description: |-
+              Add custom headers before sending response traffic to the client.
+
+              > [!note]
+              > See [the upstream documentation](https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/#add-headers)
+            type: object
+            additionalProperties: false
+            properties:
+              contentSecurityPolicy:
+                title: Ingress-NGINX Content-Security-Policy Header
+                type: string
+                description: |-
+                  Configure Content-Security-Policy header to be added before sending response traffic to clients
+
+                  Reference: https://content-security-policy.com/
+                examples:
+                  - default-src 'self' example.com;
+              additionalHeaders:
+                title: Ingress-NGINX Additional headers
+                description: |-
+                  Configure additional headers for Ingress-NGINX controller.
+
+                  > [!note]
+                  > See [the upstream documentation](https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/#add-headers) for reference.
+                type: object
+                additionalProperties:
+                  title: Ingress NGINX Headers
+                  type: string
+                default: {}
           additionalConfig:
             title: Ingress-NGINX Additional Config
             description: |-
