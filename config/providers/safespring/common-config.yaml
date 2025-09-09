@@ -5,7 +5,7 @@ storageClasses:
 networkPolicies:
   global:
     externalLoadBalancer: true
-    ingressUsingHostNetwork: false
+    ingressUsingHostNetwork: true
   kubeSystem:
     openstack:
       enabled: true
