@@ -162,6 +162,14 @@ controller:
         - namespace
         targetLabel: exported_namespace
 
+  addHeaders:
+    {{- with .Values.ingressNginx.controller.addHeaders.contentSecurityPolicy }}
+    Content-Security-Policy: {{ . }}
+    {{- end }}
+    {{- with .Values.ingressNginx.controller.addHeaders.additionalHeaders }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+
 {{- $global := dict
   "registry" (ternary (dig "uri" "" .Values.images.global.registry) "" .Values.images.global.registry.enabled)
   "repository" (ternary (dig "uri" "" .Values.images.global.repository) "" .Values.images.global.repository.enabled)
