@@ -6037,6 +6037,13 @@ properties:
         type: object
         additionalProperties: false
         properties:
+          contentSecurityPolicy:
+            title: OpenSearch Dashboards Content-Security-Policy
+            description: |-
+              Configure Content-Security-Policy header for OpenSearch Dashboards
+
+              Reference: https://content-security-policy.com/
+            type: array
           subdomain:
             title: OpenSearch Dashboards Subdomain
             description: |-

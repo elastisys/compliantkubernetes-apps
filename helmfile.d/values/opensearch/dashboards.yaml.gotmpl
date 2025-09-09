@@ -10,6 +10,16 @@ config:
     server:
       host: "0"
 
+    {{- with .Values.opensearch.dashboards.contentSecurityPolicy }}
+    csp:
+      strict: true
+
+      rules: {{ toYaml . | nindent 8}}
+    {{- end }}
+
+    opensearchDashboards:
+      configIndex: ".opensearch_dashboards_config"
+
     opensearch:
       ssl:
         verificationMode: none
