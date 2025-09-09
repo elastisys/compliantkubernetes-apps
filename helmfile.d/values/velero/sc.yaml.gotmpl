@@ -68,9 +68,9 @@ configuration:
       {{- if eq .Values.objectStorage.type "s3" }}
       provider: aws
       config:
-        region: {{ .Values.objectStorage.s3.region }}
-        s3ForcePathStyle: {{ .Values.objectStorage.s3.forcePathStyle }}
-        s3Url: {{ .Values.objectStorage.s3.regionEndpoint }}
+        region: {{ include "componentObjectStorage" (list "velero" "region" .) }}
+        s3ForcePathStyle: {{ include "componentObjectStorage" (list "velero" "forcePathStyle" .) }}
+        s3Url: {{ include "componentObjectStorage" (list "velero" "regionEndpoint" .) }}
       {{- else if eq .Values.objectStorage.type "gcs" }}
       provider: gcp
       {{- else if eq .Values.objectStorage.type "azure" }}
@@ -87,7 +87,7 @@ configuration:
     {{- if eq .Values.objectStorage.type "s3" }}
     - provider: aws
       config:
-        region: {{ .Values.objectStorage.s3.region }}
+        region: {{ include "componentObjectStorage" (list "velero" "region" .) }}
     {{- else if eq .Values.objectStorage.type "gcs" }}
     - provider: gcp
       config:
@@ -108,8 +108,8 @@ credentials:
     cloud: |
     {{- if eq .Values.objectStorage.type "s3" }}
       [default]
-      aws_access_key_id: {{ .Values.objectStorage.s3.accessKey }}
-      aws_secret_access_key: {{ .Values.objectStorage.s3.secretKey }}
+      aws_access_key_id: {{ include "componentObjectStorage" (list "velero" "accessKey" .) }}
+      aws_secret_access_key: {{ include "componentObjectStorage" (list "velero" "secretKey" .) }}
     {{- else if eq .Values.objectStorage.type "gcs" }}
       {{ .Values.objectStorage.gcs.keyfileData | nindent 6 }}
     {{- else if eq .Values.objectStorage.type "azure" }}

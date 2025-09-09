@@ -7,9 +7,9 @@ bucket: {{ .Values.objectStorage.buckets.harbor }}
 schedule: {{ .Values.harbor.mpuCleaner.schedule | quote }}
 
 s3:
-  accessKey: {{ .Values.objectStorage.s3.accessKey }}
-  secretKey: {{ .Values.objectStorage.s3.secretKey }}
-  endpoint: {{ .Values.objectStorage.s3.regionEndpoint }}
+  accessKey: {{ include "componentObjectStorage" (list "harbor" "accessKey" .) }}
+  secretKey: {{ include "componentObjectStorage" (list "harbor" "secretKey" .) }}
+  endpoint: {{ include "componentObjectStorage" (list "harbor" "regionEndpoint" .) }}
 
 {{- $global := dict
   "registry" (ternary (dig "uri" "" .Values.images.global.registry) "" .Values.images.global.registry.enabled)

@@ -928,6 +928,36 @@ $defs:
   scrapeTimeout:
     type: string
     pattern: ^((([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?|0)$
+  s3StorageConfig:
+    additionalProperties: false
+    title: S3 Storage Configurations
+    description: |-
+      Configurations for using S3 storage.
+    type: object
+    properties:
+      region:
+        title: S3 Region
+        description: Region to store data.
+        type: string
+      regionEndpoint:
+        title: S3 Region Endpoint
+        description: |-
+          Endpoint to reach the S3 service, mainly applicable for non-AWS implementations.
+          Make sure to prepend the protocol (e.g. `https://`).
+        type: string
+        format: uri
+      forcePathStyle:
+        title: S3 Force Path Style
+        description: |-
+          Force the use of path style access instead of virtual host style access.
+          Generally `false` when using AWS, Exoscale, and UpCloud and `true` for other providers.
+        type: boolean
+      v2Auth:
+        title: S3 v2 authentication
+        description: |-
+          Force the use of v2 authentication, will default to using v4 authentication otherwise.
+        type: boolean
+        default: false
 type: object
 required:
   - global
@@ -2422,6 +2452,14 @@ properties:
           resources:
             $ref: '#/$defs/kubernetesResourceRequirements'
         type: object
+      objectStorage:
+        title: Object Storage Configuration.
+        description: |-
+             Configuration options for using object storage specific to harbor.
+        type: object
+        properties:
+           s3:
+             $ref: '#/$defs/s3StorageConfig'
   storageClasses:
     additionalProperties: false
     title: Storage Classes Config
@@ -2492,36 +2530,7 @@ properties:
             description: Resource group of the storage account.
             type: string
       s3:
-        additionalProperties: false
-        title: S3 Backend Config
-        description: Supports both AWS and non-AWS implementations.
-        type: object
-        properties:
-          region:
-            title: S3 Region
-            description: Region to store data.
-            type: string
-          regionEndpoint:
-            title: S3 Region Endpoint
-            description: |-
-              Endpoint to reach the S3 service, mainly applicable for non-AWS implementations.
-
-              Make sure to prepend the protocol (e.g. `https://`).
-            type: string
-            format: uri
-          forcePathStyle:
-            title: S3 Force Path Style
-            description: |-
-              Force the use of path style access instead of virtual host style access.
-
-              Generally `false` when using AWS, Exoscale, and UpCloud and `true` for other providers.
-            type: boolean
-          v2Auth:
-            title: S3 v2 authentication
-            description: |-
-              Force the use of v2 authentication, will default to using v4 authentication otherwise.
-            type: boolean
-            default: false
+        $ref: '#/$defs/s3StorageConfig'
       swift:
         additionalProperties: false
         title: Swift Backend Config
@@ -2995,6 +3004,14 @@ properties:
         $ref: '#/$defs/kubernetesTolerations'
       nodeSelector:
         $ref: '#/$defs/kubernetesNodeSelector'
+      objectStorage:
+         title: Object Storage Configuration.
+         description: |-
+             Configuration options for using object storage specific to Velero.
+         type: object
+         properties:
+           s3:
+            $ref: '#/$defs/s3StorageConfig'
   clusterAdmin:
     title: Cluster Admin
     description: Configure the cluster admins.
@@ -5222,7 +5239,7 @@ properties:
         description: |-
           Configure Object Storage for Thanos.
 
-          Allows for using OpenStack Swift as the object storage backend type.
+          Allows for using OpenStack Swift as the object storage backend type. Also allows use separate configuration of s3 specific to Thanos.
         additionalProperties: false
         properties:
           type:
@@ -5235,6 +5252,8 @@ properties:
             meta:enum:
               "": Use global object storage type (default).
               swift: Use OpenStack Swift object storage type.
+          s3:
+            $ref: '#/$defs/s3StorageConfig'
         type: object
       bucketweb:
         title: Thanos Bucket Web
@@ -5849,6 +5868,14 @@ properties:
         additionalProperties:
           type: string
           description: ConfigMap content
+      objectStorage:
+         title: Object Storage Configuration.
+         description: |-
+             Configuration options for using object storage specific to Fluentd.
+         type: object
+         properties:
+           s3:
+            $ref: '#/$defs/s3StorageConfig'
   opensearch:
     title: OpenSearch Config
     description: |-
@@ -6465,6 +6492,14 @@ properties:
             alertSizeMB: 5500
           - prefix: other-default
             alertSizeMB: 400
+      objectStorage:
+         title: Object Storage Configuration.
+         description: |-
+             Configuration options for using object storage specific to OpenSearch.
+         type: object
+         properties:
+           s3:
+            $ref: '#/$defs/s3StorageConfig'
       plugins:
         title: OpenSearch Plugins
         description: Configures plugins used in OpenSearch.

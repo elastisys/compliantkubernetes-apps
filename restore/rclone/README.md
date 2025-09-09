@@ -35,6 +35,8 @@ Follow the instruction that matches the scenario:
 > - Disable `objectStorage.restore.addTargetsFromSync` instead of enabling it as noted below.
 > - Configure `objectStorage.restore.targets` manually as noted in the next section.
 
+The same configuration can be used even if some components have component-specific configuration. When `addTargetsFromSync is enabled`, it will generate the targets accordingly.
+
 Enable `rclone-restore` via the config:
 
 ```yaml
@@ -138,6 +140,25 @@ objectStorage:
 
 > [!important]
 > With this configuration `rclone-sync` **_may_ overwrite the data stored in main object storage** depending on your configuration!
+
+## Configure component-specific restore without existing main or sync
+
+In some cases, you may want to restore a specific component’s data from a different cloud provider or region than your global object storage configuration.
+
+Restoring component specific where sync is configured with specific configuration.
+
+```yaml
+# file: sc-config.yaml
+objectStorage:
+  restore:
+    enabled: true
+    addTargetsFromSync: false   # disable auto-generation
+    targets:
+      - destinationName:  <bucket-or-container-name>
+        destinationType: <component-name>-s3 ##component specific configuration eg: harbor-s3
+        sourceName: <bucket-or-container-name> # the bucket in AWS S3 containing the backups
+        sourceType: s3
+```
 
 ## Apply and run
 

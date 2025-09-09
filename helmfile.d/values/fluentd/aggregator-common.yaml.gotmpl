@@ -24,8 +24,8 @@ extraDeploy:
     type: Opaque
     stringData:
       {{- if eq .Values.objectStorage.type "s3" }}
-      AWS_ACCESS_KEY_ID: {{ .Values.objectStorage.s3.accessKey }}
-      AWS_ACCESS_SECRET_KEY: {{ .Values.objectStorage.s3.secretKey }}
+      AWS_ACCESS_KEY_ID: {{ include "componentObjectStorage" (list "fluentd" "accessKey" .) }}
+      AWS_ACCESS_SECRET_KEY: {{ include "componentObjectStorage" (list "fluentd" "secretKey" .) }}
       {{- else if eq .Values.objectStorage.type "azure" }}
       STORAGE_ACCOUNT: {{ .Values.objectStorage.azure.storageAccountName }}
       STORAGE_ACCESS_KEY: {{ .Values.objectStorage.azure.storageAccountKey }}
@@ -182,10 +182,10 @@ aggregator:
       aws_key_id "#{ENV['AWS_ACCESS_KEY_ID']}"
       aws_sec_key "#{ENV['AWS_ACCESS_SECRET_KEY']}"
 
-      s3_endpoint {{ .Values.objectStorage.s3.regionEndpoint }}
-      s3_region {{ .Values.objectStorage.s3.region }}
+      s3_endpoint {{ include "componentObjectStorage" (list "fluentd" "regionEndpoint" .) }}
+      s3_region {{ include "componentObjectStorage" (list "fluentd" "region" .) }}
 
-      force_path_style {{ .Values.objectStorage.s3.forcePathStyle }}
+      force_path_style {{ include "componentObjectStorage" (list "fluentd" "forcePathStyle" .) }}
       {{- else if eq .Values.objectStorage.type "azure" }}
       @type azurestorage
 
