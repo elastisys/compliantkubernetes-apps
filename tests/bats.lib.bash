@@ -20,7 +20,6 @@ if [[ -e /dev/fd/3 ]]; then
   TARGET_OUTPUT="3"
 fi
 
-
 # logging functions
 
 _log.caller() {
