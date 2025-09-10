@@ -26,7 +26,7 @@ _apply() {
 @test "SC helmfile apply is idempotent" {
   _apply sc
 
-  run --separate-stderr bash -eo pipefail -c "ck8s ops helmfile sc diff --output json | sed -n '/^\[/p' | jq -s 'reduce .[] as \$item (0; . + (\$item | length))'"
+  run --separate-stderr bash -eo pipefail -c "ck8s ops helmfile sc diff --concurrency=$(nproc) --output json | sed -n '/^\[/p' | jq -s 'reduce .[] as \$item (0; . + (\$item | length))'"
   assert_success
   assert_output "0"
 }
@@ -34,7 +34,7 @@ _apply() {
 @test "WC helmfile apply is idempotent" {
   _apply wc
 
-  run --separate-stderr bash -eo pipefail -c "ck8s ops helmfile wc diff --output json | sed -n '/^\[/p' | jq -s 'reduce .[] as \$item (0; . + (\$item | length))'"
+  run --separate-stderr bash -eo pipefail -c "ck8s ops helmfile wc diff --concurrency=$(nproc) --output json | sed -n '/^\[/p' | jq -s 'reduce .[] as \$item (0; . + (\$item | length))'"
   assert_success
   assert_output "0"
 }
