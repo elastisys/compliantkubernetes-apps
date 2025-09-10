@@ -360,6 +360,27 @@ cypress_setup() {
     exit 1
   fi
 
+  # Check for "before-each" hook failure
+  if [[ -n "$(jq -r 'select((.[0] == "fail") and (.[1].title | contains("\"before each\" hook for")))' "${CYPRESS_REPORT}")" ]]; then
+    echo "One or more \"before each\" hooks failed" >&2
+    jq -r 'select((.[0] == "fail") and (.[1].title | contains("\"before each\" hook for"))) | .[1].stack' "${CYPRESS_REPORT}"
+    exit 1
+  fi
+
+  # Check for "after-each" hook failure
+  if [[ -n "$(jq -r 'select((.[0] == "fail") and (.[1].title | contains("\"after each\" hook for")))' "${CYPRESS_REPORT}")" ]]; then
+    echo "One or more \"after each\" hooks failed" >&2
+    jq -r 'select((.[0] == "fail") and (.[1].title | contains("\"after each\" hook for"))) | .[1].stack' "${CYPRESS_REPORT}"
+    exit 1
+  fi
+
+  # Check for "after-all" hook failure
+  if [[ -n "$(jq -r 'select((.[0] == "fail") and (.[1].title | contains("\"after all\" hook for")))' "${CYPRESS_REPORT}")" ]]; then
+    echo "One or more \"after all\" hooks failed" >&2
+    jq -r 'select((.[0] == "fail") and (.[1].title | contains("\"after all\" hook for"))) | .[1].stack' "${CYPRESS_REPORT}"
+    exit 1
+  fi
+
   export CYPRESS_REPORT
 }
 
