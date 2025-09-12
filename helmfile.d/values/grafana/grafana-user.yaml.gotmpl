@@ -130,6 +130,11 @@ grafana.ini:
     default_home_dashboard_path: /tmp/dashboards/welcome-dashboard.json
   dataproxy:
     timeout: {{ .Values.grafana.user.dataproxy.timeout }}
+  {{- with .Values.grafana.user.contentSecurityPolicy }}
+  security:
+    content_security_policy: true
+    content_security_policy_template: {{ . }}
+  {{- end }}
   {{- if .Values.grafana.user.additionalConfigValues }}
   {{ .Values.grafana.user.additionalConfigValues | nindent 2 }}
   {{- end }}
