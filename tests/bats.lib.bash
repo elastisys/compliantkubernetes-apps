@@ -23,13 +23,19 @@ fi
 # logging functions
 
 _log.caller() {
-  # assumes call is an array
+  # assume call is an array
   readarray -d " " -t call < <(caller 2)
-  # locates transformed bats file
+  # catch main
+  if [[ "${call[*]}" == "" ]]; then
+    readarray -d " " -t call < <(caller 1)
+  fi
+  # locate transformed bats file
   if [[ "${call[2]}" =~ /tmp/bats-run ]]; then
     call[2]="${BATS_TEST_FILENAME:-"unknown"}"
   fi
-  # truncates path inside repository
+  # resolve absolute path
+  call[2]="$(readlink -f "${call[2]}")"
+  # truncate inside repository
   call[2]="${call[2]#"${ROOT}/"}"
 }
 
@@ -79,7 +85,7 @@ log.fatal() {
 }
 
 log.trace() {
-  echo -e "# \e[2m${*}\e[0m" >&3 >&"${TARGET_OUTPUT}"
+  echo -e "# \e[2m${*}\e[0m" >&"${TARGET_OUTPUT}"
 }
 
 # setup a marker for serial tests to check progress
