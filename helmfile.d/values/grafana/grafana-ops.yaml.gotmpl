@@ -132,6 +132,11 @@ grafana.ini:
     viewers_can_edit: {{ .Values.grafana.ops.viewersCanEdit }}
   dataproxy:
     timeout: {{ .Values.grafana.ops.dataproxy.timeout }}
+  {{- with .Values.grafana.ops.contentSecurityPolicy }}
+  security:
+    content_security_policy: true
+    content_security_policy_template: {{ . }}
+  {{- end }}
   {{- if .Values.grafana.ops.additionalConfigValues }}
   {{ .Values.grafana.ops.additionalConfigValues | nindent 2 }}
   {{- end }}
