@@ -160,8 +160,8 @@ velero:
   ## https://velero.io/docs/main/restore-reference/#restore-order
   restoreResourcePriorities:
     - customresourcedefinitions
-    - subnamespaceanchors
     - namespaces
+    - subnamespaceanchors
     - storageclasses
     - volumesnapshotclass.snapshot.storage.k8s.io
     - volumesnapshotcontents.snapshot.storage.k8s.io
