@@ -23,6 +23,8 @@ has_diff=0
 #TODO: To be changed when decision made on networkpolicies for azure storage
 storage_service=$(yq '.objectStorage.type' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml")
 
+cloud_provider=$(yq '.global.ck8sCloudProvider' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml")
+
 CK8S_IPV6_ENABLED="${3:-"false"}"
 
 # Get the value of the config option or the provided default value if the
@@ -391,6 +393,23 @@ allow_cidrs() {
   yq_eval "${config_file}" "${config_option}" "${config_option} = ${list}"
 }
 
+# Appends cidrs
+#
+# Usage: append_cidrs <config_file> <config_options> <cidr> [<cidr> ...]
+append_cidrs() {
+  local config_file="${1}"
+  local config_option="${2}"
+  shift 2
+
+  local -a cidrs
+  readarray -t cidrs <<<"$(sort_cidrs "${@}")"
+
+  local list
+  list=$(echo "[$(for v in "${cidrs[@]}"; do echo "${v},"; done)]" | yq -oj)
+
+  yq_eval "${config_file}" "${config_option}" "${config_option} += ${list}"
+}
+
 # Updates the configuration to allow IPs.
 #
 # Usage: allow_ips <config_file> <config_option> <ip> [<ip> ...]
@@ -403,6 +422,20 @@ allow_ips() {
   readarray -t cidrs <<<"$(process_ips_to_cidrs "${config_file}" "${config_option}" "${@}")"
 
   allow_cidrs "${config_file}" "${config_option}" "${cidrs[@]}"
+}
+
+# appends to the configuration to allow IPs.
+#
+# Usage: append_ips <config_file> <config_option> <ip> [<ip> ...]
+append_ips() {
+  local config_file="${1}"
+  local config_option="${2}"
+  shift 2
+
+  local -a cidrs
+  readarray -t cidrs <<<"$(process_ips_to_cidrs "${config_file}" "${config_option}" "${@}")"
+
+  append_cidrs "${config_file}" "${config_option}" "${cidrs[@]}"
 }
 
 # Updates the configuration to allow ports.
@@ -587,6 +620,23 @@ allow_ingress() {
 
   allow_domain "${config["override_common"]}" '.networkPolicies.global.scIngress.ips' "grafana.${ops_domain}"
   allow_domain "${config["override_common"]}" '.networkPolicies.global.wcIngress.ips' "non-existing-subdomain.${base_domain}"
+
+  if [ "${cloud_provider}" == "upcloud" ]; then
+    local sc_private_address
+    local wc_private_address
+
+    local -a sc_array
+    local -a wc_array
+
+    sc_private_address=$(jq -r '.resources[].instances[].attributes.nodes | select( . != null) | .[].networks[].ip_addresses[] | select( .listen == false) | .address' "${CK8S_CONFIG_PATH}"/sc-config/terraform.tfstate)
+    wc_private_address=$(jq -r '.resources[].instances[].attributes.nodes | select( . != null) | .[].networks[].ip_addresses[] | select( .listen == false) | .address' "${CK8S_CONFIG_PATH}"/wc-config/terraform.tfstate)
+
+    readarray -t sc_array <<<"${sc_private_address[@]}"
+    readarray -t wc_array <<<"${wc_private_address[@]}"
+
+    append_ips "${config["override_common"]}" '.networkPolicies.global.scIngress.ips' "${sc_array[@]}"
+    append_ips "${config["override_common"]}" '.networkPolicies.global.wcIngress.ips' "${wc_array[@]}"
+  fi
 }
 
 # Synchronize the Swift object storage network policy configuration.
