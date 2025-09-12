@@ -34,6 +34,17 @@ spec:
       {{- end }}
         - namespaceSelector:
             matchLabels:
+              kubernetes.io/metadata.name: opensearch-system
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: harbor
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/component: core
+              app.kubernetes.io/instance: harbor
+              app.kubernetes.io/name: harbor
+        - namespaceSelector:
+            matchLabels:
               kubernetes.io/metadata.name: monitoring
           podSelector:
             matchLabels:
