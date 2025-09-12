@@ -871,9 +871,9 @@ networkPlugin:
   type: calico
   calico:
     calicoAccountant:
-      # Backend for networkpolicy rules - Ubuntu 20.04 and older use iptables - Ubuntu 22.04 and newer use nftables
       # Can be only enabled if .networkPlugin.type is "calico"
       enabled: true
+      # Backend for networkpolicy rules - Ubuntu 20.04 and older use iptables - Ubuntu 22.04 and newer use nftables
       backend: nftables
       tolerations:
         - key: node-role.kubernetes.io/master
