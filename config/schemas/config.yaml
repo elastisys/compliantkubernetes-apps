@@ -4474,6 +4474,17 @@ properties:
           additionalDatasources:
             title: Grafana Additional Datasources
             type: object
+          contentSecurityPolicy:
+            title: Grafana Content-Security-Policy
+            description: |-
+              Configure Content-Security-Policy header for Grafana
+
+              References:
+              - https://content-security-policy.com/
+              - https://grafana.com/docs/grafana/latest/setup-grafana/configure-security/configure-security-hardening/#add-a-content-security-policy
+            type: string
+            examples:
+              - default-src 'self' example.com;
           dataproxy:
             title: Grafana dataproxy values
             description: Configure Grafana dataproxy values
