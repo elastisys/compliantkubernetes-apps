@@ -125,28 +125,6 @@ extraEnvs:
   - name: DISABLE_INSTALL_DEMO_CONFIG
     value: "true"
 
-# This is a workaround to set vm.max_map_count before OpenSearch starts.
-# The chart provides this using non privileged container, and instead allows the unsafe sysctl through PSP.
-# However this relies on the unsafe sysctl to be allowed in kubelet, which it is not by default.
-extraInitContainers:
-  - name: init-sysctl
-    {{- with .Values.images | dig "opensearch" "initSysctl" "" }}
-    {{- with merge (include "container_uri.parse" . | fromJson) $global }}
-    image: "{{- include "gen.container_uri" . }}"
-    {{- end }}
-    {{- else }}
-    image: ghcr.io/elastisys/curl-jq:1.0.0
-    {{- end }}
-    command:
-      - sysctl
-      - -w
-      - vm.max_map_count=262144
-    securityContext:
-      allowPrivilegeEscalation: true
-      privileged: true
-      runAsNonRoot: false
-      runAsUser: 0
-
 secretMounts:
   - secretName: opensearch-transport-cert
     name: opensearch-transport-cert

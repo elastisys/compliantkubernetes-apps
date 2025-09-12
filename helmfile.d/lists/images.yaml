@@ -75,7 +75,6 @@ images:
     image: registry.k8s.io/dns/k8s-dns-node-cache:1.25.0
   opensearch:
     image: docker.io/opensearchproject/opensearch:2.19.3
-    initSysctl: ghcr.io/elastisys/curl-jq:1.0.0
     dashboards: docker.io/opensearchproject/opensearch-dashboards:2.19.3
     configurerJob: ghcr.io/elastisys/curl-jq:1.0.0
     curatorCronjob: ghcr.io/elastisys/bitnami/elasticsearch-curator:5.8.4-debian-10-r235

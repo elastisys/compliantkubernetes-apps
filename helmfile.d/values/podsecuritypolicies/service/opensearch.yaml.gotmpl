@@ -4,12 +4,6 @@ constraints:
       podSelectorLabels:
         app.kubernetes.io/name: opensearch
       allow:
-        allowPrivilegeEscalation: true
-        # allowedUnsafeSysctls:
-        #   - vm.max_map_count
-        privileged: true
-        runAsUser:
-          rule: RunAsAny
         volumes:
           - configMap
           - emptyDir
