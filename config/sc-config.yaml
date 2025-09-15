@@ -755,8 +755,10 @@ opensearch:
   createIndices: true
 
   dashboards:
-    contentSecurityPolicy: []
+    contentSecurityPolicy:
+      rules: []
       # - "default-src 'self' example.com;"
+      strict: true
 
     # subdomain moved to common-config
     # Note SSO is enabled via `opensearch.sso.enabled`
