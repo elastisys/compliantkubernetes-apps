@@ -243,7 +243,7 @@ test_job_complete() {
 # usage: test_run_cronjob <name> <timeout>
 test_run_cronjob() {
   local job_name
-  job_name="$(echo "${1}-$(uuid)" | head -c 63)"
+  job_name="$(echo "${1}-$(uuid)" | head -c 63 | sed 's/-$//g')"
 
   test_cronjob "${1}"
 
