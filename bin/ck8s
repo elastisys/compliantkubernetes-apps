@@ -33,8 +33,8 @@ usage() {
   echo "  team remove-pgp <fp>                            remove a PGP key from secrets and rotate the data encryption key" 1>&2
   echo "  test <wc|sc> [--logging-enabled]                test the applications" 1>&2
   echo "  update-ips <wc|sc|both> <apply|dry-run>         Automatically fetches and applies the IPs for network policies" 1>&2
-  echo "  upgrade <wc|sc|both> <vX.Y> apply               runs all apply steps upgrading the environment" 1>&2
-  echo "  upgrade <wc|sc|both> <vX.Y> prepare             runs all prepare steps upgrading the configuration" 1>&2
+  echo "  upgrade <wc|sc|both> <main|vX.Y> apply          runs all apply steps upgrading the environment" 1>&2
+  echo "  upgrade <wc|sc|both> <main|vX.Y> prepare        runs all prepare steps upgrading the configuration" 1>&2
   echo "  upgrade <wc|sc|both> unlock                     reset an upgrade to allow trying again" 1>&2
   echo "  validate <wc|sc>                                validates config files" 1>&2
   echo "  check-requirements                              check the locally installed tool versions" 1>&2
@@ -86,7 +86,7 @@ dry-run)
   ;;
 upgrade)
   [[ "${2}" =~ ^(wc|sc|both)$ ]] || usage
-  [[ "${3}" =~ ^(v[0-9]+\.[0-9]+|unlock)$ ]] || usage
+  [[ "${3}" =~ ^(main|v[0-9]+\.[0-9]+|unlock)$ ]] || usage
   if [[ "${3}" != "unlock" ]]; then
     [[ "${4}" =~ ^(prepare|apply)$ ]] || usage
   fi
