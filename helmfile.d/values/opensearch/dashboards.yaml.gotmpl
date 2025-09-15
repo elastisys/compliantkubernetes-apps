@@ -12,9 +12,12 @@ config:
 
     {{- with .Values.opensearch.dashboards.contentSecurityPolicy }}
     csp:
-      strict: true
-
+      {{- with .rules }}
       rules: {{ toYaml . | nindent 8}}
+      {{- end }}
+      {{- with .strict }}
+      strict: {{ . }}
+      {{- end }}
     {{- end }}
 
     opensearchDashboards:
