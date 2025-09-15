@@ -756,8 +756,13 @@ opensearch:
 
   dashboards:
     contentSecurityPolicy:
-      rules: []
-      # - "default-src 'self' example.com;"
+      rules:
+        - "default-src 'self'"
+        - "frame-ancestors 'none'"
+        - "img-src 'self' data:"
+        - "script-src 'unsafe-eval' 'self'"
+        - "style-src 'unsafe-inline' 'self'"
+        - "worker-src blob: 'self'"
       strict: true
 
     # subdomain moved to common-config
