@@ -162,7 +162,7 @@ grafana:
     additionalConfigValues: ""
     dataproxy:
       timeout: 600
-    contentSecurityPolicy: "script-src 'self' 'unsafe-eval' 'unsafe-inline' 'strict-dynamic' $NONCE;object-src 'none';font-src 'self';style-src 'self' 'unsafe-inline' blob:;img-src * data:;base-uri 'self';connect-src 'self' grafana.com ws://$ROOT_PATH wss://$ROOT_PATH;manifest-src 'self';media-src 'none';form-action 'self';"
+    contentSecurityPolicy: script-src 'self' 'unsafe-eval' 'unsafe-inline' 'strict-dynamic' $${q}NONCE;object-src 'none';font-src 'self';style-src 'self' 'unsafe-inline' blob:;img-src * data:;base-uri 'self';connect-src 'self' grafana.com ws://$${q}ROOT_PATH wss://$${q}ROOT_PATH;manifest-src 'self';media-src 'none';form-action 'self';
   user:
     enabled: true
     # subdomain moved to common-config
