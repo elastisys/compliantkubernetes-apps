@@ -50,7 +50,7 @@ images:
     admissionWebhooksPatch: registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.5.2
     fileCopier: docker.io/library/busybox:1.36
   kured:
-    image: ghcr.io/kubereboot/kured:1.17.0
+    image: ghcr.io/kubereboot/kured:1.20.0
   kyverno:
     main: ghcr.io/kyverno/kyverno:v1.13.4
     init: ghcr.io/kyverno/kyverno:v1.13.4
