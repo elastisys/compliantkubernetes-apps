@@ -7,6 +7,7 @@ metadata:
   {{- else }}
   name: {{ template "kured.fullname" . }}
   {{- end }}
+  namespace: {{ .Release.Namespace }}
   labels:
     {{- include "kured.labels" . | nindent 4 }}
   {{- if .Values.service.annotations }}
