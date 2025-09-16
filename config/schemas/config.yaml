@@ -3221,11 +3221,11 @@ properties:
             default: kmod
             enum:
               - kmod
-              - modern-bpf
+              - modern_ebpf
               - ebpf
             meta:enum:
               kmod: Kernel module (default)
-              modern-bpf: Modern eBPF probe
+              modern_ebpf: Modern eBPF probe
               ebpf: Legacy eBPF probe
         if:
           properties:
@@ -3251,7 +3251,7 @@ properties:
             kind:
               type: string
               enum:
-                - modern-bpf
+                - modern_ebpf
                 - ebpf
             ebpf:
               additionalProperties: false

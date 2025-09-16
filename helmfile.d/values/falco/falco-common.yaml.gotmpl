@@ -75,8 +75,8 @@ driver:
     {{- end }}
     hostNetwork: {{ .Values.falco.driver.ebpf.hostNetwork }}
     leastPrivileged: true
-  {{- else if eq .Values.falco.driver.kind "modern-bpf" }}
-  modern_bpf:
+  {{- else if eq .Values.falco.driver.kind "modern_ebpf" }}
+  modernEbpf:
     leastPrivileged: true
   {{- end }}
   loader:
