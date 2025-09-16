@@ -18,11 +18,15 @@ dsAnnotations: {}
 extraArgs: {}
 
 extraEnvVars:
-#  - name: slackHookUrl
+#  - name: KURED_SLACK_HOOK_URL
 #    valueFrom:
 #      secretKeyRef:
 #        name: secret_name
 #        key: secret_key
+#
+# Note: To override kured options with environment variables, use the KURED_ prefix and uppercase with underscores.
+# For example, to override slackHookUrl, use KURED_SLACK_HOOK_URL. For notifyUrl, use KURED_NOTIFY_URL.
+#
 #  - name: regularEnvVariable
 #    value: 123
 
@@ -76,6 +80,7 @@ rbac:
 serviceAccount:
   create: true
   name:
+  extraAnnotations: {}
 
 podSecurityPolicy:
   create: false
