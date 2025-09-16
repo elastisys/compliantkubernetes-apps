@@ -6,16 +6,6 @@ templates:
     labels:
       app: opensearch
 
-  opensearch-podsecuritypolicy:
-    inherit:
-      - template: opensearch
-      - template: podsecuritypolicies
-    installed: {{ and (.Values | get "ck8sManagementCluster.enabled" false) (.Values | get "opensearch.enabled" false) }}
-    labels:
-      psp: opensearch
-    values:
-      - values/podsecuritypolicies/service/opensearch.yaml.gotmpl
-
   opensearch-secrets:
     disableValidationOnInstall: true # creates cert-manager/certificates
     inherit: [ template: opensearch ]
@@ -41,7 +31,6 @@ templates:
       {{- end }}
       - kube-system/service-cluster-np
       - opensearch-system/opensearch-secrets
-      - opensearch-system/podsecuritypolicy
     values:
       - values/opensearch/common.yaml.gotmpl
       - values/opensearch/master.yaml.gotmpl
@@ -56,7 +45,6 @@ templates:
     needs:
       - kube-system/service-cluster-np
       - opensearch-system/opensearch-master
-      - opensearch-system/podsecuritypolicy
     values:
       - values/opensearch/common.yaml.gotmpl
       - values/opensearch/client.yaml.gotmpl
@@ -71,7 +59,6 @@ templates:
     needs:
       - kube-system/service-cluster-np
       - opensearch-system/opensearch-master
-      - opensearch-system/podsecuritypolicy
     values:
       - values/opensearch/common.yaml.gotmpl
       - values/opensearch/data.yaml.gotmpl
@@ -89,7 +76,6 @@ templates:
       {{- end }}
       - kube-system/service-cluster-np
       - opensearch-system/opensearch-master
-      - opensearch-system/podsecuritypolicy
     values:
       - values/opensearch/dashboards.yaml.gotmpl
     wait: true
