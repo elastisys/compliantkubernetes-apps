@@ -13,8 +13,8 @@
         "actions": [
           {
             "rollover": {
-              "min_size": "{{ .Values.config.ism.rolloverSize }}GB",
-              "min_index_age": "{{ .Values.config.ism.rolloverAge }}d"
+              "min_size": "{{ .Values.config.ism.authlog.rolloverSize }}MB",
+              "min_index_age": "{{ .Values.config.ism.authlog.rolloverAge }}d"
             }
           }
         ]
