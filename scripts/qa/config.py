@@ -42,7 +42,7 @@ SwiftSecrets = TypedDict(
 )
 
 ObjectStorageSecrets = TypedDict(
-    "ObjectStorageSecrets", {"s3": AwsSecrets, "swift": SwiftSecrets}, total=False
+    "ObjectStorageSecrets", {"s3": AwsSecrets, "swift": Optional[SwiftSecrets]}
 )
 
 S3Config = TypedDict("S3Config", {"region": str, "regionEndpoint": str})
@@ -51,8 +51,7 @@ ObjectStorageConfig = TypedDict("ObjectStorageConfig", {"s3": S3Config})
 
 ObjectStorage = TypedDict(
     "ObjectStorage",
-    {"config": ObjectStorageConfig, "secrets": ObjectStorageSecrets},
-    total=False,
+    {"config": Optional[ObjectStorageConfig], "secrets": ObjectStorageSecrets},
 )
 
 Subnets = TypedDict(
@@ -71,7 +70,7 @@ class Config(TypedDict):
     dnsProvider: DnsProvider
 
     externalLoadbalancers: Optional[ExternalLoadbalancers]
-    objectStorage: Optional[ObjectStorage]
+    objectStorage: ObjectStorage
 
     wcSubnets: Optional[Subnets]
     scSubnets: Optional[Subnets]
