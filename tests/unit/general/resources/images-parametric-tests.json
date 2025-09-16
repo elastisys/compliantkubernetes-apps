@@ -271,12 +271,6 @@
       "template_file": "sc/opensearch/templates/statefulset.yaml"
     },
     {
-      "image_property": "opensearch.initSysctl",
-      "helmfile_selector": "app=opensearch",
-      "container_name": "init-sysctl",
-      "template_file": "sc/opensearch/templates/statefulset.yaml"
-    },
-    {
       "image_property": "opensearch.dashboards",
       "helmfile_selector": "app=opensearch",
       "container_name": "dashboards",
