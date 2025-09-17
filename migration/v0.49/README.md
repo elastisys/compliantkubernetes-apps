@@ -109,7 +109,7 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     export CK8S_CLUSTER=<wc|sc|both>
     ```
 
-1. Reinstall OpenSearch, as its PSA has been lowered to `restricted`.
+1. Apply OpenSearch and remove PSPs, as its PSA has been lowered to `restricted`.
 
     ```bash
     ./migration/v0.49/apply/30-opensearch-initContainer.sh
