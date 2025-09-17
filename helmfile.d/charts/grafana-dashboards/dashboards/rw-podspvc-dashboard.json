@@ -19,7 +19,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 4494,
+  "id": 4908,
   "links": [],
   "panels": [
     {
@@ -420,8 +420,8 @@
       {
         "allowCustomValue": false,
         "current": {
-          "text": "Thanos All",
-          "value": "PE090269EBE049DA8"
+          "text": "Service Cluster",
+          "value": "PD3B28F1364F2B8D6"
         },
         "description": "",
         "label": "Datasource",
@@ -433,25 +433,28 @@
         "type": "datasource"
       },
       {
+        "allowCustomValue": false,
         "current": {
           "text": [
-            "opensearch-system",
-            "alertmanager",
             "fluentd-system",
-            "harbor",
+            "thanos",
+            "opensearch-system",
             "monitoring",
-            "thanos"
+            "harbor"
           ],
           "value": [
-            "opensearch-system",
-            "alertmanager",
             "fluentd-system",
-            "harbor",
+            "thanos",
+            "opensearch-system",
             "monitoring",
-            "thanos"
+            "harbor"
           ]
         },
-        "definition": "label_values(kube_pod_info,namespace)",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${datasource}"
+        },
+        "definition": "label_values(kube_namespace_status_phase{job=\"kube-state-metrics\"},namespace)",
         "description": "",
         "includeAll": false,
         "label": "Namespace",
@@ -460,11 +463,12 @@
         "options": [],
         "query": {
           "qryType": 1,
-          "query": "label_values(kube_pod_info,namespace)",
+          "query": "label_values(kube_namespace_status_phase{job=\"kube-state-metrics\"},namespace)",
           "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
         "refresh": 1,
         "regex": "",
+        "sort": 1,
         "type": "query"
       }
     ]
@@ -477,5 +481,5 @@
   "timezone": "",
   "title": "Read and Write - Namespace (Pods with PVCs)",
   "uid": "277ee1ad-fad0-453f-a0a0-e10eda8c8131",
-  "version": 12
+  "version": 3
 }
