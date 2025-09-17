@@ -23,5 +23,4 @@ run() {
   esac
 }
 
-#run "${@}"
-helmfile_upgrade sc app=opensearch
+run "${@}"
