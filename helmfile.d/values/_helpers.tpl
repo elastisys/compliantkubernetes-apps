@@ -96,5 +96,5 @@ after the separator.
 {{- $key := index . 1 -}}
 {{- $ctx := index . 2 -}}
 {{- $default := $ctx.Values | dig "objectStorage" "s3" $key "" -}}
-{{- $ctx.Values | dig $component "objectStorage" "s3" $key $default | quote }}
+{{- $ctx.Values | dig $component "objectStorage" "s3" $key $default }}
 {{- end }}
