@@ -135,7 +135,7 @@ grafana.ini:
   {{- with .Values.grafana.ops.contentSecurityPolicy }}
   security:
     content_security_policy: true
-    content_security_policy_template: {{ . }}
+    content_security_policy_template: {{ . | quote }}
   {{- end }}
   {{- if .Values.grafana.ops.additionalConfigValues }}
   {{ .Values.grafana.ops.additionalConfigValues | nindent 2 }}
