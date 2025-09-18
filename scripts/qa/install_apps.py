@@ -168,26 +168,26 @@ def configure_apps(
     common_config.set("networkPlugin.calico.calicoFelixMetrics", {"enabled": False})
 
     # Open up Network Policies
-    common_config.set(
-        "networkPolicies",
-        {
-            "global": {
-                "scIngress": ALL_IPS,
-                "wcIngress": ALL_IPS,
-                "trivy": ALL_IPS,
-                "objectStorage": {**ALL_IPS, "ports": [443]},
-                "objectStorageSwift": ALL_IPS,
-            },
-            "kubeSystem": {"openstack": ALL_IPS},
-            "alertmanager": {"alertReceivers": ALL_IPS},
-            "coredns": {"externalDns": ALL_IPS},
-            "dex": {"connectors": ALL_IPS},
-            "falco": {"plugins": ALL_IPS},
-            "harbor": {"jobservice": ALL_IPS, "registries": ALL_IPS, "trivy": ALL_IPS},
-            "kured": {"notificationSlack": ALL_IPS},
-            "opensearch": {"plugins": ALL_IPS},
+    common_network_policies = {
+        "global": {
+            "scIngress": ALL_IPS,
+            "wcIngress": ALL_IPS,
+            "trivy": ALL_IPS,
+            "objectStorage": {**ALL_IPS, "ports": [443]},
+            "objectStorageSwift": ALL_IPS,
         },
-    )
+        "alertmanager": {"alertReceivers": ALL_IPS},
+        "coredns": {"externalDns": ALL_IPS},
+        "dex": {"connectors": ALL_IPS},
+        "falco": {"plugins": ALL_IPS},
+        "harbor": {"jobservice": ALL_IPS, "registries": ALL_IPS, "trivy": ALL_IPS},
+        "kured": {"notificationSlack": ALL_IPS},
+        "opensearch": {"plugins": ALL_IPS},
+    }
+    if args.cloud_provider in ["openstack", "upcloud"]:
+        common_network_policies["kubeSystem"] = {args.cloud_provider: ALL_IPS}
+
+    common_config.set("networkPolicies", common_network_policies)
 
     sc_config.set("networkPolicies.global", {"scApiserver": ALL_IPS, "scNodes": ALL_IPS})
     wc_config.set("networkPolicies.global", {"wcApiserver": ALL_IPS, "wcNodes": ALL_IPS})
