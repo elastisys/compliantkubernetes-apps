@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-here="$(dirname "$(readlink -f "$0")")"
+here="$(dirname "$(readlink --canonicalize "$0")")"
 # shellcheck source=bin/common.bash
 source "${here}/common.bash"
 
@@ -190,8 +190,8 @@ run_diagnostics() {
     echo -e "All pods are ready"
   else
     for pod in "${pod_arr[@]}"; do
-      pod_name=$(echo "$pod" | jq -r '.name')
-      namespace=$(echo "$pod" | jq -r '.namespace')
+      pod_name=$(echo "$pod" | jq --raw-output '.name')
+      namespace=$(echo "$pod" | jq --raw-output '.namespace')
 
       echo -e "\nDescribing pod <${pod_name}>"
       "${here}/ops.bash" kubectl "${cluster}" describe pod "${pod_name}" -n "${namespace}"
@@ -244,8 +244,8 @@ run_diagnostics() {
     echo -e "All challenges are valid"
   else
     for challenge in "${challenge_arr[@]}"; do
-      challenge_name=$(echo "$challenge" | jq -r '.name')
-      namespace=$(echo "$challenge" | jq -r '.namespace')
+      challenge_name=$(echo "$challenge" | jq --raw-output '.name')
+      namespace=$(echo "$challenge" | jq --raw-output '.namespace')
       "${here}/ops.bash" kubectl "${cluster}" describe challenge "${challenge_name}" -n "${namespace}"
     done
   fi
@@ -345,7 +345,7 @@ run_diagnostics_default_metrics() {
     print_func="${2}"
     res="$(curl "${endpoint}/query_range" --insecure -s --header "${header}" --data-urlencode query="${query}" "${range_arg[@]}")"
     if [[ $(jq '.data.result | length' <<<"${res}") -gt 0 ]]; then
-      readarray metric_results_arr < <(jq -c '.data.result[]' <<<"${res}")
+      readarray metric_results_arr < <(jq --compact-output '.data.result[]' <<<"${res}")
       for row in "${metric_results_arr[@]}"; do
         "${print_func}" "${row}"
       done
@@ -364,7 +364,7 @@ run_diagnostics_default_metrics() {
   query_and_parse 'sum(rate(fluentd_output_status_retry_count[1m])) > 0' print_fluentd
 
   print_dropped_packages() {
-    direction="$([[ $(jq -r .metric.type <<<"${1}") == "fw" ]] && echo "from" || echo "to")"
+    direction="$([[ $(jq --raw-output .metric.type <<<"${1}") == "fw" ]] && echo "from" || echo "to")"
     pod="$(jq '.metric.exported_pod' <<<"${1}")"
     echo "Found dropped packages going ${direction} pod: ${pod} on dates:"
     jq '.values[][0]' <<<"${1}" | xargs -I {} date -d@{}
