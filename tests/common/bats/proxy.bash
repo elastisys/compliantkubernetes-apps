@@ -18,7 +18,7 @@ proxy.start_proxy() {
   local -r fifo="${TMPDIR:-/tmp}/kube-proxy-fifo-${RANDOM}"
   mkfifo "$fifo"
 
-  echo -e "\033[1m[Starting kube proxy for ${1}]\033[0m" >&3
+  log.trace "start kube proxy for ${1}"
   kubectl proxy --port=0 --keepalive=3s >"$fifo" 2>&1 &
   proxy_pids+=($!)
 
@@ -27,7 +27,7 @@ proxy.start_proxy() {
 
   curl --silent --retry 10 --retry-all-errors "http://127.0.0.1:${port}/healthz"
 
-  echo -e "\033[1m[Kube proxy for ${1} started on port=${port}]\033[0m" >&3
+  log.trace "kube proxy started for ${1} on port ${port}"
 
   case "${1}" in
   sc) export SC_PROXY_PORT="${port}" ;;
@@ -38,7 +38,7 @@ proxy.start_proxy() {
 
 # Usage: proxy.stop_all
 proxy.stop_all() {
-  echo -e "\033[1m[Stopping all kube proxies]\033[0m" >&3
+  log.trace "stop all kube proxies"
   local pid
   for pid in "${proxy_pids[@]}"; do
     kill "${pid}" || true

@@ -74,6 +74,10 @@ args+=("--hostname" "compliantkubernetes-apps-tests")
 args+=("--workdir" "${root}")
 args+=("--env" "LANG=C.UTF-8")
 
+if [[ "${GITHUB_ACTIONS:-}" == "true" ]]; then
+  args+=("--env" "GITHUB_ACTIONS")
+fi
+
 # Prepare podman to work with selinux
 if [[ "${runtime}" == "podman" ]]; then
   if [[ "${FORWARD_ENVIRONMENT:-false}" == "true" ]] || [[ "${FORWARD_RUNTIME:-false}" == "true" ]]; then

@@ -15,21 +15,77 @@ export ROOT
 
 export CK8S_TESTS_HARNESS="true"
 
-log.fatal() {
-  if [[ -e /dev/fd/3 ]]; then
-    echo "error: ${1}" >&3
-  else
-    echo "error: ${1}" >&2
+TARGET_OUTPUT="2"
+if [[ -e /dev/fd/3 ]]; then
+  TARGET_OUTPUT="3"
+fi
+
+# logging functions
+
+_log.caller() {
+  # assume call is an array
+  readarray -d " " -t call < <(caller 2)
+  # catch main
+  if [[ "${call[*]}" == "" ]]; then
+    readarray -d " " -t call < <(caller 1)
   fi
+  # locate transformed bats file
+  if [[ "${call[2]}" =~ /tmp/bats-run ]]; then
+    call[2]="${BATS_TEST_FILENAME:-"unknown"}"
+  fi
+  # resolve absolute path
+  call[2]="$(readlink -f "${call[2]}")"
+  # truncate inside repository
+  call[2]="${call[2]#"${ROOT}/"}"
+}
+
+log.note() {
+  local -a call
+  _log.caller
+
+  if [[ "${GITHUB_ACTIONS:-}" == "true" ]]; then
+    echo -e "::notice file=${call[2]},line=${call[0]} ::note from ${call[1]}: ${*}"
+  else
+    echo -e "# \e[1;34mnote from ${call[1]} in ${call[2]}:${call[0]}\e[0;1m: ${*}\e[0m" >&"${TARGET_OUTPUT}"
+  fi >&"${TARGET_OUTPUT}"
+}
+
+log.warn() {
+  local -a call
+  _log.caller
+
+  if [[ "${GITHUB_ACTIONS:-}" == "true" ]]; then
+    echo -e "::warning file=${call[2]},line=${call[0]} ::warn from ${call[1]}: ${*}"
+  else
+    echo -e "# \e[1;33mwarn from ${call[1]} in ${call[2]}:${call[0]}\e[0;1m: ${*}\e[0m"
+  fi >&"${TARGET_OUTPUT}"
+}
+
+log.error() {
+  local -a call
+  _log.caller
+
+  if [[ "${GITHUB_ACTIONS:-}" == "true" ]]; then
+    echo -e "::error file=${call[2]},line=${call[0]} ::error from ${call[1]}: ${*}"
+  else
+    echo -e "# \e[1;31merror from ${call[1]} in ${call[2]}:${call[0]}\e[0;1m: ${*}\e[0m"
+  fi >&"${TARGET_OUTPUT}"
+}
+
+log.fatal() {
+  local -a call
+  _log.caller
+
+  if [[ "${GITHUB_ACTIONS:-}" == "true" ]]; then
+    echo -e "::error file=${call[2]},line=${call[0]} ::fatal from ${call[1]}: ${*}"
+  else
+    echo -e "\e[1;31mfatal from ${call[1]} in ${call[2]}:${call[0]}\e[0;1m: ${*}\e[0m"
+  fi >&"${TARGET_OUTPUT}"
   exit 1
 }
 
 log.trace() {
-  if [[ -e /dev/fd/3 ]]; then
-    echo "# ${1}" >&3
-  else
-    echo "# ${1}" >&2
-  fi
+  echo -e "# \e[2m${*}\e[0m" >&"${TARGET_OUTPUT}"
 }
 
 # setup a marker for serial tests to check progress
@@ -322,9 +378,9 @@ cypress_setup() {
 
   pushd "${ROOT}/tests" || exit 1
 
-  log.trace "cypress run: $1"
+  log.trace "run cypress ${1#"${ROOT}/"}"
   for seq in $(seq 3); do
-    [[ "${seq}" == "1" ]] || log.trace "cypress run: try ${seq}/3"
+    [[ "${seq}" == "1" ]] || log.trace "retry cypress ${seq}/3"
 
     cypress run "${cypress_args[@]}" --spec "$1" --reporter json-stream --quiet >"${CYPRESS_REPORT}" || true
 
@@ -338,6 +394,7 @@ cypress_setup() {
 
   # Without json events we have some failure
   if ! grep -q '^\[.*\]$' <"${CYPRESS_REPORT}"; then
+    log.error "cypress ran into an unknown error"
     cat "${CYPRESS_REPORT}" >&2
     exit 1
   fi
@@ -348,15 +405,36 @@ cypress_setup() {
 
   # Check for any auto-generated error
   if [[ -n "$(jq -r 'select(.[1].title == "An uncaught error was detected outside of a test")' "${CYPRESS_REPORT}" 2>&1)" ]]; then
-    echo "An uncaught error was detected outside of a test" >&2
+    log.error "cypress detected an uncaught error outside of a test"
     jq -r 'select(.[1].title == "An uncaught error was detected outside of a test") | .[1].stack' "${CYPRESS_REPORT}"
     exit 1
   fi
 
   # Check for "before-all" hook failure
   if [[ -n "$(jq -r 'select((.[0] == "fail") and (.[1].title | contains("\"before all\" hook for")))' "${CYPRESS_REPORT}")" ]]; then
-    echo "One or more \"before all\" hooks failed" >&2
+    log.error "cypress failed to run one or more \"before all\" hooks"
     jq -r 'select((.[0] == "fail") and (.[1].title | contains("\"before all\" hook for"))) | .[1].stack' "${CYPRESS_REPORT}"
+    exit 1
+  fi
+
+  # Check for "before-each" hook failure
+  if [[ -n "$(jq -r 'select((.[0] == "fail") and (.[1].title | contains("\"before each\" hook for")))' "${CYPRESS_REPORT}")" ]]; then
+    log.error "cypress failed to run one or more \"before each\" hooks"
+    jq -r 'select((.[0] == "fail") and (.[1].title | contains("\"before each\" hook for"))) | .[1].stack' "${CYPRESS_REPORT}"
+    exit 1
+  fi
+
+  # Check for "after-each" hook failure
+  if [[ -n "$(jq -r 'select((.[0] == "fail") and (.[1].title | contains("\"after each\" hook for")))' "${CYPRESS_REPORT}")" ]]; then
+    log.error "cypress failed to run one or more \"after each\" hooks"
+    jq -r 'select((.[0] == "fail") and (.[1].title | contains("\"after each\" hook for"))) | .[1].stack' "${CYPRESS_REPORT}"
+    exit 1
+  fi
+
+  # Check for "after-all" hook failure
+  if [[ -n "$(jq -r 'select((.[0] == "fail") and (.[1].title | contains("\"after all\" hook for")))' "${CYPRESS_REPORT}")" ]]; then
+    log.error "cypress failed to run one or more \"after all\" hooks"
+    jq -r 'select((.[0] == "fail") and (.[1].title | contains("\"after all\" hook for"))) | .[1].stack' "${CYPRESS_REPORT}"
     exit 1
   fi
 
@@ -377,6 +455,7 @@ cypress_test() {
   elif [[ "$(jq -r "select(.[1].fullTitle == \"$1\") | .[0]" "${CYPRESS_REPORT}")" == "pass" ]]; then
     assert true
   else
+    log.warn "cypress skipped test \"$1\""
     skip "cypress skipped this test"
   fi
 }

@@ -35,7 +35,7 @@ setup_suite() {
 
   with_namespace "${falco_event_generator_namespace}"
 
-  echo -e "\033[1m[Deploying event-generator on WC]\033[0m" >&3
+  log.trace "deploy falco event-generator on wc"
   with_kubeconfig wc
 
   create_namespace
@@ -50,7 +50,7 @@ setup_suite() {
 teardown_suite() {
   with_kubeconfig wc
 
-  echo -e "\033[1m[Deleting event-generator from WC]\033[0m" >&3
+  log.trace "delete falco event-generator from wc"
   delete_test_application "${falco_event_generator_namespace}"
   delete_namespace
 
