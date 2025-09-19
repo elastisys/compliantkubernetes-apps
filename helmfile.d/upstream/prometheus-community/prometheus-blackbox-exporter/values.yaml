@@ -24,18 +24,23 @@ podDisruptionBudget: {}
 automountServiceAccountToken: false
 
 ## Additional blackbox-exporter container environment variables
-## For instance to add a http_proxy
-##
-## extraEnv:
-##   HTTP_PROXY: "http://superproxy.com:3128"
-##   NO_PROXY: "localhost,127.0.0.1"
-extraEnv: {}
+extraEnv: []
+  # - name: GOMAXPROCS
+  #   valueFrom:
+  #     resourceFieldRef:
+  #       resource: limits.cpu
+  #       divisor: "1"
+  # - name: HTTP_PROXY
+  #   value: "http://superproxy.com:3128"
 
-## Additional blackbox-exporter container environment variables for secret
-## extraEnvFromSecret:
-##   - secretOne
-##   - secretTwo
-extraEnvFromSecret: ""
+## Additional blackbox-exporter container environment variables for secret or configMap
+extraEnvFrom: []
+  # - configMapRef:
+  #     name: configMapOne
+  # - secretRef:
+  #     name: secretOne
+  # - secretRef:
+  #     name: secretTwo
 
 extraVolumes: []
   # - name: secret-blackbox-oauth-htpasswd
@@ -79,6 +84,10 @@ extraContainers: []
   #     - mountPath: /etc/prometheus/secrets/blackbox-tls
   #       name: secret-blackbox-tls
 
+## Number of replicasets to retain ##
+## default value is 10, 0 will not retain any replicasets and make rollbacks impossible ##
+revisionHistoryLimit: 10
+
 # String mode
 # extraContainers: |-
 #   - name: oAuth2-proxy
@@ -88,9 +97,6 @@ extraContainers: []
 #       - -skip-auth-regex=^/metrics
 #       - -openshift-delegate-urls={"/":{"group":"monitoring.coreos.com","resource":"prometheuses","verb":"get"}}
 #     image: {{ .Values.global.imageRegistry }}/openshift/oauth-proxy:v1.1.0
-
-## Enable pod security policy
-pspEnabled: true
 
 hostNetwork: false
 
@@ -213,6 +219,10 @@ service:
 # https://github.com/prometheus/blackbox_exporter/blob/998037b5b40c1de5fee348ffdea8820509d85171/main.go#L55
 containerPort: 9115
 
+# Number of port to expose on the host. If specified, this must be a valid port number, 0 < x < 65536. If zero, no port is exposed.
+# This is useful for communicating with Daemon Pods when kind is DaemonSet.
+hostPort: 0
+
 serviceAccount:
   # Specifies whether a ServiceAccount should be created
   create: true
@@ -230,7 +240,6 @@ ingress:
   className: ""
   labels: {}
   annotations: {}
-    # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
   hosts:
     ## The host property on hosts and tls is passed through helm tpl function.
@@ -278,6 +287,8 @@ serviceMonitor:
     additionalRelabeling: []
     labels: {}
     path: /metrics
+    scheme: http
+    tlsConfig: {}
     interval: 30s
     scrapeTimeout: 30s
     ## Port can be defined by assigning a value for the port key below
@@ -295,6 +306,7 @@ serviceMonitor:
     labels: {}
     interval: 30s
     scrapeTimeout: 30s
+    honorTimestamps: true
     module: http_2xx
   ## scheme: HTTP scheme to use for scraping. Can be used with `tlsConfig` for example if using istio mTLS.
   scheme: http
@@ -372,9 +384,11 @@ networkPolicy:
   # Enable network policy and allow access from anywhere
   enabled: false
   # Limit access only from monitoring namespace
-  # Before setting this value to true, you must add the name=monitoring label to the monitoring namespace
+  # Before setting this value to true, you must add the name=monitoring label to the monitoring namespace.  Name can be rewritten by monitoringNamespaceName
   # Network Policy uses label filtering
   allowMonitoringNamespace: false
+  # Rewrite monitoring namespace in network policy (default value monitoring)
+  monitoringNamespaceName: "monitoring"
 
 ## dnsPolicy and dnsConfig for Deployments and Daemonsets if you want non-default settings.
 ## These will be passed directly to the PodSpec of same.
@@ -435,7 +449,7 @@ configReloader:
   image:
     registry: quay.io
     repository: prometheus-operator/prometheus-config-reloader
-    tag: "v0.71.2"
+    tag: "v0.85.0"
     pullPolicy: IfNotPresent
     digest: ""
   securityContext:
@@ -469,5 +483,7 @@ configReloader:
       additionalMetricsRelabels: {}
       additionalRelabeling: []
       path: /metrics
+      scheme: http
+      tlsConfig: {}
       interval: 30s
       scrapeTimeout: 30s

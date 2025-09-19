@@ -66,7 +66,7 @@ images:
     admissionWebhooksPatch: registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.5.2
     grafana: docker.io/grafana/grafana:12.0.3
     grafanaSidecar: quay.io/kiwigrid/k8s-sidecar:1.30.0
-    blackboxExporter: quay.io/prometheus/blackbox-exporter:v0.24.0
+    blackboxExporter: quay.io/prometheus/blackbox-exporter:v0.27.0
     grafanaLabelEnforcer: quay.io/prometheuscommunity/prom-label-proxy:v0.11.0
     s3Exporter: ghcr.io/elastisys/s3-exporter:0.5.0
     metricsServer: registry.k8s.io/metrics-server/metrics-server:v0.7.1
