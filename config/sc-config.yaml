@@ -830,8 +830,19 @@ opensearch:
 
   # Index state management
   ism:
-    rolloverSizeGB: 1
-    rolloverAgeDays: 1
+    authlog:
+      rolloverSizeMB: 2
+      rolloverAgeDays: 1
+    kubeaudit:
+      rolloverSizeMB: 5000
+      rolloverAgeDays: 1
+    kubernetes:
+      rolloverSizeMB: 5000
+      rolloverAgeDays: 1
+    other:
+      rolloverSizeMB: 350
+      rolloverAgeDays: 1
+
     # Overwrite ism policies
     overwritePolicies: true
     # Create default policies - kubernetes, kubeaudit, authlog, and other
@@ -998,7 +1009,7 @@ opensearch:
     - prefix: other-default
       alertSizeMB: 400
     - prefix: authlog-default
-      alertSizeMB: 2
+      alertSizeMB: 3
 
   # Snapshot and snapshot lifecycle configuration
   # Requires S3 or GCS to be enabled
