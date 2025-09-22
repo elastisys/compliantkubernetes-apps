@@ -1,0 +1,56 @@
+{
+  "kubeloginClientSecret": "set-me",
+  "adminGroup": "set-me",
+  "dex": {
+    "gcp": {
+      "clientID": "set-me",
+      "clientSecret": "set-me"
+    }
+  },
+  "dnsProvider": {
+    "domain": "set-me",
+    "aws": {
+      "hostedZone": "set-me",
+      "secrets": {
+        "accessKey": "set-me",
+        "secretKey": "set-me"
+      }
+    }
+  },
+  "externalLoadbalancers": {
+    "scAddress": "set-me",
+    "scDomainName": "set-me",
+    "scProxyProtocol": false,
+    "wcAddress": "set-me",
+    "wcDomainName": "set-me",
+    "wcProxyProtocol": false
+  },
+  "objectStorage": {
+    "config": {
+      "s3": {
+        "region": "set-me",
+        "regionEndpoint": "set-me"
+      }
+    },
+    "secrets": {
+      "s3": {
+        "accessKey": "set-me",
+        "secretKey": "set-me"
+      },
+      "swift": {
+        "applicationCredentialID": "set-me",
+        "applicationCredentialSecret": "set-me"
+      }
+    }
+  },
+  "wcSubnets": {
+    "apiServer": [],
+    "nodes": [],
+    "ingress": []
+  },
+  "scSubnets": {
+    "apiServer": [],
+    "nodes": [],
+    "ingress": []
+  }
+}
