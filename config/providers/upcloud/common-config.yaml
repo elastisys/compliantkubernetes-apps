@@ -3,10 +3,7 @@ storageClasses:
 networkPolicies:
   global:
     externalLoadBalancer: true
-    ingressUsingHostNetwork: true
-  ingressNginx:
-    ingressOverride:
-      enabled: false
+    ingressUsingHostNetwork: false
   kubeSystem:
     upcloud:
       enabled: true
@@ -24,10 +21,12 @@ ingressNginx:
   controller:
     config:
       useProxyProtocol: false
-    useHostPort: true
+    useHostPort: false
     service:
-      enabled: false
+      enabled: true
       allocateLoadBalancerNodePorts: true
+      type: NodePort
+      annotations: {}
 opa:
   rejectLoadBalancerService:
     enabled: true

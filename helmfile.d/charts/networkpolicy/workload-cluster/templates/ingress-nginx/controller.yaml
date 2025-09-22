@@ -12,14 +12,9 @@ spec:
     - Ingress
     - Egress
   ingress:
-    {{- if or .Values.ingressNginx.ingressOverride.ips .Values.global.wcNodes.ips .Values.global.wcIngress.ips }}
+    {{- if or .Values.global.wcNodes.ips .Values.global.wcIngress.ips }}
     - from:
-      {{- if and .Values.ingressNginx.ingressOverride.enabled .Values.ingressNginx.ingressOverride.ips }}
-        {{- range $IP := .Values.ingressNginx.ingressOverride.ips }}
-        - ipBlock:
-            cidr: {{ $IP }}
-        {{- end }}
-      {{- else if not (or .Values.global.externalLoadBalancer .Values.global.ingressUsingHostNetwork) }}
+      {{- if not (or .Values.global.externalLoadBalancer .Values.global.ingressUsingHostNetwork) }}
         {{- if .Values.global.wcNodes.ips }}
         {{- range $IP := .Values.global.wcNodes.ips }}
         - ipBlock:
@@ -81,14 +76,9 @@ spec:
           protocol: UDP
         - port: 53
           protocol: TCP
-    {{- if or .Values.ingressNginx.ingressOverride.ips .Values.global.wcIngress.ips }}
+    {{- if .Values.global.wcIngress.ips }}
     - to:
-      {{- if and .Values.ingressNginx.ingressOverride.enabled .Values.ingressNginx.ingressOverride.ips }}
-        {{- range $IP := .Values.ingressNginx.ingressOverride.ips }}
-        - ipBlock:
-            cidr: {{ $IP }}
-        {{- end }}
-      {{- else if .Values.global.wcIngress.ips }}
+      {{- if .Values.global.wcIngress.ips }}
         {{- range $IP := .Values.global.wcIngress.ips }}
         - ipBlock:
             cidr: {{ $IP }}
