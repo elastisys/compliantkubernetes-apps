@@ -17,6 +17,7 @@ setup_file() {
   env.init openstack capi dev
 
   yq.set sc .externalDns.enabled 'true'
+  yq.set sc .falco.driver.kind '"kmod"'
   yq.set sc .fluentd.enabled 'true'
   yq.set sc .gpu.enabled 'true'
   yq.set sc .harbor.backup.enabled 'true'
@@ -35,6 +36,7 @@ setup_file() {
 
   yq.set wc .hnc.enabled 'true'
   yq.set wc .velero.enabled 'true'
+  yq.set wc .falco.driver.kind '"kmod"'
   _setup_rclone wc sync
 }
 
