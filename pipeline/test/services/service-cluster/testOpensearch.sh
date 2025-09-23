@@ -350,7 +350,8 @@ check_opensearch_ism() {
   read -ra write_indices <<<"$write_indices_data"
   for write_index in "${write_indices[@]}"; do
 
-    rollover_age_days=$(yq -e '.opensearch.ism.rolloverAgeDays' "${config['config_file_sc']}")
+    write_index_short="${write_index%-default*}"
+    rollover_age_days=$(yq -e ".opensearch.ism.${write_index_short}.rolloverAgeDays" "${config['config_file_sc']}")
     ((rollover_limit = rollover_age_days * 86400000))
 
     epoch_now=$(date +%s%3N)

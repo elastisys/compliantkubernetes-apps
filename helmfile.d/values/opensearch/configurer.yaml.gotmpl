@@ -31,8 +31,18 @@ config:
   additionalPolicies: {{- toYaml .Values.opensearch.ism.additionalPolicies | nindent 4 }}
 
   ism:
-    rolloverSize: {{ .Values.opensearch.ism.rolloverSizeGB }}
-    rolloverAge: {{ .Values.opensearch.ism.rolloverAgeDays }}
+    authlog:
+      rolloverSize: {{ .Values.opensearch.ism.authlog.rolloverSizeMB }}
+      rolloverAge: {{ .Values.opensearch.ism.authlog.rolloverAgeDays }}
+    kubeaudit:
+      rolloverSize: {{ .Values.opensearch.ism.kubeaudit.rolloverSizeMB }}
+      rolloverAge: {{ .Values.opensearch.ism.kubeaudit.rolloverAgeDays }}
+    kubernetes:
+      rolloverSize: {{ .Values.opensearch.ism.kubernetes.rolloverSizeMB }}
+      rolloverAge: {{ .Values.opensearch.ism.kubernetes.rolloverAgeDays }}
+    other:
+      rolloverSize: {{ .Values.opensearch.ism.other.rolloverSizeMB }}
+      rolloverAge: {{ .Values.opensearch.ism.other.rolloverAgeDays }}
 
   snapshots:
     enabled: {{ .Values.opensearch.snapshot.enabled }}

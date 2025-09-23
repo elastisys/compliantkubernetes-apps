@@ -102,8 +102,18 @@ config:
     #   }
 
   ism:
-    rolloverSize: 1
-    rolloverAge: 1
+    authlog:
+      rolloverSize: 2
+      rolloverAgeDays: 1
+    kubeaudit:
+      rolloverSize: 5000
+      rolloverAgeDays: 1
+    kubernetes:
+      rolloverSize: 5000
+      rolloverAgeDays: 1
+    other:
+      rolloverSize: 350
+      rolloverAgeDays: 1
 
   snapshotRepository: s3_snapshotRepository_7.x
 

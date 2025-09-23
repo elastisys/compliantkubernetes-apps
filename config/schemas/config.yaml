@@ -6240,6 +6240,17 @@ properties:
         description: Configures index state management in OpenSearch.
         type: object
         additionalProperties: false
+        $defs:
+          rolloverAgeDays:
+            title: OpenSearch Rollover Age Days
+            description: Configures the age a write index must reach before it is rolled over to a new one.
+            type: number
+            default: 1
+          rolloverSizeMB:
+            title: OpenSearch Rollover Size MB
+            description: Configures the size a write index must reach before it is rolled over to a new one.
+            type: number
+            default: 1000
         properties:
           defaultPolicies:
             title: OpenSearch Default Policies
@@ -6271,16 +6282,42 @@ properties:
             additionalProperties:
               type: string
               format: json
-          rolloverAgeDays:
-            title: OpenSearch Rollover Age Days
-            description: Configures the age a write index must reach before it is rolled over to a new one.
-            type: number
-            default: 1
-          rolloverSizeGB:
-            title: OpenSearch Rollover Size GB
-            description: Configures the size a write index must reach before it is rolled over to a new one.
-            type: number
-            default: 1
+          authlog:
+            title: OpenSearch Rollover Configuration for `authlog` index
+            description: Configures rollover for `authlog` index
+            type: object
+            properties:
+              rolloverSizeMB:
+                $ref: '#/properties/opensearch/properties/ism/$defs/rolloverSizeMB'
+              rolloverAgeDays:
+                $ref: '#/properties/opensearch/properties/ism/$defs/rolloverAgeDays'
+          kubeaudit:
+            title: OpenSearch Rollover Configuration for `kubeaudit` index
+            description: Configures rollover for `kubeaudit` index
+            type: object
+            properties:
+              rolloverSizeMB:
+                $ref: '#/properties/opensearch/properties/ism/$defs/rolloverSizeMB'
+              rolloverAgeDays:
+                $ref: '#/properties/opensearch/properties/ism/$defs/rolloverAgeDays'
+          kubernetes:
+            title: OpenSearch Rollover Configuration for `kubernetes` index
+            description: Configures rollover for `kubernetes` index
+            type: object
+            properties:
+              rolloverSizeMB:
+                $ref: '#/properties/opensearch/properties/ism/$defs/rolloverSizeMB'
+              rolloverAgeDays:
+                $ref: '#/properties/opensearch/properties/ism/$defs/rolloverAgeDays'
+          other:
+            title: OpenSearch Rollover Configuration for `other` index
+            description: Configures rollover for `other` index
+            type: object
+            properties:
+              rolloverSizeMB:
+                $ref: '#/properties/opensearch/properties/ism/$defs/rolloverSizeMB'
+              rolloverAgeDays:
+                $ref: '#/properties/opensearch/properties/ism/$defs/rolloverAgeDays'
       ingress:
         title: OpenSearch Ingress
         description: Configures the ingress for OpenSearch master or client nodes.
@@ -6466,7 +6503,7 @@ properties:
               type: number
         default:
           - prefix: authlog-default
-            alertSizeMB: 2
+            alertSizeMB: 3
           - prefix: kubeaudit-default
             alertSizeMB: 5500
           - prefix: kubernetes-default
