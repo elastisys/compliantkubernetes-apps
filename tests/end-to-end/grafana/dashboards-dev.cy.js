@@ -17,7 +17,7 @@ describe('grafana dev dashboards', function () {
       cy.grafanaDexExtraStaticLogin(`${this.ingress}/dashboards`, 'dev@example.com')
     })
 
-    cy.visit(`https://${this.ingress}/dashboards`)
+    cy.visitAndVerifyCSPHeader(`https://${this.ingress}/dashboards`)
   })
 
   after(function () {
@@ -47,9 +47,9 @@ describe('grafana dev dashboards', function () {
         ).should('exist')
       } else {
         cy.testGrafanaDashboard('NetworkPolicy Dashboard Cilium', false)
-        cy.get(
-          '[data-testid="data-testid Panel menu Allowed packages going from pod"]'
-        ).should('exist')
+        cy.get('[data-testid="data-testid Panel menu Allowed packages going from pod"]').should(
+          'exist'
+        )
       }
     })
   })

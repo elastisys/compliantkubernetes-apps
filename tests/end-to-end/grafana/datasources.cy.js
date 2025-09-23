@@ -2,7 +2,7 @@ import '../../common/cypress/grafana.js'
 
 function loginNavigate(cy, ingress, passwordKey) {
   cy.session(ingress, () => {
-    cy.visit(`https://${ingress}`)
+    cy.visitAndVerifyCSPHeader(`https://${ingress}`)
 
     cy.contains('Welcome to Grafana').should('exist')
 
@@ -17,7 +17,7 @@ function loginNavigate(cy, ingress, passwordKey) {
     cy.contains('Home').should('exist')
   })
 
-  cy.visit(`https://${ingress}`)
+  cy.visitAndVerifyCSPHeader(`https://${ingress}`)
 
   cy.contains('Home').should('exist')
 
