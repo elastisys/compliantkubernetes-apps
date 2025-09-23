@@ -39,11 +39,19 @@ describe('grafana dev dashboards', function () {
   })
 
   it('open the NetworkPolicy Dashboard', function () {
-    cy.testGrafanaDashboard('NetworkPolicy Dashboard', false)
-
-    cy.get(
-      '[data-testid="data-testid Panel menu Packets allowed by NetworkPolicy going from pod"]'
-    ).should('exist')
+    cy.yqDig('sc', '.networkPlugin.type').then((value) => {
+      if (value == 'calico') {
+        cy.testGrafanaDashboard('NetworkPolicy Dashboard', false)
+        cy.get(
+          '[data-testid="data-testid Panel menu Packets allowed by NetworkPolicy going from pod"]'
+        ).should('exist')
+      } else {
+        cy.testGrafanaDashboard('NetworkPolicy Dashboard Cilium', false)
+        cy.get(
+          '[data-testid="data-testid Panel menu Allowed packages going from pod"]'
+        ).should('exist')
+      }
+    })
   })
 
   it('open the Kubernetes cluster status dashboard', function () {
