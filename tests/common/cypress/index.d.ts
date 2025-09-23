@@ -96,6 +96,12 @@ declare namespace Cypress {
 
     /**
      * @example
+     * cy.visitAndVerifyCSPHeader('https://grafana.domain')
+     */
+    visitAndVerifyCSPHeader(url: string): Chainable<any>
+
+    /**
+     * @example
      * cy.testGrafanaDashboard('Kubernetes cluster status', false)
      */
     testGrafanaDashboard(dashboardName: string, expandRows: boolean): Chainable<any>

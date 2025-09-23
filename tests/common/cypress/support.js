@@ -169,3 +169,23 @@ Cypress.Commands.add('deleteTestKubeconfig', function (session) {
   const test_kubeconfig = Cypress.env('CK8S_CONFIG_PATH') + `/.state/kube_config_wc_${session}.yaml`
   cy.exec(`rm -f ${test_kubeconfig}`)
 })
+
+Cypress.Commands.add('visitAndVerifyCSPHeader', function (url) {
+  cy.intercept('GET', `${url}`).as('pageLoad')
+
+  cy.visit(`${url}`)
+
+  cy.wait('@pageLoad').then((interception) => {
+    expect(interception.response).to.exist
+
+    if (interception.response) {
+      cy.wrap(interception.response.headers).its('content-security-policy').should('exist')
+    } else {
+      throw new Error('No response found for the intercepted request')
+    }
+
+    // TODO:
+    // - verify CSP rules
+    // - verify unique nonces?
+  })
+})
