@@ -92,7 +92,7 @@ upgrade)
   fi
   check_tools
   export CK8S_CLUSTER="${2}"
-  "${here}/upgrade.bash" "${3}" "${4:-}"
+  "${here}/upgrade.bash" "${3}" "${4:-}" "${5:-}"
   ;;
 team)
   case "${2}" in
