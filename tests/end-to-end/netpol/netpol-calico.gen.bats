@@ -3,7 +3,7 @@
 setup_file() {
   load "../../bats.lib.bash"
 
-  cypress_setup "${ROOT}/tests/end-to-end/netpol/netpol.cy.js"
+  cypress_setup "${ROOT}/tests/end-to-end/netpol/netpol-calico.cy.js"
 }
 
 setup() {
