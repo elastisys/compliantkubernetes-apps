@@ -87,6 +87,12 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     > _Done during maintenance window._
 
     ```bash
+    # Check which changes are going to be applied
+    ./bin/ck8s upgrade both ${new_version} apply --dry-run
+    ```
+
+    ```bash
+    # If you agree with the changes, continue with apply
     ./bin/ck8s upgrade both ${new_version} apply
     ```
 
@@ -137,6 +143,13 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 1. Upgrade applications:
 
     ```bash
+    # Check the changes of each applicable migration script
+    export CK8S_DRY_RUN_INSTALL=true
+    ./migration/${new_version}/apply/${script} execute
+    ```
+
+    ```bash
+    unset CK8S_DRY_RUN_INSTALL
     ./bin/ck8s apply {sc|wc}
     # or
     ./migration/${new_version}/apply/80-apply.sh execute

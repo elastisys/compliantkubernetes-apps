@@ -41,12 +41,18 @@ helmfile_apply() {
   prefix="${1}"
   shift
 
+  if [[ "${CK8S_DRY_RUN_INSTALL}" == "true" ]]; then
+    log_info "Dry-running on ${*}"
+    helmfile_diff "${prefix}" "${@}"
+    return
+  fi
+
   helmfile_do "${prefix}" apply "${@/#/-l}" --output simple --skip-diff-on-install --quiet
 }
 
-helmfile_change() {
+helmfile_diff() {
   if [[ "${#}" -lt 2 ]] || [[ ! "${1}" =~ ^(sc|wc)$ ]]; then
-    log_fatal "usage: helmfile_change <sc|wc> <selectors>..."
+    log_fatal "usage: helmfile_diff <sc|wc> <selectors>..."
   fi
 
   prefix="${1}"
@@ -64,13 +70,18 @@ helmfile_destroy() {
   prefix="${1}"
   shift
 
+  if [[ "${CK8S_DRY_RUN_INSTALL}" == "true" ]]; then
+    log_info "Dry-run: Destroy on ${*} ${prefix}"
+    return
+  fi
+
   helmfile_do "${prefix}" destroy "${@/#/-l}" --quiet
 }
 
 # for each release matching the selectors dispatch a function on each individual release
-helmfile_change_dispatch() {
+helmfile_diff_dispatch() {
   if [[ "${#}" -lt 3 ]] || [[ ! "${2}" =~ ^(sc|wc)$ ]]; then
-    log_fatal "usage: helmfile_change_dispatch <function> <sc|wc> <selectors>..."
+    log_fatal "usage: helmfile_diff_dispatch <function> <sc|wc> <selectors>..."
   fi
 
   local list
@@ -86,7 +97,7 @@ helmfile_change_dispatch() {
     namespace="$(yq -P ".[${index}].namespace" <<<"${list}")"
     name="$(yq -P ".[${index}].name" <<<"${list}")"
 
-    if helmfile_change "${2}" "namespace=${namespace},name=${name}" >/dev/null 2>&1; then
+    if helmfile_diff "${2}" "namespace=${namespace},name=${name}" >/dev/null 2>&1; then
       log_info "  - skipping ${2} ${namespace}/${name} no change"
       continue
     fi
@@ -120,7 +131,7 @@ helmfile_replace() {
     fi
   }
 
-  helmfile_change_dispatch internal_helmfile_replace "${1}" "${@:2}"
+  helmfile_diff_dispatch internal_helmfile_replace "${1}" "${@:2}"
 }
 
 # will upgrade the matching releases as required
@@ -141,6 +152,10 @@ helmfile_upgrade() {
     if ! helmfile_apply "${1}" "namespace=${2},name=${3}"; then
       log_error "error: failed to upgrade ${1} ${2}/${3}"
 
+      if [[ "${CK8S_DRY_RUN_INSTALL}" == "true" ]]; then
+        return 1
+      fi
+
       if [ "${CK8S_ROLLBACK:-}" != "false" ]; then
         log_warn "  - rolling back ${1} ${2}/${3}"
 
@@ -155,5 +170,5 @@ helmfile_upgrade() {
     fi
   }
 
-  helmfile_change_dispatch internal_helmfile_upgrade "${1}" "${@:2}"
+  helmfile_diff_dispatch internal_helmfile_upgrade "${1}" "${@:2}"
 }

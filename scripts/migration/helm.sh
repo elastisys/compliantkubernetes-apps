@@ -5,10 +5,30 @@ helm_do() {
     log_fatal "usage: helm_do <sc|wc> <args>..."
   fi
 
+  local -a args=()
+  local -a command_args=("${@:2}")
+  local command="${2}"
+
+  if [[ "${command}" =~ ^- ]]; then
+    log_fatal "Second argument must be a helm operation, not an option"
+  fi
+
+  if [[ "${CK8S_DRY_RUN_INSTALL}" == "true" ]]; then
+    # List of common Helm subcommands that generally DO NOT support --dry-run
+    case "${command}" in
+    get | list | ls | history | diff | repo | search | show | status | test | version) ;;
+    *)
+      command_args=("${command}" "--dry-run" "${@:3}")
+      ;;
+    esac
+  fi
+
+  args+=("${command_args[@]}")
+
   if [ "${CONFIG["${1}-kubeconfig"]}" = "encrypted" ]; then
-    sops exec-file --no-fifo "${CK8S_CONFIG_PATH}/.state/kube_config_${1}.yaml" "KUBECONFIG={} helm ${*:2}"
+    sops exec-file --no-fifo "${CK8S_CONFIG_PATH}/.state/kube_config_${1}.yaml" "KUBECONFIG={} helm ${args[*]}"
   else
-    helm --kubeconfig "${CK8S_CONFIG_PATH}/.state/kube_config_${1}.yaml" "${@:2}"
+    helm --kubeconfig "${CK8S_CONFIG_PATH}/.state/kube_config_${1}.yaml" "${args[@]}"
   fi
 }
 
