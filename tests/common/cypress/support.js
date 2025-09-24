@@ -170,10 +170,14 @@ Cypress.Commands.add('deleteTestKubeconfig', function (session) {
   cy.exec(`rm -f ${test_kubeconfig}`)
 })
 
-Cypress.Commands.add('visitAndVerifyCSPHeader', function (url) {
+Cypress.Commands.add('visitAndVerifyCSPHeader', function (url, doDexLogin = false) {
   cy.intercept('GET', `${url}`).as('pageLoad')
 
   cy.visit(`${url}`)
+
+  if (doDexLogin) {
+    cy.dexStaticLogin()
+  }
 
   cy.wait('@pageLoad').then((interception) => {
     expect(interception.response).to.exist
