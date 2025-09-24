@@ -170,26 +170,29 @@ Cypress.Commands.add('deleteTestKubeconfig', function (session) {
   cy.exec(`rm -f ${test_kubeconfig}`)
 })
 
-Cypress.Commands.add('visitAndVerifyCSPHeader', function (url, doDexLogin = false) {
-  cy.intercept('GET', `${url}`).as('pageLoad')
+Cypress.Commands.add(
+  'visitAndVerifyCSPHeader',
+  function (url, interceptUrl = url, doDexLogin = false) {
+    cy.intercept('GET', `${interceptUrl}`).as('pageLoad')
 
-  cy.visit(`${url}`)
+    cy.visit(`${url}`)
 
-  if (doDexLogin) {
-    cy.dexStaticLogin()
-  }
-
-  cy.wait('@pageLoad').then((interception) => {
-    expect(interception.response).to.exist
-
-    if (interception.response) {
-      cy.wrap(interception.response.headers).its('content-security-policy').should('exist')
-    } else {
-      throw new Error('No response found for the intercepted request')
+    if (doDexLogin) {
+      cy.dexStaticLogin()
     }
 
-    // TODO:
-    // - verify CSP rules
-    // - verify unique nonces?
-  })
-})
+    cy.wait('@pageLoad').then((interception) => {
+      expect(interception.response).to.exist
+
+      if (interception.response) {
+        cy.wrap(interception.response.headers).its('content-security-policy').should('exist')
+      } else {
+        throw new Error('No response found for the intercepted request')
+      }
+
+      // TODO:
+      // - verify CSP rules
+      // - verify unique nonces?
+    })
+  }
+)
