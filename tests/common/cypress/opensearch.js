@@ -1,15 +1,13 @@
 Cypress.Commands.add('opensearchDexStaticLogin', (ingress) => {
   cy.session([ingress], () => {
-    cy.visit(`https://${ingress}`)
-
-    cy.dexStaticLogin()
+    cy.visitAndVerifyCSPHeader(`https://${ingress}`, '**/app/dashboards**', true)
 
     cy.contains('loading opensearch dashboards', { matchCase: false }).should('not.exist')
 
     cy.contains('Welcome to Welkin').should('be.visible')
   })
 
-  cy.visit(`https://${ingress}`)
+  cy.visitAndVerifyCSPHeader(`https://${ingress}`, '**/app/dashboards**')
 
   cy.contains('loading opensearch dashboards', { matchCase: false }).should('not.exist')
 
