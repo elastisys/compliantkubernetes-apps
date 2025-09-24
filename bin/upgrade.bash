@@ -17,6 +17,12 @@ source "${here}/common.bash"
 # shellcheck source=scripts/migration/lib.sh
 CK8S_ROOT_SCRIPT="true" source "${ROOT}/scripts/migration/lib.sh"
 
+export CK8S_DRY_RUN_INSTALL=false
+if [[ "${3}" == "--dry-run" ]]; then
+  export CK8S_DRY_RUN_INSTALL=true
+  log_info "Dry-run mode activated"
+fi
+
 snippets_list() {
   if [[ ! "${1}" =~ ^(prepare|apply)$ ]]; then
     log_fatal "usage: snippets_list <prepare|apply>"
@@ -112,6 +118,12 @@ apply() {
 
     log_info "apply snippet \"${snippet##"${MIGRATION_ROOT}/"}\":"
     if "${snippet}" execute; then
+
+      if [[ "${CK8S_DRY_RUN_INSTALL}" == "true" ]]; then
+        log_info "Dry-run completed on $(basename "${snippet}")"
+        continue
+      fi
+
       log_info "apply snippet success\n---"
       if [[ "${CK8S_CLUSTER:-}" == "both" ]]; then
         record_upgrade_apply_step "sc" "${snippet}"
@@ -120,6 +132,12 @@ apply() {
         record_upgrade_apply_step "${CK8S_CLUSTER}" "${snippet}"
       fi
     else
+
+      if [[ "${CK8S_DRY_RUN_INSTALL}" == "true" ]]; then
+        log_info "Dry-run not completed on $(basename "${snippet}")"
+        continue
+      fi
+
       local return="${?}"
       log_error "apply snippet execute failure"
 
@@ -136,6 +154,11 @@ apply() {
       fi
     fi
   done
+
+  if [[ "${CK8S_DRY_RUN_INSTALL}" == "true" ]]; then
+    log_info "Dry-run: completed, no changes applied."
+    return
+  fi
 
   if [[ "${CK8S_CLUSTER:-}" =~ ^(sc|both)$ ]]; then
     record_upgrade_done sc
@@ -154,7 +177,7 @@ usage() {
 
   printf "commands:\n" 1>&2
   printf "\tprepare <version> \t- run all prepare steps upgrading the configuration\n" 1>&2
-  printf "\tapply <version>   \t- run all apply steps upgrading the environment\n" 1>&2
+  printf "\tapply <version> [--dry-run]   \t- run all apply steps upgrading the environment\n" 1>&2
 
   exit 1
 }
