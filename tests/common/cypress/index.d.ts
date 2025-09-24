@@ -98,7 +98,7 @@ declare namespace Cypress {
      * @example
      * cy.visitAndVerifyCSPHeader('https://grafana.domain')
      */
-    visitAndVerifyCSPHeader(url: string): Chainable<any>
+    visitAndVerifyCSPHeader(url: string, doDexLogin?: boolean): Chainable<any>
 
     /**
      * @example
