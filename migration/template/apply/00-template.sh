@@ -15,6 +15,8 @@ source "${ROOT}/scripts/migration/lib.sh"
 #   - kubectl
 #     # Use kubectl with kubeconfig set
 #     - kubectl_do <sc|wc> <kubectl args...>
+#     # Use kubectl --dry-run=server with kubeconfig set
+#     - kubectl_do_dryrun <sc|wc> <kubectl args...>
 #     # Perform kubectl delete, will not cause errors if the resource is missing
 #     - kubectl_delete <sc|wc> <resource> <namespace> <name>
 #
@@ -35,7 +37,7 @@ source "${ROOT}/scripts/migration/lib.sh"
 #     # Apply releases matching the selector
 #     - helmfile_apply <sc|wc> <selectors...>
 #     # Check for changes on releases matching the selector
-#     - helmfile_change <sc|wc> <selectors...>
+#     - helmfile_diff <sc|wc> <selectors...>
 #     # Destroy releases matching the selector
 #     - helmfile_destroy <sc|wc> <selectors...>
 #     # Replaces the releases matching the selector, performing destroy and apply on each release individually
@@ -45,6 +47,9 @@ source "${ROOT}/scripts/migration/lib.sh"
 
 run() {
   case "${1:-}" in
+  dry-run)
+    log_info "Dry-run not implemented"
+    ;;
   execute)
     # Note: 00-template.sh will be skipped by the upgrade command
     log_info "no operation: this is a template"

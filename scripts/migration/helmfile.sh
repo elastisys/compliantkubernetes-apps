@@ -157,3 +157,14 @@ helmfile_upgrade() {
 
   helmfile_change_dispatch internal_helmfile_upgrade "${1}" "${@:2}"
 }
+
+helmfile_diff() {
+  if [[ "${#}" -lt 2 ]] || [[ ! "${1}" =~ ^(sc|wc)$ ]]; then
+    log_fatal "usage: helmfile_diff <sc|wc> <selectors>..."
+  fi
+
+  prefix="${1}"
+  shift
+
+  helmfile_do "${prefix}" diff "${@/#/-l}"
+}

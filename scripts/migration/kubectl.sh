@@ -12,6 +12,14 @@ kubectl_do() {
   fi
 }
 
+kubectl_do_dryrun() {
+  if [[ "${#}" -lt 2 ]] || [[ ! "${1}" =~ ^(sc|wc)$ ]]; then
+    log_fatal "usage: kubectl_dryrun <sc|wc> <resource> <namespace> <name>"
+  fi
+
+  kubectl_do "${@}" --dry-run=server --output=yaml
+}
+
 kubectl_delete() {
   if [[ "${#}" -lt 4 ]] || [[ ! "${1}" =~ ^(sc|wc)$ ]]; then
     log_fatal "usage: kubectl_delete <sc|wc> <resource> <namespace> <name>"
