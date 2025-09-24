@@ -11,7 +11,7 @@ function makePrometheusURL(/** @type {Cluster} */ cluster) {
   )
 }
 
-describe('workload cluster network policies', function () {
+describe('workload cluster network policies (cilium)', function () {
   before(function () {
     cy.yqDig('wc', '.networkPlugin.type').then(function (value) {
       if (value !== 'cilium') {
@@ -42,7 +42,7 @@ describe('workload cluster network policies', function () {
   })
 })
 
-describe('service cluster network policies', function () {
+describe('service cluster network policies (cilium)', function () {
   before(function () {
     cy.yqDig('sc', '.networkPlugin.type').then(function (value) {
       if (value !== 'cilium') {
