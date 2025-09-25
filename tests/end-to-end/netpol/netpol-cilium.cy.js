@@ -108,10 +108,10 @@ const acceptCondition = (response) => {
     }
 
     innerAssert(
-      result.filter(filterNonZero('ingress')).map((item) => Number.parseInt(item.value[1]))
+      result.filter(filterNonZero('egress')).map((item) => Number.parseInt(item.value[1]))
     )
     innerAssert(
-      result.filter(filterNonZero('egress')).map((item) => Number.parseInt(item.value[1]))
+      result.filter(filterNonZero('ingress')).map((item) => Number.parseInt(item.value[1]))
     )
     return true
   } catch {
