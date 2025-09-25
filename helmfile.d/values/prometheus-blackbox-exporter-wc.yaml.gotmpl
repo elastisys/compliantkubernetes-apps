@@ -50,6 +50,17 @@ config:
         preferred_ip_protocol: "ip4"
         tls_config:
           insecure_skip_verify: true
+    http_404:
+      prober: http
+      timeout: 5s
+      http:
+        # we are not logged in, just checking that it can be reached
+        valid_status_codes: [404]
+        valid_http_versions: ["HTTP/1.1", "HTTP/2.0"]
+        follow_redirects: true
+        preferred_ip_protocol: "ip4"
+        tls_config:
+          insecure_skip_verify: {{ not .Values.global.verifyTls }}
     tcp_connect:
       prober: tcp
 service:
@@ -94,6 +105,14 @@ serviceMonitor:
       interval: 60s
       scrapeTimeout: 30s
       module: http_2xx
+    {{- end }}
+
+    {{- if .Values.prometheusBlackboxExporter.targets.wc}}
+    - name: wc-ingress-probe
+      url: https://{{ .Values.ingressNginx.subDomain }}.{{ .Values.global.baseDomain  }}
+      interval: 60s
+      scrapeTimeout: 30s
+      module: http_404
     {{- end }}
 
     {{- if .Values.prometheusBlackboxExporter.targets.sc}}

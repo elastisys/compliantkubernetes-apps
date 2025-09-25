@@ -19,7 +19,6 @@ source "${ROOT}/scripts/migration/lib.sh"
 #     - yq_move <common|sc|wc> <source> <destination>
 #     - yq_remove <common|sc|wc> <target>
 #     - yq_add <common|sc|wc> <destination> <value>
-#     - yq_move_to_file <common|sc|wc> <source> <common|sc|wc> <destination>
 
 # Note: 00-template.sh will be skipped by the upgrade command
 log_info "no operation: this is a template"
