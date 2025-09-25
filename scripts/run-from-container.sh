@@ -144,14 +144,14 @@ if [[ "${FORWARD_ENVIRONMENT:-false}" == "true" ]] || [[ "${FORWARD_RUNTIME:-fal
     args+=("--env" "XAUTHORITY")
     args+=("--mount" "type=bind,src=${XAUTHORITY},dst=${XAUTHORITY}")
   fi
+fi
 
-  # Prepare container home
-  args+=("--env" "HOME")
-  if [[ "${runtime}" == "docker" ]]; then
-    args+=("--tmpfs" "${HOME}:uid=$(id -u),gid=$(id -g)")
-  else
-    args+=("--mount" "type=tmpfs,dst=${HOME},chown")
-  fi
+# Prepare container home
+args+=("--env" "HOME")
+if [[ "${runtime}" == "docker" ]]; then
+  args+=("--tmpfs" "${HOME}:uid=$(id -u),gid=$(id -g)")
+else
+  args+=("--mount" "type=tmpfs,dst=${HOME},chown")
 fi
 
 if [[ "${FORWARD_ENVIRONMENT:-false}" == "true" ]]; then
