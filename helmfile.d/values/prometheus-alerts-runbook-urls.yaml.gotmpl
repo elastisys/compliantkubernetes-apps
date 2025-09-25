@@ -273,7 +273,6 @@ runbookUrls:
     {{- dict "name" "ThanosReceiveHighHashringFileRefreshFailures" "header" "thanos-receive" "config" .thanos | include "tpl.thanos" }}
     {{- dict "name" "ThanosReceiveConfigReloadFailure" "header" "thanos-receive" "config" .thanos | include "tpl.thanos" }}
     {{- dict "name" "ThanosReceiveNoUpload" "header" "thanos-receive" "config" .thanos | include "tpl.thanos" }}
-    {{- dict "name" "ThanosReceiveTrafficBelowThreshold" "header" "thanos-receive" "config" .thanos | include "tpl.thanos" }}
     {{- dict "name" "ThanosStoreGrpcErrorRate" "header" "thanos-store" "config" .thanos | include "tpl.thanos" }}
     {{- dict "name" "ThanosStoreSeriesGateLatencyHigh" "header" "thanos-store" "config" .thanos | include "tpl.thanos" }}
     {{- dict "name" "ThanosStoreBucketHighOperationFailures" "header" "thanos-store" "config" .thanos | include "tpl.thanos" }}
