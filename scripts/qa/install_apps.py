@@ -131,7 +131,7 @@ def configure_apps(
     )
 
     # Configure Falco BPF driver
-    common_config.set("falco.driver", {"kind": "modern-bpf"})
+    common_config.set("falco.driver", {"kind": "modern_ebpf"})
 
     # Configure Grafana with test requirements
     grafana_cfg = {
