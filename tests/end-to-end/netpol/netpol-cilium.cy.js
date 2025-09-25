@@ -34,7 +34,7 @@ describe('workload cluster network policies (cilium)', function () {
 
   it('are accepting allowed traffic', function () {
     cy.retryRequest({
-      request: { method: 'GET', url: makeQueryURL('sc', ACCEPT_QUERY) },
+      request: { method: 'GET', url: makeQueryURL('wc', ACCEPT_QUERY) },
       condition: acceptCondition,
       waitTime: 10000,
       attempts: 30,
