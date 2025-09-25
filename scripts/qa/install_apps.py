@@ -48,6 +48,10 @@ def configure_apps(
 ) -> None:
     """Configure apps"""
 
+    # Configure network plugin
+    if (network_plugin := args.config["networkPlugin"]) is not None:
+        common_config.set("networkPlugin.type", network_plugin, merge=False)
+
     # Configure platform administrators
     common_config.set("clusterAdmin", {"users": [], "groups": [args.config["adminGroup"]]})
 
