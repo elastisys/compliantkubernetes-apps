@@ -202,6 +202,7 @@ kubectl delete pvc --all -A
 ### Bash
 
 - See [Googles style guide](https://google.github.io/styleguide/shellguide.html).
+- Prefer long versions of flags to improve readability, i.e. `--long-flag` instead of `-f`|
 
 ### Markdown
 
