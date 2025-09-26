@@ -60,7 +60,7 @@ config:
         follow_redirects: true 
         preferred_ip_protocol: "ip4"
         tls_config:
-          insecure_skip_verify: true
+          insecure_skip_verify: {{ not .Values.global.verifyTls }}
     tcp_connect:
       prober: tcp
 service:
