@@ -162,6 +162,8 @@ grafana:
     additionalConfigValues: ""
     dataproxy:
       timeout: 600
+    contentSecurityPolicy: |-
+      """default-src 'self';script-src 'self' 'unsafe-inline' 'strict-dynamic' $${q}NONCE https:;object-src 'none';style-src 'self' 'unsafe-inline' blob:;img-src * data:;base-uri 'self';connect-src 'self' grafana.com ws://$${q}ROOT_PATH wss://$${q}ROOT_PATH;media-src 'none';form-action 'self'; require-trusted-types-for 'script';"""
   user:
     enabled: true
     # subdomain moved to common-config
