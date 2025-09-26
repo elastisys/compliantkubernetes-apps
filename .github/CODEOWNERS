@@ -58,10 +58,9 @@
 
 #
 # Skipped files in helmfile.d/charts/
-# .gitignore
-# public.gpg
-# namespaces/
-#
+/helmfile.d/charts/.gitignore
+/helmfile.d/charts/public.gpg
+/helmfile.d/charts/namespaces/
 
 #
 # helmfile.d/hooks/
@@ -100,8 +99,7 @@
 
 #
 # Skipped files in helmfile.d/stacks/
-# namespaces.yaml
-#
+/helmfile.d/stacks/namespaces.yaml
 
 #
 # helmfile.d/upstream/
@@ -133,8 +131,7 @@
 
 #
 # Skipped files in helmfile.d/upstream/
-# index.yaml
-#
+/helmfile.d/upstream/index.yaml
 
 #
 # helmfile.d/values
@@ -200,9 +197,8 @@
 
 #
 # Skipped files in helmfile.d/values/
-# admin-namespaces-sc.yaml.gotmpl
-# admin-namespaces-wc.yaml.gotmpl
-#
+/helmfile.d/values/admin-namespaces-sc.yaml.gotmpl
+/helmfile.d/values/admin-namespaces-wc.yaml.gotmpl
 
 #
 # /helmfile.d/
@@ -210,6 +206,10 @@
 
 /helmfile.d/README.md @elastisys/goto-scripts
 /helmfile.d/state.yaml.gotmpl @elastisys/goto-scripts
+
+#
+# Skipped files in helmfile.d/
+/helmfile.d/lists/images.yaml
 
 #
 # images
@@ -224,8 +224,7 @@
 
 #
 # Skipped files in images
-# curl-jq/
-#
+/images/curl-jq/
 
 /migration/ @elastisys/goto-qa
 
@@ -267,6 +266,5 @@
 
 #
 # Skipped files and folders in /
-# /.gitignore
-# config/
-#
+/.gitignore
+/config/
