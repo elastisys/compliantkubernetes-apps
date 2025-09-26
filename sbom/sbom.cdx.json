@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:9f7e32ec-4047-4b65-aafa-bb5a50fdbe2b",
+  "serialNumber": "urn:uuid:397e23d3-578d-4dfa-b9d7-2f94a6a7a255",
   "version": 1,
   "metadata": {
-    "timestamp": "2025-10-10T10:14:48Z",
+    "timestamp": "2025-10-14T12:30:51Z",
     "lifecycles": [
       {
         "phase": "build"
@@ -964,6 +964,37 @@
       }
     },
     {
+      "bom-ref": "pkg:helm/grafana@10.0.0",
+      "type": "library",
+      "supplier": {
+        "name": "grafana"
+      },
+      "name": "grafana",
+      "version": "10.0.0",
+      "description": "The leading tool for querying and visualizing time series and metrics.",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "purl": "pkg:helm/grafana@10.0.0",
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "Not evaluated"
+        }
+      ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/prometheus-community/kube-prometheus-stack/charts/grafana"
+          }
+        ]
+      }
+    },
+    {
       "bom-ref": "pkg:helm/grafana@3.3.6",
       "type": "library",
       "supplier": {
@@ -989,37 +1020,6 @@
         "occurrences": [
           {
             "location": "helmfile.d/upstream/kyverno/kyverno/charts/grafana"
-          }
-        ]
-      }
-    },
-    {
-      "bom-ref": "pkg:helm/grafana@8.11.4",
-      "type": "library",
-      "supplier": {
-        "name": "grafana"
-      },
-      "name": "grafana",
-      "version": "8.11.4",
-      "description": "The leading tool for querying and visualizing time series and metrics.",
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
-      "purl": "pkg:helm/grafana@8.11.4",
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "Not evaluated"
-        }
-      ],
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/upstream/prometheus-community/kube-prometheus-stack/charts/grafana"
           }
         ]
       }
@@ -1363,13 +1363,13 @@
       }
     },
     {
-      "bom-ref": "pkg:helm/kube-prometheus-stack@70.6.0",
+      "bom-ref": "pkg:helm/kube-prometheus-stack@77.11.1",
       "type": "library",
       "supplier": {
         "name": "prometheus-community"
       },
       "name": "kube-prometheus-stack",
-      "version": "70.6.0",
+      "version": "77.11.1",
       "description": "kube-prometheus-stack collects Kubernetes manifests, Grafana dashboards, and Prometheus rules combined with documentation and scripts to provide easy to operate end-to-end Kubernetes cluster monitoring with Prometheus using the Prometheus Operator.",
       "licenses": [
         {
@@ -1378,7 +1378,7 @@
           }
         }
       ],
-      "purl": "pkg:helm/kube-prometheus-stack@70.6.0",
+      "purl": "pkg:helm/kube-prometheus-stack@77.11.1",
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -1425,13 +1425,13 @@
       }
     },
     {
-      "bom-ref": "pkg:helm/kube-state-metrics@5.31.2",
+      "bom-ref": "pkg:helm/kube-state-metrics@6.3.0",
       "type": "library",
       "supplier": {
         "name": "kubernetes"
       },
       "name": "kube-state-metrics",
-      "version": "5.31.2",
+      "version": "6.3.0",
       "description": "Install kube-state-metrics to generate and expose cluster-level metrics",
       "licenses": [
         {
@@ -1440,7 +1440,7 @@
           }
         }
       ],
-      "purl": "pkg:helm/kube-state-metrics@5.31.2",
+      "purl": "pkg:helm/kube-state-metrics@6.3.0",
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -2292,13 +2292,13 @@
       }
     },
     {
-      "bom-ref": "pkg:helm/prometheus-node-exporter@4.45.2",
+      "bom-ref": "pkg:helm/prometheus-node-exporter@4.48.0",
       "type": "library",
       "supplier": {
         "name": "prometheus"
       },
       "name": "prometheus-node-exporter",
-      "version": "4.45.2",
+      "version": "4.48.0",
       "description": "A Helm chart for prometheus node-exporter",
       "licenses": [
         {
@@ -2307,7 +2307,7 @@
           }
         }
       ],
-      "purl": "pkg:helm/prometheus-node-exporter@4.45.2",
+      "purl": "pkg:helm/prometheus-node-exporter@4.48.0",
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -2354,13 +2354,13 @@
       }
     },
     {
-      "bom-ref": "pkg:helm/prometheus-windows-exporter@0.9.2",
+      "bom-ref": "pkg:helm/prometheus-windows-exporter@0.12.2",
       "type": "library",
       "supplier": {
         "name": "Jan-Otto Kröpke"
       },
       "name": "prometheus-windows-exporter",
-      "version": "0.9.2",
+      "version": "0.12.2",
       "description": "A Helm chart for prometheus windows-exporter",
       "licenses": [
         {
@@ -2369,7 +2369,7 @@
           }
         }
       ],
-      "purl": "pkg:helm/prometheus-windows-exporter@0.9.2",
+      "purl": "pkg:helm/prometheus-windows-exporter@0.12.2",
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -2924,15 +2924,26 @@
       "purl": "pkg:oci/bitnami/thanos@0.37.2-debian-12-r8"
     },
     {
-      "bom-ref": "pkg:oci/brancz/kube-rbac-proxy@v0.19.0",
+      "bom-ref": "pkg:oci/brancz/kube-rbac-proxy@v0.19.1",
       "type": "container",
       "supplier": {
         "name": "brancz"
       },
       "name": "brancz/kube-rbac-proxy",
-      "version": "v0.19.0",
-      "cpe": "cpe:2.3:a:brancz:kube-rbac-proxy:0.19.0:*:*:*:*:*:*:*",
-      "purl": "pkg:oci/brancz/kube-rbac-proxy@v0.19.0"
+      "version": "v0.19.1",
+      "cpe": "cpe:2.3:a:brancz:kube-rbac-proxy:0.19.1:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/brancz/kube-rbac-proxy@v0.19.1"
+    },
+    {
+      "bom-ref": "pkg:oci/brancz/kube-rbac-proxy@v0.20.0",
+      "type": "container",
+      "supplier": {
+        "name": "brancz"
+      },
+      "name": "brancz/kube-rbac-proxy",
+      "version": "v0.20.0",
+      "cpe": "cpe:2.3:a:brancz:kube-rbac-proxy:0.20.0:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/brancz/kube-rbac-proxy@v0.20.0"
     },
     {
       "bom-ref": "pkg:oci/ceph/ceph@v17.2.6?repository_url=quay.io",
@@ -3694,17 +3705,6 @@
       "purl": "pkg:oci/goharbor/trivy-adapter-photon@v2.13.1?repository_url=docker.io"
     },
     {
-      "bom-ref": "pkg:oci/grafana/grafana-image-renderer@11.6.0",
-      "type": "container",
-      "supplier": {
-        "name": "grafana"
-      },
-      "name": "grafana/grafana-image-renderer",
-      "version": "11.6.0",
-      "cpe": "cpe:2.3:a:grafana:grafana-image-renderer:11.6.0:*:*:*:*:*:*:*",
-      "purl": "pkg:oci/grafana/grafana-image-renderer@11.6.0"
-    },
-    {
       "bom-ref": "pkg:oci/grafana/grafana-image-renderer@12.0.2",
       "type": "container",
       "supplier": {
@@ -3714,6 +3714,17 @@
       "version": "12.0.2",
       "cpe": "cpe:2.3:a:grafana:grafana-image-renderer:12.0.2:*:*:*:*:*:*:*",
       "purl": "pkg:oci/grafana/grafana-image-renderer@12.0.2"
+    },
+    {
+      "bom-ref": "pkg:oci/grafana/grafana-image-renderer@12.1.1",
+      "type": "container",
+      "supplier": {
+        "name": "grafana"
+      },
+      "name": "grafana/grafana-image-renderer",
+      "version": "12.1.1",
+      "cpe": "cpe:2.3:a:grafana:grafana-image-renderer:12.1.1:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/grafana/grafana-image-renderer@12.1.1"
     },
     {
       "bom-ref": "pkg:oci/grafana/grafana-image-renderer@latest",
@@ -3727,26 +3738,15 @@
       "purl": "pkg:oci/grafana/grafana-image-renderer@latest"
     },
     {
-      "bom-ref": "pkg:oci/grafana/grafana-image-renderer@v0.81.0",
+      "bom-ref": "pkg:oci/grafana/grafana-image-renderer@v0.85.0",
       "type": "container",
       "supplier": {
         "name": "grafana"
       },
       "name": "grafana/grafana-image-renderer",
-      "version": "v0.81.0",
-      "cpe": "cpe:2.3:a:grafana:grafana-image-renderer:0.81.0:*:*:*:*:*:*:*",
-      "purl": "pkg:oci/grafana/grafana-image-renderer@v0.81.0"
-    },
-    {
-      "bom-ref": "pkg:oci/grafana/grafana@11.6.0",
-      "type": "container",
-      "supplier": {
-        "name": "grafana"
-      },
-      "name": "grafana/grafana",
-      "version": "11.6.0",
-      "cpe": "cpe:2.3:a:grafana:grafana:11.6.0:*:*:*:*:*:*:*",
-      "purl": "pkg:oci/grafana/grafana@11.6.0"
+      "version": "v0.85.0",
+      "cpe": "cpe:2.3:a:grafana:grafana-image-renderer:0.85.0:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/grafana/grafana-image-renderer@v0.85.0"
     },
     {
       "bom-ref": "pkg:oci/grafana/grafana@12.0.2",
@@ -3771,6 +3771,17 @@
       "purl": "pkg:oci/grafana/grafana@12.0.3?repository_url=docker.io"
     },
     {
+      "bom-ref": "pkg:oci/grafana/grafana@12.1.1",
+      "type": "container",
+      "supplier": {
+        "name": "grafana"
+      },
+      "name": "grafana/grafana",
+      "version": "12.1.1",
+      "cpe": "cpe:2.3:a:grafana:grafana:12.1.1:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/grafana/grafana@12.1.1"
+    },
+    {
       "bom-ref": "pkg:oci/grafana/grafana@latest",
       "type": "container",
       "supplier": {
@@ -3782,15 +3793,15 @@
       "purl": "pkg:oci/grafana/grafana@latest"
     },
     {
-      "bom-ref": "pkg:oci/grafana/grafana@v0.81.0",
+      "bom-ref": "pkg:oci/grafana/grafana@v0.85.0",
       "type": "container",
       "supplier": {
         "name": "grafana"
       },
       "name": "grafana/grafana",
-      "version": "v0.81.0",
-      "cpe": "cpe:2.3:a:grafana:grafana:0.81.0:*:*:*:*:*:*:*",
-      "purl": "pkg:oci/grafana/grafana@v0.81.0"
+      "version": "v0.85.0",
+      "cpe": "cpe:2.3:a:grafana:grafana:0.85.0:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/grafana/grafana@v0.85.0"
     },
     {
       "bom-ref": "pkg:oci/ingress-controller/controller@1.0.0-dev",
@@ -3826,17 +3837,6 @@
       "purl": "pkg:oci/ingress-nginx/controller@v1.13.3?repository_url=registry.k8s.io"
     },
     {
-      "bom-ref": "pkg:oci/ingress-nginx/kube-webhook-certgen@v1.5.2",
-      "type": "container",
-      "supplier": {
-        "name": "ingress-nginx"
-      },
-      "name": "ingress-nginx/kube-webhook-certgen",
-      "version": "v1.5.2",
-      "cpe": "cpe:2.3:a:ingress-nginx:kube-webhook-certgen:1.5.2:*:*:*:*:*:*:*",
-      "purl": "pkg:oci/ingress-nginx/kube-webhook-certgen@v1.5.2"
-    },
-    {
       "bom-ref": "pkg:oci/ingress-nginx/kube-webhook-certgen@v1.5.2?repository_url=registry.k8s.io",
       "type": "container",
       "supplier": {
@@ -3846,6 +3846,17 @@
       "version": "v1.5.2",
       "cpe": "cpe:2.3:a:kubernetes:kube-webhook-certgen:1.5.2:*:*:*:*:*:*:*",
       "purl": "pkg:oci/ingress-nginx/kube-webhook-certgen@v1.5.2?repository_url=registry.k8s.io"
+    },
+    {
+      "bom-ref": "pkg:oci/ingress-nginx/kube-webhook-certgen@v1.6.2",
+      "type": "container",
+      "supplier": {
+        "name": "ingress-nginx"
+      },
+      "name": "ingress-nginx/kube-webhook-certgen",
+      "version": "v1.6.2",
+      "cpe": "cpe:2.3:a:ingress-nginx:kube-webhook-certgen:1.6.2:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/ingress-nginx/kube-webhook-certgen@v1.6.2"
     },
     {
       "bom-ref": "pkg:oci/ingress-nginx/kube-webhook-certgen@v1.6.3?repository_url=registry.k8s.io",
@@ -3991,26 +4002,15 @@
       "purl": "pkg:oci/k8saudit@0.11"
     },
     {
-      "bom-ref": "pkg:oci/kiwigrid/k8s-sidecar@1.30.0",
+      "bom-ref": "pkg:oci/kiwigrid/k8s-sidecar@1.30.10",
       "type": "container",
       "supplier": {
         "name": "kiwigrid"
       },
       "name": "kiwigrid/k8s-sidecar",
-      "version": "1.30.0",
-      "cpe": "cpe:2.3:a:kiwigrid:k8s-sidecar:1.30.0:*:*:*:*:*:*:*",
-      "purl": "pkg:oci/kiwigrid/k8s-sidecar@1.30.0"
-    },
-    {
-      "bom-ref": "pkg:oci/kiwigrid/k8s-sidecar@1.30.0?repository_url=quay.io",
-      "type": "container",
-      "supplier": {
-        "name": "kiwigrid"
-      },
-      "name": "quay.io/kiwigrid/k8s-sidecar",
-      "version": "1.30.0",
-      "cpe": "cpe:2.3:a:kiwigrid:k8s-sidecar:1.30.0:*:*:*:*:*:*:*",
-      "purl": "pkg:oci/kiwigrid/k8s-sidecar@1.30.0?repository_url=quay.io"
+      "version": "1.30.10",
+      "cpe": "cpe:2.3:a:kiwigrid:k8s-sidecar:1.30.10:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/kiwigrid/k8s-sidecar@1.30.10"
     },
     {
       "bom-ref": "pkg:oci/kiwigrid/k8s-sidecar@1.30.3",
@@ -4024,6 +4024,17 @@
       "purl": "pkg:oci/kiwigrid/k8s-sidecar@1.30.3"
     },
     {
+      "bom-ref": "pkg:oci/kiwigrid/k8s-sidecar@1.30.3?repository_url=quay.io",
+      "type": "container",
+      "supplier": {
+        "name": "kiwigrid"
+      },
+      "name": "quay.io/kiwigrid/k8s-sidecar",
+      "version": "1.30.3",
+      "cpe": "cpe:2.3:a:kiwigrid:k8s-sidecar:1.30.3:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/kiwigrid/k8s-sidecar@1.30.3?repository_url=quay.io"
+    },
+    {
       "bom-ref": "pkg:oci/kiwigrid/k8s-sidecar@latest",
       "type": "container",
       "supplier": {
@@ -4035,15 +4046,15 @@
       "purl": "pkg:oci/kiwigrid/k8s-sidecar@latest"
     },
     {
-      "bom-ref": "pkg:oci/kube-state-metrics/kube-state-metrics@2.15.0",
+      "bom-ref": "pkg:oci/kube-state-metrics/kube-state-metrics@2.17.0",
       "type": "container",
       "supplier": {
         "name": "kube-state-metrics"
       },
       "name": "kube-state-metrics/kube-state-metrics",
-      "version": "2.15.0",
-      "cpe": "cpe:2.3:a:kube-state-metrics:kube-state-metrics:2.15.0:*:*:*:*:*:*:*",
-      "purl": "pkg:oci/kube-state-metrics/kube-state-metrics@2.15.0"
+      "version": "2.17.0",
+      "cpe": "cpe:2.3:a:kube-state-metrics:kube-state-metrics:2.17.0:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/kube-state-metrics/kube-state-metrics@2.17.0"
     },
     {
       "bom-ref": "pkg:oci/kube-state-metrics/kube-state-metrics@latest",
@@ -4057,26 +4068,26 @@
       "purl": "pkg:oci/kube-state-metrics/kube-state-metrics@latest"
     },
     {
-      "bom-ref": "pkg:oci/kube-state-metrics/kube-state-metrics@v0.81.0",
+      "bom-ref": "pkg:oci/kube-state-metrics/kube-state-metrics@v0.85.0",
       "type": "container",
       "supplier": {
         "name": "kube-state-metrics"
       },
       "name": "kube-state-metrics/kube-state-metrics",
-      "version": "v0.81.0",
-      "cpe": "cpe:2.3:a:kube-state-metrics:kube-state-metrics:0.81.0:*:*:*:*:*:*:*",
-      "purl": "pkg:oci/kube-state-metrics/kube-state-metrics@v0.81.0"
+      "version": "v0.85.0",
+      "cpe": "cpe:2.3:a:kube-state-metrics:kube-state-metrics:0.85.0:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/kube-state-metrics/kube-state-metrics@v0.85.0"
     },
     {
-      "bom-ref": "pkg:oci/kube-state-metrics/kube-state-metrics@v2.15.0?repository_url=registry.k8s.io",
+      "bom-ref": "pkg:oci/kube-state-metrics/kube-state-metrics@v2.17.0?repository_url=registry.k8s.io",
       "type": "container",
       "supplier": {
         "name": "kube-state-metrics"
       },
       "name": "registry.k8s.io/kube-state-metrics/kube-state-metrics",
-      "version": "v2.15.0",
-      "cpe": "cpe:2.3:a:kubernetes:kube-state-metrics:2.15.0:*:*:*:*:*:*:*",
-      "purl": "pkg:oci/kube-state-metrics/kube-state-metrics@v2.15.0?repository_url=registry.k8s.io"
+      "version": "v2.17.0",
+      "cpe": "cpe:2.3:a:kubernetes:kube-state-metrics:2.17.0:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/kube-state-metrics/kube-state-metrics@v2.17.0?repository_url=registry.k8s.io"
     },
     {
       "bom-ref": "pkg:oci/kubereboot/kured@1.20.0?repository_url=ghcr.io",
@@ -4497,15 +4508,15 @@
       "purl": "pkg:oci/nvidia@v24.9.2?repository_url=nvcr.io"
     },
     {
-      "bom-ref": "pkg:oci/oauth2-proxy/oauth2-proxy@v7.8.2?repository_url=quay.io",
+      "bom-ref": "pkg:oci/oauth2-proxy/oauth2-proxy@v7.12.0?repository_url=quay.io",
       "type": "container",
       "supplier": {
         "name": "oauth2-proxy"
       },
       "name": "quay.io/oauth2-proxy/oauth2-proxy",
-      "version": "v7.8.2",
-      "cpe": "cpe:2.3:a:oauth2-proxy:oauth2-proxy:7.8.2:*:*:*:*:*:*:*",
-      "purl": "pkg:oci/oauth2-proxy/oauth2-proxy@v7.8.2?repository_url=quay.io"
+      "version": "v7.12.0",
+      "cpe": "cpe:2.3:a:oauth2-proxy:oauth2-proxy:7.12.0:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/oauth2-proxy/oauth2-proxy@v7.12.0?repository_url=quay.io"
     },
     {
       "bom-ref": "pkg:oci/openpolicyagent/gatekeeper-crds@v3.18.2",
@@ -4651,15 +4662,15 @@
       "purl": "pkg:oci/openshift/oauth-proxy@v1.1.0"
     },
     {
-      "bom-ref": "pkg:oci/prometheus-community/windows-exporter@0.30.5",
+      "bom-ref": "pkg:oci/prometheus-community/windows-exporter@0.31.3",
       "type": "container",
       "supplier": {
         "name": "prometheus-community"
       },
       "name": "prometheus-community/windows-exporter",
-      "version": "0.30.5",
-      "cpe": "cpe:2.3:a:prometheus-community:windows-exporter:0.30.5:*:*:*:*:*:*:*",
-      "purl": "pkg:oci/prometheus-community/windows-exporter@0.30.5"
+      "version": "0.31.3",
+      "cpe": "cpe:2.3:a:prometheus-community:windows-exporter:0.31.3:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/prometheus-community/windows-exporter@0.31.3"
     },
     {
       "bom-ref": "pkg:oci/prometheus-community/windows-exporter@latest",
@@ -4673,15 +4684,15 @@
       "purl": "pkg:oci/prometheus-community/windows-exporter@latest"
     },
     {
-      "bom-ref": "pkg:oci/prometheus-community/windows-exporter@v0.81.0",
+      "bom-ref": "pkg:oci/prometheus-community/windows-exporter@v0.85.0",
       "type": "container",
       "supplier": {
         "name": "prometheus-community"
       },
       "name": "prometheus-community/windows-exporter",
-      "version": "v0.81.0",
-      "cpe": "cpe:2.3:a:prometheus-community:windows-exporter:0.81.0:*:*:*:*:*:*:*",
-      "purl": "pkg:oci/prometheus-community/windows-exporter@v0.81.0"
+      "version": "v0.85.0",
+      "cpe": "cpe:2.3:a:prometheus-community:windows-exporter:0.85.0:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/prometheus-community/windows-exporter@v0.85.0"
     },
     {
       "bom-ref": "pkg:oci/prometheus-operator/admission-webhook@latest",
@@ -4695,15 +4706,15 @@
       "purl": "pkg:oci/prometheus-operator/admission-webhook@latest"
     },
     {
-      "bom-ref": "pkg:oci/prometheus-operator/admission-webhook@v0.81.0",
+      "bom-ref": "pkg:oci/prometheus-operator/admission-webhook@v0.85.0",
       "type": "container",
       "supplier": {
         "name": "prometheus-operator"
       },
       "name": "prometheus-operator/admission-webhook",
-      "version": "v0.81.0",
-      "cpe": "cpe:2.3:a:prometheus-operator:admission-webhook:0.81.0:*:*:*:*:*:*:*",
-      "purl": "pkg:oci/prometheus-operator/admission-webhook@v0.81.0"
+      "version": "v0.85.0",
+      "cpe": "cpe:2.3:a:prometheus-operator:admission-webhook:0.85.0:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/prometheus-operator/admission-webhook@v0.85.0"
     },
     {
       "bom-ref": "pkg:oci/prometheus-operator/prometheus-config-reloader@latest",
@@ -4728,28 +4739,6 @@
       "purl": "pkg:oci/prometheus-operator/prometheus-config-reloader@v0.50.0?repository_url=quay.io"
     },
     {
-      "bom-ref": "pkg:oci/prometheus-operator/prometheus-config-reloader@v0.81.0",
-      "type": "container",
-      "supplier": {
-        "name": "prometheus-operator"
-      },
-      "name": "prometheus-operator/prometheus-config-reloader",
-      "version": "v0.81.0",
-      "cpe": "cpe:2.3:a:prometheus-operator:prometheus-config-reloader:0.81.0:*:*:*:*:*:*:*",
-      "purl": "pkg:oci/prometheus-operator/prometheus-config-reloader@v0.81.0"
-    },
-    {
-      "bom-ref": "pkg:oci/prometheus-operator/prometheus-config-reloader@v0.81.0?repository_url=quay.io",
-      "type": "container",
-      "supplier": {
-        "name": "prometheus-operator"
-      },
-      "name": "quay.io/prometheus-operator/prometheus-config-reloader",
-      "version": "v0.81.0",
-      "cpe": "cpe:2.3:a:prometheus-operator:prometheus-config-reloader:0.81.0:*:*:*:*:*:*:*",
-      "purl": "pkg:oci/prometheus-operator/prometheus-config-reloader@v0.81.0?repository_url=quay.io"
-    },
-    {
       "bom-ref": "pkg:oci/prometheus-operator/prometheus-config-reloader@v0.85.0",
       "type": "container",
       "supplier": {
@@ -4759,6 +4748,17 @@
       "version": "v0.85.0",
       "cpe": "cpe:2.3:a:prometheus-operator:prometheus-config-reloader:0.85.0:*:*:*:*:*:*:*",
       "purl": "pkg:oci/prometheus-operator/prometheus-config-reloader@v0.85.0"
+    },
+    {
+      "bom-ref": "pkg:oci/prometheus-operator/prometheus-config-reloader@v0.85.0?repository_url=quay.io",
+      "type": "container",
+      "supplier": {
+        "name": "prometheus-operator"
+      },
+      "name": "quay.io/prometheus-operator/prometheus-config-reloader",
+      "version": "v0.85.0",
+      "cpe": "cpe:2.3:a:prometheus-operator:prometheus-config-reloader:0.85.0:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/prometheus-operator/prometheus-config-reloader@v0.85.0?repository_url=quay.io"
     },
     {
       "bom-ref": "pkg:oci/prometheus-operator/prometheus-operator@latest",
@@ -4772,26 +4772,26 @@
       "purl": "pkg:oci/prometheus-operator/prometheus-operator@latest"
     },
     {
-      "bom-ref": "pkg:oci/prometheus-operator/prometheus-operator@v0.81.0",
+      "bom-ref": "pkg:oci/prometheus-operator/prometheus-operator@v0.85.0",
       "type": "container",
       "supplier": {
         "name": "prometheus-operator"
       },
       "name": "prometheus-operator/prometheus-operator",
-      "version": "v0.81.0",
-      "cpe": "cpe:2.3:a:prometheus-operator:prometheus-operator:0.81.0:*:*:*:*:*:*:*",
-      "purl": "pkg:oci/prometheus-operator/prometheus-operator@v0.81.0"
+      "version": "v0.85.0",
+      "cpe": "cpe:2.3:a:prometheus-operator:prometheus-operator:0.85.0:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/prometheus-operator/prometheus-operator@v0.85.0"
     },
     {
-      "bom-ref": "pkg:oci/prometheus-operator/prometheus-operator@v0.81.0?repository_url=quay.io",
+      "bom-ref": "pkg:oci/prometheus-operator/prometheus-operator@v0.85.0?repository_url=quay.io",
       "type": "container",
       "supplier": {
         "name": "prometheus-operator"
       },
       "name": "quay.io/prometheus-operator/prometheus-operator",
-      "version": "v0.81.0",
-      "cpe": "cpe:2.3:a:prometheus-operator:prometheus-operator:0.81.0:*:*:*:*:*:*:*",
-      "purl": "pkg:oci/prometheus-operator/prometheus-operator@v0.81.0?repository_url=quay.io"
+      "version": "v0.85.0",
+      "cpe": "cpe:2.3:a:prometheus-operator:prometheus-operator:0.85.0:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/prometheus-operator/prometheus-operator@v0.85.0?repository_url=quay.io"
     },
     {
       "bom-ref": "pkg:oci/prometheus/alertmanager@v0.28.1",
@@ -4871,15 +4871,15 @@
       "purl": "pkg:oci/prometheus/node-exporter@latest"
     },
     {
-      "bom-ref": "pkg:oci/prometheus/node-exporter@v0.81.0",
+      "bom-ref": "pkg:oci/prometheus/node-exporter@v0.85.0",
       "type": "container",
       "supplier": {
         "name": "prometheus"
       },
       "name": "prometheus/node-exporter",
-      "version": "v0.81.0",
-      "cpe": "cpe:2.3:a:prometheus:node-exporter:0.81.0:*:*:*:*:*:*:*",
-      "purl": "pkg:oci/prometheus/node-exporter@v0.81.0"
+      "version": "v0.85.0",
+      "cpe": "cpe:2.3:a:prometheus:node-exporter:0.85.0:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/prometheus/node-exporter@v0.85.0"
     },
     {
       "bom-ref": "pkg:oci/prometheus/node-exporter@v1.9.1?repository_url=quay.io",
@@ -4893,26 +4893,26 @@
       "purl": "pkg:oci/prometheus/node-exporter@v1.9.1?repository_url=quay.io"
     },
     {
-      "bom-ref": "pkg:oci/prometheus/prometheus@v3.2.1",
+      "bom-ref": "pkg:oci/prometheus/prometheus@v3.6.0",
       "type": "container",
       "supplier": {
         "name": "prometheus"
       },
       "name": "prometheus/prometheus",
-      "version": "v3.2.1",
-      "cpe": "cpe:2.3:a:prometheus:prometheus:3.2.1:*:*:*:*:*:*:*",
-      "purl": "pkg:oci/prometheus/prometheus@v3.2.1"
+      "version": "v3.6.0",
+      "cpe": "cpe:2.3:a:prometheus:prometheus:3.6.0:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/prometheus/prometheus@v3.6.0"
     },
     {
-      "bom-ref": "pkg:oci/prometheus/prometheus@v3.2.1?repository_url=quay.io",
+      "bom-ref": "pkg:oci/prometheus/prometheus@v3.6.0?repository_url=quay.io",
       "type": "container",
       "supplier": {
         "name": "prometheus"
       },
       "name": "quay.io/prometheus/prometheus",
-      "version": "v3.2.1",
-      "cpe": "cpe:2.3:a:prometheus:prometheus:3.2.1:*:*:*:*:*:*:*",
-      "purl": "pkg:oci/prometheus/prometheus@v3.2.1?repository_url=quay.io"
+      "version": "v3.6.0",
+      "cpe": "cpe:2.3:a:prometheus:prometheus:3.6.0:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/prometheus/prometheus@v3.6.0?repository_url=quay.io"
     },
     {
       "bom-ref": "pkg:oci/prometheuscommunity/elasticsearch-exporter@latest?repository_url=quay.io",
@@ -5036,15 +5036,15 @@
       "purl": "pkg:oci/tektoncd/github.com/tektoncd/pipeline/cmd/webhook@v0.45.0?repository_url=ghcr.io\u0026digest=sha256:07390c988b1c651c4810e9f7b15a88dfce8030845a429cf19b762a0d50e18ca7"
     },
     {
-      "bom-ref": "pkg:oci/thanos/thanos@v0.37.2",
+      "bom-ref": "pkg:oci/thanos/thanos@v0.39.2",
       "type": "container",
       "supplier": {
         "name": "thanos"
       },
       "name": "thanos/thanos",
-      "version": "v0.37.2",
-      "cpe": "cpe:2.3:a:thanos:thanos:0.37.2:*:*:*:*:*:*:*",
-      "purl": "pkg:oci/thanos/thanos@v0.37.2"
+      "version": "v0.39.2",
+      "cpe": "cpe:2.3:a:thanos:thanos:0.39.2:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/thanos/thanos@v0.39.2"
     },
     {
       "bom-ref": "pkg:oci/velero/velero-plugin-for-aws@v1.12.1",
@@ -5189,8 +5189,8 @@
         "pkg:helm/gpu-operator@v24.9.2",
         "pkg:helm/grafana-dashboards@0.3.0",
         "pkg:helm/grafana-label-enforcer@0.1.0",
+        "pkg:helm/grafana@10.0.0",
         "pkg:helm/grafana@3.3.6",
-        "pkg:helm/grafana@8.11.4",
         "pkg:helm/grafana@9.2.10",
         "pkg:helm/harbor-backup@0.1.0",
         "pkg:helm/harbor-certs@0.1.0",
@@ -5202,9 +5202,9 @@
         "pkg:helm/ingress-nginx@4.13.3",
         "pkg:helm/init-harbor@0.2.0",
         "pkg:helm/k8s-metacollector@0.1.10",
-        "pkg:helm/kube-prometheus-stack@70.6.0",
+        "pkg:helm/kube-prometheus-stack@77.11.1",
         "pkg:helm/kube-state-metrics-extra-resource-metrics@0.1.0",
-        "pkg:helm/kube-state-metrics@5.31.2",
+        "pkg:helm/kube-state-metrics@6.3.0",
         "pkg:helm/kubeapi-metrics@0.1.0",
         "pkg:helm/kured-secret@0.1.0",
         "pkg:helm/kured@5.10.0",
@@ -5232,9 +5232,9 @@
         "pkg:helm/prometheus-alerts@0.1.1",
         "pkg:helm/prometheus-blackbox-exporter@11.3.1",
         "pkg:helm/prometheus-elasticsearch-exporter@6.1.0",
-        "pkg:helm/prometheus-node-exporter@4.45.2",
+        "pkg:helm/prometheus-node-exporter@4.48.0",
         "pkg:helm/prometheus-servicemonitor@0.1.1",
-        "pkg:helm/prometheus-windows-exporter@0.9.2",
+        "pkg:helm/prometheus-windows-exporter@0.12.2",
         "pkg:helm/rclone@0.1.0",
         "pkg:helm/s3-exporter@0.1.0",
         "pkg:helm/tekton-pipelines@0.1.0",
@@ -5419,20 +5419,20 @@
       ]
     },
     {
-      "ref": "pkg:helm/grafana@3.3.6",
-      "dependsOn": []
-    },
-    {
-      "ref": "pkg:helm/grafana@8.11.4",
+      "ref": "pkg:helm/grafana@10.0.0",
       "dependsOn": [
         "pkg:oci/bats/bats@v1.4.1",
         "pkg:oci/curlimages/curl@8.9.1",
         "pkg:oci/gambol99/keycloak-proxy@latest?repository_url=quay.io",
-        "pkg:oci/grafana/grafana-image-renderer@11.6.0",
-        "pkg:oci/grafana/grafana@11.6.0",
-        "pkg:oci/kiwigrid/k8s-sidecar@1.30.0",
+        "pkg:oci/grafana/grafana-image-renderer@12.1.1",
+        "pkg:oci/grafana/grafana@12.1.1",
+        "pkg:oci/kiwigrid/k8s-sidecar@1.30.10",
         "pkg:oci/library/busybox@1.31.1"
       ]
+    },
+    {
+      "ref": "pkg:helm/grafana@3.3.6",
+      "dependsOn": []
     },
     {
       "ref": "pkg:helm/grafana@9.2.10",
@@ -5512,34 +5512,35 @@
       ]
     },
     {
-      "ref": "pkg:helm/kube-prometheus-stack@70.6.0",
+      "ref": "pkg:helm/kube-prometheus-stack@77.11.1",
       "dependsOn": [
         "pkg:helm/crds@0.0.0",
-        "pkg:helm/grafana@8.11.4",
-        "pkg:helm/kube-state-metrics@5.31.2",
-        "pkg:helm/prometheus-node-exporter@4.45.2",
-        "pkg:helm/prometheus-windows-exporter@0.9.2",
+        "pkg:helm/grafana@10.0.0",
+        "pkg:helm/kube-state-metrics@6.3.0",
+        "pkg:helm/prometheus-node-exporter@4.48.0",
+        "pkg:helm/prometheus-windows-exporter@0.12.2",
         "pkg:oci/bats/bats@v1.4.1",
-        "pkg:oci/brancz/kube-rbac-proxy@v0.19.0",
+        "pkg:oci/brancz/kube-rbac-proxy@v0.19.1",
+        "pkg:oci/brancz/kube-rbac-proxy@v0.20.0",
         "pkg:oci/curlimages/curl@8.9.1",
         "pkg:oci/gambol99/keycloak-proxy@latest?repository_url=quay.io",
-        "pkg:oci/grafana/grafana-image-renderer@v0.81.0",
-        "pkg:oci/grafana/grafana@v0.81.0",
-        "pkg:oci/ingress-nginx/kube-webhook-certgen@v1.5.2",
-        "pkg:oci/kiwigrid/k8s-sidecar@1.30.0",
+        "pkg:oci/grafana/grafana-image-renderer@v0.85.0",
+        "pkg:oci/grafana/grafana@v0.85.0",
+        "pkg:oci/ingress-nginx/kube-webhook-certgen@v1.6.2",
+        "pkg:oci/kiwigrid/k8s-sidecar@1.30.10",
         "pkg:oci/kiwigrid/k8s-sidecar@latest",
-        "pkg:oci/kube-state-metrics/kube-state-metrics@v0.81.0",
+        "pkg:oci/kube-state-metrics/kube-state-metrics@v0.85.0",
         "pkg:oci/library/busybox@1.31.1",
         "pkg:oci/nvidia/dcgm-exporter@1.4.3",
-        "pkg:oci/oauth2-proxy/oauth2-proxy@v7.8.2?repository_url=quay.io",
-        "pkg:oci/prometheus-community/windows-exporter@v0.81.0",
-        "pkg:oci/prometheus-operator/admission-webhook@v0.81.0",
-        "pkg:oci/prometheus-operator/prometheus-config-reloader@v0.81.0",
-        "pkg:oci/prometheus-operator/prometheus-operator@v0.81.0",
+        "pkg:oci/oauth2-proxy/oauth2-proxy@v7.12.0?repository_url=quay.io",
+        "pkg:oci/prometheus-community/windows-exporter@v0.85.0",
+        "pkg:oci/prometheus-operator/admission-webhook@v0.85.0",
+        "pkg:oci/prometheus-operator/prometheus-config-reloader@v0.85.0",
+        "pkg:oci/prometheus-operator/prometheus-operator@v0.85.0",
         "pkg:oci/prometheus/alertmanager@v0.28.1",
-        "pkg:oci/prometheus/node-exporter@v0.81.0",
-        "pkg:oci/prometheus/prometheus@v3.2.1",
-        "pkg:oci/thanos/thanos@v0.37.2"
+        "pkg:oci/prometheus/node-exporter@v0.85.0",
+        "pkg:oci/prometheus/prometheus@v3.6.0",
+        "pkg:oci/thanos/thanos@v0.39.2"
       ]
     },
     {
@@ -5547,11 +5548,11 @@
       "dependsOn": []
     },
     {
-      "ref": "pkg:helm/kube-state-metrics@5.31.2",
+      "ref": "pkg:helm/kube-state-metrics@6.3.0",
       "dependsOn": [
-        "pkg:oci/brancz/kube-rbac-proxy@v0.19.0",
+        "pkg:oci/brancz/kube-rbac-proxy@v0.19.1",
         "pkg:oci/kiwigrid/k8s-sidecar@latest",
-        "pkg:oci/kube-state-metrics/kube-state-metrics@2.15.0"
+        "pkg:oci/kube-state-metrics/kube-state-metrics@2.17.0"
       ]
     },
     {
@@ -5708,9 +5709,9 @@
       ]
     },
     {
-      "ref": "pkg:helm/prometheus-node-exporter@4.45.2",
+      "ref": "pkg:helm/prometheus-node-exporter@4.48.0",
       "dependsOn": [
-        "pkg:oci/brancz/kube-rbac-proxy@v0.19.0",
+        "pkg:oci/brancz/kube-rbac-proxy@v0.20.0",
         "pkg:oci/nvidia/dcgm-exporter@1.4.3",
         "pkg:oci/prometheus/node-exporter@1.9.1"
       ]
@@ -5720,10 +5721,10 @@
       "dependsOn": []
     },
     {
-      "ref": "pkg:helm/prometheus-windows-exporter@0.9.2",
+      "ref": "pkg:helm/prometheus-windows-exporter@0.12.2",
       "dependsOn": [
         "pkg:oci/nvidia/dcgm-exporter@1.4.3",
-        "pkg:oci/prometheus-community/windows-exporter@0.30.5"
+        "pkg:oci/prometheus-community/windows-exporter@0.31.3"
       ]
     },
     {
@@ -5854,7 +5855,11 @@
       "dependsOn": []
     },
     {
-      "ref": "pkg:oci/brancz/kube-rbac-proxy@v0.19.0",
+      "ref": "pkg:oci/brancz/kube-rbac-proxy@v0.19.1",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:oci/brancz/kube-rbac-proxy@v0.20.0",
       "dependsOn": []
     },
     {
@@ -6006,19 +6011,15 @@
       "dependsOn": []
     },
     {
-      "ref": "pkg:oci/grafana/grafana-image-renderer@11.6.0",
-      "dependsOn": []
-    },
-    {
       "ref": "pkg:oci/grafana/grafana-image-renderer@12.0.2",
       "dependsOn": []
     },
     {
-      "ref": "pkg:oci/grafana/grafana-image-renderer@v0.81.0",
+      "ref": "pkg:oci/grafana/grafana-image-renderer@12.1.1",
       "dependsOn": []
     },
     {
-      "ref": "pkg:oci/grafana/grafana@11.6.0",
+      "ref": "pkg:oci/grafana/grafana-image-renderer@v0.85.0",
       "dependsOn": []
     },
     {
@@ -6026,7 +6027,11 @@
       "dependsOn": []
     },
     {
-      "ref": "pkg:oci/grafana/grafana@v0.81.0",
+      "ref": "pkg:oci/grafana/grafana@12.1.1",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:oci/grafana/grafana@v0.85.0",
       "dependsOn": []
     },
     {
@@ -6034,7 +6039,7 @@
       "dependsOn": []
     },
     {
-      "ref": "pkg:oci/ingress-nginx/kube-webhook-certgen@v1.5.2",
+      "ref": "pkg:oci/ingress-nginx/kube-webhook-certgen@v1.6.2",
       "dependsOn": []
     },
     {
@@ -6066,7 +6071,7 @@
       "dependsOn": []
     },
     {
-      "ref": "pkg:oci/kiwigrid/k8s-sidecar@1.30.0",
+      "ref": "pkg:oci/kiwigrid/k8s-sidecar@1.30.10",
       "dependsOn": []
     },
     {
@@ -6078,11 +6083,11 @@
       "dependsOn": []
     },
     {
-      "ref": "pkg:oci/kube-state-metrics/kube-state-metrics@2.15.0",
+      "ref": "pkg:oci/kube-state-metrics/kube-state-metrics@2.17.0",
       "dependsOn": []
     },
     {
-      "ref": "pkg:oci/kube-state-metrics/kube-state-metrics@v0.81.0",
+      "ref": "pkg:oci/kube-state-metrics/kube-state-metrics@v0.85.0",
       "dependsOn": []
     },
     {
@@ -6170,7 +6175,7 @@
       "dependsOn": []
     },
     {
-      "ref": "pkg:oci/oauth2-proxy/oauth2-proxy@v7.8.2?repository_url=quay.io",
+      "ref": "pkg:oci/oauth2-proxy/oauth2-proxy@v7.12.0?repository_url=quay.io",
       "dependsOn": []
     },
     {
@@ -6198,19 +6203,15 @@
       "dependsOn": []
     },
     {
-      "ref": "pkg:oci/prometheus-community/windows-exporter@0.30.5",
+      "ref": "pkg:oci/prometheus-community/windows-exporter@0.31.3",
       "dependsOn": []
     },
     {
-      "ref": "pkg:oci/prometheus-community/windows-exporter@v0.81.0",
+      "ref": "pkg:oci/prometheus-community/windows-exporter@v0.85.0",
       "dependsOn": []
     },
     {
-      "ref": "pkg:oci/prometheus-operator/admission-webhook@v0.81.0",
-      "dependsOn": []
-    },
-    {
-      "ref": "pkg:oci/prometheus-operator/prometheus-config-reloader@v0.81.0",
+      "ref": "pkg:oci/prometheus-operator/admission-webhook@v0.85.0",
       "dependsOn": []
     },
     {
@@ -6218,7 +6219,7 @@
       "dependsOn": []
     },
     {
-      "ref": "pkg:oci/prometheus-operator/prometheus-operator@v0.81.0",
+      "ref": "pkg:oci/prometheus-operator/prometheus-operator@v0.85.0",
       "dependsOn": []
     },
     {
@@ -6234,11 +6235,11 @@
       "dependsOn": []
     },
     {
-      "ref": "pkg:oci/prometheus/node-exporter@v0.81.0",
+      "ref": "pkg:oci/prometheus/node-exporter@v0.85.0",
       "dependsOn": []
     },
     {
-      "ref": "pkg:oci/prometheus/prometheus@v3.2.1",
+      "ref": "pkg:oci/prometheus/prometheus@v3.6.0",
       "dependsOn": []
     },
     {
@@ -6266,7 +6267,7 @@
       "dependsOn": []
     },
     {
-      "ref": "pkg:oci/thanos/thanos@v0.37.2",
+      "ref": "pkg:oci/thanos/thanos@v0.39.2",
       "dependsOn": []
     },
     {
