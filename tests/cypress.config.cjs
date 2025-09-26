@@ -37,5 +37,6 @@ module.exports = defineConfig({
     responseTimeout: DEFAULT_TIMEOUT,
   },
   experimentalMemoryManagement: true,
+  experimentalCspAllowList: true,
   numTestsKeptInMemory: 1,
 })

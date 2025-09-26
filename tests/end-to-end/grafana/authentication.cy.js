@@ -11,7 +11,7 @@ describe('grafana admin authentication', () => {
   })
 
   it('can login via static admin user', function () {
-    cy.visit(`https://${this.ingress}`)
+    cy.visitAndVerifyCSPHeader(`https://${this.ingress}`)
 
     cy.yqSecrets('.grafana.password').then((password) => {
       cy.get('input[placeholder*="username"]').type('admin', { log: false })
@@ -35,7 +35,7 @@ describe('grafana admin authentication', () => {
       }
     })
 
-    cy.visit(`https://${this.ingress}`)
+    cy.visitAndVerifyCSPHeader(`https://${this.ingress}`)
 
     cy.contains('Sign in with dex').click()
 
@@ -60,7 +60,7 @@ describe('grafana dev authentication', function () {
   })
 
   it('can login via static admin user', function () {
-    cy.visit(`https://${this.ingress}`)
+    cy.visitAndVerifyCSPHeader(`https://${this.ingress}`)
 
     cy.yqSecrets('.user.grafanaPassword').then((password) => {
       cy.get('input[placeholder*="username"]').type('admin', { log: false })
@@ -84,7 +84,7 @@ describe('grafana dev authentication', function () {
       }
     })
 
-    cy.visit(`https://${this.ingress}`)
+    cy.visitAndVerifyCSPHeader(`https://${this.ingress}`)
 
     cy.contains('Sign in with dex').click()
 
