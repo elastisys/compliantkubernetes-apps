@@ -309,9 +309,9 @@ prometheusBlackboxExporter:
     gatekeeper: true
     falco: true
     sc: true
+    wc: true
 
 ingressNginx:
-  subDomain: ingress-nginx
   controller:
     ## Kubernetes service configuration.
     service:

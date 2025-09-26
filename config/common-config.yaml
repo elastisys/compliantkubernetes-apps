@@ -609,6 +609,7 @@ externalTrafficPolicy:
 
 ## Nginx ingress controller configuration
 ingressNginx:
+  subDomain: ingress-nginx
   controller:
     allowSnippetAnnotations: false
     resources:
