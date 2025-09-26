@@ -312,7 +312,6 @@ prometheusBlackboxExporter:
     wc: true
 
 ingressNginx:
-  subDomain: ingress-nginx
   controller:
     ## Kubernetes service configuration.
     service:
