@@ -110,7 +110,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "rate(hubble_flows_processed_total{type=\"PolicyVerdict\",verdict=\"FORWARDED\",traffic_direction=\"egress\",source_namespace=~\"$namespace\"}[1m])",
+          "expr": "rate(hubble_flows_processed_total{cluster=~\"$cluster\",type=\"PolicyVerdict\",verdict=\"FORWARDED\",traffic_direction=\"egress\",source_namespace=~\"$namespace\"}[1m])",
           "legendFormat": "{{source_pod}} - (to {{destination_pod}})",
           "range": true,
           "refId": "A"
@@ -208,7 +208,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "rate(hubble_flows_processed_total{type=\"PolicyVerdict\",verdict=\"FORWARDED\",traffic_direction=\"ingress\",source_namespace=~\"$namespace\"}[1m])",
+          "expr": "rate(hubble_flows_processed_total{cluster=~\"$cluster\",type=\"PolicyVerdict\",verdict=\"FORWARDED\",traffic_direction=\"ingress\",source_namespace=~\"$namespace\"}[1m])",
           "legendFormat": "{{source_pod}} - (to {{destination_pod}})",
           "range": true,
           "refId": "A"
@@ -262,6 +262,7 @@
             }
           },
           "mappings": [],
+          "noValue": "missing",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -306,7 +307,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "rate(hubble_drop_total{reason=\"POLICY_DENIED\",traffic_direction=\"egress\",source_namespace=~\"$namespace\"}[1m])",
+          "expr": "rate(hubble_drop_total{cluster=~\"$cluster\",reason=\"POLICY_DENIED\",traffic_direction=\"egress\",source_namespace=~\"$namespace\"}[1m])",
           "legendFormat": "{{source_pod}} - (to {{destination_pod}})",
           "range": true,
           "refId": "A"
@@ -360,6 +361,7 @@
             }
           },
           "mappings": [],
+          "noValue": "missing",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -406,7 +408,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "rate(hubble_drop_total{reason=\"POLICY_DENIED\",traffic_direction=\"ingress\",source_namespace=~\"$namespace\"}[1m])",
+          "expr": "rate(hubble_drop_total{cluster=~\"$cluster\",reason=\"POLICY_DENIED\",traffic_direction=\"ingress\",source_namespace=~\"$namespace\"}[1m])",
           "format": "time_series",
           "legendFormat": "{{source_pod}} - (from {{destination_pod}})",
           "range": true,
@@ -436,6 +438,36 @@
         "refresh": 1,
         "regex": "",
         "type": "datasource"
+      },
+      {
+        "current": {
+          "selected": false,
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "$datasource"
+        },
+        "definition": "label_values(hubble_flows_processed_total,cluster)",
+        "hide": 0,
+        "includeAll": true,
+        "label": "cluster",
+        "multi": true,
+        "name": "cluster",
+        "options": [],
+        "query": {
+          "query": "label_values(hubble_flows_processed_total,cluster)",
+          "refId": "Thanos All-cluster-Variable-Query"
+        },
+        "refresh": 2,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "tagValuesQuery": "",
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
       },
       {
         "current": {

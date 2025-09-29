@@ -1,0 +1,23 @@
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: global-allow-all-traffic
+spec:
+  endpointSelector: {}
+  ingress:
+  - fromEntities:
+    - "all"
+  - fromEndpoints:
+    - {}
+  - fromCIDR:
+    - "0.0.0.0/0"
+    - "::/0"
+  egress:
+  - toEntities:
+    - "all"
+  - toEndpoints:
+    - {}
+  - toCIDR:
+    - "0.0.0.0/0"
+    - "::/0"

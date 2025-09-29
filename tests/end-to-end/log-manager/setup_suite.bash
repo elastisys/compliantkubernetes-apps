@@ -10,8 +10,12 @@ setup_suite() {
 
   # Temporarily allow all traffic to not cause dropped packets and fail the Network Policy test suite.
   if kubectl get crd globalnetworkpolicies.crd.projectcalico.org; then
-    kubectl apply -f "${BATS_CWD}/end-to-end/log-manager/resources/calico-allow-all.yaml" >&3 2>&1
+    kubectl apply -f "${BATS_CWD}/common/network-policies/calico-allow-all.yaml" >&3 2>&1
     # Give the CNI a bit of time to settle (arbitrary, I know..)
+    sleep 15
+  fi
+  if kubectl get crd ciliumclusterwidenetworkpolicies.cilium.io; then
+    kubectl apply -f "${BATS_CWD}/common/network-policies/cilium-allow-all.yaml" >&3 2>&1
     sleep 15
   fi
 
@@ -56,7 +60,10 @@ teardown_suite() {
 
   # Delete the allow-all policy
   if kubectl get crd globalnetworkpolicies.crd.projectcalico.org; then
-    kubectl delete -f "${BATS_CWD}/end-to-end/log-manager/resources/calico-allow-all.yaml" --ignore-not-found >&3 2>&1
+    kubectl delete -f "${BATS_CWD}/common/network-policies/calico-allow-all.yaml" --ignore-not-found >&3 2>&1
+  fi
+  if kubectl get crd ciliumclusterwidenetworkpolicies.cilium.io; then
+    kubectl delete -f "${BATS_CWD}/common/network-policies/cilium-allow-all.yaml" --ignore-not-found >&3 2>&1
   fi
 }
 

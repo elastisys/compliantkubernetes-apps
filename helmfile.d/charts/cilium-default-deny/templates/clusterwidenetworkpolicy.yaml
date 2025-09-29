@@ -3,7 +3,6 @@ kind: CiliumClusterwideNetworkPolicy
 metadata:
   name: deny-app-policy
 spec:
-spec:
   description: "Deny all ingress and egress traffic in the cluster"
   endpointSelector: {}
   ingress:
