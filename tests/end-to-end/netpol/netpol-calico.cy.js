@@ -10,7 +10,15 @@ function makePrometheusURL(/** @type {Cluster} */ cluster) {
   )
 }
 
-describe('workload cluster network policies', function () {
+describe('workload cluster network policies (calico)', function () {
+  before(function () {
+    cy.yqDig('wc', '.networkPlugin.type').then(function (value) {
+      if (value !== 'calico') {
+        this.skip('not a calico cluster')
+      }
+    })
+  })
+
   it('are not dropping any packets from workloads', function () {
     cy.request('GET', makeQueryURL('wc', DROP_QUERY)).then((response) => {
       assertNoDrops(response, 'fw', 'from')
@@ -33,7 +41,15 @@ describe('workload cluster network policies', function () {
   })
 })
 
-describe('service cluster network policies', function () {
+describe('service cluster network policies (calico)', function () {
+  before(function () {
+    cy.yqDig('sc', '.networkPlugin.type').then(function (value) {
+      if (value !== 'calico') {
+        this.skip('not a calico cluster')
+      }
+    })
+  })
+
   it('are not dropping any packets from workloads', function () {
     cy.request('GET', makeQueryURL('sc', DROP_QUERY)).then((response) => {
       assertNoDrops(response, 'fw', 'from')

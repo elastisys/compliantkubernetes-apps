@@ -2,7 +2,6 @@ type Cluster = 'sc' | 'wc'
 type GrafanaRole = 'Admin' | 'Editor' | 'Viewer'
 
 declare const yqArgumentsToConfigFiles: (cluster: Cluster, expression: string) => string
-declare const userToSession: (user: string) => string
 
 /// <reference types="cypress" />
 
