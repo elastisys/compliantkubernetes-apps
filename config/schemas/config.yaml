@@ -28,6 +28,22 @@ $defs:
     required: [] # Shouldn't at least 'enabled' be required?
     title: Common Resource
     type: object
+  contentSecurityPolicy:
+    title: Content-Security-Policy
+    description: |-
+      Configure Content-Security-Policy header rules
+    type: object
+    additionalProperties: false
+    properties:
+      rules:
+        title: Content-Security-Policy rules
+        description: |-
+          Configure Content-Security-Policy header rules
+          Reference: https://content-security-policy.com/
+        type: object
+        additionalProperties:
+          type: string
+          additionalProperties: false
   cpumem:
     deprecated: true
     description: |-
