@@ -176,7 +176,7 @@ usage() {
 
   printf "commands:\n" 1>&2
   printf "\tprepare <version> \t- run all prepare steps upgrading the configuration\n" 1>&2
-  printf "\tapply <version>   \t- run all apply steps upgrading the environment\n" 1>&2
+  printf "\tapply <version> [--dry-run]   \t- run all apply steps upgrading the environment\n" 1>&2
 
   exit 1
 }
