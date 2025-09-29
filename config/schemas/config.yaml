@@ -6045,24 +6045,16 @@ properties:
         additionalProperties: false
         properties:
           contentSecurityPolicy:
-            title: OpenSearch Dashboards Content-Security-Policy
-            description: |-
-              Configure Content-Security-Policy settings for OpenSearch Dashboards
-            type: object
-            additionalProperties: false
+            $ref: '#/$defs/contentSecurityPolicy'
             properties:
               rules:
-                title: OpenSearch Dashboards Content-Security-Policy rules
-                description: |-
-                  Configure Content-Security-Policy header rules for OpenSearch Dashboards
-
-                  Reference: https://content-security-policy.com/
-                type: array
-              strict:
-                title: OpenSearch Dashboards Strict Content-Security-Policy
-                description: |-
-                  Enable strict mode to block access to OpenSearch Dashboards in browsers that do not support CSP.
-                type: boolean
+                default:
+                  default-src: "'self'"
+                  frame-ancestors: "'none'"
+                  img-src: "'self' data:"
+                  script-src: "'unsafe-eval' 'self'"
+                  style-src: "'unsafe-inline' 'self'"
+                  worker-src: "blob: 'self'"
           subdomain:
             title: OpenSearch Dashboards Subdomain
             description: |-
