@@ -1,3 +1,12 @@
+# Container to install npm dependencies
+FROM ubuntu:24.04 AS node-deps
+
+RUN apt-get update && apt-get install -y npm && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /welkin-test
+COPY ./tests/package.json ./tests/package-lock.json ./
+RUN npm install --global --omit dev
+
 # Container to run unit tests
 FROM ubuntu:24.04 AS unit
 LABEL org.opencontainers.image.source=https://github.com/elastisys/compliantkubernetes-apps
@@ -9,7 +18,7 @@ ARG TZ="Etc/UTC"
 
 RUN apt-get update && \
     apt-get upgrade -y && \
-    apt-get install -y apache2-utils curl dnsutils gettext-base parallel git gpg iputils-ping jq locales make net-tools npm pwgen s3cmd ssh unzip && \
+    apt-get install -y apache2-utils curl dnsutils gettext-base git gpg iputils-ping jq locales make net-tools nodejs parallel pwgen python3-venv s3cmd ssh unzip && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
     localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
@@ -21,7 +30,7 @@ RUN curl -LOs "https://github.com/hairyhenderson/gomplate/releases/download/v${G
     install -Tm 755 gomplate_linux-amd64 /usr/local/bin/gomplate && \
     rm gomplate_linux-amd64
 
-ARG HELM_VERSION="3.17.2"
+ARG HELM_VERSION="3.18.4"
 ENV HELM_DATA_HOME="/usr/local/share/helm"
 RUN curl -LOs "https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz" && \
     tar -zxvf "helm-v${HELM_VERSION}-linux-amd64.tar.gz" linux-amd64/helm && \
@@ -31,7 +40,7 @@ RUN curl -LOs "https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz" && 
 ARG HELM_DIFF_VERSION="3.10.0"
 RUN helm plugin install https://github.com/databus23/helm-diff --version "v${HELM_DIFF_VERSION}" > /dev/null
 
-ARG HELM_SECRETS_VERSION="4.6.3"
+ARG HELM_SECRETS_VERSION="4.6.5"
 RUN helm plugin install https://github.com/jkroepke/helm-secrets --version "v${HELM_SECRETS_VERSION}" > /dev/null
 
 ARG HELMFILE_VERSION="0.171.0"
@@ -40,10 +49,7 @@ RUN curl -LOs "https://github.com/helmfile/helmfile/releases/download/v${HELMFIL
     install -Tm 755 helmfile /usr/local/bin/helmfile && \
     rm helmfile "helmfile_${HELMFILE_VERSION}_linux_amd64.tar.gz"
 
-ENV JSONSCHEMA2MD_VERSION="8.0.2"
-RUN npm install --global "@adobe/jsonschema2md@${JSONSCHEMA2MD_VERSION}"
-
-ARG KUBECTL_VERSION="1.31.7"
+ARG KUBECTL_VERSION="1.32.8"
 RUN curl -LOs "https://dl.k8s.io/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl" && \
     install -Tm 755 kubectl /usr/local/bin/kubectl && \
     rm kubectl
@@ -91,24 +97,39 @@ RUN git clone --depth 1 https://github.com/grayhemp/bats-mock.git /usr/local/lib
 RUN git clone --depth 1 https://github.com/bats-core/bats-support.git /usr/local/lib/bats/support
 
 ENV DOCS_PATH="/usr/local/share/docs"
-RUN git clone --depth 1 https://github.com/elastisys/welkin.git "${DOCS_PATH}" && \
-    chmod --recursive a+w "${DOCS_PATH}"
+RUN git clone --depth 1 --recurse-submodules --shallow-submodules https://github.com/elastisys/welkin.git "${DOCS_PATH}" && \
+    chmod -R a+w "${DOCS_PATH}" && \
+    python3 -m venv /opt/docs-venv && \
+    /opt/docs-venv/bin/python -m pip install --upgrade pip && \
+    cd "${DOCS_PATH}" && \
+    /opt/docs-venv/bin/pip install --no-cache-dir -r requirements.txt
+
+ENV PATH="/opt/docs-venv/bin:${PATH}:/usr/local/lib/node_modules/.bin"
+COPY --from=node-deps /usr/local/lib/node_modules/welkin-test/node_modules /usr/local/lib/node_modules
 
 # Container to run integration and end-to-end tests
 FROM unit AS main
 
+ENV DIST="noble"
+
+RUN mkdir -p /etc/apt/keyrings && \
+    curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor | tee /etc/apt/keyrings/microsoft.gpg > /dev/null && \
+    chmod go+r /etc/apt/keyrings/microsoft.gpg && \
+    echo "Types: deb \n\
+URIs: https://packages.microsoft.com/repos/azure-cli/ \n\
+Suites: ${DIST} \n\
+Components: main \n\
+Architectures: $(dpkg --print-architecture) \n\
+Signed-by: /etc/apt/keyrings/microsoft.gpg" | tee /etc/apt/sources.list.d/azure-cli.sources
+
+ARG AZ_VERSION=2.63.0
 RUN apt-get update && \
-    apt-get install -y buildah docker.io flatpak-xdg-utils libasound2t64 libatk1.0-0 libatk-bridge2.0-0 libcanberra-gtk-module libcanberra-gtk3-module libcups2 libgbm-dev libgbm1 libglib2.0-0 libgtk2.0-0 libgtk2.0-0t64 libgtk-3-0 libgtk-3-0t64 libnotify-dev libnss3 libxss1 libxtst6 podman-remote skopeo xauth xvfb && \
+    apt-get install -y azure-cli=${AZ_VERSION}-1~${DIST} buildah docker.io libasound2t64 libatk1.0-0 libatk-bridge2.0-0 libcanberra-gtk-module \
+    libcanberra-gtk3-module libcups2 libgbm-dev libgbm1 libglib2.0-0 libgtk2.0-0 libgtk2.0-0t64 libgtk-3-0 \
+    libgtk-3-0t64 libnotify-dev libnss3 libxss1 libxtst6 podman-remote skopeo socat xauth xvfb zstd && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
-    ln -s /usr/bin/podman-remote /usr/bin/podman && \
-    mv /usr/bin/xdg-open /usr/bin/xdg-open-backup && \
-    ln -s /usr/libexec/flatpak-xdg-utils/xdg-open /usr/bin/xdg-open
-
-ARG CYPRESS_VERSION="13.14.1"
-ENV CYPRESS_CACHE_FOLDER="/usr/local/lib/cypress"
-RUN npm install --global "cypress@${CYPRESS_VERSION}" && \
-    chmod --recursive a+w "${CYPRESS_CACHE_FOLDER}"
+    ln -s /usr/bin/podman-remote /usr/bin/podman
 
 ARG KIND_VERSION="0.27.0"
 RUN curl -LOs "https://github.com/kubernetes-sigs/kind/releases/download/v${KIND_VERSION}/kind-linux-amd64" && \
@@ -120,3 +141,7 @@ RUN curl -LOs "https://github.com/vmware-tanzu/velero/releases/download/v${VELER
     tar -zxvf "velero-v${VELERO_VERSION}-linux-amd64.tar.gz" "velero-v${VELERO_VERSION}-linux-amd64" && \
     install -Tm 755 "velero-v${VELERO_VERSION}-linux-amd64/velero" /usr/local/bin/velero && \
     rm -r "velero-v${VELERO_VERSION}-linux-amd64.tar.gz" "velero-v${VELERO_VERSION}-linux-amd64"
+
+ENV PATH="$PATH:/usr/local/lib/node_modules/.bin"
+ENV CYPRESS_CACHE_FOLDER=/usr/local/lib/cypress
+RUN cypress install && cypress verify

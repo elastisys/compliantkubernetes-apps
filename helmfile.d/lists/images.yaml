@@ -5,3 +5,5 @@ images:
     controllerChroot: registry.k8s.io/ingress-nginx/controller-chroot:v1.12.1@sha256:90155c86548e0bb95b3abf1971cd687d8f5d43f340cfca0ad3484e2b8351096e
     defaultBackend: registry.k8s.io/defaultbackend-amd64:1.5
     admissionWebhooksPatch: registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.5.2@sha256:e8825994b7a2c7497375a9b945f386506ca6a3eda80b89b74ef2db743f66a5ea
+  calico:
+    accountant: ghcr.io/elastisys/calico-accountant:0.1.6-ck8s3
