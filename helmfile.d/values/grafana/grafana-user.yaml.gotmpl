@@ -133,7 +133,12 @@ grafana.ini:
   {{- with .Values.grafana.user.contentSecurityPolicy }}
   security:
     content_security_policy: true
-    content_security_policy_template: {{ . | quote }}
+    {{- $grafanaCSP := list }}
+    {{- range $cspKey, $cspValue := . }}
+    {{- $grafanaCSP = append $grafanaCSP (printf "%s %s" $cspKey $cspValue)  }}
+    {{- end }}
+    content_security_policy_template: |-
+      """{{ $grafanaCSP | join ";" }}"""
   {{- end }}
   {{- if .Values.grafana.user.additionalConfigValues }}
   {{ .Values.grafana.user.additionalConfigValues | nindent 2 }}

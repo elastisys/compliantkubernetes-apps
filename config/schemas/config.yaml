@@ -4475,18 +4475,16 @@ properties:
             title: Grafana Additional Datasources
             type: object
           contentSecurityPolicy:
-            $ref: '#/$defs/contentSecurityPolicy'
-            default:
-              default-src: 'self'
-              script-src: "'self' 'unsafe-inline' 'strict-dynamic' $${q}NONCE https:"
-              object-src: 'none'
-              style-src: "'self' 'unsafe-inline' blob:"
-              img-src: "* data:"
-              base-uri: 'self'
-              connect-src: "'self' grafana.com ws://$${q}ROOT_PATH wss://$${q}ROOT_PATH"
-              media-src: 'none'
-              form-action: 'self'
-              require-trusted-types-for: 'script'
+            title: Grafana Content-Security-Policy
+            description: |-
+              Configure Content-Security-Policy header for Grafana
+
+              References:
+              - https://content-security-policy.com/
+              - https://grafana.com/docs/grafana/latest/setup-grafana/configure-security/configure-security-hardening/#add-a-content-security-policy
+            type: string
+            examples:
+              - default-src 'self' example.com;
           dataproxy:
             title: Grafana dataproxy values
             description: Configure Grafana dataproxy values
