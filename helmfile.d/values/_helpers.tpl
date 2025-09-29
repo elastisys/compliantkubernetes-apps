@@ -83,11 +83,3 @@ after the separator.
 {{- define "gen.reg-rep-img" -}}
 {{ join "/" (compact (list .registry .repository .image)) }}
 {{- end }}
-
-{{- define "gen.rep-img" -}}
-{{ join "/" (compact (list .repository .image)) }}
-{{- end }}
-
-{{- define "gen.container_uri" -}}
-{{ with include "gen.reg-rep-img" . }}{{ . }}{{ end }}{{ if or .tag .digest }}:{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}{{ end }}
-{{- end }}
