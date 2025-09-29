@@ -36,7 +36,7 @@ describe('grafana admin dashboards', function () {
 
   it('open the NetworkPolicy Dashboard', function () {
     cy.yqDig('sc', '.networkPlugin.type').then((value) => {
-      if (value == 'calico') {
+      if (value === 'calico') {
         cy.testGrafanaDashboard('NetworkPolicy Dashboard', false)
         cy.get(
           '[data-testid="data-testid Panel menu Packets allowed by NetworkPolicy going from pod"]'
