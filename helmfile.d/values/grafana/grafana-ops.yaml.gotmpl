@@ -132,7 +132,7 @@ grafana.ini:
     viewers_can_edit: {{ .Values.grafana.ops.viewersCanEdit }}
   dataproxy:
     timeout: {{ .Values.grafana.ops.dataproxy.timeout }}
-  {{- with .Values.grafana.ops.contentSecurityPolicy.rules }}
+  {{- with .Values.grafana.ops.contentSecurityPolicy }}
   security:
     content_security_policy: true
     {{- $grafanaCSP := list }}
