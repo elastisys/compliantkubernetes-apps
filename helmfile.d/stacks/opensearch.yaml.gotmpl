@@ -6,6 +6,19 @@ templates:
     labels:
       app: opensearch
 
+  opensearch-networkpolicy:
+    inherit:
+      - template: opensearch
+      - template: networkpolicies
+    installed: {{ and (.Values | get "ck8sManagementCluster.enabled" false) (.Values | get "opensearch.enabled" false) }}
+    labels:
+      netpol: opensearch
+    needs:
+      - kube-system/admin-namespaces
+    values:
+      - values/networkpolicies/common/common.yaml.gotmpl
+      - values/networkpolicies/service/opensearch.yaml.gotmpl
+
   opensearch-secrets:
     disableValidationOnInstall: true # creates cert-manager/certificates
     inherit: [ template: opensearch ]
