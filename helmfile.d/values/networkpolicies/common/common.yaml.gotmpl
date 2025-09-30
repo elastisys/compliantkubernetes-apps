@@ -118,6 +118,12 @@ rules:
           app.kubernetes.io/name: ingress-nginx
       {{- end }}
 
+  ingress-rule-ingressnginx:
+    peers:
+      {{- range $ingress.ips }}
+      - cidr: {{ . }}
+      {{- end }}
+
   ingress-rule-blackbox:
     peers:
       - namespaceSelectorLabels:
