@@ -3,6 +3,8 @@
 # Helpers for interacting with Grafana:
 # - _grafana.curl [method] [resource/path] [json data] <args...>  - curl helper function (not intended to be used outside of this file)
 # - grafana.load_env [slug]                                       - setup endpoint and auth info; slug is one of ['ops_admin', 'user_admin', 'ops_static', 'user_static']
+# - grafana.get_dashboards                                        - get all defined dashboards
+# - grafana.get_actual_user                                       - get currently logged in user
 
 _grafana.curl() {
   local method="${1}"
@@ -80,4 +82,8 @@ grafana.load_env() {
 
 grafana.get_dashboards() {
   _grafana.curl GET "apis/dashboard.grafana.app/v1beta1/namespaces/default/dashboards?limit=200" ""
+}
+
+grafana.get_actual_user() {
+  _grafana.curl GET "api/user" ""
 }
