@@ -10,7 +10,7 @@ config:
     server:
       host: "0"
 
-    {{- with .Values.opensearch.dashboards.contentSecurityPolicy.rules }}
+    {{- with .Values.opensearch.dashboards.contentSecurityPolicy }}
     csp:
       rules:
       {{- range $cspKey, $cspValue := . }}
