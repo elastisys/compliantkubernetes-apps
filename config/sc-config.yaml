@@ -145,6 +145,7 @@ grafana:
       scopes: openid profile email groups
       allowedDomains:
         - set-me
+      jwtEnabled: false
     viewersCanEdit: true
     trailingDots: true
     sidecar:
