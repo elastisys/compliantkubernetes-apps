@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 # Helpers for interacting with Grafana:
-# - _grafana.curl [method] [resource/path] [json data] <args...>                 - curl helper function (not intended to be used outside of this file)
-# - grafana.load_env [slug]                                                      - setup endpoint and auth info; slug is one of ['ops', 'user']
+# - _grafana.curl [method] [resource/path] [json data] <args...>  - curl helper function (not intended to be used outside of this file)
+# - grafana.load_env [slug]                                       - setup endpoint and auth info; slug is one of ['ops_admin', 'user_admin', 'ops_static', 'user_static']
 
 _grafana.curl() {
   local method="${1}"
@@ -11,7 +11,13 @@ _grafana.curl() {
   shift 3
 
   local url="https://${grafana_endpoint}/${path}"
-  local curl_args=(-s -u "${grafana_username}:${grafana_password}" -X "${method}" "${url}" -H "accept: application/json")
+  local curl_args=(-s -X "${method}" "${url}" -H "accept: application/json")
+
+  if [[ -n "${grafana_basic_auth}" ]]; then
+    curl_args+=(-u "${grafana_basic_auth}")
+  elif [[ -n "${grafana_token}" ]]; then
+    curl_args+=(-H "X-JWT-Assertion: ${grafana_token}")
+  fi
 
   if [[ "${method}" == "POST" || "${method}" == "PUT" || "${method}" == "PATCH" ]]; then
     curl_args+=(-H "content-type: application/json" -d "${data}")
@@ -21,27 +27,55 @@ _grafana.curl() {
 }
 
 grafana.load_env() {
-  if ! [[ "${1:-}" =~ ^(ops|user)$ ]]; then
+  if ! [[ "${1:-}" =~ ^(ops_admin|user_admin|ops_static|user_static)$ ]]; then
     fail "invalid or missing slug argument"
   fi
 
-  grafana_username="admin"
+  unset grafana_endpoint
+  unset grafana_username
+  unset grafana_password
+  unset grafana_token
 
   case "${1}" in
-  ops)
+  ops_admin | ops_static)
     grafana_endpoint="$(yq.get sc '.grafana.ops.subdomain + "." + .global.opsDomain')"
-    grafana_password="$(yq.secret ".grafana.password")"
-  ;;
-  user)
+    ;;
+  user_admin | user_static)
     grafana_endpoint="$(yq.get sc '.grafana.user.subdomain + "." + .global.baseDomain')"
-    grafana_password="$(yq.secret ".user.grafanaPassword")"
-  ;;
+    ;;
   *) return ;;
   esac
-
-  export grafana_username
   export grafana_endpoint
-  export grafana_password
+
+  case "${1}" in
+  ops_admin)
+    grafana_basic_auth="admin:$(yq.secret ".grafana.password")"
+    export grafana_basic_auth
+    ;;
+  user_admin)
+    grafana_basic_auth="admin:$(yq.secret ".user.grafanaPassword")"
+    export grafana_basic_auth
+    ;;
+  ops_static)
+    local -r dex_url="$(yq.get sc '"https://dex." + .global.baseDomain + "/token"')"
+    grafana_token="$(curl -s "$dex_url" --user "grafana-ops:$(yq.secret ".grafana.opsClientSecret")" \
+      --data-urlencode grant_type=password \
+      --data-urlencode username=admin@example.com \
+      --data-urlencode password="$(yq.secret ".dex.staticPasswordNotHashed")" \
+      --data-urlencode scope="openid email profile" | jq -r '.id_token')"
+    export grafana_token
+    ;;
+  user_static)
+    local -r dex_url="$(yq.get sc '"https://dex." + .global.baseDomain + "/token"')"
+    grafana_token="$(curl -s "$dex_url" --user "grafana:$(yq.secret ".grafana.clientSecret")" \
+      --data-urlencode grant_type=password \
+      --data-urlencode username=dev@example.com \
+      --data-urlencode password=password \
+      --data-urlencode scope="openid email profile" | jq -r '.id_token')"
+    export grafana_token
+    ;;
+  *) return ;;
+  esac
 }
 
 grafana.get_dashboards() {
