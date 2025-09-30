@@ -28,6 +28,15 @@ $defs:
     required: [] # Shouldn't at least 'enabled' be required?
     title: Common Resource
     type: object
+  contentSecurityPolicy:
+    title: Content-Security-Policy rules
+    description: |-
+      Configure Content-Security-Policy header rules
+      Reference: https://content-security-policy.com/
+    type: object
+    additionalProperties:
+      type: string
+      additionalProperties: false
   cpumem:
     deprecated: true
     description: |-
@@ -6028,6 +6037,15 @@ properties:
         type: object
         additionalProperties: false
         properties:
+          contentSecurityPolicy:
+            $ref: '#/$defs/contentSecurityPolicy'
+            default:
+              default-src: "'self'"
+              frame-ancestors: "'none'"
+              img-src: "'self' data:"
+              script-src: "'unsafe-eval' 'self'"
+              style-src: "'unsafe-inline' 'self'"
+              worker-src: "blob: 'self'"
           subdomain:
             title: OpenSearch Dashboards Subdomain
             description: |-

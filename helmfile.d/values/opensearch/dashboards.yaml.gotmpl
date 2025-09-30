@@ -10,6 +10,14 @@ config:
     server:
       host: "0"
 
+    {{- with .Values.opensearch.dashboards.contentSecurityPolicy }}
+    csp:
+      rules:
+      {{- range $cspKey, $cspValue := . }}
+      - {{ printf "\"%s %s\"" $cspKey $cspValue }}
+      {{- end }}
+    {{- end }}
+
     opensearch:
       ssl:
         verificationMode: none
