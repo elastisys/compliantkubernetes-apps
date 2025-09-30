@@ -119,23 +119,6 @@ declare namespace Cypress {
 
     /**
      * @example
-     * cy.grafanaSetRole('https://grafana.domain', '.user.grafanaPassword', 'dev@example.com', 'Admin')
-     */
-    grafanaSetRole(
-      ingress: string,
-      adminPasswordKey: string,
-      user: string,
-      role: GrafanaRole
-    ): Chainable<any>
-
-    /**
-     * @example
-     * cy.grafanaCheckRole('https://grafana.domain', 'dev@example.com', 'Admin')
-     */
-    grafanaCheckRole(ingress: string, user: string, role: GrafanaRole): Chainable<any>
-
-    /**
-     * @example
      * cy.harborAdminLogin('https://harbor.domain')
      */
     harborAdminLogin(ingress: string): Chainable<any>
