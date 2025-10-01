@@ -35,4 +35,9 @@ helmfile.d/charts/fluentd/forwarder:
   licenses:
     - license:
         id: "GPL-3.0"
+
+helmfile.d/upstream/crossplane-stable/crossplane:
+  licenses:
+    - license:
+        id: "Apache-2.0"
   evaluation: "Not evaluated"

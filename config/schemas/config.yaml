@@ -8366,6 +8366,30 @@ properties:
             $ref: '#/$defs/containerImage'
           startupapicheck:
             $ref: '#/$defs/containerImage'
+      crossplane:
+        title: crossplane stack image configuration
+        description: crossplane stack image configuration
+        type: object
+        additionalProperties: false
+        properties:
+          image:
+            $ref: '#/$defs/containerImage'
+          providers:
+            title: crossplane provider images configuration
+            description: crossplane provider images configuration
+            type: object
+            additionalProperties: false
+            patternProperties:
+              "^[a-z-]+$":
+                $ref: '#/$defs/containerImage'
+          functions:
+            title: crossplane function images configuration
+            description: crossplane function images configuration
+            type: object
+            additionalProperties: false
+            patternProperties:
+              "^[a-z-]+$":
+                $ref: '#/$defs/containerImage'
       dex:
         title: dex stack image configuration
         description: dex stack image configuration

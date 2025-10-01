@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:397e23d3-578d-4dfa-b9d7-2f94a6a7a255",
+  "serialNumber": "urn:uuid:f6e8f5f3-e850-40a1-b7ee-5d5a7d253801",
   "version": 1,
   "metadata": {
-    "timestamp": "2025-10-14T12:30:51Z",
+    "timestamp": "2025-10-02T13:16:42Z",
     "lifecycles": [
       {
         "phase": "build"
@@ -401,6 +401,68 @@
         "occurrences": [
           {
             "location": "helmfile.d/upstream/kyverno/kyverno/charts/crds"
+          }
+        ]
+      }
+    },
+    {
+      "bom-ref": "pkg:helm/crossplane-packages@0.1.0",
+      "type": "library",
+      "supplier": {
+        "name": "Elastisys"
+      },
+      "name": "crossplane-packages",
+      "version": "0.1.0",
+      "description": "Crossplane Providers and Functions",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "purl": "pkg:helm/crossplane-packages@0.1.0",
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "Not evaluated"
+        }
+      ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/crossplane/packages"
+          }
+        ]
+      }
+    },
+    {
+      "bom-ref": "pkg:helm/crossplane@2.0.2",
+      "type": "library",
+      "supplier": {
+        "name": "Crossplane Maintainers"
+      },
+      "name": "crossplane",
+      "version": "2.0.2",
+      "description": "Crossplane is an open source Kubernetes add-on that enables platform teams to assemble infrastructure from multiple vendors, and expose higher level self-service APIs for application teams to consume.",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "purl": "pkg:helm/crossplane@2.0.2",
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "Not evaluated"
+        }
+      ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/crossplane-stable/crossplane"
           }
         ]
       }
@@ -2957,6 +3019,94 @@
       "purl": "pkg:oci/ceph/ceph@v17.2.6?repository_url=quay.io"
     },
     {
+      "bom-ref": "pkg:oci/crossplane-contrib/function-auto-ready@v0.5.0?repository_url=xpkg.crossplane.io",
+      "type": "container",
+      "supplier": {
+        "name": "crossplane-contrib"
+      },
+      "name": "xpkg.crossplane.io/crossplane-contrib/function-auto-ready",
+      "version": "v0.5.0",
+      "cpe": "cpe:2.3:a:crossplane-contrib:function-auto-ready:0.5.0:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/crossplane-contrib/function-auto-ready@v0.5.0?repository_url=xpkg.crossplane.io"
+    },
+    {
+      "bom-ref": "pkg:oci/crossplane-contrib/function-go-templating@v0.11.0?repository_url=xpkg.crossplane.io",
+      "type": "container",
+      "supplier": {
+        "name": "crossplane-contrib"
+      },
+      "name": "xpkg.crossplane.io/crossplane-contrib/function-go-templating",
+      "version": "v0.11.0",
+      "cpe": "cpe:2.3:a:crossplane-contrib:function-go-templating:0.11.0:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/crossplane-contrib/function-go-templating@v0.11.0?repository_url=xpkg.crossplane.io"
+    },
+    {
+      "bom-ref": "pkg:oci/crossplane-contrib/function-patch-and-transform@v0.9.0?repository_url=xpkg.crossplane.io",
+      "type": "container",
+      "supplier": {
+        "name": "crossplane-contrib"
+      },
+      "name": "xpkg.crossplane.io/crossplane-contrib/function-patch-and-transform",
+      "version": "v0.9.0",
+      "cpe": "cpe:2.3:a:crossplane-contrib:function-patch-and-transform:0.9.0:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/crossplane-contrib/function-patch-and-transform@v0.9.0?repository_url=xpkg.crossplane.io"
+    },
+    {
+      "bom-ref": "pkg:oci/crossplane-contrib/provider-helm@v1.0.0?repository_url=xpkg.crossplane.io",
+      "type": "container",
+      "supplier": {
+        "name": "crossplane-contrib"
+      },
+      "name": "xpkg.crossplane.io/crossplane-contrib/provider-helm",
+      "version": "v1.0.0",
+      "cpe": "cpe:2.3:a:crossplane-contrib:provider-helm:1.0.0:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/crossplane-contrib/provider-helm@v1.0.0?repository_url=xpkg.crossplane.io"
+    },
+    {
+      "bom-ref": "pkg:oci/crossplane-contrib/provider-kubernetes@v1.0.0?repository_url=xpkg.crossplane.io",
+      "type": "container",
+      "supplier": {
+        "name": "crossplane-contrib"
+      },
+      "name": "xpkg.crossplane.io/crossplane-contrib/provider-kubernetes",
+      "version": "v1.0.0",
+      "cpe": "cpe:2.3:a:crossplane-contrib:provider-kubernetes:1.0.0:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/crossplane-contrib/provider-kubernetes@v1.0.0?repository_url=xpkg.crossplane.io"
+    },
+    {
+      "bom-ref": "pkg:oci/crossplane/crossplane@2.0.2?repository_url=xpkg.crossplane.io",
+      "type": "container",
+      "supplier": {
+        "name": "crossplane"
+      },
+      "name": "xpkg.crossplane.io/crossplane/crossplane",
+      "version": "2.0.2",
+      "cpe": "cpe:2.3:a:crossplane:crossplane:2.0.2:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/crossplane/crossplane@2.0.2?repository_url=xpkg.crossplane.io"
+    },
+    {
+      "bom-ref": "pkg:oci/crossplane/crossplane@latest?repository_url=xpkg.crossplane.io",
+      "type": "container",
+      "supplier": {
+        "name": "crossplane"
+      },
+      "name": "xpkg.crossplane.io/crossplane/crossplane",
+      "version": "latest",
+      "cpe": "cpe:2.3:a:crossplane:crossplane:*:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/crossplane/crossplane@latest?repository_url=xpkg.crossplane.io"
+    },
+    {
+      "bom-ref": "pkg:oci/crossplane/crossplane@v2.0.2?repository_url=xpkg.crossplane.io",
+      "type": "container",
+      "supplier": {
+        "name": "crossplane"
+      },
+      "name": "xpkg.crossplane.io/crossplane/crossplane",
+      "version": "v2.0.2",
+      "cpe": "cpe:2.3:a:crossplane:crossplane:2.0.2:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/crossplane/crossplane@v2.0.2?repository_url=xpkg.crossplane.io"
+    },
+    {
       "bom-ref": "pkg:oci/curlimages/curl@7.83.1",
       "type": "container",
       "supplier": {
@@ -5155,6 +5305,17 @@
       "version": "latest",
       "cpe": "cpe:2.3:a:weaveworks:kured:*:*:*:*:*:*:*:*",
       "purl": "pkg:oci/weaveworks/kured@latest"
+    },
+    {
+      "bom-ref": "pkg:oci/welkin/function-capability@v0.2.0?repository_url=harbor.long-running.dev-ck8s.com",
+      "type": "container",
+      "supplier": {
+        "name": "welkin"
+      },
+      "name": "harbor.long-running.dev-ck8s.com/welkin/function-capability",
+      "version": "v0.2.0",
+      "cpe": "cpe:2.3:a:welkin:function-capability:0.2.0:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/welkin/function-capability@v0.2.0?repository_url=harbor.long-running.dev-ck8s.com"
     }
   ],
   "dependencies": [
@@ -5171,6 +5332,8 @@
         "pkg:helm/common@2.30.0",
         "pkg:helm/crds@0.0.0",
         "pkg:helm/crds@3.3.6",
+        "pkg:helm/crossplane-packages@0.1.0",
+        "pkg:helm/crossplane@2.0.2",
         "pkg:helm/dex@0.18.0",
         "pkg:helm/external-dns-endpoints@0.1.0",
         "pkg:helm/external-dns-secrets@0.1.0",
@@ -5299,6 +5462,16 @@
     {
       "ref": "pkg:helm/crds@3.3.6",
       "dependsOn": []
+    },
+    {
+      "ref": "pkg:helm/crossplane-packages@0.1.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:helm/crossplane@2.0.2",
+      "dependsOn": [
+        "pkg:oci/crossplane/crossplane@2.0.2?repository_url=xpkg.crossplane.io"
+      ]
     },
     {
       "ref": "pkg:helm/dex@0.18.0",
@@ -5860,6 +6033,10 @@
     },
     {
       "ref": "pkg:oci/brancz/kube-rbac-proxy@v0.20.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:oci/crossplane/crossplane@2.0.2?repository_url=xpkg.crossplane.io",
       "dependsOn": []
     },
     {
