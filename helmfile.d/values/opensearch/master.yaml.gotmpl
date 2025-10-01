@@ -20,10 +20,10 @@ persistence:
   size: {{ .Values.opensearch.masterNode.storageSize }}
   storageClass: {{ toYaml .Values.opensearch.masterNode.storageClass }}
 
-{{ if (hasKey .Values.opensearch.masterNode.affinity.podAntiAffinity "requiredDuringSchedulingIgnoredDuringExecution") -}}
+{{ if .Values.opensearch | dig "masterNode" "affinity" "podAntiAffinity" "requiredDuringSchedulingIgnoredDuringExecution" list -}}
 antiAffinityTopologyKey: {{ (first .Values.opensearch.masterNode.affinity.podAntiAffinity.requiredDuringSchedulingIgnoredDuringExecution).topologyKey | quote }}
 antiAffinity: hard
-{{ else if (hasKey .Values.opensearch.masterNode.affinity.podAntiAffinity "preferredDuringSchedulingIgnoredDuringExecution") -}}
+{{ else if .Values.opensearch | dig "masterNode" "affinity" "podAntiAffinity" "preferredDuringSchedulingIgnoredDuringExecution" list -}}
 antiAffinityTopologyKey: {{ (first .Values.opensearch.masterNode.affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution).podAffinityTerm.topologyKey | quote }}
 antiAffinity: soft
 {{ end -}}
