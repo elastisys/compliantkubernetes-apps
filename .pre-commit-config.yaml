@@ -132,6 +132,6 @@ repos:
         language: system
         entry: bash
         args: [sbom/diff.sh]
+        files: ^(helmfile\.d/|sbom/)
         pass_filenames: false
-        always_run: true
         require_serial: true
