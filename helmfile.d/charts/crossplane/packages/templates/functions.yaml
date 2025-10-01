@@ -1,0 +1,41 @@
+{{- range $name, $values := .Values.functions }}
+{{- $functionName := printf "function-%s" $name }}
+{{- if gt (len $functionName) 63 }}
+{{- printf "function name is too long '%s', needs to be maximum 63 characters" $functionName | fail }}
+{{- end }}
+---
+apiVersion: pkg.crossplane.io/v1beta1
+kind: Function
+metadata:
+  name: {{ $functionName }}
+spec:
+  package: {{ $values.image.repository }}:{{ $values.image.tag }}
+  runtimeConfigRef:
+    apiVersion: pkg.crossplane.io/v1beta1
+    kind: DeploymentRuntimeConfig
+    name: {{ $functionName }}
+---
+apiVersion: pkg.crossplane.io/v1beta1
+kind: DeploymentRuntimeConfig
+metadata:
+  name: {{ $functionName }}
+spec:
+  deploymentTemplate:
+    spec:
+      selector: {}
+      template:
+        spec:
+          resources: {{ toYaml $values.resources | nindent 12 }}
+          securityContext:
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+            - name: package-runtime
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
+                runAsUser: 65532
+{{- end }}
