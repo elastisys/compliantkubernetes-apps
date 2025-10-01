@@ -1,0 +1,45 @@
+---
+templates:
+  crossplane:
+    condition: ck8sAnyCluster.enabled
+    namespace: crossplane-system
+    labels:
+      app: crossplane
+
+  crossplane-controller:
+    inherit:
+      - template: crossplane
+      - template: crossplane-chart
+    installed: {{ and (.Values | get "ck8sAnyCluster.enabled" false) (.Values | get "crossplane.enabled" false) }}
+    wait: true
+    name: crossplane
+    needs:
+      - kube-system/admin-namespaces
+    values:
+      - values/crossplane.yaml.gotmpl
+
+  crossplane-networkpolicy:
+    inherit:
+      - template: crossplane
+      - template: networkpolicies
+    installed: {{ and (.Values | get "crossplane.enabled" false) (.Values | get "networkPolicies.crossplane.enabled" false) }}
+    labels:
+      netpol: crossplane
+    needs:
+      - kube-system/admin-namespaces
+    values:
+      - values/networkpolicies/common/common.yaml.gotmpl
+      - values/networkpolicies/common/crossplane.yaml.gotmpl
+
+  crossplane-packages:
+    disableValidationOnInstall: true
+    inherit: [ template: crossplane ]
+    installed: {{ and (.Values | get "ck8sAnyCluster.enabled" false) (.Values | get "crossplane.enabled" false) }}
+    wait: true
+    chart: charts/crossplane/packages
+    version: 0.1.0
+    name: crossplane-packages
+    needs:
+      - crossplane-system/crossplane
+    values:
+      - values/crossplane-packages.yaml.gotmpl

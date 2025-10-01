@@ -1,0 +1,48 @@
+{{- $imagesGlobal := dict
+  "registry" (ternary (dig "uri" "" .Values.images.global.registry) "" .Values.images.global.registry.enabled)
+  "repository" (ternary (dig "uri" "" .Values.images.global.repository) "" .Values.images.global.repository.enabled)
+}}
+
+{{- with .Values.images | dig "crossplane" "kubectl" "" }}
+{{- with merge (include "container_uri.parse" . | fromJson) $imagesGlobal }}
+kubectlImage:
+  {{- with include "gen.reg-rep-img" . }}
+  repository: {{ . }}
+  {{- end }}
+  {{- if or .tag .digest }}
+  tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
+  {{- end }}
+{{- end }}
+{{- end }}
+
+functions:
+{{- range $function, $image := .Values.images.crossplane.functions }}
+  {{ $function }}:
+    {{- $image = merge (include "container_uri.parse" $image | fromJson) $imagesGlobal }}
+    {{- with $image }}
+    image:
+      {{- with include "gen.reg-rep-img" . }}
+      repository: {{ . }}
+      {{- end }}
+      {{- if or .tag .digest }}
+      tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
+      {{- end }}
+    {{- end }}
+    {{- $.Values | dig "crossplane" "functions" $function "resources" | toYaml | nindent 4 }}
+{{- end }}
+
+providers:
+{{- range $provider, $image := .Values.images.crossplane.providers }}
+  {{ $provider }}:
+    {{- $image = merge (include "container_uri.parse" $image | fromJson) $imagesGlobal }}
+    {{- with $image }}
+    image:
+      {{- with include "gen.reg-rep-img" . }}
+      repository: {{ . }}
+      {{- end }}
+      {{- if or .tag .digest }}
+      tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
+      {{- end }}
+    {{- end }}
+    {{- $.Values | dig "crossplane" "providers" $provider "resources" | toYaml | nindent 4 }}
+{{- end }}

@@ -1,0 +1,61 @@
+{{- range $name, $values := .Values.providers }}
+{{- $providerName := printf "provider-%s" $name }}
+{{- $clusterRoleBindingName := printf "%s-cluster-admin" $providerName }}
+{{- if gt (len $providerName) 63 }}
+{{- printf "provider name is too long '%s', needs to be maximum 63 characters" $providerName | fail }}
+{{- end }}
+{{- if gt (len $clusterRoleBindingName) 63 }}
+{{- printf "provider cluster role binding name is too long '%s', needs to be maximum 63 characters" $clusterRoleBindingName | fail }}
+{{- end }}
+---
+apiVersion: pkg.crossplane.io/v1
+kind: Provider
+metadata:
+  name: {{ $providerName }}
+spec:
+  package: {{ $values.image.repository }}:{{ $values.image.tag }}
+  runtimeConfigRef:
+    apiVersion: pkg.crossplane.io/v1beta1
+    kind: DeploymentRuntimeConfig
+    name: {{ $providerName }}
+---
+apiVersion: pkg.crossplane.io/v1beta1
+kind: DeploymentRuntimeConfig
+metadata:
+  name: {{ $providerName }}
+spec:
+  serviceAccountTemplate:
+    metadata:
+      name: {{ $providerName }}
+  deploymentTemplate:
+    spec:
+      selector: {}
+      template:
+        spec:
+          resources: {{ toYaml $values.resources | nindent 12 }}
+          securityContext:
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+            - name: package-runtime
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ $clusterRoleBindingName}}
+subjects:
+  - kind: ServiceAccount
+    name: {{ $providerName }}
+    namespace: crossplane-system
+roleRef:
+  kind: ClusterRole
+  name: cluster-admin
+  apiGroup: rbac.authorization.k8s.io
+{{- end }}
