@@ -894,6 +894,12 @@ opensearch:
       ## - Only one rule and term can be set
       ## - The label selector is hardcoded and changing it here does not affect it
       podAntiAffinity:
+        ## Some providers (such as elastx) have default hard anti-affinity.
+        ## To override them with soft anti-affinity (as below), you need to also set
+        ## requiredDuringSchedulingIgnoredDuringExecution to an empty value.
+        ## If both keys are set to non-empty values at the same time, only the
+        ## hard anti-affinity rules will be used.
+        #requiredDuringSchedulingIgnoredDuringExecution: []
         preferredDuringSchedulingIgnoredDuringExecution:
           - weight: 1
             podAffinityTerm:
