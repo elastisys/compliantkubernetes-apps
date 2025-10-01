@@ -137,6 +137,16 @@ def configure_apps(
             "allowedDomains": ["elastisys.com", "example.com"],
             "jwtEnabled": True,
         },
+        "resources": {
+            "requests": {
+                "cpu": "400m",
+                "memory": "400Mi",
+            },
+            "limits": {
+                "cpu": "800m",
+                "memory": "800Mi",
+            },
+        },
     }
     sc_config.set("grafana.ops", grafana_cfg)
     sc_config.set("grafana.user", grafana_cfg)
