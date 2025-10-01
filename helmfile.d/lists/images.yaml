@@ -7,6 +7,16 @@ images:
     webhook: quay.io/jetstack/cert-manager-webhook:v1.17.1
     cainjector: quay.io/jetstack/cert-manager-cainjector:v1.17.1
     startupapicheck: quay.io/jetstack/cert-manager-startupapicheck:v1.17.1
+  crossplane:
+    image: xpkg.crossplane.io/crossplane/crossplane:v2.0.2
+    providers:
+      kubernetes: xpkg.crossplane.io/crossplane-contrib/provider-kubernetes:v1.0.0
+      helm: xpkg.crossplane.io/crossplane-contrib/provider-helm:v1.0.0
+    functions:
+      auto-ready: xpkg.crossplane.io/crossplane-contrib/function-auto-ready:v0.5.0
+      capability: harbor.long-running.dev-ck8s.com/welkin/function-capability:v0.2.0
+      go-templating: xpkg.crossplane.io/crossplane-contrib/function-go-templating:v0.11.0
+      patch-and-transform: xpkg.crossplane.io/crossplane-contrib/function-patch-and-transform:v0.9.0
   dex:
     image: ghcr.io/dexidp/dex:v2.40.0
   externalDns:
