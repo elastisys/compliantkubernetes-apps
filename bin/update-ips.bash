@@ -787,9 +787,16 @@ check_cluster="${1}"
 [[ "${1}" =~ ^(wc|sc|both)$ ]] || log_fatal "first argument must be either wc, sc or both"
 
 dry_run=true
-if [[ "${2}" == "apply" ]]; then
+list_operations=false
+
+case "${2}" in
+"apply")
   dry_run=false
-fi
+  ;;
+"operations")
+  list_operations=true
+  ;;
+esac
 
 shift 2
 
@@ -811,13 +818,15 @@ declare -A operations=(
   [rclone]=-
 )
 
+declare -a enabled_operations=()
+
 while [ -n "${1+x}" ]; do
   case "${1}" in
   "--enable")
     if [ "${#}" -lt 2 ]; then
       log_fatal "The --enable flag requires an operation, example: --enable ingress"
     fi
-    operations=(["${2}"]=-)
+    enabled_operations+=("${2}")
     shift
     ;;
   "--disable")
@@ -836,6 +845,21 @@ while [ -n "${1+x}" ]; do
   esac
   shift
 done
+
+if [ "${#enabled_operations[@]}" -ne 0 ]; then
+  for op1 in "${!operations[@]}"; do
+    enabled=false
+    for op2 in "${enabled_operations[@]}"; do
+      [ "${op1}" = "${op2}" ] && enabled=true
+    done
+    ! ${enabled} && unset 'operations[${op1}]'
+  done
+fi
+
+if ${list_operations}; then
+  echo "${!operations[@]}"
+  exit
+fi
 
 validate_config
 
