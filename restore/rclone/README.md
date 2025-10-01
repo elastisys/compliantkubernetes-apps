@@ -78,6 +78,34 @@ objectStorage:
     enabled: true
 ```
 
+Make sure to add networkpolicies:
+
+```yaml
+# file: sc-config.yaml
+networkPolicies:
+  rclone:
+    sync: # restore uses networkpolicies under sync
+        objectStorage:
+          ips:
+           ## ips of the objectstorage to restore from, same as networkpolicies.global.objectstorage.ips
+           ## from common-config.yaml in the origin cluster config
+            - <ip>
+            - <ip>
+          ports:
+            - 443
+```
+
+And credentials:
+
+```yaml
+# file: secrets.yaml
+objectStorage:
+    sync: # restore uses credentials under sync
+        s3:
+            accessKey: <key>
+            secretKey: <key>
+```
+
 Specify destinations and sources (the backend object storage services) you want to use, follows the same structure as `.objectStorage.type` does ([config schema](https://elastisys.io/welkin/operator-manual/schema/config-properties-object-storage-config-properties-rclone-restore-config)) ([secrets schema](https://elastisys.io/welkin/operator-manual/schema/secrets-properties-object-storage-secrets-properties-rclone-restore-secrets/)):
 
 ```yaml
