@@ -1,6 +1,8 @@
 ---
 templates:
   crossplane:
+    condition: ck8sAnyCluster.enabled
+    installed: {{ .Values | get "ck8sAnyCluster.enabled" false }}
     inherit: [ template: crossplane-chart ]
     wait: true
     namespace: crossplane-system
@@ -13,6 +15,9 @@ templates:
       - values/crossplane.yaml.gotmpl
 
   crossplane-packages:
+    disableValidationOnInstall: true
+    condition: ck8sAnyCluster.enabled
+    installed: {{ .Values | get "ck8sAnyCluster.enabled" false }}
     chart: charts/crossplane/packages
     version: 0.1.0
     namespace: crossplane-system
