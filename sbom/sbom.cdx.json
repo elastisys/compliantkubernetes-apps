@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:82b3e71c-544c-4701-938b-68a8a410f653",
+  "serialNumber": "urn:uuid:5dcbb1f3-b5b9-4dbb-8087-2c45e313abdf",
   "version": 1,
   "metadata": {
-    "timestamp": "2025-11-06T07:38:38Z",
+    "timestamp": "2025-11-11T10:34:57Z",
     "lifecycles": [
       {
         "phase": "build"
@@ -1828,6 +1828,37 @@
       }
     },
     {
+      "bom-ref": "pkg:helm/module-node-local-dns@0.1.0",
+      "type": "library",
+      "supplier": {
+        "name": "Elastisys"
+      },
+      "name": "module-node-local-dns",
+      "version": "0.1.0",
+      "description": "A Helm chart for the NodeLocalDNS Module",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "purl": "pkg:helm/module-node-local-dns@0.1.0",
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "Not evaluated"
+        }
+      ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/modules/node-local-dns"
+          }
+        ]
+      }
+    },
+    {
       "bom-ref": "pkg:helm/namespaces@0.1.1",
       "type": "library",
       "supplier": {
@@ -1978,36 +2009,6 @@
         "occurrences": [
           {
             "location": "helmfile.d/upstream/nvidia/gpu-operator/charts/node-feature-discovery"
-          }
-        ]
-      }
-    },
-    {
-      "bom-ref": "pkg:helm/node-local-dns@0.1.1",
-      "type": "library",
-      "supplier": {
-        "name": "Elastisys"
-      },
-      "name": "node-local-dns",
-      "version": "0.1.1",
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
-      "purl": "pkg:helm/node-local-dns@0.1.1",
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "Not evaluated"
-        }
-      ],
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/charts/node-local-dns"
           }
         ]
       }
@@ -4293,6 +4294,17 @@
       "version": "latest",
       "cpe": "cpe:2.3:a:weaveworks:kured:*:*:*:*:*:*:*:*",
       "purl": "pkg:oci/weaveworks/kured@latest"
+    },
+    {
+      "bom-ref": "pkg:oci/welkin/module-node-local-dns@v0.2.0?repository_url=harbor.long-running.dev-ck8s.com",
+      "type": "container",
+      "supplier": {
+        "name": "welkin"
+      },
+      "name": "harbor.long-running.dev-ck8s.com/welkin/module-node-local-dns",
+      "version": "v0.2.0",
+      "cpe": "cpe:2.3:a:welkin:module-node-local-dns:0.2.0:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/welkin/module-node-local-dns@v0.2.0?repository_url=harbor.long-running.dev-ck8s.com"
     }
   ],
   "dependencies": [
@@ -4355,12 +4367,12 @@
         "pkg:helm/metrics-server@3.12.1",
         "pkg:helm/minio@15.0.5",
         "pkg:helm/minio@5.0.14",
+        "pkg:helm/module-node-local-dns@0.1.0",
         "pkg:helm/namespaces@0.1.1",
         "pkg:helm/networkpolicy-generator@0.1.0",
         "pkg:helm/networkpolicy-service@0.2.0",
         "pkg:helm/networkpolicy-workload@0.2.0",
         "pkg:helm/node-feature-discovery@0.16.6",
-        "pkg:helm/node-local-dns@0.1.1",
         "pkg:helm/opensearch-configurer@0.1.0",
         "pkg:helm/opensearch-curator@0.1.0",
         "pkg:helm/opensearch-dashboards@2.31.0",
@@ -4912,6 +4924,13 @@
       ]
     },
     {
+      "ref": "pkg:helm/module-node-local-dns@0.1.0",
+      "dependsOn": [
+        "pkg:oci/dns/k8s-dns-node-cache@1.25.0?repository_url=registry.k8s.io",
+        "pkg:oci/welkin/module-node-local-dns@v0.2.0?repository_url=harbor.long-running.dev-ck8s.com"
+      ]
+    },
+    {
       "ref": "pkg:helm/namespaces@0.1.1",
       "dependsOn": []
     },
@@ -4932,12 +4951,6 @@
       "dependsOn": [
         "pkg:oci/nfd/node-feature-discovery@v0.16.6?repository_url=registry.k8s.io",
         "pkg:oci/nvidia/gpu-operator@v24.9.2?repository_url=nvcr.io"
-      ]
-    },
-    {
-      "ref": "pkg:helm/node-local-dns@0.1.1",
-      "dependsOn": [
-        "pkg:oci/dns/k8s-dns-node-cache@1.25.0?repository_url=registry.k8s.io"
       ]
     },
     {
@@ -5684,6 +5697,10 @@
     },
     {
       "ref": "pkg:oci/weaveworks/kured@latest",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:oci/welkin/module-node-local-dns@v0.2.0?repository_url=harbor.long-running.dev-ck8s.com",
       "dependsOn": []
     }
   ]

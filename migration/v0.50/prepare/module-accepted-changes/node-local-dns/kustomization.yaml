@@ -1,0 +1,8 @@
+resources:
+  - rendered-templates.yaml
+  - servicemonitor.yaml
+patches:
+  - path: metric-service-annotations.yaml
+    target:
+      kind: Service
+      name: node-local-dns
