@@ -28,3 +28,13 @@ templates:
       - crossplane-system/crossplane
     values:
       - values/crossplane-packages.yaml.gotmpl
+
+  crossplane-providerconfigs:
+    chart: charts/crossplane/providerconfigs
+    version: 0.1.0
+    namespace: crossplane-system
+    name: crossplane-providerconfigs
+    labels:
+      app: crossplane-providerconfigs
+    needs:
+      - crossplane-system/crossplane-packages

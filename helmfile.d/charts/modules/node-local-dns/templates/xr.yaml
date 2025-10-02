@@ -1,0 +1,13 @@
+apiVersion: module.elastisys.com/v1alpha1
+kind: NodeLocalDNS
+metadata:
+  namespace: kube-system
+  name: node-local-dns
+spec:
+  clusterDNS: {{ .Values.clusterDNS }}
+  resources: {{ .Values.resources | toYaml | nindent 4 }}
+  customConfig: {{ .Values.customConfig | toYaml | nindent 4 }}
+  errorConfig: {{ .Values.errorConfig | toYaml | nindent 4 }}
+  crossplane:
+    compositionRef:
+      name: node-local-dns
