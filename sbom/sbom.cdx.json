@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:87278a33-2525-404b-8ce2-abff25a52f20",
+  "serialNumber": "urn:uuid:66c4a422-9f11-4659-8f1e-00a4d7369b96",
   "version": 1,
   "metadata": {
-    "timestamp": "2025-10-28T14:47:04Z",
+    "timestamp": "2025-10-31T16:01:45Z",
     "lifecycles": [
       {
         "phase": "build"
@@ -1828,6 +1828,37 @@
       }
     },
     {
+      "bom-ref": "pkg:helm/module-node-local-dns@0.1.0",
+      "type": "library",
+      "supplier": {
+        "name": "Elastisys"
+      },
+      "name": "module-node-local-dns",
+      "version": "0.1.0",
+      "description": "A Helm chart for the NodeLocalDNS Module",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "purl": "pkg:helm/module-node-local-dns@0.1.0",
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "Not evaluated"
+        }
+      ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/modules/node-local-dns"
+          }
+        ]
+      }
+    },
+    {
       "bom-ref": "pkg:helm/namespaces@0.1.1",
       "type": "library",
       "supplier": {
@@ -1978,36 +2009,6 @@
         "occurrences": [
           {
             "location": "helmfile.d/upstream/nvidia/gpu-operator/charts/node-feature-discovery"
-          }
-        ]
-      }
-    },
-    {
-      "bom-ref": "pkg:helm/node-local-dns@0.1.1",
-      "type": "library",
-      "supplier": {
-        "name": "Elastisys"
-      },
-      "name": "node-local-dns",
-      "version": "0.1.1",
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
-      "purl": "pkg:helm/node-local-dns@0.1.1",
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "Not evaluated"
-        }
-      ],
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/charts/node-local-dns"
           }
         ]
       }
@@ -3006,17 +3007,6 @@
       "version": "2.40.0",
       "cpe": "cpe:2.3:a:dexidp:dex:2.40.0:*:*:*:*:*:*:*",
       "purl": "pkg:oci/dexidp/dex@2.40.0?repository_url=ghcr.io"
-    },
-    {
-      "bom-ref": "pkg:oci/dns/k8s-dns-node-cache@1.25.0?repository_url=registry.k8s.io",
-      "type": "container",
-      "supplier": {
-        "name": "dns"
-      },
-      "name": "registry.k8s.io/dns/k8s-dns-node-cache",
-      "version": "1.25.0",
-      "cpe": "cpe:2.3:a:kubernetes:k8s-dns-node-cache:1.25.0:*:*:*:*:*:*:*",
-      "purl": "pkg:oci/dns/k8s-dns-node-cache@1.25.0?repository_url=registry.k8s.io"
     },
     {
       "bom-ref": "pkg:oci/elastisys/backup-postgres@1.5.0?repository_url=ghcr.io",
@@ -4080,12 +4070,12 @@
         "pkg:helm/metrics-server@3.12.1",
         "pkg:helm/minio@15.0.5",
         "pkg:helm/minio@5.0.14",
+        "pkg:helm/module-node-local-dns@0.1.0",
         "pkg:helm/namespaces@0.1.1",
         "pkg:helm/networkpolicy-generator@0.1.0",
         "pkg:helm/networkpolicy-service@0.2.0",
         "pkg:helm/networkpolicy-workload@0.2.0",
         "pkg:helm/node-feature-discovery@0.16.6",
-        "pkg:helm/node-local-dns@0.1.1",
         "pkg:helm/opensearch-configurer@0.1.0",
         "pkg:helm/opensearch-curator@0.1.0",
         "pkg:helm/opensearch-dashboards@2.31.0",
@@ -4488,6 +4478,10 @@
       ]
     },
     {
+      "ref": "pkg:helm/module-node-local-dns@0.1.0",
+      "dependsOn": []
+    },
+    {
       "ref": "pkg:helm/namespaces@0.1.1",
       "dependsOn": []
     },
@@ -4507,12 +4501,6 @@
       "ref": "pkg:helm/node-feature-discovery@0.16.6",
       "dependsOn": [
         "pkg:oci/nfd/node-feature-discovery@v0.16.6?repository_url=registry.k8s.io"
-      ]
-    },
-    {
-      "ref": "pkg:helm/node-local-dns@0.1.1",
-      "dependsOn": [
-        "pkg:oci/dns/k8s-dns-node-cache@1.25.0?repository_url=registry.k8s.io"
       ]
     },
     {
@@ -4736,10 +4724,6 @@
     },
     {
       "ref": "pkg:oci/dexidp/dex@2.40.0?repository_url=ghcr.io",
-      "dependsOn": []
-    },
-    {
-      "ref": "pkg:oci/dns/k8s-dns-node-cache@1.25.0?repository_url=registry.k8s.io",
       "dependsOn": []
     },
     {

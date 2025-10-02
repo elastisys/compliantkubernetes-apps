@@ -1,0 +1,25 @@
+apiVersion: module.elastisys.com/v1alpha1
+kind: NodeLocalDNS
+metadata:
+  namespace: kube-system
+  name: node-local-dns
+spec:
+  providerConfigs:
+    helm:
+      local:
+        kind: ProviderConfig
+        name: node-local-dns-local
+    kubernetes:
+      local:
+        kind: ProviderConfig
+        name: node-local-dns-local
+  clusterDNS: {{ .Values.clusterDNS }}
+  resources: {{ .Values.resources | toYaml | nindent 4 }}
+  customConfig: {{ .Values.customConfig | toYaml | nindent 4 }}
+  errorConfig: {{ .Values.errorConfig | toYaml | nindent 4 }}
+  ipFamilyPolicy: {{ .Values.ipFamilyPolicy }}
+  ipFamilies: {{ .Values.ipFamilies | toYaml | nindent 4 }}
+  image: {{ .Values.image.repository }}{{ with .Values.image.tag }}:{{ . }}{{ end }}
+  crossplane:
+    compositionRef:
+      name: node-local-dns
