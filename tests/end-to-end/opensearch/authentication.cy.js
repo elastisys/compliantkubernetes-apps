@@ -8,9 +8,7 @@ describe('opensearch admin authentication', () => {
   it('can login via static dex user', function () {
     cy.continueOn('sc', '.dex.enableStaticLogin')
 
-    cy.visit(`https://${this.ingress}`)
-
-    cy.dexStaticLogin()
+    cy.visitAndVerifyCSPHeader(`https://${this.ingress}`, '**/app/dashboards**', true)
 
     cy.contains('Loading OpenSearch Dashboards').should('not.exist')
 

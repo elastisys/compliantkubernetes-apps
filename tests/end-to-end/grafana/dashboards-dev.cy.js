@@ -17,7 +17,7 @@ describe('grafana dev dashboards', function () {
       cy.grafanaDexExtraStaticLogin(`${this.ingress}/dashboards`, 'dev@example.com')
     })
 
-    cy.visit(`https://${this.ingress}/dashboards`)
+    cy.visitAndVerifyCSPHeader(`https://${this.ingress}/dashboards`)
   })
 
   after(function () {
