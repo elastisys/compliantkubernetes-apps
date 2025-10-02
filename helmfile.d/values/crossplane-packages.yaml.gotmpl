@@ -1,0 +1,48 @@
+{{- $imagesGlobal := dict
+  "registry" (ternary (dig "uri" "" .Values.images.global.registry) "" .Values.images.global.registry.enabled)
+  "repository" (ternary (dig "uri" "" .Values.images.global.repository) "" .Values.images.global.repository.enabled)
+}}
+
+{{- $functions := (list
+  "auto-ready"
+  "capability"
+  "go-templating"
+  "patch-and-transform"
+) }}
+
+{{- $providers := (list
+  "kubernetes"
+  "helm"
+) }}
+
+functions:
+{{- range $function := $functions }}
+  {{ $function }}:
+    {{- $image := $.Values.images | dig "crossplane" "functions" $function "" }}
+    {{- $image = merge (include "container_uri.parse" $image | fromJson) $imagesGlobal }}
+    {{- with $image }}
+    image:
+      {{- with include "gen.reg-rep-img" . }}
+      repository: {{ . }}
+      {{- end }}
+      {{- if or .tag .digest }}
+      tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
+      {{- end }}
+    {{- end }}
+{{- end }}
+
+providers:
+{{- range $provider := $providers }}
+  {{ $provider }}:
+    {{- $image := $.Values.images | dig "crossplane" "providers" $provider "" }}
+    {{- $image = merge (include "container_uri.parse" $image | fromJson) $imagesGlobal }}
+    {{- with $image }}
+    image:
+      {{- with include "gen.reg-rep-img" . }}
+      repository: {{ . }}
+      {{- end }}
+      {{- if or .tag .digest }}
+      tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
+      {{- end }}
+    {{- end }}
+{{- end }}
