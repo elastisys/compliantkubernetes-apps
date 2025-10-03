@@ -29,12 +29,12 @@ class AppsConfig:
 
     path: Path
 
-    def set(self, key: str, value: Jsonable) -> None:
+    def set(self, key: str, value: Jsonable, merge: bool = True) -> None:
         """Set a config key (with merge)"""
         _run(
             "yq",
             "-i",
-            f".{key} = .{key} * {json.dumps(value)}",
+            f".{key} = .{key} * {json.dumps(value)}" if merge else f".{key} = {json.dumps(value)}",
             self.path.resolve().as_posix(),
         )
 

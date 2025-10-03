@@ -8,7 +8,18 @@ Configuration for the installer script.
 import json
 import sys
 from contextlib import suppress
-from typing import Any, Optional, Type, TypedDict, Union, cast, get_args, get_origin, get_type_hints
+from typing import (
+    Any,
+    Literal,
+    Optional,
+    Type,
+    TypedDict,
+    Union,
+    cast,
+    get_args,
+    get_origin,
+    get_type_hints,
+)
 
 AwsSecrets = TypedDict(
     "AwsSecrets",
@@ -60,6 +71,8 @@ Subnets = TypedDict(
     total=False,
 )
 
+NetworkPlugin = Literal["calico", "cilium"]
+
 
 class Config(TypedDict):
     """Holds the parsed configuration"""
@@ -74,6 +87,8 @@ class Config(TypedDict):
 
     wcSubnets: Optional[Subnets]
     scSubnets: Optional[Subnets]
+
+    networkPlugin: Optional[NetworkPlugin]
 
 
 def dig(config: Config, path: str) -> str | int | float | bool | list | dict | None:
@@ -140,6 +155,9 @@ def _instantiate_typeddict(
                 return set()
             if origin is tuple:
                 return ()
+            if origin is Literal:
+                non_none_types = get_non_none_types(f_type)
+                return get_default_value(type(non_none_types[0])) if non_none_types else None
 
         # Default fallback
         return None

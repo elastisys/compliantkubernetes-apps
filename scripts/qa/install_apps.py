@@ -48,6 +48,10 @@ def configure_apps(
 ) -> None:
     """Configure apps"""
 
+    # Configure network plugin
+    if (network_plugin := args.config["networkPlugin"]) is not None:
+        common_config.set("networkPlugin.type", network_plugin, merge=False)
+
     # Configure platform administrators
     common_config.set("clusterAdmin", {"users": [], "groups": [args.config["adminGroup"]]})
 
@@ -127,7 +131,7 @@ def configure_apps(
     )
 
     # Configure Falco BPF driver
-    common_config.set("falco.driver", {"kind": "modern-bpf"})
+    common_config.set("falco.driver", {"kind": "modern_ebpf"})
 
     # Configure Grafana with test requirements
     grafana_cfg = {
