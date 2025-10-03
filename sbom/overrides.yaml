@@ -97,8 +97,39 @@ helmfile.d/upstream/dexidp/dex:
     project and the availability of alternatives, such as Keycloak,
     sandbox is sufficient for the mission and vision of Welkin.
 
-helmfile.d/upstream/jetstack/cert-manager:
+helmfile.d/upstream/falcosecurity/falco/charts/falco-talon:
   evaluation: >-
-    🟢 cert-manager is a CNCF graduate project, which means it is
+    🟡 This project seems to fall under Falco, which is a
+    CNCF graduated project. However, it seems to receive significant
+    contributions from a single author. This is not an issue right now,
+    but we'll monitor the project.
+
+helmfile.d/upstream/falcosecurity/falco:
+  evaluation: >-
+    🟢 Falco is a CNCF graduated project, which means it is
     community-driven open-source and has passed a high bar for
     organizational and technical maturity.
+
+helmfile.d/upstream/falcosecurity/falco/charts/falcosidekick:
+  evaluation: >-
+    🟡 This project seems to fall under Falco, which is a
+    CNCF graduated project. However, it seems to receive significant
+    contributions from a single author. This is not an issue right now,
+    but we'll monitor the project.
+
+helmfile.d/charts/file-copier:
+  evaluation: 🟢 This is a glue Chart maintained by Elastisys.
+
+helmfile.d/upstream/kokuwa/fluentd-elasticsearch:
+  evaluation: >-
+    🟡 Fluentd is a CNCF graduated project, which means it is
+    community-driven open-source and has passed a high bar for
+    organizational and technical maturity. However, we don't
+    use the official Chart. This is not a problem for now.
+
+helmfile.d/upstream/bitnami/fluentd:
+  evaluation: >-
+    🟡 Fluentd is a CNCF graduated project, which means it is
+    community-driven open-source and has passed a high bar for
+    organizational and technical maturity. However, we don't
+    use the official Chart. This is not a problem for now.
