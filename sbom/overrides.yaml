@@ -38,3 +38,9 @@ helmfile.d/upstream/dexidp/dex:
     organizational and technical maturity. Given the complexity of the
     project and the availability of alternatives, such as Keycloak,
     sandbox is sufficient for the mission and vision of Welkin.
+
+helmfile.d/upstream/jetstack/cert-manager:
+  evaluation: >-
+    🟢 cert-manager is a CNCF graduate project, which means it is
+    community-driven open-source and has passed a high bar for
+    organizational and technical maturity.
