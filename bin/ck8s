@@ -33,7 +33,7 @@ usage() {
   echo "  team remove-pgp <fp>                            remove a PGP key from secrets and rotate the data encryption key" 1>&2
   echo "  test <wc|sc> [--logging-enabled]                test the applications" 1>&2
   echo "  update-ips <wc|sc|both> <apply|dry-run>         Automatically fetches and applies the IPs for network policies" 1>&2
-  echo "  upgrade <wc|sc|both> <vX.Y> apply               runs all apply steps upgrading the environment" 1>&2
+  echo "  upgrade <wc|sc|both> <vX.Y> apply [--dry-run]   runs all apply steps upgrading the environment" 1>&2
   echo "  upgrade <wc|sc|both> <vX.Y> prepare             runs all prepare steps upgrading the configuration" 1>&2
   echo "  upgrade <wc|sc|both> unlock                     reset an upgrade to allow trying again" 1>&2
   echo "  validate <wc|sc>                                validates config files" 1>&2
@@ -92,7 +92,7 @@ upgrade)
   fi
   check_tools
   export CK8S_CLUSTER="${2}"
-  "${here}/upgrade.bash" "${3}" "${4:-}"
+  "${here}/upgrade.bash" "${3}" "${4:-}" "${5:-}"
   ;;
 team)
   case "${2}" in
