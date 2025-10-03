@@ -11,13 +11,19 @@ helmfile.d/upstream/prometheus-community/kube-prometheus-stack/charts/crds:
   licenses:
     - license:
         id: "Apache-2.0"
-  evaluation: "Not evaluated"
+  evaluation: >-
+    🟢 Prometheus is a CNCF graduated project, which means it is
+    community-driven open-source and has passed a high bar for
+    organizational and technical maturity.
 
 helmfile.d/upstream/kyverno/kyverno/charts/crds:
   licenses:
     - license:
         id: "Apache-2.0"
-  evaluation: "Not evaluated"
+  evaluation: >-
+    🟢 Kyverno is a CNCF graduated project, which means it is
+    community-driven open-source and has passed a high bar for
+    organizational and technical maturity.
 
 helmfile.d/upstream/kyverno/kyverno/charts/grafana:
   licenses:
@@ -30,6 +36,58 @@ helmfile.d/upstream/opensearch-project/opensearch-dashboards:
     - license:
         id: "Apache-2.0"
   evaluation: "Not evaluated"
+
+#
+# Evaluations start here
+#
+helmfile.d/charts/autoscaling-monitoring:
+  evaluation: 🟢 This is a glue Chart maintained by Elastisys.
+
+helmfile.d/charts/calico-accountant:
+  evaluation: >-
+    🟡 This is a Chart maintained by Elastisys. It incorporates
+    a project which is poorly maintained. However, replacing it
+    is already on the Welkin roadmap.
+
+helmfile.d/charts/calico-default-deny:
+  evaluation: 🟢 This is a glue Chart maintained by Elastisys.
+
+helmfile.d/charts/calico-felix-metrics:
+  evaluation: 🟢 This is a glue Chart maintained by Elastisys.
+
+helmfile.d/upstream/jetstack/cert-manager:
+  evaluation: >-
+    🟢 cert-manager is a CNCF graduated project, which means it is
+    community-driven open-source and has passed a high bar for
+    organizational and technical maturity.
+
+helmfile.d/charts/cilium-default-deny:
+  evaluation: 🟢 This is a glue Chart maintained by Elastisys.
+
+helmfile.d/charts/cluster-admin-rbac:
+  evaluation: 🟢 This is a glue Chart maintained by Elastisys.
+
+helmfile.d/upstream/bitnami/fluentd/charts/common:
+  evaluation: >-
+    🟡 We would rather avoid Charts from Bitnami. However,
+    there is no urgency in replacing it.
+
+helmfile.d/upstream/bitnami/thanos/charts/common:
+  evaluation: >-
+    🟡 We would rather avoid Charts from Bitnami. However,
+    there is no urgency in replacing it.
+
+helmfile.d/charts/external-dns-endpoints:
+  evaluation: 🟢 This is a glue Chart maintained by Elastisys.
+
+helmfile.d/charts/external-dns-secrets:
+  evaluation: 🟢 This is a glue Chart maintained by Elastisys.
+
+helmfile.d/upstream/kubernetes-external-dns/external-dns:
+  evaluation: >-
+    🟢 This project looks sufficiently health for Welkin.
+    It seems vendor neutral, organizationally and technologically
+    mature.
 
 helmfile.d/upstream/dexidp/dex:
   evaluation: >-
