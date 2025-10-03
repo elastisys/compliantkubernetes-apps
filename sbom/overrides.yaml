@@ -11,13 +11,19 @@ helmfile.d/upstream/prometheus-community/kube-prometheus-stack/charts/crds:
   licenses:
     - license:
         id: "Apache-2.0"
-  evaluation: "Not evaluated"
+  evaluation: >-
+    🟢 Prometheus is a CNCF graduated project, which means it is
+    community-driven open-source and has passed a high bar for
+    organizational and technical maturity.
 
 helmfile.d/upstream/kyverno/kyverno/charts/crds:
   licenses:
     - license:
         id: "Apache-2.0"
-  evaluation: "Not evaluated"
+  evaluation: >-
+    🟢 Kyverno is a CNCF graduated project, which means it is
+    community-driven open-source and has passed a high bar for
+    organizational and technical maturity.
 
 helmfile.d/upstream/kyverno/kyverno/charts/grafana:
   licenses:
@@ -30,3 +36,100 @@ helmfile.d/upstream/opensearch-project/opensearch-dashboards:
     - license:
         id: "Apache-2.0"
   evaluation: "Not evaluated"
+
+#
+# Evaluations start here
+#
+helmfile.d/charts/autoscaling-monitoring:
+  evaluation: 🟢 This is a glue Chart maintained by Elastisys.
+
+helmfile.d/charts/calico-accountant:
+  evaluation: >-
+    🟡 This is a Chart maintained by Elastisys. It incorporates
+    a project which is poorly maintained. However, replacing it
+    is already on the Welkin roadmap.
+
+helmfile.d/charts/calico-default-deny:
+  evaluation: 🟢 This is a glue Chart maintained by Elastisys.
+
+helmfile.d/charts/calico-felix-metrics:
+  evaluation: 🟢 This is a glue Chart maintained by Elastisys.
+
+helmfile.d/upstream/jetstack/cert-manager:
+  evaluation: >-
+    🟢 cert-manager is a CNCF graduated project, which means it is
+    community-driven open-source and has passed a high bar for
+    organizational and technical maturity.
+
+helmfile.d/charts/cilium-default-deny:
+  evaluation: 🟢 This is a glue Chart maintained by Elastisys.
+
+helmfile.d/charts/cluster-admin-rbac:
+  evaluation: 🟢 This is a glue Chart maintained by Elastisys.
+
+helmfile.d/upstream/bitnami/fluentd/charts/common:
+  evaluation: >-
+    🟡 We would rather avoid Charts from Bitnami. However,
+    there is no urgency in replacing it.
+
+helmfile.d/upstream/bitnami/thanos/charts/common:
+  evaluation: >-
+    🟡 We would rather avoid Charts from Bitnami. However,
+    there is no urgency in replacing it.
+
+helmfile.d/charts/external-dns-endpoints:
+  evaluation: 🟢 This is a glue Chart maintained by Elastisys.
+
+helmfile.d/charts/external-dns-secrets:
+  evaluation: 🟢 This is a glue Chart maintained by Elastisys.
+
+helmfile.d/upstream/kubernetes-external-dns/external-dns:
+  evaluation: >-
+    🟢 This project looks sufficiently health for Welkin.
+    It seems vendor neutral, organizationally and technologically
+    mature.
+
+helmfile.d/upstream/dexidp/dex:
+  evaluation: >-
+    🟢 Dex is a CNCF sandbox project, which means it is
+    community-driven open-source and has passed some bar for
+    organizational and technical maturity. Given the complexity of the
+    project and the availability of alternatives, such as Keycloak,
+    sandbox is sufficient for the mission and vision of Welkin.
+
+helmfile.d/upstream/falcosecurity/falco/charts/falco-talon:
+  evaluation: >-
+    🟡 This project seems to fall under Falco, which is a
+    CNCF graduated project. However, it seems to receive significant
+    contributions from a single author. This is not an issue right now,
+    but we'll monitor the project.
+
+helmfile.d/upstream/falcosecurity/falco:
+  evaluation: >-
+    🟢 Falco is a CNCF graduated project, which means it is
+    community-driven open-source and has passed a high bar for
+    organizational and technical maturity.
+
+helmfile.d/upstream/falcosecurity/falco/charts/falcosidekick:
+  evaluation: >-
+    🟡 This project seems to fall under Falco, which is a
+    CNCF graduated project. However, it seems to receive significant
+    contributions from a single author. This is not an issue right now,
+    but we'll monitor the project.
+
+helmfile.d/charts/file-copier:
+  evaluation: 🟢 This is a glue Chart maintained by Elastisys.
+
+helmfile.d/upstream/kokuwa/fluentd-elasticsearch:
+  evaluation: >-
+    🟡 Fluentd is a CNCF graduated project, which means it is
+    community-driven open-source and has passed a high bar for
+    organizational and technical maturity. However, we don't
+    use the official Chart. This is not a problem for now.
+
+helmfile.d/upstream/bitnami/fluentd:
+  evaluation: >-
+    🟡 Fluentd is a CNCF graduated project, which means it is
+    community-driven open-source and has passed a high bar for
+    organizational and technical maturity. However, we don't
+    use the official Chart. This is not a problem for now.
