@@ -1,7 +1,11 @@
+{{- if not .Values.clusterName }}
+{{- fail "clusterName must not be empty" }}
+{{- end }}
+---
 apiVersion: kubernetes.m.crossplane.io/v1alpha1
 kind: ClusterProviderConfig
 metadata:
-  name: mc
+  name: {{ .Values.clusterName }}
 spec:
   credentials:
     source: InjectedIdentity
@@ -9,7 +13,33 @@ spec:
 apiVersion: helm.m.crossplane.io/v1beta1
 kind: ClusterProviderConfig
 metadata:
-  name: mc
+  name: {{ .Values.clusterName }}
 spec:
   credentials:
     source: InjectedIdentity
+{{- range $cluster, $values := .Values.remoteClusters }}
+---
+apiVersion: kubernetes.m.crossplane.io/v1alpha1
+kind: ClusterProviderConfig
+metadata:
+  name: {{ $cluster }}
+spec:
+  credentials:
+    source: Secret
+    secretRef:
+      name: {{ $values.secretRef.name }}
+      namespace: {{ $values.secretRef.namespace }}
+      key: {{ $values.secretRef.key }}
+---
+apiVersion: helm.m.crossplane.io/v1beta1
+kind: ClusterProviderConfig
+metadata:
+  name: {{ $cluster }}
+spec:
+  credentials:
+    source: Secret
+    secretRef:
+      name: {{ $values.secretRef.name }}
+      namespace: {{ $values.secretRef.namespace }}
+      key: {{ $values.secretRef.key }}
+{{- end }}
