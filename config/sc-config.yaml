@@ -521,10 +521,10 @@ dex:
   additionalKubeloginRedirects: []
   contentSecurityPolicy:
     default-src: "'none'"
-    style-src: "'self'"
-    img-src: "'self'"
     frame-ancestors: "'none'"
+    img-src: "'self'"
     require-trusted-types-for: "'script'"
+    style-src: "'self'"
   enableStaticLogin: true
   serviceMonitor:
     enabled: true
