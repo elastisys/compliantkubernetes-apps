@@ -34,7 +34,7 @@ bases:
   - stacks/velero.yaml.gotmpl
 ---
 releases:
-  - inherit: [ template: crossplane ]
+  - inherit: [ template: crossplane-controller ]
   - inherit: [ template: crossplane-packages ]
 
   - inherit: [ template: tigera ]
