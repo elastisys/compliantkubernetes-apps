@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+
+crossplane_diff() {
+  if [[ "${#}" -lt 2 ]] || [[ ! "${1}" =~ ^(sc|wc)$ ]]; then
+    log_fatal "usage: crossplane_diff <sc|wc> <module_name>"
+  fi
+
+  local crossplane_release
+  local release_namespace
+  local chart_repository
+  local chart_name
+  local chart_version
+  local values
+
+  crossplane_release="$(_crossplane_render "${CK8S_CLUSTER}" "${2}" | yq 'select(.kind == "Release")')"
+
+  release_namespace=$(yq '.spec.forProvider.namespace' <<<"${crossplane_release}")
+  chart_repository=$(yq '.spec.forProvider.chart.repository' <<<"${crossplane_release}")
+  chart_name=$(yq '.spec.forProvider.chart.name' <<<"${crossplane_release}")
+  chart_version=$(yq '.spec.forProvider.chart.version' <<<"${crossplane_release}")
+  values="$(yq -o json '.spec.forProvider.values' <<<"${crossplane_release}")"
+
+  # FIXME: Currently null
+  release_namespace="kube-system"
+
+  if ! echo "${values}" | helm diff -n "${release_namespace}" upgrade "${2}" "${chart_repository}/${chart_name}" \
+    --version "${chart_version}" \
+    --allow-unreleased \
+    --reset-values \
+    --values - \
+    --detailed-exitcode; then
+    log_error "Detected differences between the existing release '${2}' and the module '${2}'."
+    log_error "DO NOT UPGRADE unless you are sure these are acceptable."
+  fi
+}
+
+_crossplane_render() {
+  if [[ "${#}" -lt 2 ]] || [[ ! "${1}" =~ ^(sc|wc)$ ]]; then
+    log_fatal "usage: _crossplane_render <sc|wc> <module_name>"
+  fi
+
+  local tmpdir
+  tmpdir="$(mktemp -d)"
+
+  append_trap 'rm -r '"${tmpdir}" EXIT
+
+  _crossplane_composition "${1}" "${2}" >"${tmpdir}/composition.yaml"
+
+  _crossplane_functions "${1}" >"${tmpdir}/functions.yaml"
+
+  _crossplane_xr "${1}" "${2}" >"${tmpdir}/xr.yaml"
+
+  crossplane render "${tmpdir}/xr.yaml" "${tmpdir}/composition.yaml" "${tmpdir}/functions.yaml"
+}
+
+_crossplane_composition() {
+  if [[ "${#}" -lt 2 ]] || [[ ! "${1}" =~ ^(sc|wc)$ ]]; then
+    log_fatal "usage: _crossplane_composition <sc|wc> <module_name>"
+  fi
+
+  local tmpdir
+  tmpdir="$(mktemp -d)"
+
+  append_trap 'rm -r '"${tmpdir}" EXIT
+
+  local configuration_package
+  configuration_package=$(helmfile_do "${1}" template -l name=crossplane-packages | yq 'select(.kind == "Configuration" and .metadata.name == "'"module-${2}"'").spec.package')
+
+  crossplane xpkg extract "${configuration_package}" -o "${tmpdir}/out.gz"
+
+  zcat "${tmpdir}/out.gz" | yq 'select(.kind == "Composition")'
+}
+
+_crossplane_functions() {
+  if [[ ! "${1}" =~ ^(sc|wc)$ ]]; then
+    log_fatal "usage: _crossplane_functions <sc|wc>"
+  fi
+
+  helmfile_do "${1}" template -l name=crossplane-packages | yq 'select(.kind == "Function")'
+}
+
+_crossplane_xr() {
+  if [[ "${#}" -lt 2 ]] || [[ ! "${1}" =~ ^(sc|wc)$ ]]; then
+    log_fatal "usage: _crossplane_xr <sc|wc> <module_name>"
+  fi
+
+  helmfile_do "${1}" template -l "name=module-${2}"
+}
