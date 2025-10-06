@@ -132,6 +132,16 @@ grafana.ini:
     viewers_can_edit: {{ .Values.grafana.ops.viewersCanEdit }}
   dataproxy:
     timeout: {{ .Values.grafana.ops.dataproxy.timeout }}
+  {{- with .Values.grafana.ops.contentSecurityPolicy }}
+  security:
+    content_security_policy: true
+    {{- $grafanaCSP := list }}
+    {{- range $cspKey, $cspValue := . }}
+    {{- $grafanaCSP = append $grafanaCSP (printf "%s %s" $cspKey $cspValue)  }}
+    {{- end }}
+    content_security_policy_template: |-
+      """{{ $grafanaCSP | join ";" }}"""
+  {{- end }}
   {{- if .Values.grafana.ops.additionalConfigValues }}
   {{ .Values.grafana.ops.additionalConfigValues | nindent 2 }}
   {{- end }}

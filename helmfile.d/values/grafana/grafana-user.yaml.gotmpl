@@ -130,6 +130,16 @@ grafana.ini:
     default_home_dashboard_path: /tmp/dashboards/welcome-dashboard.json
   dataproxy:
     timeout: {{ .Values.grafana.user.dataproxy.timeout }}
+  {{- with .Values.grafana.user.contentSecurityPolicy }}
+  security:
+    content_security_policy: true
+    {{- $grafanaCSP := list }}
+    {{- range $cspKey, $cspValue := . }}
+    {{- $grafanaCSP = append $grafanaCSP (printf "%s %s" $cspKey $cspValue)  }}
+    {{- end }}
+    content_security_policy_template: |-
+      """{{ $grafanaCSP | join ";" }}"""
+  {{- end }}
   {{- if .Values.grafana.user.additionalConfigValues }}
   {{ .Values.grafana.user.additionalConfigValues | nindent 2 }}
   {{- end }}
