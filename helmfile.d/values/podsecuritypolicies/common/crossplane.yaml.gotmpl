@@ -1,0 +1,46 @@
+constraints:
+  crossplane-system:
+    function-capability:
+      podSelectorLabels:
+        pkg.crossplane.io/function: function-capability
+      allow:
+        runAsUser:
+          rule: MustRunAsNonRoot
+      metadata:
+        labels:
+          pkg.crossplane.io/function: function-capability
+      mutation:
+        runAsUser: 65532
+    function-patch-and-transform:
+      podSelectorLabels:
+        pkg.crossplane.io/function: function-patch-and-transform
+      allow:
+        runAsUser:
+          rule: MustRunAsNonRoot
+      metadata:
+        labels:
+          pkg.crossplane.io/function: function-patch-and-transform
+      mutation:
+        runAsUser: 65532
+    function-go-templating:
+      podSelectorLabels:
+        pkg.crossplane.io/function: function-go-templating
+      allow:
+        runAsUser:
+          rule: MustRunAsNonRoot
+      metadata:
+        labels:
+          pkg.crossplane.io/function: function-go-templating
+      mutation:
+        runAsUser: 65532
+    function-auto-ready:
+      podSelectorLabels:
+        pkg.crossplane.io/function: function-auto-ready
+      allow:
+        runAsUser:
+          rule: MustRunAsNonRoot
+      metadata:
+        labels:
+          pkg.crossplane.io/function: function-auto-ready
+      mutation:
+        runAsUser: 65532

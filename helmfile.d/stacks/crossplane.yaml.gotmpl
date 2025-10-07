@@ -28,3 +28,13 @@ templates:
       - crossplane-system/crossplane
     values:
       - values/crossplane-packages.yaml.gotmpl
+
+  crossplane-podsecuritypolicy:
+    inherit:
+      - template: crossplane
+      - template: podsecuritypolicies
+    namespace: crossplane-system
+    labels:
+      psp: crossplane
+    values:
+      - values/podsecuritypolicies/common/crossplane.yaml.gotmpl
