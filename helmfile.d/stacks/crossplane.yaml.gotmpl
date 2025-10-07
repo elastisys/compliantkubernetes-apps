@@ -21,6 +21,7 @@ templates:
   crossplane-packages:
     disableValidationOnInstall: true
     inherit: [ template: crossplane ]
+    wait: true
     chart: charts/crossplane/packages
     version: 0.1.0
     name: crossplane-packages
