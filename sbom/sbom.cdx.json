@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:1252ba9f-fb66-4d6a-a16c-7670cd1cc157",
+  "serialNumber": "urn:uuid:e8e84ac5-78cf-4d49-ba41-6b40bed8a028",
   "version": 1,
   "metadata": {
-    "timestamp": "2025-10-02T15:17:56Z",
+    "timestamp": "2025-10-07T14:05:38Z",
     "lifecycles": [
       {
         "phase": "build"
@@ -432,37 +432,6 @@
         "occurrences": [
           {
             "location": "helmfile.d/charts/crossplane/packages"
-          }
-        ]
-      }
-    },
-    {
-      "bom-ref": "pkg:helm/crossplane-providerconfigs@0.1.0",
-      "type": "library",
-      "supplier": {
-        "name": "Elastisys"
-      },
-      "name": "crossplane-providerconfigs",
-      "version": "0.1.0",
-      "description": "Crossplane ProviderConfigs",
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
-      "purl": "pkg:helm/crossplane-providerconfigs@0.1.0",
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "Not evaluated"
-        }
-      ],
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/charts/crossplane/providerconfigs"
           }
         ]
       }
@@ -5366,7 +5335,6 @@
         "pkg:helm/crds@0.0.0",
         "pkg:helm/crds@3.3.6",
         "pkg:helm/crossplane-packages@0.1.0",
-        "pkg:helm/crossplane-providerconfigs@0.1.0",
         "pkg:helm/crossplane@2.0.2",
         "pkg:helm/dex@0.18.0",
         "pkg:helm/external-dns-endpoints@0.1.0",
@@ -5499,10 +5467,6 @@
     },
     {
       "ref": "pkg:helm/crossplane-packages@0.1.0",
-      "dependsOn": []
-    },
-    {
-      "ref": "pkg:helm/crossplane-providerconfigs@0.1.0",
       "dependsOn": []
     },
     {
