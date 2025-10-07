@@ -9,6 +9,7 @@ images:
     startupapicheck: quay.io/jetstack/cert-manager-startupapicheck:v1.17.1
   crossplane:
     image: xpkg.crossplane.io/crossplane/crossplane:v2.0.2
+    kubectl: ghcr.io/elastisys/bitnami/kubectl:1.32.4
     providers:
       kubernetes: xpkg.crossplane.io/crossplane-contrib/provider-kubernetes:v1.0.0
       helm: xpkg.crossplane.io/crossplane-contrib/provider-helm:v1.0.0

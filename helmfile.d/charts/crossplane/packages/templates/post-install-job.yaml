@@ -1,0 +1,78 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: crossplane-provider-waiter
+  annotations:
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+    helm.sh/hook: post-install
+    helm.sh/hook-weight: "-6"
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: crossplane-provider-waiter
+  annotations:
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+    helm.sh/hook: post-install
+    helm.sh/hook-weight: "-6"
+rules:
+  - apiGroups:
+      - pkg.crossplane.io
+    resources:
+      - providers
+    verbs:
+      - get
+      - list
+      - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: crossplane-provider-waiter
+  annotations:
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+    helm.sh/hook: post-install
+    helm.sh/hook-weight: "-5"
+subjects:
+  - kind: ServiceAccount
+    name: crossplane-provider-waiter
+    namespace: crossplane-system
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: crossplane-provider-waiter
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: crossplane-provider-waiter
+  annotations:
+    helm.sh/hook: post-install,post-upgrade
+    helm.sh/hook-weight: "-4"
+    helm.sh/hook-delete-policy: hook-succeeded
+spec:
+  template:
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      restartPolicy: Never
+      serviceAccountName: crossplane-provider-waiter
+      containers:
+        - name: waiter
+          image: {{ .Values.kubectlImage.repository }}:{{ .Values.kubectlImage.tag }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          command:
+          - /bin/sh
+          - -c
+          - |
+            {{- range $name := keys .Values.providers }}
+            echo "Waiting for provider-{{ $name }} to become healthy"
+            kubectl wait --for=condition=Healthy=True --timeout 120s providers.pkg.crossplane.io/provider-{{ $name }}
+            {{- end }}

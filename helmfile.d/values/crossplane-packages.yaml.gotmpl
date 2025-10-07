@@ -3,6 +3,18 @@
   "repository" (ternary (dig "uri" "" .Values.images.global.repository) "" .Values.images.global.repository.enabled)
 }}
 
+{{- with .Values.images | dig "crossplane" "kubectl" "" }}
+{{- with merge (include "container_uri.parse" . | fromJson) $imagesGlobal }}
+kubectlImage:
+  {{- with include "gen.reg-rep-img" . }}
+  repository: {{ . }}
+  {{- end }}
+  {{- if or .tag .digest }}
+  tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
+  {{- end }}
+{{- end }}
+{{- end }}
+
 {{- $functions := (list
   "auto-ready"
   "capability"

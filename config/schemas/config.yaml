@@ -8374,6 +8374,8 @@ properties:
         properties:
           image:
             $ref: '#/$defs/containerImage'
+          kubectl:
+            $ref: '#/$defs/containerImage'
           providers:
             title: crossplane provider images configuration
             description: crossplane provider images configuration
