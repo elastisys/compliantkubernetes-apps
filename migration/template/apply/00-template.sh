@@ -5,6 +5,8 @@ ROOT="$(readlink -f "$(dirname "${0}")/../../../")"
 # shellcheck source=scripts/migration/lib.sh
 source "${ROOT}/scripts/migration/lib.sh"
 
+: "${CK8S_DRY_RUN_INSTALL:=false}"
+
 # functions currently available in the library:
 #   - logging:
 #     - log_info(_no_newline) <message>
@@ -15,8 +17,6 @@ source "${ROOT}/scripts/migration/lib.sh"
 #   - kubectl
 #     # Use kubectl with kubeconfig set
 #     - kubectl_do <sc|wc> <kubectl args...>
-#     # Use kubectl --dry-run=server with kubeconfig set
-#     - kubectl_do_dryrun <sc|wc> <kubectl args...>
 #     # Perform kubectl delete, will not cause errors if the resource is missing
 #     - kubectl_delete <sc|wc> <resource> <namespace> <name>
 #
@@ -47,9 +47,6 @@ source "${ROOT}/scripts/migration/lib.sh"
 
 run() {
   case "${1:-}" in
-  dry-run)
-    log_warn "Dry-run not implemented"
-    ;;
   execute)
     # Note: 00-template.sh will be skipped by the upgrade command
     log_info "no operation: this is a template"
@@ -60,6 +57,11 @@ run() {
     if [[ "${CK8S_CLUSTER}" =~ ^(wc|both)$ ]]; then
       log_info "operation on workload cluster"
     fi
+
+    if $CK8S_DRY_RUN_INSTALL; then
+      log_info "Dry-run enabled on $(basename "${0}")"
+    fi
+
     ;;
   rollback)
     log_warn "rollback not implemented"

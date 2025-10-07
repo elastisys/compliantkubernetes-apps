@@ -116,19 +116,14 @@ apply() {
       continue
     fi
 
-    if $CK8S_DRY_RUN_INSTALL; then
-      if [[ "$(basename "${snippet}")" == "80-apply.sh" ]]; then
-        log_info "Dry-run: skipping last apply step."
-        continue
-      else
-        log_info "Dry-run: $(basename "${snippet}")"
-        "${snippet}" dry-run
-        continue
-      fi
-    fi
-
     log_info "apply snippet \"${snippet##"${MIGRATION_ROOT}/"}\":"
     if "${snippet}" execute; then
+
+      if $CK8S_DRY_RUN_INSTALL; then
+        log_info "Dry-run completed on $(basename "${snippet}")"
+        continue
+      fi
+
       log_info "apply snippet success\n---"
       if [[ "${CK8S_CLUSTER:-}" == "both" ]]; then
         record_upgrade_apply_step "sc" "${snippet}"
@@ -137,6 +132,12 @@ apply() {
         record_upgrade_apply_step "${CK8S_CLUSTER}" "${snippet}"
       fi
     else
+
+      if $CK8S_DRY_RUN_INSTALL; then
+        log_info "Dry-run not completed on $(basename "${snippet}")"
+        continue
+      fi
+
       local return="${?}"
       log_error "apply snippet execute failure"
 

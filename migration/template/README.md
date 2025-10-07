@@ -145,10 +145,12 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 
     ```bash
     # Check the changes of each applicable migration script
-    ./migration/${new_version}/apply/${script} dry-run
+    export CK8S_DRY_RUN_INSTALL=true
+    ./migration/${new_version}/apply/${script} execute
     ```
 
     ```bash
+    unset CK8S_DRY_RUN_INSTALL
     ./bin/ck8s apply {sc|wc}
     # or
     ./migration/${new_version}/apply/80-apply.sh execute
