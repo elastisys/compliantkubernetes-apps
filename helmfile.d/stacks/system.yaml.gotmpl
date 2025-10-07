@@ -61,7 +61,7 @@ templates:
     labels:
       app: node-local-dns
     needs:
-      - crossplane-system/crossplane-providerconfigs
+      - crossplane-system/crossplane-packages
     values:
       - values/node-local-dns.yaml.gotmpl
 
