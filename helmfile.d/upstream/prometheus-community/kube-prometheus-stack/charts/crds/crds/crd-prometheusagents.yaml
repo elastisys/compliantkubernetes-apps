@@ -1,11 +1,11 @@
-# https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.81.0/example/prometheus-operator-crd/monitoring.coreos.com_prometheusagents.yaml
+# https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.85.0/example/prometheus-operator-crd/monitoring.coreos.com_prometheusagents.yaml
 ---
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.17.2
-    operator.prometheus.io/version: 0.81.0
+    controller-gen.kubebuilder.io/version: v0.18.0
+    operator.prometheus.io/version: 0.85.0
   name: prometheusagents.monitoring.coreos.com
 spec:
   group: monitoring.coreos.com
@@ -422,7 +422,6 @@ spec:
                                     pod labels will be ignored. The default value is empty.
                                     The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                                     Also, matchLabelKeys cannot be set when labelSelector isn't set.
-                                    This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                   items:
                                     type: string
                                   type: array
@@ -437,7 +436,6 @@ spec:
                                     pod labels will be ignored. The default value is empty.
                                     The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                                     Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-                                    This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                   items:
                                     type: string
                                   type: array
@@ -603,7 +601,6 @@ spec:
                                 pod labels will be ignored. The default value is empty.
                                 The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                                 Also, matchLabelKeys cannot be set when labelSelector isn't set.
-                                This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                               items:
                                 type: string
                               type: array
@@ -618,7 +615,6 @@ spec:
                                 pod labels will be ignored. The default value is empty.
                                 The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                                 Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-                                This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                               items:
                                 type: string
                               type: array
@@ -781,7 +777,6 @@ spec:
                                     pod labels will be ignored. The default value is empty.
                                     The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                                     Also, matchLabelKeys cannot be set when labelSelector isn't set.
-                                    This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                   items:
                                     type: string
                                   type: array
@@ -796,7 +791,6 @@ spec:
                                     pod labels will be ignored. The default value is empty.
                                     The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                                     Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-                                    This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                   items:
                                     type: string
                                   type: array
@@ -962,7 +956,6 @@ spec:
                                 pod labels will be ignored. The default value is empty.
                                 The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                                 Also, matchLabelKeys cannot be set when labelSelector isn't set.
-                                This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                               items:
                                 type: string
                               type: array
@@ -977,7 +970,6 @@ spec:
                                 pod labels will be ignored. The default value is empty.
                                 The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                                 Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-                                This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                               items:
                                 type: string
                               type: array
@@ -1191,6 +1183,58 @@ spec:
                       Kubernetes API address consisting of a hostname or IP address followed
                       by an optional port number.
                     type: string
+                  noProxy:
+                    description: |-
+                      `noProxy` is a comma-separated string that can contain IPs, CIDR notation, domain names
+                      that should be excluded from proxying. IP and domain names can
+                      contain port numbers.
+
+                      It requires Prometheus >= v2.43.0, Alertmanager >= v0.25.0 or Thanos >= v0.32.0.
+                    type: string
+                  proxyConnectHeader:
+                    additionalProperties:
+                      items:
+                        description: SecretKeySelector selects a key of a Secret.
+                        properties:
+                          key:
+                            description: The key of the secret to select from.  Must
+                              be a valid secret key.
+                            type: string
+                          name:
+                            default: ""
+                            description: |-
+                              Name of the referent.
+                              This field is effectively required, but due to backwards compatibility is
+                              allowed to be empty. Instances of this type with an empty value here are
+                              almost certainly wrong.
+                              More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                            type: string
+                          optional:
+                            description: Specify whether the Secret or its key must
+                              be defined
+                            type: boolean
+                        required:
+                        - key
+                        type: object
+                        x-kubernetes-map-type: atomic
+                      type: array
+                    description: |-
+                      ProxyConnectHeader optionally specifies headers to send to
+                      proxies during CONNECT requests.
+
+                      It requires Prometheus >= v2.43.0, Alertmanager >= v0.25.0 or Thanos >= v0.32.0.
+                    type: object
+                    x-kubernetes-map-type: atomic
+                  proxyFromEnvironment:
+                    description: |-
+                      Whether to use the proxy configuration defined by environment variables (HTTP_PROXY, HTTPS_PROXY, and NO_PROXY).
+
+                      It requires Prometheus >= v2.43.0, Alertmanager >= v0.25.0 or Thanos >= v0.32.0.
+                    type: boolean
+                  proxyUrl:
+                    description: '`proxyURL` defines the HTTP proxy server to use.'
+                    pattern: ^(http|https|socks5)://.+$
+                    type: string
                   tlsConfig:
                     description: TLS Config to use for the API server.
                     properties:
@@ -1343,7 +1387,7 @@ spec:
                         description: |-
                           Maximum acceptable TLS version.
 
-                          It requires Prometheus >= v2.41.0.
+                          It requires Prometheus >= v2.41.0 or Thanos >= v0.31.0.
                         enum:
                         - TLS10
                         - TLS11
@@ -1354,7 +1398,7 @@ spec:
                         description: |-
                           Minimum acceptable TLS version.
 
-                          It requires Prometheus >= v2.35.0.
+                          It requires Prometheus >= v2.35.0 or Thanos >= v0.28.0.
                         enum:
                         - TLS10
                         - TLS11
@@ -1594,7 +1638,7 @@ spec:
                         Cannot be updated.
                       items:
                         description: EnvFromSource represents the source of a set
-                          of ConfigMaps
+                          of ConfigMaps or Secrets
                         properties:
                           configMapRef:
                             description: The ConfigMap to select from
@@ -1615,8 +1659,8 @@ spec:
                             type: object
                             x-kubernetes-map-type: atomic
                           prefix:
-                            description: An optional identifier to prepend to each
-                              key in the ConfigMap. Must be a C_IDENTIFIER.
+                            description: Optional text to prepend to the name of each
+                              environment variable. Must be a C_IDENTIFIER.
                             type: string
                           secretRef:
                             description: The Secret to select from
@@ -1879,6 +1923,12 @@ spec:
                               - port
                               type: object
                           type: object
+                        stopSignal:
+                          description: |-
+                            StopSignal defines which signal will be sent to a container when it is being stopped.
+                            If not specified, the default is defined by the container runtime in use.
+                            StopSignal can only be set for Pods with a non-empty .spec.os.name
+                          type: string
                       type: object
                     livenessProbe:
                       description: |-
@@ -2848,6 +2898,13 @@ spec:
                   - name
                   type: object
                 type: array
+              convertClassicHistogramsToNHCB:
+                description: |-
+                  Whether to convert all scraped classic histograms into a native
+                  histogram with custom buckets.
+
+                  It requires Prometheus >= v3.4.0.
+                type: boolean
               dnsConfig:
                 description: Defines the DNS configuration for the pods.
                 properties:
@@ -3158,11 +3215,20 @@ spec:
                   Use the host's network namespace if true.
 
                   Make sure to understand the security implications if you want to enable
-                  it (https://kubernetes.io/docs/concepts/configuration/overview/).
+                  it (https://kubernetes.io/docs/concepts/configuration/overview/ ).
 
                   When hostNetwork is enabled, this will set the DNS policy to
                   `ClusterFirstWithHostNet` automatically (unless `.spec.DNSPolicy` is set
                   to a different value).
+                type: boolean
+              hostUsers:
+                description: |-
+                  HostUsers supports the user space in Kubernetes.
+
+                  More info: https://kubernetes.io/docs/tasks/configure-pod-container/user-namespaces/
+
+                  The feature requires at least Kubernetes 1.28 with the `UserNamespacesSupport` feature gate enabled.
+                  Starting Kubernetes 1.33, the feature is enabled by default.
                 type: boolean
               ignoreNamespaceSelectors:
                 description: |-
@@ -3399,7 +3465,7 @@ spec:
                         Cannot be updated.
                       items:
                         description: EnvFromSource represents the source of a set
-                          of ConfigMaps
+                          of ConfigMaps or Secrets
                         properties:
                           configMapRef:
                             description: The ConfigMap to select from
@@ -3420,8 +3486,8 @@ spec:
                             type: object
                             x-kubernetes-map-type: atomic
                           prefix:
-                            description: An optional identifier to prepend to each
-                              key in the ConfigMap. Must be a C_IDENTIFIER.
+                            description: Optional text to prepend to the name of each
+                              environment variable. Must be a C_IDENTIFIER.
                             type: string
                           secretRef:
                             description: The Secret to select from
@@ -3684,6 +3750,12 @@ spec:
                               - port
                               type: object
                           type: object
+                        stopSignal:
+                          description: |-
+                            StopSignal defines which signal will be sent to a container when it is being stopped.
+                            If not specified, the default is defined by the container runtime in use.
+                            StopSignal can only be set for Pods with a non-empty .spec.os.name
+                          type: string
                       type: object
                     livenessProbe:
                       description: |-
@@ -4724,11 +4796,10 @@ spec:
                 description: |-
                   Minimum number of seconds for which a newly created Pod should be ready
                   without any of its container crashing for it to be considered available.
-                  Defaults to 0 (pod will be considered available as soon as it is ready)
 
-                  This is an alpha field from kubernetes 1.22 until 1.24 which requires
-                  enabling the StatefulSetMinReadySeconds feature gate.
+                  If unset, pods will be considered available as soon as they are ready.
                 format: int32
+                minimum: 0
                 type: integer
               mode:
                 description: |-
@@ -4739,9 +4810,24 @@ spec:
                 - StatefulSet
                 - DaemonSet
                 type: string
+              nameEscapingScheme:
+                description: |-
+                  Specifies the character escaping scheme that will be requested when scraping
+                  for metric and label names that do not conform to the legacy Prometheus
+                  character set.
+
+                  It requires Prometheus >= v3.4.0.
+                enum:
+                - AllowUTF8
+                - Underscores
+                - Dots
+                - Values
+                type: string
               nameValidationScheme:
-                description: Specifies the validation scheme for metric and label
-                  names.
+                description: |-
+                  Specifies the validation scheme for metric and label names.
+
+                  It requires Prometheus >= v2.55.0.
                 enum:
                 - UTF8
                 - Legacy
@@ -4756,6 +4842,23 @@ spec:
                   Settings related to the OTLP receiver feature.
                   It requires Prometheus >= v2.55.0.
                 properties:
+                  convertHistogramsToNHCB:
+                    description: |-
+                      Configures optional translation of OTLP explicit bucket histograms into native histograms with custom buckets.
+                      It requires Prometheus >= v3.4.0.
+                    type: boolean
+                  ignoreResourceAttributes:
+                    description: |-
+                      List of OpenTelemetry resource attributes to ignore when `promoteAllResourceAttributes` is true.
+
+                      It requires `promoteAllResourceAttributes` to be true.
+                      It requires Prometheus >= v3.5.0.
+                    items:
+                      minLength: 1
+                      type: string
+                    minItems: 1
+                    type: array
+                    x-kubernetes-list-type: set
                   keepIdentifyingResourceAttributes:
                     description: |-
                       Enables adding `service.name`, `service.namespace` and `service.instance.id`
@@ -4763,9 +4866,17 @@ spec:
 
                       It requires Prometheus >= v3.1.0.
                     type: boolean
+                  promoteAllResourceAttributes:
+                    description: |-
+                      Promote all resource attributes to metric labels except the ones defined in `ignoreResourceAttributes`.
+
+                      Cannot be true when `promoteResourceAttributes` is defined.
+                      It requires Prometheus >= v3.5.0.
+                    type: boolean
                   promoteResourceAttributes:
-                    description: List of OpenTelemetry Attributes that should be promoted
-                      to metric labels, defaults to none.
+                    description: |-
+                      List of OpenTelemetry Attributes that should be promoted to metric labels, defaults to none.
+                      Cannot be defined when `promoteAllResourceAttributes` is true.
                     items:
                       minLength: 1
                       type: string
@@ -4780,6 +4891,7 @@ spec:
                     enum:
                     - NoUTF8EscapingWithSuffixes
                     - UnderscoreEscapingWithSuffixes
+                    - NoTranslation
                     type: string
                 type: object
               overrideHonorLabels:
@@ -4845,7 +4957,7 @@ spec:
                       Annotations is an unstructured key value map stored with a resource that may be
                       set by external tools to store and retrieve arbitrary metadata. They are not
                       queryable and should be preserved when modifying objects.
-                      More info: http://kubernetes.io/docs/user-guide/annotations
+                      More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
                     type: object
                   labels:
                     additionalProperties:
@@ -4854,7 +4966,7 @@ spec:
                       Map of string keys and values that can be used to organize and categorize
                       (scope and select) objects. May match selectors of replication controllers
                       and services.
-                      More info: http://kubernetes.io/docs/user-guide/labels
+                      More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
                     type: object
                   name:
                     description: |-
@@ -4863,7 +4975,7 @@ spec:
                       automatically. Name is primarily intended for creation idempotence and configuration
                       definition.
                       Cannot be updated.
-                      More info: http://kubernetes.io/docs/user-guide/identifiers#names
+                      More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/
                     type: string
                 type: object
               podMonitorNamespaceSelector:
@@ -5121,7 +5233,7 @@ spec:
                       description: |-
                         Authorization section for the URL.
 
-                        It requires Prometheus >= v2.26.0.
+                        It requires Prometheus >= v2.26.0 or Thanos >= v0.24.0.
 
                         Cannot be set at the same time as `sigv4`, `basicAuth`, `oauth2`, or `azureAd`.
                       properties:
@@ -5167,7 +5279,7 @@ spec:
                       description: |-
                         AzureAD for the URL.
 
-                        It requires Prometheus >= v2.45.0.
+                        It requires Prometheus >= v2.45.0 or Thanos >= v0.31.0.
 
                         Cannot be set at the same time as `authorization`, `basicAuth`, `oauth2`, or `sigv4`.
                       properties:
@@ -5195,7 +5307,7 @@ spec:
                             OAuth defines the oauth config that is being used to authenticate.
                             Cannot be set at the same time as `managedIdentity` or `sdk`.
 
-                            It requires Prometheus >= v2.48.0.
+                            It requires Prometheus >= v2.48.0 or Thanos >= v0.31.0.
                           properties:
                             clientId:
                               description: '`clientID` is the clientId of the Azure
@@ -5247,7 +5359,7 @@ spec:
                             See https://learn.microsoft.com/en-us/azure/developer/go/azure-sdk-authentication
                             Cannot be set at the same time as `oauth` or `managedIdentity`.
 
-                            It requires Prometheus >= 2.52.0.
+                            It requires Prometheus >= v2.52.0 or Thanos >= v0.36.0.
                           properties:
                             tenantId:
                               description: '`tenantId` is the tenant ID of the azure
@@ -5336,7 +5448,7 @@ spec:
                       description: |-
                         Configure whether HTTP requests follow HTTP 3xx redirects.
 
-                        It requires Prometheus >= v2.26.0.
+                        It requires Prometheus >= v2.26.0 or Thanos >= v0.24.0.
                       type: boolean
                     headers:
                       additionalProperties:
@@ -5345,7 +5457,7 @@ spec:
                         Custom HTTP headers to be sent along with each remote write request.
                         Be aware that headers that are set by Prometheus itself can't be overwritten.
 
-                        It requires Prometheus >= v2.25.0.
+                        It requires Prometheus >= v2.25.0 or Thanos >= v0.24.0.
                       type: object
                     messageVersion:
                       description: |-
@@ -5360,7 +5472,7 @@ spec:
                         Before setting this field, consult with your remote storage provider
                         what message version it supports.
 
-                        It requires Prometheus >= v2.54.0.
+                        It requires Prometheus >= v2.54.0 or Thanos >= v0.37.0.
                       enum:
                       - V1.0
                       - V2.0
@@ -5369,6 +5481,14 @@ spec:
                       description: MetadataConfig configures the sending of series
                         metadata to the remote storage.
                       properties:
+                        maxSamplesPerSend:
+                          description: |-
+                            MaxSamplesPerSend is the maximum number of metadata samples per send.
+
+                            It requires Prometheus >= v2.29.0.
+                          format: int32
+                          minimum: -1
+                          type: integer
                         send:
                           description: Defines whether metric metadata is sent to
                             the remote storage or not.
@@ -5384,7 +5504,7 @@ spec:
                         The name of the remote write queue, it must be unique if specified. The
                         name is used in metrics and logging in order to differentiate queues.
 
-                        It requires Prometheus >= v2.15.0.
+                        It requires Prometheus >= v2.15.0 or Thanos >= 0.24.0.
                       type: string
                     noProxy:
                       description: |-
@@ -5392,13 +5512,13 @@ spec:
                         that should be excluded from proxying. IP and domain names can
                         contain port numbers.
 
-                        It requires Prometheus >= v2.43.0 or Alertmanager >= 0.25.0.
+                        It requires Prometheus >= v2.43.0, Alertmanager >= v0.25.0 or Thanos >= v0.32.0.
                       type: string
                     oauth2:
                       description: |-
                         OAuth2 configuration for the URL.
 
-                        It requires Prometheus >= v2.27.0.
+                        It requires Prometheus >= v2.27.0 or Thanos >= v0.24.0.
 
                         Cannot be set at the same time as `sigv4`, `authorization`, `basicAuth`, or `azureAd`.
                       properties:
@@ -5495,7 +5615,7 @@ spec:
                             that should be excluded from proxying. IP and domain names can
                             contain port numbers.
 
-                            It requires Prometheus >= v2.43.0 or Alertmanager >= 0.25.0.
+                            It requires Prometheus >= v2.43.0, Alertmanager >= v0.25.0 or Thanos >= v0.32.0.
                           type: string
                         proxyConnectHeader:
                           additionalProperties:
@@ -5528,19 +5648,19 @@ spec:
                             ProxyConnectHeader optionally specifies headers to send to
                             proxies during CONNECT requests.
 
-                            It requires Prometheus >= v2.43.0 or Alertmanager >= 0.25.0.
+                            It requires Prometheus >= v2.43.0, Alertmanager >= v0.25.0 or Thanos >= v0.32.0.
                           type: object
                           x-kubernetes-map-type: atomic
                         proxyFromEnvironment:
                           description: |-
                             Whether to use the proxy configuration defined by environment variables (HTTP_PROXY, HTTPS_PROXY, and NO_PROXY).
 
-                            It requires Prometheus >= v2.43.0 or Alertmanager >= 0.25.0.
+                            It requires Prometheus >= v2.43.0, Alertmanager >= v0.25.0 or Thanos >= v0.32.0.
                           type: boolean
                         proxyUrl:
                           description: '`proxyURL` defines the HTTP proxy server to
                             use.'
-                          pattern: ^http(s)?://.+$
+                          pattern: ^(http|https|socks5)://.+$
                           type: string
                         scopes:
                           description: '`scopes` defines the OAuth2 scopes used for
@@ -5693,7 +5813,7 @@ spec:
                               description: |-
                                 Maximum acceptable TLS version.
 
-                                It requires Prometheus >= v2.41.0.
+                                It requires Prometheus >= v2.41.0 or Thanos >= v0.31.0.
                               enum:
                               - TLS10
                               - TLS11
@@ -5704,7 +5824,7 @@ spec:
                               description: |-
                                 Minimum acceptable TLS version.
 
-                                It requires Prometheus >= v2.35.0.
+                                It requires Prometheus >= v2.35.0 or Thanos >= v0.28.0.
                               enum:
                               - TLS10
                               - TLS11
@@ -5756,18 +5876,18 @@ spec:
                         ProxyConnectHeader optionally specifies headers to send to
                         proxies during CONNECT requests.
 
-                        It requires Prometheus >= v2.43.0 or Alertmanager >= 0.25.0.
+                        It requires Prometheus >= v2.43.0, Alertmanager >= v0.25.0 or Thanos >= v0.32.0.
                       type: object
                       x-kubernetes-map-type: atomic
                     proxyFromEnvironment:
                       description: |-
                         Whether to use the proxy configuration defined by environment variables (HTTP_PROXY, HTTPS_PROXY, and NO_PROXY).
 
-                        It requires Prometheus >= v2.43.0 or Alertmanager >= 0.25.0.
+                        It requires Prometheus >= v2.43.0, Alertmanager >= v0.25.0 or Thanos >= v0.32.0.
                       type: boolean
                     proxyUrl:
                       description: '`proxyURL` defines the HTTP proxy server to use.'
-                      pattern: ^http(s)?://.+$
+                      pattern: ^(http|https|socks5)://.+$
                       type: string
                     queueConfig:
                       description: QueueConfig allows tuning of the remote write queue
@@ -5818,7 +5938,7 @@ spec:
                         sampleAgeLimit:
                           description: |-
                             SampleAgeLimit drops samples older than the limit.
-                            It requires Prometheus >= v2.50.0.
+                            It requires Prometheus >= v2.50.0 or Thanos >= v0.32.0.
                           pattern: ^(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$
                           type: string
                       type: object
@@ -5839,7 +5959,7 @@ spec:
                         Note: The connection timeout applies to the entire resolution and connection process.
                               If disabled, the timeout is distributed across all connection attempts.
 
-                        It requires Prometheus >= v3.1.0.
+                        It requires Prometheus >= v3.1.0 or Thanos >= v0.38.0.
                       type: boolean
                     sendExemplars:
                       description: |-
@@ -5847,20 +5967,20 @@ spec:
                         exemplar-storage itself must be enabled using the `spec.enableFeatures`
                         option for exemplars to be scraped in the first place.
 
-                        It requires Prometheus >= v2.27.0.
+                        It requires Prometheus >= v2.27.0 or Thanos >= v0.24.0.
                       type: boolean
                     sendNativeHistograms:
                       description: |-
                         Enables sending of native histograms, also known as sparse histograms
                         over remote write.
 
-                        It requires Prometheus >= v2.40.0.
+                        It requires Prometheus >= v2.40.0 or Thanos >= v0.30.0.
                       type: boolean
                     sigv4:
                       description: |-
                         Sigv4 allows to configures AWS's Signature Verification 4 for the URL.
 
-                        It requires Prometheus >= v2.26.0.
+                        It requires Prometheus >= v2.26.0 or Thanos >= v0.24.0.
 
                         Cannot be set at the same time as `authorization`, `basicAuth`, `oauth2`, or `azureAd`.
                       properties:
@@ -6079,7 +6199,7 @@ spec:
                           description: |-
                             Maximum acceptable TLS version.
 
-                            It requires Prometheus >= v2.41.0.
+                            It requires Prometheus >= v2.41.0 or Thanos >= v0.31.0.
                           enum:
                           - TLS10
                           - TLS11
@@ -6090,7 +6210,7 @@ spec:
                           description: |-
                             Minimum acceptable TLS version.
 
-                            It requires Prometheus >= v2.35.0.
+                            It requires Prometheus >= v2.35.0 or Thanos >= v0.28.0.
                           enum:
                           - TLS10
                           - TLS11
@@ -6754,7 +6874,7 @@ spec:
                           description: |-
                             Maximum acceptable TLS version.
 
-                            It requires Prometheus >= v2.41.0.
+                            It requires Prometheus >= v2.41.0 or Thanos >= v0.31.0.
                           enum:
                           - TLS10
                           - TLS11
@@ -6765,7 +6885,7 @@ spec:
                           description: |-
                             Minimum acceptable TLS version.
 
-                            It requires Prometheus >= v2.35.0.
+                            It requires Prometheus >= v2.35.0 or Thanos >= v0.28.0.
                           enum:
                           - TLS10
                           - TLS11
@@ -6783,6 +6903,14 @@ spec:
                 x-kubernetes-list-map-keys:
                 - name
                 x-kubernetes-list-type: map
+              scrapeClassicHistograms:
+                description: |-
+                  Whether to scrape a classic histogram that is also exposed as a native histogram.
+
+                  Notice: `scrapeClassicHistograms` corresponds to the `always_scrape_classic_histograms` field in the Prometheus configuration.
+
+                  It requires Prometheus >= v3.5.0.
+                type: boolean
               scrapeConfigNamespaceSelector:
                 description: |-
                   Namespaces to match for ScrapeConfig discovery. An empty label selector
@@ -7347,6 +7475,10 @@ spec:
                   Users can define their own sharding implementation by setting the
                   `__tmp_hash` label during the target discovery with relabeling
                   configuration (either in the monitoring resources or via scrape class).
+
+                  You can also disable sharding on a specific target by setting the
+                  `__tmp_disable_sharding` label with relabeling configuration. When
+                  the label value isn't empty, all Prometheus shards will scrape the target.
                 format: int32
                 type: integer
               storage:
@@ -7662,7 +7794,7 @@ spec:
                               Annotations is an unstructured key value map stored with a resource that may be
                               set by external tools to store and retrieve arbitrary metadata. They are not
                               queryable and should be preserved when modifying objects.
-                              More info: http://kubernetes.io/docs/user-guide/annotations
+                              More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
                             type: object
                           labels:
                             additionalProperties:
@@ -7671,7 +7803,7 @@ spec:
                               Map of string keys and values that can be used to organize and categorize
                               (scope and select) objects. May match selectors of replication controllers
                               and services.
-                              More info: http://kubernetes.io/docs/user-guide/labels
+                              More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
                             type: object
                           name:
                             description: |-
@@ -7680,7 +7812,7 @@ spec:
                               automatically. Name is primarily intended for creation idempotence and configuration
                               definition.
                               Cannot be updated.
-                              More info: http://kubernetes.io/docs/user-guide/identifiers#names
+                              More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/
                             type: string
                         type: object
                       spec:
@@ -8077,6 +8209,16 @@ spec:
                   If you want to enforce a maximum limit for all scrape objects, refer to enforcedTargetLimit.
                 format: int64
                 type: integer
+              terminationGracePeriodSeconds:
+                description: |-
+                  Optional duration in seconds the pod needs to terminate gracefully.
+                  Value must be non-negative integer. The value zero indicates stop immediately via
+                  the kill signal (no opportunity to shut down) which may lead to data corruption.
+
+                  Defaults to 600 seconds.
+                format: int64
+                minimum: 0
+                type: integer
               tolerations:
                 description: Defines the Pods' tolerations if specified.
                 items:
@@ -8244,7 +8386,6 @@ spec:
                         - Ignore: nodeAffinity/nodeSelector are ignored. All nodes are included in the calculations.
 
                         If this value is nil, the behavior is equivalent to the Honor policy.
-                        This is a beta-level feature default enabled by the NodeInclusionPolicyInPodTopologySpread feature flag.
                       type: string
                     nodeTaintsPolicy:
                       description: |-
@@ -8255,7 +8396,6 @@ spec:
                         - Ignore: node taints are ignored. All nodes are included.
 
                         If this value is nil, the behavior is equivalent to the Ignore policy.
-                        This is a beta-level feature default enabled by the NodeInclusionPolicyInPodTopologySpread feature flag.
                       type: string
                     topologyKey:
                       description: |-
@@ -8496,7 +8636,7 @@ spec:
                         description: |-
                           Maximum acceptable TLS version.
 
-                          It requires Prometheus >= v2.41.0.
+                          It requires Prometheus >= v2.41.0 or Thanos >= v0.31.0.
                         enum:
                         - TLS10
                         - TLS11
@@ -8507,7 +8647,7 @@ spec:
                         description: |-
                           Minimum acceptable TLS version.
 
-                          It requires Prometheus >= v2.35.0.
+                          It requires Prometheus >= v2.35.0 or Thanos >= v0.28.0.
                         enum:
                         - TLS10
                         - TLS11
@@ -9543,7 +9683,7 @@ spec:
                         The types of objects that may be mounted by this volume are defined by the container runtime implementation on a host machine and at minimum must include all valid types supported by the container image field.
                         The OCI object gets mounted in a single directory (spec.containers[*].volumeMounts.mountPath) by merging the manifest layers in the same way as for container images.
                         The volume will be mounted read-only (ro) and non-executable files (noexec).
-                        Sub path mounts for containers are not supported (spec.containers[*].volumeMounts.subpath).
+                        Sub path mounts for containers are not supported (spec.containers[*].volumeMounts.subpath) before 1.33.
                         The field spec.securityContext.fsGroupChangePolicy has no effect on this volume type.
                       properties:
                         pullPolicy:
@@ -10691,6 +10831,21 @@ spec:
                     type: object
                 type: object
             type: object
+            x-kubernetes-validations:
+            - message: replicas cannot be set when mode is DaemonSet
+              rule: '!(has(self.mode) && self.mode == ''DaemonSet'' && has(self.replicas))'
+            - message: storage cannot be set when mode is DaemonSet
+              rule: '!(has(self.mode) && self.mode == ''DaemonSet'' && has(self.storage))'
+            - message: shards cannot be greater than 1 when mode is DaemonSet
+              rule: '!(has(self.mode) && self.mode == ''DaemonSet'' && has(self.shards)
+                && self.shards > 1)'
+            - message: persistentVolumeClaimRetentionPolicy cannot be set when mode
+                is DaemonSet
+              rule: '!(has(self.mode) && self.mode == ''DaemonSet'' && has(self.persistentVolumeClaimRetentionPolicy))'
+            - message: scrapeConfigSelector cannot be set when mode is DaemonSet
+              rule: '!(has(self.mode) && self.mode == ''DaemonSet'' && has(self.scrapeConfigSelector))'
+            - message: probeSelector cannot be set when mode is DaemonSet
+              rule: '!(has(self.mode) && self.mode == ''DaemonSet'' && has(self.probeSelector))'
           status:
             description: |-
               Most recent observed status of the Prometheus cluster. Read-only.
