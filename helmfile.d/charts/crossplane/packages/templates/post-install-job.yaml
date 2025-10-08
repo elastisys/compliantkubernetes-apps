@@ -72,7 +72,7 @@ spec:
           - /bin/sh
           - -c
           - |
-            {{- range $name := keys .Values.providers }}
+            {{- range $name := (keys .Values.providers | sortAlpha) }}
             echo "Waiting for provider-{{ $name }} to become healthy"
             kubectl wait --for=condition=Healthy=True --timeout 120s providers.pkg.crossplane.io/provider-{{ $name }}
             {{- end }}
