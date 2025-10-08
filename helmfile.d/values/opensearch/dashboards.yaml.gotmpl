@@ -57,6 +57,10 @@ config:
         keepalive: {{ .Values.opensearch.dashboards.sessionKeepalive }}
         {{- end }}
       {{- end }}
+    {{- if hasKey .Values.opensearch.dashboards "autocompleteTerminateAfter" }}
+    opensearchDashboards:
+      autocompleteTerminateAfter: {{ .Values.opensearch.dashboards.autocompleteTerminateAfter }}
+    {{- end }}
 
 opensearchAccount:
   secret: opensearch-dashboards-user
