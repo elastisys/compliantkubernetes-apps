@@ -35,9 +35,9 @@ Params:
 Checks whether the redis chart's includes the standarizations (version >= 14)
 
 Usage:
-{{ include "common.redis.values.standarized.version" (dict "context" $) }}
+{{ include "common.redis.values.standardized.version" (dict "context" $) }}
 */}}
-{{- define "common.redis.values.standarized.version" -}}
+{{- define "common.redis.values.standardized.version" -}}
 
   {{- $standarizedAuth := printf "%s%s" (include "common.redis.values.keys.prefix" .) "auth" -}}
   {{- $standarizedAuthValues := include "common.utils.getValueFromKey" (dict "key" $standarizedAuth "context" .context) }}

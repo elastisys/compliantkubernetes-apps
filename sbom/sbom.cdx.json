@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:819d1308-8b1f-4d8a-b54b-adf41401701a",
+  "serialNumber": "urn:uuid:62d94f37-ed48-43e3-b52a-b86f5882671f",
   "version": 1,
   "metadata": {
-    "timestamp": "2025-09-23T09:07:36Z",
+    "timestamp": "2025-10-08T08:42:49Z",
     "lifecycles": [
       {
         "phase": "build"
@@ -309,7 +309,7 @@
       "evidence": {
         "occurrences": [
           {
-            "location": "helmfile.d/upstream/bitnami/fluentd/charts/common"
+            "location": "helmfile.d/charts/fluentd/aggregator/charts/common"
           }
         ]
       }
@@ -679,7 +679,7 @@
       "evidence": {
         "occurrences": [
           {
-            "location": "helmfile.d/upstream/kokuwa/fluentd-elasticsearch"
+            "location": "helmfile.d/charts/fluentd/forwarder"
           }
         ]
       }
@@ -710,7 +710,7 @@
       "evidence": {
         "occurrences": [
           {
-            "location": "helmfile.d/upstream/bitnami/fluentd"
+            "location": "helmfile.d/charts/fluentd/aggregator"
           }
         ]
       }
@@ -5157,7 +5157,6 @@
         "pkg:helm/cert-manager@v1.17.1",
         "pkg:helm/cilium-default-deny@0.1.0",
         "pkg:helm/cluster-admin-rbac@0.1.0",
-        "pkg:helm/common@2.29.0",
         "pkg:helm/common@2.30.0",
         "pkg:helm/crds@0.0.0",
         "pkg:helm/crds@3.3.6",
