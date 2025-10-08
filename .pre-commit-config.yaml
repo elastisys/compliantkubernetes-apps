@@ -98,8 +98,9 @@ repos:
         entry: tests/common/check-js.bash
 
       - id: avoid-direct-cli-tools
-        name: avoid direct use of kubectl, helmfile, and helm in migrations (excluding comments and helpers)
-        entry: '(?m)^(?!\s*#).*?\b(kubectl(?![_a-zA-Z])|helmfile(?![_a-zA-Z])|helm(?![_a-zA-Z]))\b'
+        name: Avoid direct use of kubectl, helmfile, and helm in migrations (excluding comments, helpers, paths, logs, and strings)
+        entry: >-
+          (?m)^(?!\s*#)(?!.*log_(info|warn|error|fatal)\s+["']).*(?:^|\s)(?<!/)(kubectl(?![_a-zA-Z])|helmfile(?![_a-zA-Z])|helm(?![_a-zA-Z]))(?=\s|$)
         language: pygrep
         types: [text]
         files: '^migration/[^/]+/[^/]+/[^/]+\.sh$'
