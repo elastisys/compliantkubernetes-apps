@@ -12,11 +12,6 @@ if [[ -z "${CK8S_CLUSTER:-}" ]]; then
   log_fatal "CK8S_CLUSTER is not set. Please export CK8S_CLUSTER=wc|sc|both before running."
 fi
 
-# Check if helmfile exists
-if ! command -v helmfile >/dev/null 2>&1; then
-  log_fatal "helmfile is not installed. Please install it before running."
-fi
-
 run() {
   case "${1:-}" in
   execute)
