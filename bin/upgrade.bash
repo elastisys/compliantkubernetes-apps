@@ -119,7 +119,7 @@ apply() {
     log_info "apply snippet \"${snippet##"${MIGRATION_ROOT}/"}\":"
     if "${snippet}" execute; then
 
-      if $CK8S_DRY_RUN_INSTALL; then
+      if [[ "${CK8S_DRY_RUN_INSTALL}" == "true" ]]; then
         log_info "Dry-run completed on $(basename "${snippet}")"
         continue
       fi
@@ -133,7 +133,7 @@ apply() {
       fi
     else
 
-      if $CK8S_DRY_RUN_INSTALL; then
+      if [[ "${CK8S_DRY_RUN_INSTALL}" == "true" ]]; then
         log_info "Dry-run not completed on $(basename "${snippet}")"
         continue
       fi
@@ -155,7 +155,7 @@ apply() {
     fi
   done
 
-  if $CK8S_DRY_RUN_INSTALL; then
+  if [[ "${CK8S_DRY_RUN_INSTALL}" == "true" ]]; then
     log_info "Dry-run: completed, no changes applied."
     return
   fi

@@ -41,7 +41,7 @@ helmfile_apply() {
   prefix="${1}"
   shift
 
-  if $CK8S_DRY_RUN_INSTALL; then
+  if [[ "${CK8S_DRY_RUN_INSTALL}" == "true" ]]; then
     log_info "Dry-running on ${*}"
     helmfile_diff "${prefix}" "${@}"
     return
@@ -147,7 +147,7 @@ helmfile_upgrade() {
     if ! helmfile_apply "${1}" "namespace=${2},name=${3}"; then
       log_error "error: failed to upgrade ${1} ${2}/${3}"
 
-      if $CK8S_DRY_RUN_INSTALL; then
+      if [[ "${CK8S_DRY_RUN_INSTALL}" == "true" ]]; then
         return 1
       fi
 

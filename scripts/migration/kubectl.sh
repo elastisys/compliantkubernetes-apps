@@ -5,26 +5,24 @@ kubectl_do() {
     log_fatal "usage: kubectl_do <sc|wc> <args>..."
   fi
 
-  local dry_run_flag=""
-  if $CK8S_DRY_RUN_INSTALL; then
+  local -a args=()
+  if [[ "${CK8S_DRY_RUN_INSTALL}" == "true" ]]; then
     local command="${2}"
-
     # List of common commands that generally DO NOT support --dry-run=server
-    case "$command" in
+    case "${command}" in
     get | describe | logs | api-resources | api-versions | cluster-info | config | kustomize | proxy | version) ;;
     *)
-      dry_run_flag="--dry-run=server"
+      args+=("--dry-run=server")
       ;;
     esac
   fi
 
+  args+=("${@:2}")
   if [ "${CONFIG["${1}-kubeconfig"]}" = "encrypted" ]; then
-    kubeconfig_path="<(sops -d \"${CK8S_CONFIG_PATH}/.state/kube_config_${1}.yaml\")"
+    kubectl --kubeconfig <(sops -d "${CK8S_CONFIG_PATH}/.state/kube_config_${1}.yaml") "${args[@]}"
   else
-    kubeconfig_path="\"${CK8S_CONFIG_PATH}/.state/kube_config_${1}.yaml\""
+    kubectl --kubeconfig "${CK8S_CONFIG_PATH}/.state/kube_config_${1}.yaml" "${args[@]}"
   fi
-
-  eval "kubectl --kubeconfig $kubeconfig_path $dry_run_flag \"\${@:2}\""
 }
 
 kubectl_delete() {
