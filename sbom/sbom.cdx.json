@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:e8e84ac5-78cf-4d49-ba41-6b40bed8a028",
+  "serialNumber": "urn:uuid:7839ff64-5371-435d-bb06-a8dd39257e29",
   "version": 1,
   "metadata": {
-    "timestamp": "2025-10-07T14:05:38Z",
+    "timestamp": "2025-10-08T14:52:44Z",
     "lifecycles": [
       {
         "phase": "build"
@@ -5297,26 +5297,26 @@
       "purl": "pkg:oci/weaveworks/kured@latest"
     },
     {
-      "bom-ref": "pkg:oci/welkin/function-capability@v0.2.0?repository_url=harbor.long-running.dev-ck8s.com",
+      "bom-ref": "pkg:oci/welkin/function-capability@fieldpath?repository_url=harbor.long-running.dev-ck8s.com",
       "type": "container",
       "supplier": {
         "name": "welkin"
       },
       "name": "harbor.long-running.dev-ck8s.com/welkin/function-capability",
-      "version": "v0.2.0",
-      "cpe": "cpe:2.3:a:welkin:function-capability:0.2.0:*:*:*:*:*:*:*",
-      "purl": "pkg:oci/welkin/function-capability@v0.2.0?repository_url=harbor.long-running.dev-ck8s.com"
+      "version": "fieldpath",
+      "cpe": "cpe:2.3:a:welkin:function-capability:fieldpath:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/welkin/function-capability@fieldpath?repository_url=harbor.long-running.dev-ck8s.com"
     },
     {
-      "bom-ref": "pkg:oci/welkin/module-node-local-dns@v0.2.0-dev?repository_url=harbor.long-running.dev-ck8s.com",
+      "bom-ref": "pkg:oci/welkin/module-node-local-dns@fieldpath?repository_url=harbor.long-running.dev-ck8s.com",
       "type": "container",
       "supplier": {
         "name": "welkin"
       },
       "name": "harbor.long-running.dev-ck8s.com/welkin/module-node-local-dns",
-      "version": "v0.2.0-dev",
-      "cpe": "cpe:2.3:a:welkin:module-node-local-dns:0.2.0:*:*:*:*:*:*:*",
-      "purl": "pkg:oci/welkin/module-node-local-dns@v0.2.0-dev?repository_url=harbor.long-running.dev-ck8s.com"
+      "version": "fieldpath",
+      "cpe": "cpe:2.3:a:welkin:module-node-local-dns:fieldpath:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/welkin/module-node-local-dns@fieldpath?repository_url=harbor.long-running.dev-ck8s.com"
     }
   ],
   "dependencies": [
