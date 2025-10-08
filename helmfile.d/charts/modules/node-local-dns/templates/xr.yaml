@@ -4,6 +4,9 @@ metadata:
   namespace: kube-system
   name: node-local-dns
 spec:
+  providerConfigs:
+    helm: mc-node-local-dns
+    kubernetes: mc-node-local-dns
   clusterDNS: {{ .Values.clusterDNS }}
   resources: {{ .Values.resources | toYaml | nindent 4 }}
   customConfig: {{ .Values.customConfig | toYaml | nindent 4 }}
