@@ -13,6 +13,8 @@ userCRDs:
         name: "gatekeeper-admin-upgrade-crds"
       - namespace: "velero"
         name: "velero-server-upgrade-crds"
+      - namespace: "crossplane-system"
+        name: "crossplane"
       {{- if .Values.gatekeeper.allowUserCRDs.extraServiceAccounts }}
       {{- toYaml .Values.gatekeeper.allowUserCRDs.extraServiceAccounts | nindent 6 }}
       {{- end }}
