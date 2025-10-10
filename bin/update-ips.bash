@@ -847,10 +847,13 @@ while [ -n "${1+x}" ]; do
 done
 
 if [ "${#enabled_operations[@]}" -ne 0 ]; then
-  for op in "${!enabled_operations[@]}"; do
-    [[ -n "${operations["${op}"]+x}" ]] || unset "enabled_operations[${op}]"
+  for op1 in "${!operations[@]}"; do
+    enabled=false
+    for op2 in "${enabled_operations[@]}"; do
+      [ "${op1}" = "${op2}" ] && enabled=true
+    done
+    ! ${enabled} && unset 'operations[${op1}]'
   done
-  operations=("${enabled_operations[@]}")
 fi
 
 if ${list_operations}; then
