@@ -826,7 +826,7 @@ while [ -n "${1+x}" ]; do
     if [ "${#}" -lt 2 ]; then
       log_fatal "The --enable flag requires an operation, example: --enable ingress"
     fi
-    enabled_operations["${2}"]=-
+    enabled_operations+=("${2}")
     shift
     ;;
   "--disable")
