@@ -97,6 +97,14 @@ repos:
         require_serial: true
         entry: tests/common/check-js.bash
 
+      - id: avoid-direct-cli-tools
+        name: Avoid direct use of kubectl, helmfile, and helm in migrations (excluding comments, helpers, paths, logs, and strings)
+        entry: >-
+          (?m)^(?!\s*#)(?!.*log_(info|warn|error|fatal)\s+["']).*(?:^|\s)(?<!/)(kubectl(?![_a-zA-Z])|helmfile(?![_a-zA-Z])|helm(?![_a-zA-Z]))(?=\s|$)
+        language: pygrep
+        types: [text]
+        files: '^migration/[^/]+/[^/]+/[^/]+\.sh$'
+
   - repo: https://github.com/codespell-project/codespell
     rev: v2.3.0
     hooks:

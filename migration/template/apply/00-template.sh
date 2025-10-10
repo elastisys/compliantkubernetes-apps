@@ -5,6 +5,8 @@ ROOT="$(readlink -f "$(dirname "${0}")/../../../")"
 # shellcheck source=scripts/migration/lib.sh
 source "${ROOT}/scripts/migration/lib.sh"
 
+: "${CK8S_DRY_RUN_INSTALL:=false}"
+
 # functions currently available in the library:
 #   - logging:
 #     - log_info(_no_newline) <message>
@@ -35,7 +37,7 @@ source "${ROOT}/scripts/migration/lib.sh"
 #     # Apply releases matching the selector
 #     - helmfile_apply <sc|wc> <selectors...>
 #     # Check for changes on releases matching the selector
-#     - helmfile_change <sc|wc> <selectors...>
+#     - helmfile_diff <sc|wc> <selectors...>
 #     # Destroy releases matching the selector
 #     - helmfile_destroy <sc|wc> <selectors...>
 #     # Replaces the releases matching the selector, performing destroy and apply on each release individually
@@ -55,6 +57,11 @@ run() {
     if [[ "${CK8S_CLUSTER}" =~ ^(wc|both)$ ]]; then
       log_info "operation on workload cluster"
     fi
+
+    if [[ "${CK8S_DRY_RUN_INSTALL}" == "true" ]]; then
+      log_info "Dry-run enabled on $(basename "${0}")"
+    fi
+
     ;;
   rollback)
     log_warn "rollback not implemented"

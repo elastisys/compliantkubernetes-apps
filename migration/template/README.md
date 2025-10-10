@@ -21,6 +21,7 @@ Notice to developers on writing migration steps:
       - may **only** modify the state of the environment,
       - may **not** modify the configuration of the environment,
       - are run in order of their names use two digit prefixes,
+      - are run with the argument `dry-run` on dry-run and should return 1 on failure,
       - are run with the argument `execute` on upgrade and should return 1 on failure and 2 on successful internal rollback,
       - are rerun with the argument `rollback` on execute failure and should return 1 on failure.
 
@@ -87,6 +88,12 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     > _Done during maintenance window._
 
     ```bash
+    # Check which changes are going to be applied
+    ./bin/ck8s upgrade both ${new_version} apply --dry-run
+    ```
+
+    ```bash
+    # If you agree with the changes, continue with apply
     ./bin/ck8s upgrade both ${new_version} apply
     ```
 
@@ -137,6 +144,13 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 1. Upgrade applications:
 
     ```bash
+    # Check the changes of each applicable migration script
+    export CK8S_DRY_RUN_INSTALL=true
+    ./migration/${new_version}/apply/${script} execute
+    ```
+
+    ```bash
+    unset CK8S_DRY_RUN_INSTALL
     ./bin/ck8s apply {sc|wc}
     # or
     ./migration/${new_version}/apply/80-apply.sh execute
