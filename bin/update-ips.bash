@@ -818,7 +818,7 @@ declare -A operations=(
   [rclone]=-
 )
 
-declare -A enabled_operations=()
+declare -a enabled_operations=()
 
 while [ -n "${1+x}" ]; do
   case "${1}" in
