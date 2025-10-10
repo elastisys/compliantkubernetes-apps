@@ -852,7 +852,7 @@ if [ "${#enabled_operations[@]}" -ne 0 ]; then
     for op2 in "${enabled_operations[@]}"; do
       [ "${op1}" = "${op2}" ] && enabled=true
     done
-    ! ${enabled} && unset 'operations[${op1}]'
+    ${enabled} || unset 'operations[${op1}]'
   done
 fi
 
