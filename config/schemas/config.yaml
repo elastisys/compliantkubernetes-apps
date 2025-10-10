@@ -4471,6 +4471,10 @@ properties:
                     title: Grafana OIDC Viewer Group
                     type: string
                     default: grafana_viewer
+              jwtEnabled:
+                title: Enable authentication through JWT
+                type: boolean
+                default: false
           viewersCanEdit:
             title: Grafana Viewers Can Edit
             type: boolean

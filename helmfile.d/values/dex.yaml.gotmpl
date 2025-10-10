@@ -30,6 +30,9 @@ volumes:
 config:
   oauth2:
     skipApprovalScreen: true
+    {{- if or .Values.grafana.ops.oidc.jwtEnabled .Values.grafana.user.oidc.jwtEnabled }}
+    passwordConnector: local
+    {{- end }}
   expiry:
     deviceRequests: {{ .Values.dex.expiry.deviceRequests }}
     signingKeys: {{ .Values.dex.expiry.signingKeys }}
