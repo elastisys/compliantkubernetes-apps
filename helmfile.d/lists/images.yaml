@@ -44,10 +44,10 @@ images:
   hnc:
     image: ghcr.io/elastisys/hnc-manager:v1.1.0
   ingressNginx:
-    controller: registry.k8s.io/ingress-nginx/controller:v1.12.1
-    controllerChroot: registry.k8s.io/ingress-nginx/controller-chroot:v1.12.1
+    controller: registry.k8s.io/ingress-nginx/controller:v1.13.3
+    controllerChroot: registry.k8s.io/ingress-nginx/controller-chroot:v1.13.3
     defaultBackend: registry.k8s.io/defaultbackend-amd64:1.5
-    admissionWebhooksPatch: registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.5.2
+    admissionWebhooksPatch: registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.6.3
     fileCopier: docker.io/library/busybox:1.36
   kured:
     image: ghcr.io/kubereboot/kured:1.20.0
