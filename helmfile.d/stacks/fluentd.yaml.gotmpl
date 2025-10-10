@@ -38,7 +38,7 @@ templates:
     disableValidationOnInstall: true
     inherit:
       - template: fluentd
-      - template: fluentd-chart
+    chart: charts/fluentd/aggregator
     {{- if .Values | get "ck8sWorkloadCluster.enabled" false }}
     installed: {{ and (.Values | get "fluentd.enabled" false) (.Values | get "fluentd.audit.enabled" false) }}
     {{- else }}
@@ -63,7 +63,7 @@ templates:
     disableValidationOnInstall: true
     inherit:
       - template: fluentd
-      - template: fluentd-elasticsearch-chart
+    chart: charts/fluentd/forwarder
     {{- if .Values | get "ck8sWorkloadCluster.enabled" false }}
     installed: {{ and (.Values | get "fluentd.enabled" false) (or (.Values | get "fluentd.audit.enabled" false) (.Values | get "opensearch.enabled" false)) }}
     {{- else }}
@@ -90,7 +90,7 @@ templates:
     condition: ck8sWorkloadCluster.enabled
     inherit:
       - template: fluentd
-      - template: fluentd-elasticsearch-chart
+    chart: charts/fluentd/forwarder
     installed: {{ and (.Values | get "fluentd.enabled" false) (or (.Values | get "fluentd.audit.enabled" false) (.Values | get "opensearch.enabled" false)) }}
     namespace: fluentd
     name: fluentd

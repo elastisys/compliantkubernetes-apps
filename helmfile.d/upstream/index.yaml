@@ -13,8 +13,6 @@ repositories:
 
   jetstack: https://charts.jetstack.io
 
-  kokuwa: https://kokuwaio.github.io/helm-charts
-
   kubereboot: https://kubereboot.github.io/charts
 
   kubernetes-external-dns: https://kubernetes-sigs.github.io/external-dns
@@ -40,7 +38,6 @@ repositories:
 charts:
   aquasecurity/trivy-operator: 0.26.0
 
-  bitnami/fluentd: 7.1.1
   bitnami/thanos: 15.13.1
 
   dexidp/dex: 0.18.0
@@ -52,8 +49,6 @@ charts:
   grafana/grafana: 9.2.10
 
   jetstack/cert-manager: v1.17.1
-
-  kokuwa/fluentd-elasticsearch: 13.12.2
 
   kubereboot/kured: 5.10.0
 
