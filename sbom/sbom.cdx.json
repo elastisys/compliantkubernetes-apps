@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:7839ff64-5371-435d-bb06-a8dd39257e29",
+  "serialNumber": "urn:uuid:26700c95-a64b-4685-977b-d4665e1f05ba",
   "version": 1,
   "metadata": {
-    "timestamp": "2025-10-08T14:52:44Z",
+    "timestamp": "2025-10-10T15:10:12Z",
     "lifecycles": [
       {
         "phase": "build"
@@ -5319,15 +5319,15 @@
       "purl": "pkg:oci/welkin/function-capability@fieldpath?repository_url=harbor.long-running.dev-ck8s.com"
     },
     {
-      "bom-ref": "pkg:oci/welkin/module-node-local-dns@fieldpath?repository_url=harbor.long-running.dev-ck8s.com",
+      "bom-ref": "pkg:oci/welkin/module-node-local-dns@syncapps?repository_url=harbor.long-running.dev-ck8s.com",
       "type": "container",
       "supplier": {
         "name": "welkin"
       },
       "name": "harbor.long-running.dev-ck8s.com/welkin/module-node-local-dns",
-      "version": "fieldpath",
-      "cpe": "cpe:2.3:a:welkin:module-node-local-dns:fieldpath:*:*:*:*:*:*:*",
-      "purl": "pkg:oci/welkin/module-node-local-dns@fieldpath?repository_url=harbor.long-running.dev-ck8s.com"
+      "version": "syncapps",
+      "cpe": "cpe:2.3:a:welkin:module-node-local-dns:syncapps:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/welkin/module-node-local-dns@syncapps?repository_url=harbor.long-running.dev-ck8s.com"
     }
   ],
   "dependencies": [
