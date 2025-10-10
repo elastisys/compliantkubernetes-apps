@@ -21,7 +21,7 @@ helmfile.d/upstream/kyverno/kyverno/charts/crds:
     - license:
         id: "Apache-2.0"
   evaluation: >-
-    🟢 Kyverno is a CNCF graduated project, which means it is
+    🟢 Kyverno is a CNCF incubating project, which means it is
     community-driven open-source and has passed a high bar for
     organizational and technical maturity.
 
@@ -29,7 +29,10 @@ helmfile.d/upstream/kyverno/kyverno/charts/grafana:
   licenses:
     - license:
         id: "Apache-2.0"
-  evaluation: "Not evaluated"
+  evaluation: >-
+    🟢 Kyverno is a CNCF incubating project, which means it is
+    community-driven open-source and has passed a high bar for
+    organizational and technical maturity.
 
 helmfile.d/upstream/opensearch-project/opensearch-dashboards:
   licenses:
@@ -133,3 +136,96 @@ helmfile.d/upstream/bitnami/fluentd:
     community-driven open-source and has passed a high bar for
     organizational and technical maturity. However, we don't
     use the official Chart. This is not a problem for now.
+
+helmfile.d/charts/gatekeeper/metrics:
+  evaluation: 🟢 This is a glue Chart maintained by Elastisys.
+
+helmfile.d/charts/gatekeeper/mutations:
+  evaluation: 🟢 This is a glue Chart maintained by Elastisys.
+
+helmfile.d/charts/gatekeeper/templates:
+  evaluation: 🟢 This is a glue Chart maintained by Elastisys.
+
+helmfile.d/upstream/open-policy-agent-gatekeeper/gatekeeper:
+  evaluation: 🟢 This is a CNCF graduated project.
+
+helmfile.d/upstream/nvidia/gpu-operator:
+  evaluation: >-
+    🟢 This is the best option if we want to consume NVIDIA hardware.
+
+helmfile.d/charts/grafana-dashboards:
+  evaluation: 🟢 This is a glue Chart maintained by Elastisys.
+
+helmfile.d/charts/grafana-label-enforcer:
+  evaluation: >-
+    🟡 The license is okay (Apache 2.0), but I get the feeling that
+    the maintainer base is rather small. No action needed right now,
+    as this is a rather small component, which we can easily deal with.
+
+helmfile.d/upstream/prometheus-community/kube-prometheus-stack/charts/grafana:
+  evaluation: >-
+    🟡 Grafana is the leading tol for querying and visualizing time
+    series and metrics. However, it is not community-driven and the
+    company behind it (Grafana Labs) may change the license at any
+    time. If that happens, we could consider replacing it with
+    OpenSearch.
+    Right now Grafana is licensed under AGPL-3.0-only.
+    No action is needed at this time, but we should avoid further
+    adoption.
+
+helmfile.d/upstream/grafana/grafana:
+  evaluation: >-
+    🟡 Grafana is the leading tol for querying and visualizing time
+    series and metrics. However, it is not community-driven and the
+    company behind it (Grafana Labs) may change the license at any
+    time. If that happens, we could consider replacing it with
+    OpenSearch.
+    Right now Grafana is licensed under AGPL-3.0-only.
+    No action is needed at this time, but we should avoid further
+    adoption.
+
+helmfile.d/charts/harbor/harbor-backup:
+  evaluation: 🟢 This is a glue Chart maintained by Elastisys.
+
+helmfile.d/charts/harbor/harbor-certs:
+  evaluation: 🟢 This is a glue Chart maintained by Elastisys.
+
+helmfile.d/upstream/goharbor/harbor:
+  evaluation: 🟢 This is a CNCF graduated project.
+
+helmfile.d/charts/hnc/config-and-crds:
+  evaluation: >-
+    🟡 HNC is unfortunately deprecated. Its API is exposed
+    to our customers, so replacing it needs to be done carefully.
+    It is a rather small component, so there is not urgency to
+    replace it as of now.
+
+helmfile.d/charts/hnc/controller:
+  evaluation: >-
+    🟡 HNC is unfortunately deprecated. Its API is exposed
+    to our customers, so replacing it needs to be done carefully.
+    It is a rather small component, so there is not urgency to
+    replace it as of now.
+
+helmfile.d/charts/ingress-nginx-probe-ingress:
+  evaluation: 🟢 This is a glue Chart maintained by Elastisys.
+
+helmfile.d/upstream/kubernetes-ingress-nginx/ingress-nginx:
+  evaluation: >-
+    🟡 NGINX Ingress Controller is (or will shortly be) in
+    maintenance mode. We have it on our roadmap to look for a
+    replacement. No action is needed at this point.
+
+helmfile.d/charts/harbor/init-harbor:
+  evaluation: 🟢 This is a glue Chart maintained by Elastisys.
+
+helmfile.d/upstream/falcosecurity/falco/charts/k8s-metacollector:
+  evaluation: >-
+    🟡 k8s-metacollector seems to be work-in-progress. However,
+    it is part of the broader Falco project, which is a CNCF graduated
+    project.
+
+helmfile.d/upstream/prometheus-community/kube-prometheus-stack:
+  evaluation: >-
+    🟢 Prometheus is a CNCF graduated project. The Kube Prometheus Stack
+    is the leading solution to deploying Prometheus.
