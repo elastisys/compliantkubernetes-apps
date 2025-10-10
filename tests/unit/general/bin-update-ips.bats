@@ -75,23 +75,33 @@ teardown_file() {
   run ck8s update-ips both operations
   assert_success
   assert_output "rclone ingress objectstorage apiserver nodes swift"
+}
 
+@test "ck8s update-ips both operations --enable ingress" {
   run ck8s update-ips both operations --enable ingress
   assert_success
   assert_output "ingress"
+}
 
+@test "ck8s update-ips both operations --disable ingress" {
   run ck8s update-ips both operations --disable ingress
   assert_success
   assert_output "rclone objectstorage apiserver nodes swift"
+}
 
+@test "ck8s update-ips both operations --enable ingress --enable apiserver" {
   run ck8s update-ips both operations --enable ingress --enable apiserver
   assert_success
   assert_output "ingress apiserver"
+}
 
+@test "ck8s update-ips both operations --disable ingress --disable apiserver" {
   run ck8s update-ips both operations --disable ingress --disable apiserver
   assert_success
   assert_output "rclone objectstorage nodes swift"
+}
 
+@test "ck8s update-ips both operations --enable ingress --enable apiserver --disable apiserver" {
   run ck8s update-ips both operations --enable ingress --enable apiserver --disable apiserver
   assert_success
   assert_output "ingress"
