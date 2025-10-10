@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:62d94f37-ed48-43e3-b52a-b86f5882671f",
+  "serialNumber": "urn:uuid:9f7e32ec-4047-4b65-aafa-bb5a50fdbe2b",
   "version": 1,
   "metadata": {
-    "timestamp": "2025-10-08T08:42:49Z",
+    "timestamp": "2025-10-10T10:14:48Z",
     "lifecycles": [
       {
         "phase": "build"
@@ -3804,26 +3804,26 @@
       "purl": "pkg:oci/ingress-controller/controller@1.0.0-dev"
     },
     {
-      "bom-ref": "pkg:oci/ingress-nginx/controller-chroot@v1.12.1?repository_url=registry.k8s.io",
+      "bom-ref": "pkg:oci/ingress-nginx/controller-chroot@v1.13.3?repository_url=registry.k8s.io",
       "type": "container",
       "supplier": {
         "name": "ingress-nginx"
       },
       "name": "registry.k8s.io/ingress-nginx/controller-chroot",
-      "version": "v1.12.1",
-      "cpe": "cpe:2.3:a:kubernetes:controller-chroot:1.12.1:*:*:*:*:*:*:*",
-      "purl": "pkg:oci/ingress-nginx/controller-chroot@v1.12.1?repository_url=registry.k8s.io"
+      "version": "v1.13.3",
+      "cpe": "cpe:2.3:a:kubernetes:controller-chroot:1.13.3:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/ingress-nginx/controller-chroot@v1.13.3?repository_url=registry.k8s.io"
     },
     {
-      "bom-ref": "pkg:oci/ingress-nginx/controller@v1.12.1?repository_url=registry.k8s.io",
+      "bom-ref": "pkg:oci/ingress-nginx/controller@v1.13.3?repository_url=registry.k8s.io",
       "type": "container",
       "supplier": {
         "name": "ingress-nginx"
       },
       "name": "registry.k8s.io/ingress-nginx/controller",
-      "version": "v1.12.1",
-      "cpe": "cpe:2.3:a:kubernetes:controller:1.12.1:*:*:*:*:*:*:*",
-      "purl": "pkg:oci/ingress-nginx/controller@v1.12.1?repository_url=registry.k8s.io"
+      "version": "v1.13.3",
+      "cpe": "cpe:2.3:a:kubernetes:controller:1.13.3:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/ingress-nginx/controller@v1.13.3?repository_url=registry.k8s.io"
     },
     {
       "bom-ref": "pkg:oci/ingress-nginx/kube-webhook-certgen@v1.5.2",
@@ -3846,6 +3846,17 @@
       "version": "v1.5.2",
       "cpe": "cpe:2.3:a:kubernetes:kube-webhook-certgen:1.5.2:*:*:*:*:*:*:*",
       "purl": "pkg:oci/ingress-nginx/kube-webhook-certgen@v1.5.2?repository_url=registry.k8s.io"
+    },
+    {
+      "bom-ref": "pkg:oci/ingress-nginx/kube-webhook-certgen@v1.6.3?repository_url=registry.k8s.io",
+      "type": "container",
+      "supplier": {
+        "name": "ingress-nginx"
+      },
+      "name": "registry.k8s.io/ingress-nginx/kube-webhook-certgen",
+      "version": "v1.6.3",
+      "cpe": "cpe:2.3:a:kubernetes:kube-webhook-certgen:1.6.3:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/ingress-nginx/kube-webhook-certgen@v1.6.3?repository_url=registry.k8s.io"
     },
     {
       "bom-ref": "pkg:oci/jetstack/cert-manager-acmesolver@latest?repository_url=quay.io",
