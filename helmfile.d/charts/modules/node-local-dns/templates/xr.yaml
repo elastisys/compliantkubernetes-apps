@@ -13,6 +13,7 @@ spec:
   errorConfig: {{ .Values.errorConfig | toYaml | nindent 4 }}
   service: {{ .Values.service | toYaml | nindent 4 }}
   metricsService: {{ .Values.metricsService | toYaml | nindent 4 }}
+  image: {{ .Values.image | toYaml | nindent 4 }}
   crossplane:
     compositionRef:
       name: node-local-dns
