@@ -4473,6 +4473,7 @@ properties:
                     default: grafana_viewer
               jwtEnabled:
                 title: Enable authentication through JWT
+                description: This setting can weaken the security stance for authentication and should only be used in testing.
                 type: boolean
                 default: false
           viewersCanEdit:
