@@ -1,0 +1,59 @@
+etcd_deployment_type: kubeadm
+cloud_provider: external
+external_cloud_provider: openstack
+calico_mtu: 1480
+external_openstack_cloud_controller_extra_args:
+  # Must be different for every cluster in the same openstack project
+  cluster-name: pipeline-safespring-sc
+cinder_csi_enabled: true
+cinder_topology: false
+persistent_volumes_enabled: true
+expand_persistent_volumes: true
+openstack_blockstorage_ignore_volume_az: true
+storage_classes:
+  - name: cinder-csi
+    is_default: true
+    parameters:
+      availability: nova
+      allowVolumeExpansion: true
+# external_openstack_lbaas_network_id: "Neutron network ID to create LBaaS VIP"
+# external_openstack_lbaas_subnet_id: "Neutron subnet ID to get IP from"
+# external_openstack_lbaas_floating_network_id: "Neutron floating network ID to create LBaaS VIP"
+# external_openstack_lbaas_floating_subnet_id: "Neutron subnet ID to get floating IP from"
+# external_openstack_lbaas_method: "ROUND_ROBIN"
+# external_openstack_lbaas_provider: "amphora"
+# external_openstack_lbaas_use_octavia: true
+# external_openstack_lbaas_create_monitor: true
+# external_openstack_lbaas_monitor_delay: "1m"
+# external_openstack_lbaas_monitor_timeout: "30s"
+# external_openstack_lbaas_monitor_max_retries: "3"
+# external_openstack_lbaas_manage_security_groups: false
+# external_openstack_lbaas_internal_lb: false
+# external_openstack_network_ipv6_disabled: false
+# external_openstack_network_internal_networks:
+#   - ""
+# external_openstack_network_public_networks:
+#   - "ext-net"
+# external_openstack_metadata_search_order: "configDrive,metadataService"
+supplementary_addresses_in_ssl_keys:
+  - kube.ops.pipeline-safespring.dev-ck8s.com
+kubeconfig_localhost_ansible_host: true
+external_openstack_enable_ingress_hostname: true
+## used to expose the openstack cloud controller metrics
+external_openstack_cloud_controller_bind_address: 0.0.0.0
+ntp_filter_interface: true
+# Specify the interfaces
+# Only takes effect when ntp_filter_interface is true
+# ntp_interfaces:
+#   - ignore wildcard
+#   - listen <default interface>
+
+openstack_lbaas_enabled: false
+external_openstack_network_ipv6_disabled: true
+cinder_tolerations:
+  - key: elastisys.io/node-type
+    operator: Exists
+    effect: NoSchedule
+ntp_interfaces:
+  - ignore wildcard
+  - listen ens3

@@ -1,0 +1,120 @@
+# Changes made here will override the default values as well as the common config for this cluster.
+# See the default configuration under "defaults/" to see available and suggested options.
+templates:
+  amsNamespaces: &amsNamespaces
+    - jaeger-system
+    - postgres-system
+    - rabbitmq-system
+    - redis-system
+  tolerateElastisys: &tolerateElastisys
+    - key: elastisys.io/node-type
+      operator: Equal
+      value: elastisys
+      effect: NoSchedule
+  affinity: &affinityElastisys
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: elastisys.io/node-type
+                operator: In
+                values:
+                  - elastisys
+  tolerateSystem: &tolerateSystem
+    - key: node-role.kubernetes.io/control-plane
+      operator: Exists
+      effect: NoSchedule
+    - key: node-role.kubernetes.io/master
+      operator: Exists
+      effect: NoSchedule
+    - key: elastisys.io/node-type
+      operator: Exists
+      effect: NoSchedule
+  affinitySystem: &affinitySystem
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: node-role.kubernetes.io/control-plane
+                operator: Exists
+          - matchExpressions:
+              - key: elastisys.io/node-type
+                operator: Exists
+calicoAccountant:
+  tolerations: *tolerateSystem
+certmanager:
+  tolerations: *tolerateElastisys
+  affinity: *affinityElastisys
+  cainjector:
+    tolerations: *tolerateElastisys
+    affinity: *affinityElastisys
+  webhook:
+    tolerations: *tolerateElastisys
+    affinity: *affinityElastisys
+falco:
+  tolerations: *tolerateSystem
+  falcoSidekick:
+    tolerations: *tolerateElastisys
+    affinity: *affinityElastisys
+fluentd:
+  aggregator:
+    tolerations: *tolerateElastisys
+    affinity: *affinityElastisys
+  forwarder:
+    tolerations: *tolerateSystem
+    affinity: *affinitySystem
+hnc:
+  excludedNamespaces: *amsNamespaces
+  manager:
+    tolerations: *tolerateElastisys
+    affinity: *affinityElastisys
+  webhook:
+    tolerations: *tolerateElastisys
+ingressNginx:
+  controller:
+    tolerations: *tolerateElastisys
+  defaultBackend:
+    tolerations: *tolerateElastisys
+    affinity: *affinityElastisys
+prometheus:
+  tolerations: *tolerateElastisys
+  affinity: *affinityElastisys
+  alertmanagerSpec:
+    tolerations: *tolerateElastisys
+trivy:
+  tolerations: *tolerateElastisys
+  affinity: *affinityElastisys
+velero:
+  excludedExtraNamespaces: *amsNamespaces
+  tolerations: *tolerateElastisys
+  nodeSelector:
+    elastisys.io/node-type: elastisys
+  nodeAgent:
+    tolerations: *tolerateElastisys
+opa:
+  controllerManager:
+    tolerations: *tolerateElastisys
+  audit:
+    tolerations: *tolerateElastisys
+metricsServer:
+  tolerations: *tolerateElastisys
+kyverno:
+  tolerations: *tolerateElastisys
+networkPolicies:
+  global:
+    wcApiserver:
+      ips:
+        - set-me
+    wcNodes:
+      ips:
+        - set-me
+user:
+  namespaces:
+    - set-me
+    - production
+    - staging
+  adminUsers:
+    - set-me
+    - admin@example.com
+  adminGroups:
+    - set-me

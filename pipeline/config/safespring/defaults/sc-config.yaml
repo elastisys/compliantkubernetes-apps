@@ -1,0 +1,1394 @@
+# This configuration applies to the service cluster.
+# It will override settings set in "defaults/common-config.yaml".
+global:
+  clusterName: pipeline-safespring-sc
+  # Names of the workload clusters that sends metrics to this cluster.
+  # Mainly used for filtering of metrics.
+  clustersMonitoring:
+    - pipeline-safespring-wc
+objectStorage:
+  ## Swift can be enabled separately for Harbor, Thanos and rclone-sync only.
+  # swift:
+  #   authVersion: 0 # auto detect
+  #   authUrl: set-me
+  #   region: set-me
+  #   domainId: set-me
+  #   domainName: set-me
+  #   projectDomainId: set-me
+  #   projectDomainName: set-me
+  #   projectId: set-me
+  #   projectName: set-me
+  #   segmentsContainerSuffix: "+segments" # same as s3api
+  buckets:
+    harbor: pipeline-safespring-harbor
+    opensearch: pipeline-safespring-opensearch
+    scFluentd: pipeline-safespring-sc-logs
+  ## Restore object storage from off-site backups with rclone
+  ## Decrypt, destinations, and sources are automatically configured based on main and sync object storage configuration.
+  ## See https://github.com/elastisys/compliantkubernetes-apps/blob/main/docs/restore/rclone.md for the instructions.
+  restore:
+    enabled: false
+    dryrun: false
+    ## Allows for overrides of the main object storage configuration
+    destinations: {}
+    ## Allows for overrides of the sync object storage configuration
+    sources: {}
+    ## Allows for overrides of the sync encrypt configuration
+    decrypt: {}
+    ## Allows for point in time restoring using object versions
+    ## Only supported by S3 sources.
+    ## See https://rclone.org/docs/#time-option for the format.
+    timestamp: ""
+    ## Autogenerate restore targets from sync configuration
+    ## Note: Harbor and Thanos will be configured with both the destination and source type based on their individual configuration.
+    addTargetsFromSync: false
+    ## Restore targets
+    targets: []
+    # - destinationName: <bucket-or-container-name>
+    #   # destinationType: <object-storage-type> # Optional: if set supported values are 's3', 'azure' or 'swift'. Defaults to value of 'objectStorage.type'
+    #   # destinationPath: /folder/name # Optional: Only sync items from this path. Defaults to ""
+    #   # sourceName: <bucket-or-container-name> # Defaults to value of 'destinationName'
+    #   # sourceType: <object-storage-type> # Optional: if set supported values are 's3', 'azure' or 'swift'. Defaults to value of 'objectStorage.sync.destinationType'
+    #   # sourcePath: /folder/name # Optional: Only sync items from this path. Defaults to ""
+    #   # nameSuffix: custom-name # Optional: Used to add a special suffix to the cronjob name. Defaults to "custom"
+  ## Off-site backup replication between two providers or regions using rclone sync
+  sync:
+    activeDeadlineSeconds: 14400
+    enabled: false
+    dryrun: false
+    ## If Harbor or Thanos are using Swift then we will automatically use Swift for the sync of Harbor or Thanos with 'syncDefaultBuckets', regardless of the value set for destinationType.
+    ## Supported values are 's3', 'azure', 'swift'
+    destinationType: s3
+    # secondaryUrl: set-me if regionEndpoint and or authUrl does not have all the relevant ips and or ports used for rclone-sync networkpolicy.
+    # s3:
+    #   region: set-me
+    #   regionEndpoint: set-me
+    #   # Generally false when using AWS and Exoscale and true for other providers.
+    #   forcePathStyle: set-me
+    #   # v2Auth: false
+    ## rclone-sync needs authUrl with a /v3 suffix for swift.
+    # swift:
+    #   authUrl: set-me
+    #   region: set-me
+    #   projectName: set-me
+    ## Sync all buckets under 'objectStorage.buckets'
+    ## These will be appended to 'buckets' using the same name from source as destination, and the default schedule.
+    syncDefaultBuckets: false
+    ## Default schedule for sync jobs
+    defaultSchedule: 0 5 * * *
+    ## Buckets to sync.
+    buckets: []
+    # - source: <bucket-or-container-name>
+    #   # destination: <bucket-or-container-name> # Defaults to value of 'source'
+    #   # schedule: 0 5 * * * # Defaults to value of 'objectStorage.sync.defaultSchedule'
+    #   # sourceType: <object-storage-type> # Optional: if set supported values are 's3', 'azure' or 'swift'. Defaults to value of 'objectStorage.type'
+    #   # sourcePath: /folder/name # Optional: Only sync items from this path. Defaults to ""
+    #   # destinationType: <object-storage-type> # Optional: if set supported values are 's3', 'azure' or 'swift'. Defaults to value of 'objectStorage.sync.destinationType'
+    #   # destinationPath: /folder/name # Optional: Only sync items from this path. Defaults to ""
+    #   # nameSuffix: custom-name # Optional: Used to add a special suffix to the cronjob name. Defaults to "custom"
+
+    # Encrypt (symmetric) before syncing
+    encrypt:
+      enabled: false
+      # Enable to encrypt directory or file names
+      directoryNames: false
+      fileNames: false
+    ## Sync job resources
+    resources:
+      requests:
+        cpu: 100m
+        memory: 100Mi
+      limits:
+        cpu: 300m
+        memory: 500Mi
+falco:
+  alerts:
+    hostPort: http://alertmanager-operated.monitoring:9093
+    type: none
+grafana:
+  ops:
+    # subdomain moved to common-config
+    resources:
+      requests:
+        cpu: 150m
+        memory: 250Mi
+      limits:
+        cpu: 300m
+        memory: 600Mi
+    tolerations: []
+    affinity: {}
+    nodeSelector: {}
+    oidc:
+      enabled: true
+      skipRoleSync: false # enable if you want to manage the roles of your users from within Grafana
+      userGroups:
+        grafanaAdmin: grafana_admin # maps to grafana role admin
+        grafanaEditor: grafana_editor # maps to grafana role editor
+        grafanaViewer: grafana_viewer # maps to grafana role viewer
+      scopes: openid profile email groups
+      allowedDomains:
+        - set-me
+    viewersCanEdit: true
+    trailingDots: true
+    sidecar:
+      resources:
+        requests:
+          cpu: 10m
+          memory: 150Mi
+        limits:
+          cpu: 250m
+          memory: 200Mi
+    plugins: [] # this will require adding the correct IP/range and port to .networkPolicies.monitoring.grafana.externalDashboardProvider
+    # if the datasource require a secrets, you can set that in secrets.yaml under .grafana.{ops|user}.envRenderSecret
+    # the correct IP/range and port should be added to .networkPolicies.monitoring.grafana.externalDataSources
+    additionalDatasources: {}
+    additionalConfigValues: ""
+    dataproxy:
+      timeout: 600
+    contentSecurityPolicy:
+      default-src: '''self'''
+      script-src: '''self'' ''unsafe-inline'' ''strict-dynamic'' $NONCE https:'
+      object-src: '''none'''
+      style-src: '''self'' ''unsafe-inline'' blob:'
+      img-src: '* data:'
+      base-uri: '''self'''
+      connect-src: '''self'' grafana.com ws://$ROOT_PATH wss://$ROOT_PATH'
+      media-src: '''none'''
+      form-action: '''self'''
+      require-trusted-types-for: '''script'''
+  user:
+    enabled: true
+    # subdomain moved to common-config
+    resources:
+      requests:
+        cpu: 150m
+        memory: 250Mi
+      limits:
+        cpu: 300m
+        memory: 600Mi
+    tolerations: []
+    affinity: {}
+    nodeSelector: {}
+    oidc:
+      enabled: true
+      skipRoleSync: false # enable if you want to manage the roles of your users from within Grafana
+      userGroups:
+        grafanaAdmin: grafana_admin # maps to grafana role admin
+        grafanaEditor: grafana_editor # maps to grafana role editor
+        grafanaViewer: grafana_viewer # maps to grafana role viewer
+      scopes: openid profile email groups
+      allowedDomains:
+        - set-me
+    viewersCanEdit: true
+    trailingDots: true
+    sidecar:
+      resources:
+        requests:
+          cpu: 10m
+          memory: 150Mi
+        limits:
+          cpu: 250m
+          memory: 200Mi
+    plugins: [] # this will require adding the correct IP/range and port to .networkPolicies.monitoring.grafana.externalDashboardProvider
+    # if the datasource require a secrets, you can set that in secrets.yaml under .grafana.{ops|user}.envRenderSecret
+    # the correct IP/range and port should be added to .networkPolicies.monitoring.grafana.externalDataSources
+    additionalDatasources: {}
+    additionalConfigValues: ""
+    dataproxy:
+      timeout: 600
+    contentSecurityPolicy:
+      default-src: '''self'''
+      script-src: '''self'' ''unsafe-inline'' ''strict-dynamic'' $NONCE https:'
+      object-src: '''none'''
+      style-src: '''self'' ''unsafe-inline'' blob:'
+      img-src: '* data:'
+      base-uri: '''self'''
+      connect-src: '''self'' grafana.com ws://$ROOT_PATH wss://$ROOT_PATH'
+      media-src: '''none'''
+      form-action: '''self'''
+      require-trusted-types-for: '''script'''
+harbor:
+  # the enabled property moved to common-config
+  # subdomain moved to common-config
+  # The tolerations, affinity, and nodeSelector are applied to all harbor pods.
+  tolerations: []
+  nodeSelector: {}
+  ingress:
+    defaultAnnotations:
+      nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
+      nginx.ingress.kubernetes.io/proxy-buffering: "off"
+    additionalAnnotations: {}
+  core:
+    replicas: 1
+    resources:
+      requests:
+        cpu: 100m
+        memory: 250Mi
+      limits:
+        cpu: 250m
+        memory: 500Mi
+    affinity:
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                    - harbor
+                - key: component
+                  operator: In
+                  values:
+                    - core
+            topologyKey: kubernetes.io/hostname
+  database:
+    # if external database is used, set "type" to "external"
+    # and fill the connection information in "external" section
+    type: internal
+    internal:
+      persistentVolumeClaim:
+        size: 5Gi
+      resources:
+        requests:
+          memory: 512Mi
+          cpu: 100m
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - harbor
+                  - key: component
+                    operator: In
+                    values:
+                      - database
+              topologyKey: kubernetes.io/hostname
+              # external:
+              #   host: set-me
+              #   port: 5432
+              #   username: set-me
+              #   # password: set-me # should be set in secrets.yaml
+              #   coreDatabase: registry
+              #   sslmode: disable
+  exporter:
+    resources:
+      requests:
+        memory: 20Mi
+        cpu: 10m
+      limits:
+        cpu: 50m
+        memory: 40Mi
+    external:
+      # host: "set-me"
+      port: "5432"
+      # username: "set-me"
+      coreDatabase: registry
+      # "disable" - No SSL
+      # "require" - Always SSL (skip verification)
+      # "verify-ca" - Always SSL (verify that the certificate presented by the
+      # server was signed by a trusted CA)
+      # "verify-full" - Always SSL (verify that the certification presented by the
+      # server was signed by a trusted CA and the server host name matches the one
+      # in the certificate)
+      # sslmode: "set-me"
+  jobservice:
+    jobLog:
+      persistentVolumeClaim:
+        size: 1Gi
+    scanDataExports:
+      persistentVolumeClaim:
+        size: 1Gi
+    replicas: 1
+    resources:
+      requests:
+        cpu: 50m
+        memory: 125Mi
+      limits:
+        cpu: 250m
+        memory: 250Mi
+    jobLoggers:
+      - file
+    affinity:
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                    - harbor
+                - key: component
+                  operator: In
+                  values:
+                    - jobservice
+            topologyKey: kubernetes.io/hostname
+  registry:
+    replicas: 1
+    persistentVolumeClaim:
+      size: 5Gi
+    resources:
+      requests:
+        cpu: 125m
+        memory: 125Mi
+      limits:
+        cpu: 250m
+        memory: 250Mi
+    controller:
+      resources:
+        requests:
+          cpu: 10m
+          memory: 125Mi
+        limits:
+          cpu: 250m
+          memory: 250Mi
+    affinity:
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                    - harbor
+                - key: component
+                  operator: In
+                  values:
+                    - registry
+            topologyKey: kubernetes.io/hostname
+  redis:
+    type: internal
+    internal:
+      persistentVolumeClaim:
+        size: 1Gi
+      resources:
+        requests:
+          memory: 32Mi
+          cpu: 10m
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - harbor
+                  - key: component
+                    operator: In
+                    values:
+                      - redis
+              topologyKey: kubernetes.io/hostname
+    # if external redis database is used, please uncomment and update the below lines
+    external: {}
+    #  addr: "rfs-redis-harbor.redis-system.svc.cluster.local:26379"
+    #  sentinelMasterSet: "mymaster"
+  portal:
+    replicas: 1
+    resources:
+      requests:
+        cpu: 50m
+        memory: 125Mi
+      limits:
+        cpu: 250m
+        memory: 250Mi
+    affinity:
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                    - harbor
+                - key: component
+                  operator: In
+                  values:
+                    - portal
+            topologyKey: kubernetes.io/hostname
+  trivy:
+    replicas: 1
+    persistentVolumeClaim:
+      size: 5Gi
+    resources:
+      requests:
+        cpu: 50m
+        memory: 263Mi
+      limits:
+        cpu: 400m
+        memory: 512Mi
+    # Can be used to add mirrors from where trivy updates its' vulnerability DB
+    # example:
+    # extraEnvVars:
+    #   - name: SCANNER_TRIVY_DB_REPOSITORY
+    #     value: public.ecr.aws/aquasecurity/trivy-db,mirror.gcr.io/aquasec/trivy-db
+    #   - name: SCANNER_TRIVY_JAVA_DB_REPOSITORY
+    #     value: public.ecr.aws/aquasecurity/trivy-java-db,mirror.gcr.io/aquasec/trivy-db
+    extraEnvVars: []
+    affinity:
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                    - harbor
+                - key: component
+                  operator: In
+                  values:
+                    - trivy
+            topologyKey: kubernetes.io/hostname
+  persistence:
+    # Valid options are "filesystem" (persistent volume), "swift", or "objectStorage" (matching global config)
+    type: objectStorage
+    disableRedirect: true
+  oidc:
+    # group claim name used by OIDC Provider
+    groupClaimName: groups
+    # Name of the group that automatically will get admin
+    # Set to "" to disable
+    adminGroupName: set-me
+    scope: openid,email,profile,offline_access,groups
+  backup:
+    enabled: true
+    retentionDays: 7
+    schedule: 30 0 * * *
+    ephemeralBackupStore:
+      enabled: false
+      storageSize: 10Gi
+  s3:
+    multipartcopythresholdsize: "536870912"
+    multipartcopychunksize: "33554432"
+    multipartcopymaxconcurrency: "100"
+  gc:
+    enabled: true
+    forceConfigure: false
+    schedule: 0 0 0 * * SUN
+  alerts:
+    # Alert if values are above the below threshold
+    maxTotalStorageUsedGB: 1500
+    maxTotalArtifacts: 3000
+  mpuCleaner:
+    enabled: true
+    maxAgeDays: 7
+    schedule: 30 2 * * *
+    # Optional: Component-specific S3 configuration for harbor.
+    # If not set, the global `.objectStorage.s3 configuration will be used instead.
+    # Only set if harbor needs separate S3 storage configuration.
+  #objectStorage:
+  #  s3:
+  #    region: ""
+  #    regionEndpoint: ""
+  #    forcePathStyle: false
+grafanaLabelEnforcer:
+  resources:
+    limits:
+      cpu: 100m
+      memory: 50Mi
+    requests:
+      cpu: 20m
+      memory: 20Mi
+prometheus:
+  s3BucketAlerts:
+    # alert on each individual bucket
+    size:
+      enabled: false
+      percent: 80
+      sizeQuotaGB: 1000
+    # alert for the total size of all buckets combined
+    totalSize:
+      enabled: false
+      percent: 80
+      sizeQuotaGB: 1000
+    objects:
+      enabled: true
+      percent: 80
+      count: 1000000
+    exclude: []
+    # Custom per-bucket alerts
+    buckets: []
+    #  - name: <cluster>-thanos # This gets excluded from regular object storage alerts
+    #    size:
+    #      enabled: false
+    #      percent: 80
+    #      sizeQuotaGB: 1000
+    #    objects:
+    #      enabled: false
+    #      percent: 80
+    #      count: 1638400
+  # Todo remove dependency on alertmanager from service cluster
+  alertmanagerSpec:
+    groupBy:
+      - '...'
+    topologySpreadConstraints:
+      - labelSelector:
+          matchLabels:
+            app.kubernetes.io/name: alertmanager
+            app.kubernetes.io/instance: kube-prometheus-stack-alertmanager
+        maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: DoNotSchedule
+        #image:
+        # registry: registry.example.com
+        # repository: prometheus/alertmanager
+        # tag: vX.Y.Z
+  diskAlerts:
+    perf:
+      enabled: true
+      queueSizeThreshold: 5
+      writeWaitTimeThreshold: 1
+      readWaitTimeThreshold: 1
+  retention:
+    age: 7d
+dex:
+  replicaCount: 2
+  # subdomain moved to common-config
+  additionalKubeloginRedirects: []
+  contentSecurityPolicy:
+    default-src: '''none'''
+    frame-ancestors: '''none'''
+    img-src: '''self'''
+    require-trusted-types-for: '''script'''
+    style-src: '''self'''
+  enableStaticLogin: false
+  serviceMonitor:
+    enabled: true
+  resources:
+    limits:
+      cpu: 100m
+      memory: 50Mi
+    requests:
+      cpu: 5m
+      memory: 25Mi
+  tolerations: []
+  topologySpreadConstraints:
+    - labelSelector:
+        matchLabels:
+          app.kubernetes.io/name: dex
+      maxSkew: 1
+      topologyKey: kubernetes.io/hostname
+      whenUnsatisfiable: DoNotSchedule
+  affinity: {}
+  nodeSelector: {}
+  expiry:
+    deviceRequests: 5m
+    signingKeys: 6h
+    idToken: 24h
+    refreshTokens:
+      reuseInterval: 3s
+      validIfNotUsedFor: 2160h # 90 days
+      absoluteLifetime: 3960h # 165 days
+  google:
+    # Enables extra config needed to enable google connector to fetch group info.
+    # When this is enabled the SASecretName needs to be set.
+    groupSupport: false
+    # Name of the secret that includes the key file for the service account that is used for fetching group info.
+    # The secret will be mounted to the folder /etc/dex/google/ this means that multiple files from the same secret can be used.
+    # Simply add `serviceAccountFilePath: /etc/dex/google/secret-key` for each google connector.
+    # For more details, see https://elastisys.com/elastisys-engineering-how-to-use-dex-with-google-accounts-to-manage-access-in-kubernetes/
+    # SASecretName: set-me
+thanos:
+  query:
+    # Enables the query/query-frontend components
+    enabled: true
+    # Number of query pods
+    # They are infinitely scalable
+    replicaCount: 1
+    topologySpreadConstraints:
+      - labelSelector:
+          matchLabels:
+            app.kubernetes.io/name: thanos
+            app.kubernetes.io/instance: thanos-query
+            app.kubernetes.io/component: query
+        maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: DoNotSchedule
+    affinity: {}
+    resources:
+      requests:
+        cpu: 50m
+        memory: 60Mi
+      limits:
+        cpu: 500m
+        memory: 1Gi
+  queryFrontend:
+    resources:
+      requests:
+        cpu: 50m
+        memory: 40Mi
+      limits:
+        cpu: 300m
+        memory: 500Mi
+  receiveDistributor:
+    # How many nodes that a time-series needs to be written to for a write to be considered successful.
+    # It needs to write to (REPLICATION_FACTOR + 1)/2 nodes for success.
+    # For more info: https://thanos.io/v0.24/proposals-done/201812-thanos-remote-receive.md/#replication
+    replicationFactor: 1
+    replicaCount: 3
+    resources:
+      requests:
+        cpu: 150m
+        memory: 100Mi
+      limits:
+        cpu: 1000m
+        memory: 1Gi
+    receiveHashringsAlgorithm: ketama
+    receiveMaxConcurrency: 5
+    extraFlags: [] #use extraflags when you want to add more command line flags to the component.
+  ruler:
+    # Enables the ruler component
+    # Evaluates alert rules through thanos, record rules and thanos alert rules are still evaluated through prometheus.
+    enabled: true
+    replicaCount: 2
+    topologySpreadConstraints:
+      - labelSelector:
+          matchLabels:
+            app.kubernetes.io/name: thanos
+            app.kubernetes.io/instance: thanos-receiver
+            app.kubernetes.io/component: ruler
+        maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: DoNotSchedule
+    affinity: {}
+    resources:
+      requests:
+        cpu: 50m
+        memory: 40Mi
+      limits:
+        cpu: 300m
+        memory: 300Mi
+    configReloader:
+      resources:
+        limits:
+          cpu: 100m
+          memory: 50Mi
+        requests:
+          cpu: 10m
+          memory: 50Mi
+    # With our configuration of rules, thanos ruler has no recording rules so it should be fine without persistence.
+    persistence:
+      enabled: false
+      size: 8Gi
+  receiver:
+    persistence:
+      enabled: true
+      size: 50Gi
+    # Sets the mode of operation for the receiver component
+    # dual-mode: Multiple instances of the receiver. For redundancy
+    # standalone: Single instance of receiver.
+    mode: dual-mode
+    # Can only be used if thanos.compactor.verticalCompaction is set to true
+    outOfOrderTimeWindow: 600s
+    # Retention for the metrics in the receiver
+    tsdbRetention: 15d
+    # Number of receiver instances
+    replicaCount: 2
+    topologySpreadConstraints:
+      - labelSelector:
+          matchLabels:
+            app.kubernetes.io/name: thanos
+            app.kubernetes.io/instance: thanos-receiver
+            app.kubernetes.io/component: receive
+        maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: DoNotSchedule
+    affinity: {}
+    resources:
+      requests:
+        cpu: 200m
+        memory: 2Gi
+      limits:
+        cpu: "1"
+        memory: 4Gi
+  compactor:
+    # Set to 0s to disable retention
+    retentionResolutionRaw: 30d
+    retentionResolution5m: 90d
+    retentionResolution1h: 0s
+    verticalCompaction: false
+    # Deduplication of metrics in long term storage
+    # receiverReplicas: Deduplicate results from multiple receivers, simpler dedup
+    # prometheusReplicas: Deduplicate results from multiple receivers and multiple prometheis, heavier dedup
+    deduplication: none
+    # Persistence is recommended for caching.
+    # https://thanos.io/v0.24/components/compact.md/#disk
+    persistence:
+      enabled: true
+      size: 20Gi
+    resources:
+      requests:
+        cpu: 50m
+        memory: 80Mi
+      limits:
+        cpu: "2"
+        memory: 600Mi
+  storegateway:
+    persistence:
+      size: 8Gi
+    resources:
+      requests:
+        cpu: 100m
+        memory: 300Mi
+      limits:
+        cpu: 300m
+        memory: 2000Mi
+  bucketweb:
+    resources:
+      requests:
+        cpu: 20m
+        memory: 40Mi
+      limits:
+        cpu: 50m
+        memory: 80Mi
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+  objectStorage:
+    # Available options "s3" or "swift", defaults to "objectStorage.type" when empty
+    # Configure the storage credentials in the global "objectStorage"
+    type: ""
+    # Optional: Component-specific S3 configuration for thanos.
+    # If not set, the global `.objectStorage.s3 configuration will be used instead.
+    # Only set if thanos needs separate S3 storage configuration.
+    # s3:
+    #   region: ""
+    #   regionEndpoint: ""
+    #   forcePathStyle: false
+opensearch:
+  # 'subdomain' and 'indexPerNamespace' is set in common-config.yaml
+  clusterName: opensearch
+  # Change this value before applying opensearch to adjust indices.query.bool.max_clause_count
+  maxClauseCount: 1024
+  # Configure how many shards a node with the data role can hold
+  maxShardsPerNode: 1000
+  # Create initial indices upon first startup
+  createIndices: true
+  dashboards:
+    contentSecurityPolicy:
+      default-src: '''self'''
+      frame-ancestors: '''none'''
+      img-src: '''self'' data:'
+      script-src: '''unsafe-eval'' ''self'''
+      style-src: '''unsafe-inline'' ''self'''
+      worker-src: 'blob: ''self'''
+    # subdomain moved to common-config
+    # Note SSO is enabled via `opensearch.sso.enabled`
+    resources:
+      requests:
+        memory: 286Mi
+        cpu: 100m
+      limits:
+        memory: 1024Mi
+        cpu: 1
+    affinity: {}
+    nodeSelector: {}
+    tolerations: []
+    # cookieTtl: 3600000
+    # sessionTtl: 3600000
+    # sessionKeepalive: true
+  # Single-sign-on using OIDC, note this requires LetsEncrypt Production
+  sso:
+    enabled: true
+    # Where to find subject
+    subjectKey: email
+    # Where to find roles
+    rolesKey: groups
+    scope: openid profile email groups
+  extraRoles: []
+  # - role_name: log_reader
+  #   definition:
+  #     index_permissions:
+  #       - index_patterns:
+  #           - kubernetes-*
+  #         allowed_actions:
+  #           - read
+
+  extraRoleMappings:
+    - mapping_name: kibana_user
+      definition:
+        users:
+          - set-me # dashboards_dev
+    - mapping_name: kubernetes_log_reader
+      definition:
+        users:
+          - set-me # dashboards_dev
+    - mapping_name: all_access
+      definition:
+        users:
+          - set-me # dashboards_admin
+    - mapping_name: alerting_ack_alerts #Grants permissions to view and acknowledge alerts, but not modify destinations or monitors.
+      definition:
+        users:
+          - set-me # alerting_dev
+    - mapping_name: alerting_read_access #Grants permissions to view alerts, destinations, and monitors, but not acknowledge alerts or modify destinations or monitors.
+      definition:
+        users:
+          - set-me # alerting_dev
+    - mapping_name: alerting_full_access #Grants full permissions to all alerting actions.
+      definition:
+        users:
+          - set-me # alerting_admin
+  # Overwrite index templates
+  overwriteTemplates: true
+  # Create default index templates - kubernetes, kubeaudit, and other
+  defaultTemplates: true
+  additionalTemplates: {}
+  plugins:
+    # in an air-gapped environment where the nodes are not connected to the Internet, set
+    # following variable to false to prevent downloading external object storage plugin
+    installExternalObjectStoragePlugin: true
+    # in an air-gapped environment this can be used to install plugins from known sources
+    additionalPlugins: []
+    # - server.local:8080/repository-s3-2.8.0.zip
+  # Index state management
+  ism:
+    authlog:
+      rolloverSizeMB: 2
+      rolloverAgeDays: 1
+    kubeaudit:
+      rolloverSizeMB: 5000
+      rolloverAgeDays: 1
+    kubernetes:
+      rolloverSizeMB: 5000
+      rolloverAgeDays: 1
+    other:
+      rolloverSizeMB: 350
+      rolloverAgeDays: 1
+    # Overwrite ism policies
+    overwritePolicies: true
+    # Create default policies - kubernetes, kubeaudit, authlog, and other
+    defaultPolicies: true
+    additionalPolicies: {}
+  masterNode:
+    count: 3
+    ## If null, no storageclass is specified in pvc and default storageClass is used
+    ## if the DefaultStorageClass admission plugin is enabled.
+    ## If "-", "" will be used as storageClassName.
+    storageClass: null
+    storageSize: 100Gi
+    javaOpts: -Xms1024m -Xmx1024m
+    resources:
+      requests:
+        memory: 2Gi
+        cpu: 100m
+      limits:
+        memory: 3Gi
+        cpu: 1
+    affinity:
+      ## Note: The OpenSearch chart has some restrictions on pod anti affinity:
+      ## - Only one rule and term can be set
+      ## - The label selector is hardcoded and changing it here does not affect it
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 1
+            podAffinityTerm:
+              topologyKey: kubernetes.io/hostname
+              labelSelector:
+                matchExpressions:
+                  - key: app.kubernetes.io/instance
+                    operator: In
+                    values:
+                      - opensearch-master
+                  - key: app.kubernetes.io/name
+                    operator: In
+                    values:
+                      - opensearch
+    nodeSelector: {}
+    tolerations: []
+  dataNode:
+    ## Enables dedicated statefulset for data nodes, else the master nodes will assume data role.
+    dedicatedPods: false
+    count: 0
+    ## If null, no storageclass is specified in pvc and default storageClass is used
+    ## if the DefaultStorageClass admission plugin is enabled.
+    ## If "-", "" will be used as storageClassName.
+    storageClass: null
+    storageSize: 130Gi
+    javaOpts: -Xms2048m -Xmx2048m
+    resources:
+      requests:
+        memory: 4Gi
+        cpu: 200m
+      limits:
+        memory: 5Gi
+        cpu: 1
+    affinity:
+      ## Note: Same restrictions applies here as on the master nodes
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 1
+            podAffinityTerm:
+              topologyKey: kubernetes.io/hostname
+              labelSelector:
+                matchExpressions:
+                  - key: app.kubernetes.io/instance
+                    operator: In
+                    values:
+                      - opensearch-data
+                  - key: app.kubernetes.io/name
+                    operator: In
+                    values:
+                      - opensearch
+    nodeSelector: {}
+    tolerations: []
+  clientNode:
+    ## Enables dedicated deployment for client/ingest nodes, else the master nodes will assume client/ingest roles
+    dedicatedPods: false
+    count: 0
+    javaOpts: -Xms1024m -Xmx1024m
+    resources:
+      requests:
+        memory: 2Gi
+        cpu: 200m
+      limits:
+        memory: 2.5Gi
+        cpu: 1
+    affinity:
+      ## Note: Same restrictions applies here as on the master nodes
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 1
+            podAffinityTerm:
+              topologyKey: kubernetes.io/hostname
+              labelSelector:
+                matchExpressions:
+                  - key: app.kubernetes.io/instance
+                    operator: In
+                    values:
+                      - opensearch-client
+                  - key: app.kubernetes.io/name
+                    operator: In
+                    values:
+                      - opensearch
+    nodeSelector: {}
+    tolerations: []
+  # Initializes and reconfigures the OpenSearch security plugin
+  # Disable after the cluster is initialized to prevent it from removing manually created user, roles, role mappings, etc.
+  securityadmin:
+    enabled: true
+    activeDeadlineSeconds: 1200
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 250m
+        memory: 256Mi
+  # Config for https://www.elastic.co/guide/en/elasticsearch/client/curator/5.8/about.html
+  curator:
+    enabled: true
+    retention:
+      - pattern: other-*
+        sizeGB: 5
+        ageDays: 10
+      - pattern: kubeaudit-*
+        sizeGB: 50
+        ageDays: 30
+      - pattern: kubernetes-*
+        sizeGB: 50
+        ageDays: 30
+      - pattern: authlog-*
+        sizeGB: 5
+        ageDays: 30
+      - pattern: security-auditlog-*
+        sizeGB: 1
+        ageDays: 14
+    startingDeadlineSeconds: 600
+    activeDeadlineSeconds: 2700
+    resources:
+      requests:
+        cpu: 10m
+        memory: 32Mi
+      limits:
+        cpu: 100m
+        memory: 128Mi
+    affinity: {}
+    nodeSelector: {}
+    tolerations: []
+  # Config for https://github.com/elastisys/compliantkubernetes-apps/blob/main/helmfile.d/charts/prometheus-alerts/templates/alerts/opensearch.yaml#L75:L83
+  promIndexAlerts:
+    - prefix: kubernetes-default
+      alertSizeMB: 5500
+    - prefix: kubeaudit-default
+      alertSizeMB: 5500
+    - prefix: other-default
+      alertSizeMB: 400
+    - prefix: authlog-default
+      alertSizeMB: 3
+  # Snapshot and snapshot lifecycle configuration
+  # Requires S3 or GCS to be enabled
+  snapshot:
+    enabled: true # Snapshots can be enabled after installation but *not* disabled if they have already been enabled (ref: https://github.com/elastisys/compliantkubernetes-apps/pull/2541)
+    repository: opensearch-snapshots # Uses the bucket set in `objectStorage.buckets.opensearch`
+    min: 300 # 12 / day * 30 days = 360, subtract some to account for failures
+    max: 500
+    retentionAge: 30d # 30 days
+    backupSchedule: 30 */2 * * * # 30 min past every 2nd hour to avoid collision with retention
+    retentionSchedule: 0 0 * * *
+  exporter:
+    serviceMonitor:
+      interval: 30s
+      scrapeTimeout: 30s
+    resources:
+      requests:
+        cpu: 15m
+        memory: 30Mi
+      limits:
+        cpu: 30m
+        memory: 300Mi
+    tolerations: []
+  ingress:
+    maxbodysize: 32m
+    # Optional: Component-specific S3 configuration for opensearch.
+    # If not set, the global `.objectStorage.s3 configuration will be used instead.
+    # Only set if opensearch needs separate S3 storage configuration.
+  #objectStorage:
+  #  s3:
+  #    region: ""
+  #    regionEndpoint: ""
+  #    forcePathStyle: false
+opa:
+  ## Enable rule that requires pods to come from
+  ## the image registry defined by "URL".
+  ## "enforcement" can assume either "dryrun" or "deny".
+  imageRegistry:
+    enabled: false
+    URL: []
+  ## Enable rule that requires pods to be targeted
+  ## by at least one network policy.
+  networkPolicies:
+    enabled: false
+  ## Enable rule that requires pods to have resource requests.
+  resourceRequests:
+    enabled: false
+  ## It will not allow any image with the latest tag
+  disallowedTags:
+    enabled: false
+  controllerManager:
+    resources:
+      requests:
+        cpu: 30m
+fluentd:
+  enabled: true
+  audit:
+    compaction:
+      enabled: true
+      ephemeralVolumes:
+        enabled: false
+      schedule: 0 1/6 * * *
+      days: 30
+    retention:
+      enabled: true
+      schedule: 0 20 * * *
+      days: 30 # For HIPAA/PDL 1825
+  scLogs:
+    enabled: true
+    compaction:
+      enabled: true
+      ephemeralVolumes:
+        enabled: false
+      schedule: 0 2/6 * * *
+      days: 30
+    retention:
+      enabled: true
+      schedule: 0 21 * * *
+      days: 30
+  aggregator:
+    resources:
+      requests:
+        cpu: 150m
+  forwarder:
+    buffer:
+      chunkLimitSize: 256MB
+  logManager:
+    compaction:
+      volume:
+        storage: 5Gi
+      resources:
+        requests:
+          cpu: 200m
+          memory: 100Mi
+        limits:
+          cpu: 1000m
+          memory: 400Mi
+    retention:
+      resources:
+        requests:
+          cpu: 100m
+          memory: 50Mi
+        limits:
+          cpu: 200m
+          memory: 400Mi
+    tolerations: []
+    nodeSelector: {}
+    affinity: {}
+alerts:
+  alertTo: opsgenie
+  opsGenieHeartbeat:
+    enabled: true
+    url: https://api.eu.opsgenie.com/v2/heartbeats
+    name: set-me-if-(.alerts.opsGenieHeartbeat.enabled)
+  slack:
+    channel: set-me-if-(.alerts.alertTo == "slack")
+    # Alertmanager templating: https://prometheus.io/docs/alerting/notifications/
+    customTemplate: ""
+    ## Example:
+    # customTemplate: |-
+    #   *Common summary:* {{ .CommonAnnotations.summary }}
+    #   *Common description:* {{ .CommonAnnotations.description }}
+  #   *Individual alerts below*
+  #   {{ range .Alerts }}
+  #   *Status:* {{ .Status }}
+  #   {{ end }}
+
+  opsGenie:
+    apiUrl: https://api.eu.opsgenie.com
+    # Set updateAlerts to true if you intend to group alerts
+    updateAlerts: false
+  # Configure custom alert receivers
+  customReceivers: []
+  customRoutes: []
+externalTrafficPolicy:
+  # Whitelisting requires externalTrafficPolicy.local to be true
+  # local: true
+
+  # Comma separated list of CIDRs, e.g. 172.16.0.0/24,172.24.0.0/24
+  whitelistRange:
+    # global: 0.0.0.0/0
+    dex: false
+    harbor: false
+    opensearch: false
+    opensearchDashboards: false
+    userGrafana: false
+    opsGrafana: false
+    thanosReceiver: false
+s3Exporter:
+  # Also requires objectStorage.type=s3
+  enabled: true
+  interval: 60m
+  scrapeTimeout: 10m
+  resources:
+    limits: {}
+    requests:
+      cpu: 50m
+      memory: 20Mi
+  tolerations: []
+  affinity: {}
+  nodeSelector: {}
+prometheusBlackboxExporter:
+  # List of kube-apiservers to target, instead of targeting kube-apiserver on baseDomain
+  customKubeapiTargets: []
+  # Example:
+  # customKubeapiTargets:
+  #   - name: example-api-server
+  #     domain: example.com
+  targets:
+    fluentd: true
+    thanosQuery: true
+    thanosReceiver: true
+    wc: true
+welcomingDashboard:
+  # If you want to add extra text to the grafana/opensearch "welcoming dashboards"
+  # then write the text in these values as a one-line string.
+  # Example: 'extraTextGrafana: "Hello\\n\\n[This is an example link](https:/elastisys.io)"'
+  # Note, first line of the string is a header, not all characters are supported.
+  # For newline in Grafana dashboard use format "\\n"
+  extraTextGrafana: ""
+  # For newline in Opensearch dashboard use format "\\\\n"
+  extraTextOpensearch: ""
+  extraVersions: []
+  #- name: Stuffs
+  #  version: v0.30.4
+  #  releasenotes: https://elastisys.io/welkin/release-notes/
+  #- name: Dex
+  #  version: "v2.37"
+  #  subdomain: dex
+  #- name: Postgres
+  #  version: "11"
+  #  url: https://www.postgresql.org/
+  #  releasenotes: https://elastisys.io/welkin/release-notes/#postgres
+# Network policies for service cluster
+networkPolicies:
+  global:
+    objectStorageSwift:
+      ips:
+        - set-me-if-(.harbor.persistence.type == "swift" or .thanos.objectStorage.type == "swift")
+      ports:
+        - 5000
+    scApiserver:
+      # usually private ip of control-plane nodes
+      ips:
+        - set-me
+      port: 6443
+    scNodes:
+      # ip of all nodes in the cluster for internal communication
+      ips:
+        - set-me
+  harbor:
+    enabled: true
+    # For replication, added to core and jobservice
+    registries:
+      ips:
+        - set-me-if-(.harbor.enabled and .networkPolicies.harbor.enabled)
+      ports:
+        - 443
+    jobservice:
+      ips:
+        - set-me-if-(.harbor.enabled and .networkPolicies.harbor.enabled)
+      ports:
+        - 443
+    database:
+      # internalIngress:
+      #    peers:
+      #      - namespaceSelectorLabels:
+      #          kubernetes.io/metadata.name: harbor
+      #        podSelectorLabels:
+      #          component: backup
+      internalIngress:
+        peers: []
+        ports: []
+      # externalEgress:
+      #    peers:
+      #      - namespaceSelectorLabels:
+      #          kubernetes.io/metadata.name: postgres-system
+      #        podSelectorLabels:
+      #          cluster-name: harbor-cluster
+      #    ports:
+      #      - 5432
+      externalEgress:
+        peers: []
+        ports: []
+    redis:
+      # externalEgress:
+      #    peers:
+      #      - namespaceSelectorLabels:
+      #          kubernetes.io/metadata.name: redis-system
+      #        podSelectorLabels:
+      #          app.kubernetes.io/name: redis-harbor
+      #    ports:
+      #      - 26379
+      #      - 6379
+      externalEgress:
+        peers: []
+        ports: []
+    trivy:
+      # IP to trivy vulnerability database
+      ips:
+        - set-me-if-(.harbor.enabled and .networkPolicies.harbor.enabled)
+      ports:
+        - 443
+  monitoring:
+    enabled: true
+    grafana:
+      # allows sc-config to add ip and ports to access user Grafana
+      externalDataSources:
+        enabled: false
+        ips:
+          - set-me-if-(.networkPolicies.monitoring.enabled and .networkPolicies.monitoring.grafana.externalDataSources.enabled)
+        ports:
+          - set-me-if-(.networkPolicies.monitoring.enabled and .networkPolicies.monitoring.grafana.externalDataSources.enabled)
+      # loading dashboards from grafana website
+      externalDashboardProvider:
+        ips:
+          - set-me
+        ports:
+          - 443
+  tektonPipelines:
+    enabled: true
+    # Build required network policies for the pipeline.
+    # It is possible to use pre-built rules, such as egress-rule-apiserver.
+    # pipeline:
+    #  upgrade-pod:
+    #    podSelectorLabels:
+    #       app.kubernetes.io/instance: upgrade-apps-pipeline
+    #     ingress: {}
+    #     egress:
+    #       - rule: egress-rule-apiserver
+    pipeline: {}
+  thanos:
+    enabled: true
+  opensearch:
+    enabled: true
+    plugins:
+      ips:
+        - set-me-if-(.networkPolicies.opensearch.enabled)
+      ports:
+        - 443
+  fluentd:
+    enabled: true
+  rclone:
+    enabled: true
+    # Restore reuses network policy rules set for .global.objectStorage and .rclone.sync.objectStorage
+    sync:
+      objectStorage:
+        ips:
+          - set-me-if-(.objectStorage.sync.enabled and .objectStorage.type == "s3")
+        ports:
+          - 443
+      objectStorageSwift:
+        ips:
+          - set-me-if-(.objectStorage.sync.enabled and ((.harbor.persistence.type == "swift" and (.objectStorage.sync.buckets | select(all_c(.source != "*harbor*") or any_c(.source == "*harbor*" and has("destinationType") | not)))) or (.thanos.objectStorage.type == "swift" and (.objectStorage.sync.buckets | select(all_c(.source != "*thanos*") or any_c(.source == "*thanos*" and has("destinationType") | not)))) or (.objectStorage.sync.buckets | any_c(.destinationType == "swift"))))
+        ports:
+          - 5000
+      secondaryUrl:
+        ips:
+          - set-me-if-(.objectStorage.sync.secondaryUrl != null and .objectStorage.sync.secondaryUrl != "")
+        ports:
+          - 443
+  s3Exporter:
+    enabled: true
+  certManager:
+    namespaces:
+      - dex
+      - harbor
+      - monitoring
+      - opensearch-system
+      - thanos
+  dex:
+    enabled: true
+    # Ip to connector, e.g. Google, LDAP, ...
+    connectors:
+      ips:
+        - set-me-if-(.networkPolicies.dex.enabled)
+      ports:
+        - 443
+# Tekton Configuration
+tektonPipelines:
+  enabled: false
+  controller:
+    replicas: 1
+    resources:
+      limits:
+        cpu: 20m
+        memory: 128Mi
+      requests:
+        cpu: 10m
+        memory: 64Mi
+  webhook:
+    replicas: 1
+    resources:
+      limits:
+        cpu: 20m
+        memory: 128Mi
+      requests:
+        cpu: 10m
+        memory: 64Mi
+  remoteResolvers:
+    replicas: 1
+    resources:
+      requests:
+        cpu: 10m
+        memory: 64Mi
+      limits:
+        cpu: 20m
+        memory: 128Mi
+  customConfigDefaults: {}
+trivy:
+  scanner:
+    resources:
+      limits:
+        memory: 850Mi

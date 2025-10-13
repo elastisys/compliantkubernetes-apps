@@ -1,0 +1,86 @@
+{
+  "Comment": "Manage pipeline-elastx cluster DNS records",
+  "Changes": [
+    {
+      "Action": "UPSERT",
+      "ResourceRecordSet": {
+        "Name": "*.pipeline-elastx.dev-ck8s.com",
+        "Type": "A",
+        "TTL": 300,
+        "ResourceRecords": []
+      }
+    },
+    {
+      "Action": "UPSERT",
+      "ResourceRecordSet": {
+        "Name": "*.ops.pipeline-elastx.dev-ck8s.com",
+        "Type": "A",
+        "TTL": 300,
+        "ResourceRecords": []
+      }
+    },
+    {
+      "Action": "UPSERT",
+      "ResourceRecordSet": {
+        "Name": "grafana.pipeline-elastx.dev-ck8s.com",
+        "Type": "A",
+        "TTL": 300,
+        "ResourceRecords": []
+      }
+    },
+    {
+      "Action": "UPSERT",
+      "ResourceRecordSet": {
+        "Name": "harbor.pipeline-elastx.dev-ck8s.com",
+        "Type": "A",
+        "TTL": 300,
+        "ResourceRecords": []
+      }
+    },
+    {
+      "Action": "UPSERT",
+      "ResourceRecordSet": {
+        "Name": "notary.harbor.pipeline-elastx.dev-ck8s.com",
+        "Type": "A",
+        "TTL": 300,
+        "ResourceRecords": []
+      }
+    },
+    {
+      "Action": "UPSERT",
+      "ResourceRecordSet": {
+        "Name": "opensearch.pipeline-elastx.dev-ck8s.com",
+        "Type": "A",
+        "TTL": 300,
+        "ResourceRecords": []
+      }
+    },
+    {
+      "Action": "UPSERT",
+      "ResourceRecordSet": {
+        "Name": "dex.pipeline-elastx.dev-ck8s.com",
+        "Type": "A",
+        "TTL": 300,
+        "ResourceRecords": []
+      }
+    },
+    {
+      "Action": "UPSERT",
+      "ResourceRecordSet": {
+        "Name": "kube.pipeline-elastx.dev-ck8s.com",
+        "Type": "A",
+        "TTL": 300,
+        "ResourceRecords": []
+      }
+    },
+    {
+      "Action": "UPSERT",
+      "ResourceRecordSet": {
+        "Name": "kube.ops.pipeline-elastx.dev-ck8s.com",
+        "Type": "A",
+        "TTL": 300,
+        "ResourceRecords": []
+      }
+    }
+  ]
+}
