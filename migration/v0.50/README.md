@@ -82,6 +82,11 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ./bin/ck8s upgrade wc v0.50 apply
     ```
 
+1. > **Note:**
+   > For Elastx deployments, the default is now hard anti-affinity for OpenSearch. If you want to override this with soft anti-affinity,
+   > you need to explicitly set `requiredDuringSchedulingIgnoredDuringExecution: []`, as well as setting
+   > `preferredDuringSchedulingIgnoredDuringExecution:` to the desired soft anti-affinity rules.
+
 1. Apply upgrade - _disruptive_
 
     > _Done during maintenance window._
