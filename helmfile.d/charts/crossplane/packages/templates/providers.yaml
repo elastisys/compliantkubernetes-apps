@@ -1,4 +1,7 @@
 {{- range $name, $values := .Values.providers }}
+{{- if gt (len (printf "provider-%s" $name)) 63 }}
+{{- printf "provider name is too long 'provider-%s', needs to be maximum 63 characters" $name | fail }}
+{{- end }}
 ---
 apiVersion: pkg.crossplane.io/v1
 kind: Provider
@@ -36,6 +39,9 @@ spec:
                   drop:
                     - ALL
 ---
+{{- if gt (len (printf "provider-%s-cluster-admin" $name)) 63 }}
+{{- printf "provider cluster role binding name is too long 'provider-%s-cluster-admin', needs to be maximum 63 characters" $name | fail }}
+{{- end }}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
