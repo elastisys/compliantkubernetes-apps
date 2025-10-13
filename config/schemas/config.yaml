@@ -8640,6 +8640,15 @@ properties:
             $ref: '#/$defs/containerImage'
           kubectl:
             $ref: '#/$defs/containerImage'
+  crossplane:
+    title: Crossplane Config
+    description: Configure Crossplane
+    type: object
+    properties:
+      enabled:
+        title: Enable Crossplane
+        default: false
+        type: boolean
 additionalProperties:
   title: Additional Properties
   description: Configure additional properties not covered by the schema.
