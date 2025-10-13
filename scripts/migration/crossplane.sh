@@ -2,7 +2,7 @@
 
 crossplane_diff() {
   if [[ "${#}" -lt 2 ]] || [[ ! "${1}" =~ ^(sc|wc)$ ]]; then
-    log_fatal "usage: crossplane_diff <sc|wc> <module_name>"
+    log_fatal "usage: crossplane_diff <sc|wc> <module_name> [<helm-post-renderer-kustomization-dir>]"
   fi
 
   local crossplane_release
@@ -23,12 +23,24 @@ crossplane_diff() {
   # FIXME: Currently null
   release_namespace="kube-system"
 
-  if ! echo "${values}" | helm diff -n "${release_namespace}" upgrade "${2}" "${chart_repository}/${chart_name}" \
-    --version "${chart_version}" \
-    --allow-unreleased \
-    --reset-values \
-    --values - \
-    --detailed-exitcode; then
+  helm_diff_args=(
+    -n "${release_namespace}"
+    upgrade "${2}" "${chart_repository}/${chart_name}"
+    --version "${chart_version}"
+    --allow-unreleased
+    --reset-values
+    --values -
+    --detailed-exitcode
+    --normalize-manifests
+  )
+
+  [[ "${#}" -gt 2 ]] &&
+    helm_diff_args+=(
+      --post-renderer "${ROOT}/scripts/helm-kustomize-post-renderer.sh"
+      --post-renderer-args "${3}"
+    )
+
+  if ! echo "${values}" | helm diff "${helm_diff_args[@]}"; then
     log_error "Detected differences between the existing release '${2}' and the module '${2}'."
     log_error "DO NOT UPGRADE unless you are sure these are acceptable."
   fi
