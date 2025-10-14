@@ -77,6 +77,73 @@ clusterApi:
   - sc
   - wc
 
+crossplane:
+  resources:
+    requests:
+      cpu: 10m
+      memory: 160Mi
+    limits:
+      cpu: 100m
+      memory: 512Mi
+  rbacManager:
+    resources:
+      requests:
+        cpu: 5m
+        memory: 32Mi
+      limits:
+        cpu: 10m
+        memory: 128Mi
+  functions:
+    auto-ready:
+      resources:
+        requests:
+          cpu: 1m
+          memory: 16Mi
+        limits:
+          cpu: 20m
+          memory: 64Mi
+    capability:
+      resources:
+        requests:
+          cpu: 1m
+          memory: 16Mi
+        limits:
+          cpu: 20m
+          memory: 64Mi
+    go-templating:
+      resources:
+        requests:
+          cpu: 1m
+          memory: 16Mi
+        limits:
+          cpu: 20m
+          memory: 64Mi
+    patch-and-transform:
+        resources:
+          requests:
+            cpu: 1m
+            memory: 16Mi
+          limits:
+            cpu: 20m
+            memory: 64Mi
+  providers:
+    helm:
+      resources:
+        requests:
+          cpu: 5m
+          memory: 64Mi
+        limits:
+          cpu: 50m
+          memory: 256Mi
+    kubernetes:
+      resources:
+        requests:
+          cpu: 5m
+          memory: 64Mi
+        limits:
+          cpu: 50m
+          memory: 256Mi
+
 ## Configuration of storageclasses.
 storageClasses:
   # Name of the default storageclass.
