@@ -1167,6 +1167,14 @@ networkPolicies:
         - set-me-if-(.trivy.enabled)
       port: 443
 
+  crossplane:
+    enabled: true
+    packageRegistry:
+      ips:
+        - set-me-if-(.crossplane.enabled)
+      ports:
+        - 443
+
   kured:
     enabled: true
     notificationSlack:

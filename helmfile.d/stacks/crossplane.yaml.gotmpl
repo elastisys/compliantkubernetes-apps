@@ -18,6 +18,19 @@ templates:
     values:
       - values/crossplane.yaml.gotmpl
 
+  crossplane-networkpolicy:
+    inherit:
+      - template: crossplane
+      - template: networkpolicies
+    installed: {{ and (.Values | get "crossplane.enabled" false) (.Values | get "networkPolicies.crossplane.enabled" false) }}
+    labels:
+      netpol: crossplane
+    needs:
+      - kube-system/admin-namespaces
+    values:
+      - values/networkpolicies/common/common.yaml.gotmpl
+      - values/networkpolicies/common/crossplane.yaml.gotmpl
+
   crossplane-packages:
     disableValidationOnInstall: true
     inherit: [ template: crossplane ]

@@ -1,0 +1,38 @@
+policies:
+  crossplane-system:
+    all-deny:
+      podSelectorLabels: {}
+      egress: {}
+      ingress: {}
+
+    crossplane:
+      podSelectorLabels:
+        app.kubernetes.io/name: crossplane
+        app: crossplane
+      egress:
+        - rule: egress-rule-apiserver
+        - rule: egress-rule-dns
+        {{- if and (.Values | get "networkPolicies.crossplane.packageRegistry.ips" list) (.Values | get "networkPolicies.crossplane.packageRegistry.ports" list) }}
+        - name: egress-rule-package-registry
+          peers:
+            {{- range .Values | get "networkPolicies.crossplane.packageRegistry.ips" list }}
+            - cidr: {{ . }}
+            {{- end }}
+          ports:
+            {{- range .Values | get "networkPolicies.crossplane.packageRegistry.ports" list }}
+            - tcp: {{ . }}
+            {{- end }}
+        {{- end }}
+
+    crossplane-rbac-manager:
+      podSelectorLabels:
+        app.kubernetes.io/name: crossplane
+        app: crossplane-rbac-manager
+      egress:
+        - rule: egress-rule-apiserver
+
+    provider-waiter:
+      podSelectorLabels:
+        batch.kubernetes.io/job-name: crossplane-provider-waiter
+      egress:
+        - rule: egress-rule-apiserver
