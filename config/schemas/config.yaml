@@ -8671,6 +8671,25 @@ properties:
         title: Enable Crossplane
         default: false
         type: boolean
+      resources:
+        $ref: '#/$defs/kubernetesResourceRequirements'
+      rbacManager:
+        resources:
+          $ref: '#/$defs/kubernetesResourceRequirements'
+      providers:
+        title: crossplane provider images configuration
+        description: crossplane provider images configuration
+        type: object
+        resources:
+          $ref: '#/$defs/kubernetesResourceRequirements'
+        additionalProperties: false
+      functions:
+        title: crossplane function images configuration
+        description: crossplane function images configuration
+        type: object
+        resources:
+          $ref: '#/$defs/kubernetesResourceRequirements'
+        additionalProperties: false
 additionalProperties:
   title: Additional Properties
   description: Configure additional properties not covered by the schema.

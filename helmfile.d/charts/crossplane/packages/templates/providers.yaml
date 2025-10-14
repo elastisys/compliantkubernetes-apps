@@ -27,6 +27,7 @@ spec:
       selector: {}
       template:
         spec:
+          resources: {{ toYaml $values.resources | nindent 12 }}
           securityContext:
             runAsNonRoot: true
             seccompProfile:

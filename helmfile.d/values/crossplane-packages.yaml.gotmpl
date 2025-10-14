@@ -41,6 +41,7 @@ functions:
       tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
       {{- end }}
     {{- end }}
+    {{- $.Values | dig "crossplane" "functions" $function "resources" | toYaml | nindent 4 }}
 {{- end }}
 
 providers:
@@ -57,4 +58,5 @@ providers:
       tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
       {{- end }}
     {{- end }}
+    {{- $.Values | dig "crossplane" "providers" $provider "resources" | toYaml | nindent 4 }}
 {{- end }}
