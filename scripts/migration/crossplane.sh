@@ -14,6 +14,14 @@ crossplane_diff() {
 
   crossplane_release="$(_crossplane_render "${CK8S_CLUSTER}" "${2}" | yq 'select(.kind == "Release")')"
 
+  crossplane_release_external_name=$(yq '.metadata.annotations["crossplane.io/external-name"]' <<<"${crossplane_release}")
+  if [ "${crossplane_release_external_name}" != "${2}" ]; then
+    log_error "Annotation 'crossplane.io/external-name' in Release in Module ${2} does not match existing release name"
+    log_error "Expected: ${2}"
+    log_error "Actual: ${crossplane_release_external_name}"
+    log_fatal "DO NOT UPGRADE"
+  fi
+
   release_namespace=$(yq '.spec.forProvider.namespace' <<<"${crossplane_release}")
   chart_repository=$(yq '.spec.forProvider.chart.repository' <<<"${crossplane_release}")
   chart_name=$(yq '.spec.forProvider.chart.name' <<<"${crossplane_release}")
