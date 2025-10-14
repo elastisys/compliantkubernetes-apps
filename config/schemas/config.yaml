@@ -8677,15 +8677,15 @@ properties:
         resources:
           $ref: '#/$defs/kubernetesResourceRequirements'
       providers:
-        title: crossplane provider images configuration
-        description: crossplane provider images configuration
+        title: crossplane provider resource configuration
+        description: crossplane provider resource configuration
         type: object
         resources:
           $ref: '#/$defs/kubernetesResourceRequirements'
         additionalProperties: false
       functions:
-        title: crossplane function images configuration
-        description: crossplane function images configuration
+        title: crossplane function resource configuration
+        description: crossplane function resource configuration
         type: object
         resources:
           $ref: '#/$defs/kubernetesResourceRequirements'
