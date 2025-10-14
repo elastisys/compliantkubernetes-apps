@@ -33,15 +33,26 @@ templates:
     disableValidationOnInstall: true
     condition: ck8sManagementCluster.enabled
     inherit: [ template: tekton ]
-    chart: charts/tekton-pipelines
+    chart: upstream/tekton/tekton-pipeline
     version: 0.1.0
     name: tekton-pipelines
     needs:
       - kube-system/admin-namespaces
-      - monitoring/kube-prometheus-stack # creates servicemonitors and prometheusrules
       {{- if .Values | get "networkPolicies.tektonPipelines.enabled" false }}
       - tekton-pipelines/networkpolicy
       {{- end }}
       - tekton-pipelines/podsecuritypolicy
+    values:
+      - values/tekton.gotmpl
+
+  tekton-monitoring:
+    disableValidationOnInstall: true
+    inherit: [ template: tekton ]
+    chart: charts/tekton-monitoring
+    version: 0.1.0
+    name: tekton-monitoring
+    needs:
+      - tekton-pipelines/tekton-pipelines
+      - monitoring/kube-prometheus-stack # creates servicemonitors and prometheusrules
     values:
       - values/tekton.gotmpl
