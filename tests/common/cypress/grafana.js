@@ -54,7 +54,7 @@ Cypress.Commands.add('testGrafanaDashboard', (dashboardName, expandRows) => {
 // Available as cy.grafanaDexStaticLogin("grafana.example.com")
 Cypress.Commands.add('grafanaDexStaticLogin', (ingress, cacheSession = true) => {
   const login = function () {
-    cy.visit(`https://${ingress}`)
+    cy.visitAndVerifyCSPHeader(`https://${ingress}`)
 
     cy.contains('Sign in with dex').click()
 
@@ -65,7 +65,7 @@ Cypress.Commands.add('grafanaDexStaticLogin', (ingress, cacheSession = true) => 
 
   if (cacheSession) {
     cy.session([ingress], login)
-    cy.visit(`https://${ingress}`)
+    cy.visitAndVerifyCSPHeader(`https://${ingress}`)
   } else {
     login()
   }
@@ -74,7 +74,7 @@ Cypress.Commands.add('grafanaDexStaticLogin', (ingress, cacheSession = true) => 
 
 // Available as cy.grafanaDexStaticLogin("grafana.example.com", "dev@example.com")
 Cypress.Commands.add('grafanaDexExtraStaticLogin', (ingress, staticUser) => {
-  cy.visit(`https://${ingress}`)
+  cy.visitAndVerifyCSPHeader(`https://${ingress}`)
 
   cy.contains('Sign in with dex').click()
 
@@ -89,7 +89,7 @@ Cypress.Commands.add('grafanaDexExtraStaticLogin', (ingress, staticUser) => {
 Cypress.Commands.add('grafanaSetRole', (ingress, adminPasswordKey, user, role) => {
   // Log in as the grafana admin and change the role
   cy.session([`${ingress}/admin/users`], function () {
-    cy.visit(`https://${ingress}`)
+    cy.visitAndVerifyCSPHeader(`https://${ingress}`)
 
     cy.yqSecrets(adminPasswordKey).then((password) => {
       cy.get('input[placeholder*="username"]').type('admin', { log: false })
@@ -99,10 +99,10 @@ Cypress.Commands.add('grafanaSetRole', (ingress, adminPasswordKey, user, role) =
       cy.get('button').contains('Log in').click()
     })
 
-    cy.visit(`https://${ingress}/admin/users`)
+    cy.visitAndVerifyCSPHeader(`https://${ingress}/admin/users`)
   })
 
-  cy.visit(`https://${ingress}/admin/users`)
+  cy.visitAndVerifyCSPHeader(`https://${ingress}/admin/users`)
   cy.contains('Organization users').should('be.visible').click()
 
   // remove TLD, form doesn't seem to like it
