@@ -11,7 +11,7 @@ setup_file() {
   gpg.setup
   env.setup
 
-  env.init openstack capi dev
+  env.init openstack capi dev --skip-object-storage --skip-network-policies
 }
 
 setup() {
@@ -40,90 +40,150 @@ teardown_file() {
   gpg.teardown
 }
 
-update_ips.mock_minimal_with_subnet() {
-  update_ips.mock_minimal
-
-  mock_set_output "${mock_kubectl}" "" 1                                     # check if cluster with name <environment>-sc exists
-  mock_set_output "${mock_kubectl}" "" 2                                     # check if cluster with name <environment>-<cluster> exists
-  mock_set_output "${mock_kubectl}" "[1]" 3                                  # check number of subnets in cluster
-  mock_set_output "${mock_kubectl}" "10.0.0.0/24" 4                          # .networkPolicies.global.scApiserver.ips cluster subnet
-  mock_set_output "${mock_kubectl}" "127.0.1.2 127.0.2.2 127.0.3.2" 5        # .networkPolicies.global.scApiserver.ips calico ipip
-  mock_set_output "${mock_kubectl}" "127.0.1.21 127.0.2.21 127.0.3.21" 6     # .networkPolicies.global.scApiserver.ips calico vxlan
-  mock_set_output "${mock_kubectl}" "127.0.1.3 127.0.2.3 127.0.3.3" 7        # .networkPolicies.global.scApiserver.ips calico wireguard
-  mock_set_output "${mock_kubectl}" "" 8                                     # .networkPolicies.global.scApiserver.ips cilium internal
-  mock_set_output "${mock_kubectl}" "" 9                                     # check if cluster with name <environment>-sc exists
-  mock_set_output "${mock_kubectl}" "" 10                                    # check if cluster with name <environment>-<cluster> exists
-  mock_set_output "${mock_kubectl}" "[1]" 11                                 # check number of subnets in cluster
-  mock_set_output "${mock_kubectl}" "10.0.0.0/24" 12                         # .networkPolicies.global.scNodes.ips cluster subnet
-  mock_set_output "${mock_kubectl}" "127.0.1.8 127.0.2.8 127.0.3.8" 13       # .networkPolicies.global.scNodes.ips calico ipip
-  mock_set_output "${mock_kubectl}" "127.0.1.81 127.0.2.81 127.0.3.81" 14    # .networkPolicies.global.scNodes.ips calico vxlan
-  mock_set_output "${mock_kubectl}" "127.0.1.9 127.0.2.9 127.0.3.9" 15       # .networkPolicies.global.scNodes.ips calico wireguard
-  mock_set_output "${mock_kubectl}" "" 16                                    # .networkPolicies.global.scNodes.ips cilium internal
-  mock_set_output "${mock_kubectl}" "" 17                                    # check if cluster with name <environment>-<cluster> exists
-  mock_set_output "${mock_kubectl}" "[1]" 18                                 # check number of subnets in cluster
-  mock_set_output "${mock_kubectl}" "10.0.1.0/24" 19                         # .networkPolicies.global.wcApiserver.ips cluster subnet
-  mock_set_output "${mock_kubectl}" "127.0.1.5 127.0.2.5 127.0.3.5" 20       # .networkPolicies.global.wcApiserver.ips calico ipip
-  mock_set_output "${mock_kubectl}" "127.0.1.51 127.0.2.51 127.0.3.51" 21    # .networkPolicies.global.wcApiserver.ips calico vxlan
-  mock_set_output "${mock_kubectl}" "127.0.1.6 127.0.2.6 127.0.3.6" 22       # .networkPolicies.global.wcApiserver.ips calico wireguard
-  mock_set_output "${mock_kubectl}" "" 23                                    # .networkPolicies.global.wcApiserver.ips cilium internal
-  mock_set_output "${mock_kubectl}" "" 24                                    # check if cluster with name <environment>-<cluster> exists
-  mock_set_output "${mock_kubectl}" "[1]" 25                                 # check number of subnets in cluster
-  mock_set_output "${mock_kubectl}" "10.0.1.0/24" 26                         # .networkPolicies.global.wcNodes.ips cluster subnet
-  mock_set_output "${mock_kubectl}" "127.0.1.11 127.0.2.11 127.0.3.11" 27    # .networkPolicies.global.wcNodes.ips calico ipip
-  mock_set_output "${mock_kubectl}" "127.0.1.111 127.0.2.111 127.0.3.111" 28 # .networkPolicies.global.wcNodes.ips calico vxlan
-  mock_set_output "${mock_kubectl}" "127.0.1.12 127.0.2.12 127.0.3.12" 29    # .networkPolicies.global.wcNodes.ips calico wireguard
-  mock_set_output "${mock_kubectl}" "" 30                                    # .networkPolicies.global.wcNodes.ips cilium internal
+_mock_sc() {
+  mock_set_output "${mock_kubectl}" "" 1             # check if cluster with name <environment>-sc exists
+  mock_set_output "${mock_kubectl}" "" 2             # check if cluster with name <environment>-<cluster> exists
+  mock_set_output "${mock_kubectl}" "[1]" 3          # check number of subnets in cluster
+  mock_set_output "${mock_kubectl}" "192.0.2.0/24" 4 # cluster subnet
+  mock_set_output "${mock_kubectl}" "203.0.113.1" 5  # calico ipip
+  mock_set_output "${mock_kubectl}" "203.0.113.2" 6  # calico vxlan
+  mock_set_output "${mock_kubectl}" "203.0.113.3" 7  # calico wireguard
+  mock_set_output "${mock_kubectl}" "" 8             # cilium internal
 }
 
-@test "ck8s update-ips can allow subnet" {
-  update_ips.mock_minimal_with_subnet
-  update_ips.populate_minimal
-
-  run ck8s update-ips both apply
-
-  assert_equal "$(yq.dig sc '.networkPolicies.global.scApiserver.ips | . style="flow"')" "[10.0.0.0/24, 127.0.1.2/32, 127.0.1.3/32, 127.0.1.21/32, 127.0.2.2/32, 127.0.2.3/32, 127.0.2.21/32, 127.0.3.2/32, 127.0.3.3/32, 127.0.3.21/32]"
-  assert_equal "$(yq.dig sc '.networkPolicies.global.scNodes.ips | . style="flow"')" "[10.0.0.0/24, 127.0.1.8/32, 127.0.1.9/32, 127.0.1.81/32, 127.0.2.8/32, 127.0.2.9/32, 127.0.2.81/32, 127.0.3.8/32, 127.0.3.9/32, 127.0.3.81/32]"
-  assert_equal "$(yq.dig wc '.networkPolicies.global.wcApiserver.ips | . style="flow"')" "[10.0.1.0/24, 127.0.1.5/32, 127.0.1.6/32, 127.0.1.51/32, 127.0.2.5/32, 127.0.2.6/32, 127.0.2.51/32, 127.0.3.5/32, 127.0.3.6/32, 127.0.3.51/32]"
-  assert_equal "$(yq.dig wc '.networkPolicies.global.wcNodes.ips | . style="flow"')" "[10.0.1.0/24, 127.0.1.11/32, 127.0.1.12/32, 127.0.1.111/32, 127.0.2.11/32, 127.0.2.12/32, 127.0.2.111/32, 127.0.3.11/32, 127.0.3.12/32, 127.0.3.111/32]"
-
-  assert_equal "$(mock_get_call_num "${mock_curl}")" 0
-  assert_equal "$(mock_get_call_num "${mock_dig}")" 3
-  assert_equal "$(mock_get_call_num "${mock_kubectl}")" 30
+_mock_wc() {
+  mock_set_output "${mock_kubectl}" "" 1             # check if cluster with name <environment>-<cluster> exists
+  mock_set_output "${mock_kubectl}" "[1]" 2          # check number of subnets in cluster
+  mock_set_output "${mock_kubectl}" "192.0.2.0/24" 3 # cluster subnet
+  mock_set_output "${mock_kubectl}" "203.0.113.1" 4  # calico ipip
+  mock_set_output "${mock_kubectl}" "203.0.113.2" 5  # calico vxlan
+  mock_set_output "${mock_kubectl}" "203.0.113.3" 6  # calico wireguard
+  mock_set_output "${mock_kubectl}" "" 7             # cilium internal
 }
 
-@test "ck8s update-ips swallows existing internal ips into cluster subnet" {
-  update_ips.mock_minimal_with_subnet
-  update_ips.populate_minimal
-
-  yq.set sc .networkPolicies.global.scNodes.ips '["10.0.0.1/32", "10.0.0.2/32", "10.0.0.3/32"]'
-  yq.set wc .networkPolicies.global.wcNodes.ips '["10.0.1.1/32", "10.0.1.2/32", "10.0.1.3/32"]'
-
-  run ck8s update-ips both apply
-
-  assert_equal "$(yq.dig sc '.networkPolicies.global.scNodes.ips | . style="flow"')" "[10.0.0.0/24, 127.0.1.8/32, 127.0.1.9/32, 127.0.1.81/32, 127.0.2.8/32, 127.0.2.9/32, 127.0.2.81/32, 127.0.3.8/32, 127.0.3.9/32, 127.0.3.81/32]"
-  assert_equal "$(yq.dig wc '.networkPolicies.global.wcNodes.ips | . style="flow"')" "[10.0.1.0/24, 127.0.1.11/32, 127.0.1.12/32, 127.0.1.111/32, 127.0.2.11/32, 127.0.2.12/32, 127.0.2.111/32, 127.0.3.11/32, 127.0.3.12/32, 127.0.3.111/32]"
+_assert_sc() {
+  assert_equal "$(yq.dig sc "${1}"' | . style="flow"')" "[192.0.2.0/24, 203.0.113.1/32, 203.0.113.2/32, 203.0.113.3/32]"
 
   assert_equal "$(mock_get_call_num "${mock_curl}")" 0
-  assert_equal "$(mock_get_call_num "${mock_dig}")" 3
-  assert_equal "$(mock_get_call_num "${mock_kubectl}")" 30
+  assert_equal "$(mock_get_call_num "${mock_dig}")" 0
+  assert_equal "$(mock_get_call_num "${mock_kubectl}")" 8
 }
 
-@test "ck8s update-ips falls back on individual node IPs if CAPI cluster is not found" {
-  update_ips.mock_minimal_with_subnet
-  update_ips.populate_minimal
-
-  mock_set_status "${mock_kubectl}" 1 24
-  mock_set_output "${mock_kubectl}" "10.0.1.2 10.0.1.3 10.0.1.4" 25          # .networkPolicies.global.wcNodes.ips node internal
-  mock_set_output "${mock_kubectl}" "127.0.1.11 127.0.2.11 127.0.3.11" 26    # .networkPolicies.global.wcNodes.ips calico ipip
-  mock_set_output "${mock_kubectl}" "127.0.1.111 127.0.2.111 127.0.3.111" 27 # .networkPolicies.global.wcNodes.ips calico vxlan
-  mock_set_output "${mock_kubectl}" "127.0.1.12 127.0.2.12 127.0.3.12" 28    # .networkPolicies.global.wcNodes.ips calico wireguard
-
-  run ck8s update-ips both apply
-
-  assert_equal "$(yq.dig sc '.networkPolicies.global.scNodes.ips | . style="flow"')" "[10.0.0.0/24, 127.0.1.8/32, 127.0.1.9/32, 127.0.1.81/32, 127.0.2.8/32, 127.0.2.9/32, 127.0.2.81/32, 127.0.3.8/32, 127.0.3.9/32, 127.0.3.81/32]"
-  assert_equal "$(yq.dig wc '.networkPolicies.global.wcNodes.ips | . style="flow"')" "[10.0.1.2/32, 10.0.1.3/32, 10.0.1.4/32, 127.0.1.11/32, 127.0.1.12/32, 127.0.1.111/32, 127.0.2.11/32, 127.0.2.12/32, 127.0.2.111/32, 127.0.3.11/32, 127.0.3.12/32, 127.0.3.111/32]"
+_assert_wc() {
+  assert_equal "$(yq.dig wc "${1}"' | . style="flow"')" "[192.0.2.0/24, 203.0.113.1/32, 203.0.113.2/32, 203.0.113.3/32]"
 
   assert_equal "$(mock_get_call_num "${mock_curl}")" 0
-  assert_equal "$(mock_get_call_num "${mock_dig}")" 3
-  assert_equal "$(mock_get_call_num "${mock_kubectl}")" 29
+  assert_equal "$(mock_get_call_num "${mock_dig}")" 0
+  assert_equal "$(mock_get_call_num "${mock_kubectl}")" 7
+}
+
+@test "ck8s update-ips sc apply --enable apiserver can allow subnet" {
+  _mock_sc
+  run ck8s update-ips sc apply --enable apiserver
+  _assert_sc .networkPolicies.global.scApiserver.ips
+}
+
+@test "ck8s update-ips sc apply --enable nodes can allow subnet" {
+  _mock_sc
+  run ck8s update-ips sc apply --enable nodes
+  _assert_sc .networkPolicies.global.scNodes.ips
+}
+
+@test "ck8s update-ips wc apply --enable apiserver can allow subnet" {
+  _mock_wc
+  run ck8s update-ips wc apply --enable apiserver
+  _assert_wc .networkPolicies.global.wcApiserver.ips
+}
+
+@test "ck8s update-ips wc apply --enable nodes can allow subnet" {
+  _mock_wc
+  run ck8s update-ips wc apply --enable nodes
+  _assert_wc .networkPolicies.global.wcNodes.ips
+}
+
+@test "ck8s update-ips sc apply --enable apiserver swallows existing internal ips into cluster subnet" {
+  yq.set sc .networkPolicies.global.scApiserver.ips '["192.0.2.1/32", "192.0.2.2/32", "192.0.2.3/32"]'
+  _mock_sc
+  run ck8s update-ips sc apply --enable apiserver
+  _assert_sc .networkPolicies.global.scApiserver.ips
+}
+
+@test "ck8s update-ips sc apply --enable nodes swallows existing internal ips into cluster subnet" {
+  yq.set sc .networkPolicies.global.scNodes.ips '["192.0.2.1/32", "192.0.2.2/32", "192.0.2.3/32"]'
+  _mock_sc
+  run ck8s update-ips sc apply --enable nodes
+  _assert_sc .networkPolicies.global.scNodes.ips
+}
+
+@test "ck8s update-ips wc apply --enable apiserver swallows existing internal ips into cluster subnet" {
+  yq.set wc .networkPolicies.global.wcApiserver.ips '["192.0.2.1/32", "192.0.2.2/32", "192.0.2.3/32"]'
+  _mock_wc
+  run ck8s update-ips wc apply --enable apiserver
+  _assert_wc .networkPolicies.global.wcApiserver.ips
+}
+
+@test "ck8s update-ips wc apply --enable nodes swallows existing internal ips into cluster subnet" {
+  yq.set wc .networkPolicies.global.wcNodes.ips '["192.0.2.1/32", "192.0.2.2/32", "192.0.2.3/32"]'
+  _mock_wc
+  run ck8s update-ips wc apply --enable nodes
+  _assert_wc .networkPolicies.global.wcNodes.ips
+}
+
+_mock_fallback_sc() {
+  mock_set_status "${mock_kubectl}" 1 1                               # check if cluster with name <environment>-sc exists
+  mock_set_status "${mock_kubectl}" 1 2                               # check if cluster with name <environment>-<cluster> exists
+  mock_set_output "${mock_kubectl}" "192.0.2.1 192.0.2.2 192.0.2.3" 3 # node internal
+  mock_set_output "${mock_kubectl}" "203.0.113.1" 4                   # calico ipip
+  mock_set_output "${mock_kubectl}" "203.0.113.2" 5                   # calico vxlan
+  mock_set_output "${mock_kubectl}" "203.0.113.3" 6                   # calico wireguard
+  mock_set_output "${mock_kubectl}" "" 7                              # cilium internal
+}
+
+_mock_fallback_wc() {
+  mock_set_status "${mock_kubectl}" 1 1                               # check if cluster with name <environment>-<cluster> exists
+  mock_set_output "${mock_kubectl}" "192.0.2.1 192.0.2.2 192.0.2.3" 2 # node internal
+  mock_set_output "${mock_kubectl}" "203.0.113.1" 3                   # calico ipip
+  mock_set_output "${mock_kubectl}" "203.0.113.2" 4                   # calico vxlan
+  mock_set_output "${mock_kubectl}" "203.0.113.3" 5                   # calico wireguard
+  mock_set_output "${mock_kubectl}" "" 6                              # cilium internal
+}
+
+_assert_fallback_sc() {
+  assert_equal "$(yq.dig sc "${1}"' | . style="flow"')" "[192.0.2.1/32, 192.0.2.2/32, 192.0.2.3/32, 203.0.113.1/32, 203.0.113.2/32, 203.0.113.3/32]"
+
+  assert_equal "$(mock_get_call_num "${mock_curl}")" 0
+  assert_equal "$(mock_get_call_num "${mock_dig}")" 0
+  assert_equal "$(mock_get_call_num "${mock_kubectl}")" 7
+}
+
+_assert_fallback_wc() {
+  assert_equal "$(yq.dig wc "${1}"' | . style="flow"')" "[192.0.2.1/32, 192.0.2.2/32, 192.0.2.3/32, 203.0.113.1/32, 203.0.113.2/32, 203.0.113.3/32]"
+
+  assert_equal "$(mock_get_call_num "${mock_curl}")" 0
+  assert_equal "$(mock_get_call_num "${mock_dig}")" 0
+  assert_equal "$(mock_get_call_num "${mock_kubectl}")" 6
+}
+
+@test "ck8s update-ips sc apply --enable apiserver falls back on individual node IPs if CAPI cluster is not found" {
+  _mock_fallback_sc
+  run ck8s update-ips sc apply --enable apiserver
+  _assert_fallback_sc .networkPolicies.global.scApiserver.ips
+}
+
+@test "ck8s update-ips sc apply --enable nodes falls back on individual node IPs if CAPI cluster is not found" {
+  _mock_fallback_sc
+  run ck8s update-ips sc apply --enable nodes
+  _assert_fallback_sc .networkPolicies.global.scNodes.ips
+}
+
+@test "ck8s update-ips wc apply --enable apiserver falls back on individual node IPs if CAPI cluster is not found" {
+  _mock_fallback_wc
+  run ck8s update-ips wc apply --enable apiserver
+  _assert_fallback_wc .networkPolicies.global.wcApiserver.ips
+}
+
+@test "ck8s update-ips wc apply --enable nodes falls back on individual node IPs if CAPI cluster is not found" {
+  _mock_fallback_wc
+  run ck8s update-ips wc apply --enable nodes
+  _assert_fallback_wc .networkPolicies.global.wcNodes.ips
 }
