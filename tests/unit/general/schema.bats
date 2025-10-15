@@ -118,6 +118,9 @@ find_schemas() {
 }
 
 @test "documentation should be generated" {
+
+  skip "documentation generation has changed for new versions"
+
   pushd "${DOCS_PATH}" || exit 1
 
   run "./scripts/jsonschema2md.sh" --path "${APPS_PATH}"

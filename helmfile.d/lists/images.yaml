@@ -24,7 +24,7 @@ images:
     image: docker.io/openpolicyagent/gatekeeper:v3.18.2
     preInstallCRDs: docker.io/openpolicyagent/gatekeeper-crds:v3.18.2
     postInstallLabelNamespace: docker.io/openpolicyagent/gatekeeper-crds:v3.18.2
-    kubectl: docker.io/bitnami/kubectl:1.25
+    kubectl: ghcr.io/elastisys/bitnami/kubectl:1.32.4
   gpuOperator:
     operator: nvcr.io/nvidia/gpu-operator:v24.9.2
     nodeFeatureDiscovery: registry.k8s.io/nfd/node-feature-discovery:v0.16.6
@@ -53,7 +53,7 @@ images:
   kyverno:
     main: ghcr.io/kyverno/kyverno:v1.13.4
     init: ghcr.io/kyverno/kyverno:v1.13.4
-    webhooksCleanup: docker.io/bitnami/kubectl:1.30.2
+    webhooksCleanup: ghcr.io/elastisys/bitnami/kubectl:1.32.4
     crdsMigration: ghcr.io/kyverno/kyverno-cli:v1.13.4
   monitoring:
     nodeExporter: quay.io/prometheus/node-exporter:v1.9.1
@@ -93,4 +93,4 @@ images:
     pluginAws: docker.io/velero/velero-plugin-for-aws:v1.9.0
     pluginGcp: docker.io/velero/velero-plugin-for-gcp:v1.9.1
     pluginAzure: docker.io/velero/velero-plugin-for-microsoft-azure:v1.9.2
-    kubectl: ghcr.io/elastisys/bitnami/kubectl:1.29.11
+    kubectl: ghcr.io/elastisys/bitnami/kubectl:1.32.4
