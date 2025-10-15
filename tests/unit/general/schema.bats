@@ -118,9 +118,6 @@ find_schemas() {
 }
 
 @test "documentation should be generated" {
-
-  skip "documentation generation has changed for new versions"
-
   pushd "${DOCS_PATH}" || exit 1
 
   run "./scripts/jsonschema2md.py" "${APPS_PATH}/config/schemas"
