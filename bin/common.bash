@@ -505,7 +505,7 @@ validate_sops_config() {
 }
 
 # Load and validate all configuration options from the config path.
-# Usage: config_load <sc|wc> [--skip-validation|-v] [--skip-test-encrypt]
+# Usage: config_load <sc|wc> [--skip-validation] [-v] [--skip-test-encrypt]
 config_load() {
   cluster="${1}"
   load_config "${cluster}"
@@ -526,7 +526,7 @@ config_load() {
       verbose=true
       ;;
     *)
-      log_error "Usage: config_load <sc|wc> [--skip-validation|-v] [--test-encrypt]"
+      log_error "Usage: config_load <sc|wc> [--skip-validation] [-v] [--test-encrypt]"
       ;;
     esac
     shift
