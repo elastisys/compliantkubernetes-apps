@@ -300,6 +300,17 @@ These are the general steps to do when replacing old Helm chart(s) with a Module
     +  - crossplane-system/crossplane-packages
     ```
 
+### Testing Modules
+
+Modules should be tested just as components have been tested previously in the [end-to-end tests](tests/end-to-end).
+
+#### Testing Chart to Module migration
+
+For every release that replaces a Helm chart with a Module an acceptance test should be added to the migration prepare step.
+This acceptance test will verify that the existing Helm release is adopted by the Module and not recreated as well as making sure that there is no unexpected diff in the resources managed by the Helm release.
+
+The acceptance test implementation is [here](scripts/migration/crossplane.sh) and an example of a prepare step that uses the acceptance test is [here](migration/v0.50/prepare/90-verify-module-zero-diff.sh).
+
 ## Code styling guidelines
 
 ### Bash
