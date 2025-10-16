@@ -49,6 +49,7 @@ templates:
       app: metrics-server
     values:
       - values/metrics-server.yaml.gotmpl
+
   autoscaling-monitoring:
     disableValidationOnInstall: true
     condition: ck8sManagementCluster.enabled
