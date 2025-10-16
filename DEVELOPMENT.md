@@ -197,6 +197,112 @@ kubectl delete pvc --all -A
 ./scripts/local-cluster.sh delete <name>
 ```
 
+## Modules
+
+Modules is the new way components are packaged and managed in Welkin.
+They are packaged as [Crossplane Configurations](https://docs.crossplane.io/latest/packages/configurations/) and installed as [Crossplane Composite Resources](https://docs.crossplane.io/latest/composition/composite-resources/).
+
+### Adding a Module
+
+These are the general steps to do when replacing old Helm chart(s) with a Module.
+
+1. Add the Crossplane Configuration package to `helmfile.d/lists/images.yaml`.
+
+    ```diff
+    images:
+      crossplane:
+        configurations:
+    +      module-$NAME: $REGISTRY/welkin/module-$NAME:$VERSION
+    ```
+
+1. Create a Module Helm chart in `helmfile.d/charts/modules`.
+
+    ```sh
+    mkdir helmfile.d/charts/modules/$NAME
+    ```
+
+1. Add the `Chart.yaml` file in `helmfile.d/charts/modules/$NAME`.
+
+    ```yaml
+    apiVersion: v2
+    name: module-$NAME
+    description: A Helm chart for the $NAME Module
+    type: application
+    version: 0.1.0
+    appVersion: $APPLICATION_VERSION
+    ```
+
+1. Copy the values file from the old chart to the Module chart.
+
+> [!note]
+> The values does not need to be identical to the previous chart but everything that is already configurable via the Apps common/sc/wc-config must still be configurable through the module.
+
+    ```sh
+    cp helmfile.d/charts/$NAME/values.yaml helmfile.d/charts/modules/$NAME/values.yaml
+    ```
+
+1. Add ProviderConfigs to the Helm chart templates.
+
+    ```yaml
+    apiVersion: kubernetes.m.crossplane.io/v1alpha1
+    kind: ProviderConfig
+    metadata:
+      name: $NAME-mc
+    spec:
+      credentials:
+        source: InjectedIdentity
+    ---
+    apiVersion: helm.m.crossplane.io/v1beta1
+    kind: ProviderConfig
+    metadata:
+      name: $NAME-mc
+    spec:
+      credentials:
+        source: InjectedIdentity
+    ```
+
+1. Add the XR to the Helm chart templates.
+
+    ```yaml
+    apiVersion: module.elastisys.com/v1alpha1
+    kind: $XR_KIND
+    metadata:
+      name: $NAME
+    spec:
+      foo: {{ .Values.foo }}
+      bar: {{ .Values.bar | toYaml | nindent 4 }}
+      providerConfigs:
+        helm:
+          mc:
+            kind: ProviderConfig
+            name: $NAME-mc
+        kubernetes:
+          mc:
+            kind: ProviderConfig
+            name: $NAME-mc
+      crossplane:
+        compositionRef:
+            name: $NAME
+    ```
+
+1. Remove the old Helm chart
+
+    ```sh
+    rm -r helmfile.d/charts/$NAME
+    ```
+
+1. Update the stack in `helmfile.d/stacks/$STACK.yaml.gotmpl`
+
+    ```diff
+    - chart: charts/old-chart
+    + chart: charts/modules/$NAME
+    ```
+
+    ```diff
+    needs:
+    +  - crossplane-system/crossplane-packages
+    ```
+
 ## Code styling guidelines
 
 ### Bash
