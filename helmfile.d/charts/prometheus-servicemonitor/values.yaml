@@ -7,3 +7,13 @@ rookMonitor:
   relabelings: []
   # - targetLabel: cluster
   #   replacement: service_cluster
+
+kubeVIP:
+  enabled: true
+  namespace: kube-system
+
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: http
+    selectorLabels: {}
