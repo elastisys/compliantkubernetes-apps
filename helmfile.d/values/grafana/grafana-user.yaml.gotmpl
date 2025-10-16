@@ -124,6 +124,19 @@ grafana.ini:
     tls_skip_verify_insecure: {{ not .Values.global.verifyTls }}
     skip_org_role_sync: {{ .Values.grafana.user.oidc.skipRoleSync }}
     role_attribute_path: contains(groups[*], '{{ .Values.grafana.user.oidc.userGroups.grafanaAdmin }}') && 'Admin' || contains(groups[*], '{{ .Values.grafana.user.oidc.userGroups.grafanaEditor }}') && 'Editor' || contains(groups[*], '{{ .Values.grafana.user.oidc.userGroups.grafanaViewer }}') && 'Viewer'
+  {{ if .Values.grafana.user.oidc.jwtEnabled -}}
+  # Enable JWT auth
+  auth.jwt:
+    enabled: true
+    header_name: X-JWT-Assertion
+    username_claim: preferred_username
+    email_claim: email
+    name_claim: name
+    jwk_set_url: https://{{ .Values.dex.subdomain }}.{{ .Values.global.baseDomain }}{{ $trailingDot }}/keys
+    auto_sign_up: true
+    cache_ttl: 60m
+    skip_org_role_sync: true
+  {{- end }}
   users:
     viewers_can_edit: {{ .Values.grafana.user.viewersCanEdit }}
   dashboards:

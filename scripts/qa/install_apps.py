@@ -139,6 +139,7 @@ def configure_apps(
         "oidc": {
             "skipRoleSync": True,
             "allowedDomains": ["elastisys.com", "example.com"],
+            "jwtEnabled": True,
         },
     }
     sc_config.set("grafana.ops", grafana_cfg)
