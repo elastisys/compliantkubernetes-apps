@@ -303,6 +303,21 @@ These are the general steps to do when replacing old Helm chart(s) with a Module
     +  - crossplane-system/crossplane-packages
     ```
 
+### Testing Modules
+
+Modules should be tested just as components have been tested previously in the [tests](tests/).
+
+#### Testing Chart to Module migration
+
+For every release that replaces a Helm chart with a Module a maintenance test should be added to the migration prepare step.
+This maintenance test will verify that the existing Helm release is adopted by the Module and not recreated as well as making sure that there is no unexpected diff in the resources managed by the Helm release.
+
+The maintenance test implementation is [here](scripts/migration/crossplane.sh) and an example of a prepare step that uses the maintenance test looks like this:
+
+```sh
+module_maintenance_test "${CK8S_CLUSTER}" app=node-local-dns "${HERE}/module-accepted-changes/node-local-dns"
+```
+
 ## Code styling guidelines
 
 ### Bash
