@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:397e23d3-578d-4dfa-b9d7-2f94a6a7a255",
+  "serialNumber": "urn:uuid:31b68014-6b82-4085-b6a5-e800de8caf42",
   "version": 1,
   "metadata": {
-    "timestamp": "2025-10-14T12:30:51Z",
+    "timestamp": "2025-10-16T14:43:16Z",
     "lifecycles": [
       {
         "phase": "build"
@@ -4519,28 +4519,6 @@
       "purl": "pkg:oci/oauth2-proxy/oauth2-proxy@v7.12.0?repository_url=quay.io"
     },
     {
-      "bom-ref": "pkg:oci/open-policy-agent/fake-reader@latest?repository_url=ghcr.io",
-      "type": "container",
-      "supplier": {
-        "name": "open-policy-agent"
-      },
-      "name": "ghcr.io/open-policy-agent/fake-reader",
-      "version": "latest",
-      "cpe": "cpe:2.3:a:open-policy-agent:fake-reader:*:*:*:*:*:*:*:*",
-      "purl": "pkg:oci/open-policy-agent/fake-reader@latest?repository_url=ghcr.io"
-    },
-    {
-      "bom-ref": "pkg:oci/open-policy-agent/fake-reader@v3.20.1?repository_url=ghcr.io",
-      "type": "container",
-      "supplier": {
-        "name": "open-policy-agent"
-      },
-      "name": "ghcr.io/open-policy-agent/fake-reader",
-      "version": "v3.20.1",
-      "cpe": "cpe:2.3:a:open-policy-agent:fake-reader:*:*:*:*:*:*:*:*",
-      "purl": "pkg:oci/open-policy-agent/fake-reader@v3.20.1?repository_url=ghcr.io"
-    },
-    {
       "bom-ref": "pkg:oci/openpolicyagent/gatekeeper-crds@v3.20.1",
       "type": "container",
       "supplier": {
@@ -5415,8 +5393,6 @@
       "ref": "pkg:helm/gatekeeper@3.20.1",
       "dependsOn": [
         "pkg:oci/curlimages/curl@8.12.0",
-        "pkg:oci/open-policy-agent/fake-reader@latest?repository_url=ghcr.io",
-        "pkg:oci/open-policy-agent/fake-reader@v3.20.1?repository_url=ghcr.io",
         "pkg:oci/openpolicyagent/gatekeeper-crds@v3.20.1",
         "pkg:oci/openpolicyagent/gatekeeper@v3.20.1"
       ]
@@ -6200,14 +6176,6 @@
     },
     {
       "ref": "pkg:oci/oauth2-proxy/oauth2-proxy@v7.12.0?repository_url=quay.io",
-      "dependsOn": []
-    },
-    {
-      "ref": "pkg:oci/open-policy-agent/fake-reader@latest?repository_url=ghcr.io",
-      "dependsOn": []
-    },
-    {
-      "ref": "pkg:oci/open-policy-agent/fake-reader@v3.20.1?repository_url=ghcr.io",
       "dependsOn": []
     },
     {
