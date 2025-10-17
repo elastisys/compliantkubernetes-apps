@@ -57,6 +57,10 @@ user:
   # Requires that gatekeeper.allowUserCRDs.enabled is enabled.
   kafka:
     enabled: false
+  # Installs required cluster resources needed to install jaeger-operator
+  # Requires that gatekeeper.allowUserCRDs.enabled is enabled.
+  jaeger:
+    enabled: false
 
   # Create extra application developer RBAC
   extraRoles: {}

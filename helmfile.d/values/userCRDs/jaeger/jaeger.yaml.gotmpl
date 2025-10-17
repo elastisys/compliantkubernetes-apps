@@ -1,0 +1,196 @@
+{{- if .Values.user.jaeger.enabled }}
+roles:
+  jaeger-operator:
+    rules:
+    - apiGroups:
+      - apps
+      resources:
+      - daemonsets
+      - deployments
+      - replicasets
+      - statefulsets
+      verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+    - apiGroups:
+      - apps
+      resources:
+      - deployments/status
+      verbs:
+      - get
+      - patch
+      - update
+    - apiGroups:
+      - autoscaling
+      resources:
+      - horizontalpodautoscalers
+      verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+    - apiGroups:
+      - batch
+      resources:
+      - cronjobs
+      - jobs
+      verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+    - apiGroups:
+      - coordination.k8s.io
+      resources:
+      - leases
+      verbs:
+      - create
+      - get
+      - list
+      - update
+    - apiGroups:
+      - ""
+      resources:
+      - configmaps
+      - persistentvolumeclaims
+      - pods
+      - secrets
+      - serviceaccounts
+      - services
+      - services/finalizers
+      verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+    - apiGroups:
+      - ""
+      resources:
+      - namespaces
+      verbs:
+      - get
+      - list
+      - watch
+    - apiGroups:
+      - extensions
+      resources:
+      - ingresses
+      verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+    - apiGroups:
+      - jaegertracing.io
+      resources:
+      - jaegers
+      verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+    - apiGroups:
+      - jaegertracing.io
+      resources:
+      - jaegers/finalizers
+      verbs:
+      - update
+    - apiGroups:
+      - jaegertracing.io
+      resources:
+      - jaegers/status
+      verbs:
+      - get
+      - patch
+      - update
+    - apiGroups:
+      - monitoring.coreos.com
+      resources:
+      - servicemonitors
+      verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+    - apiGroups:
+      - networking.k8s.io
+      resources:
+      - ingresses
+      verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+clusterRoles:
+  jaeger-operator-ingressclasses:
+    rules:
+    - apiGroups:
+      - networking.k8s.io
+      resources:
+      - ingressclasses
+      verbs:
+      - get
+      - list
+      - watch
+clusterRoleBindings:
+  jaeger-operator-ingressclasses:
+    roleRef:
+      name: jaeger-operator-ingressclasses
+    subjects:
+    - kind: ServiceAccount
+      name: jaeger-operator
+      namespace: jaeger
+roleBindings:
+  jaeger-operator:
+    roleRef:
+      name: jaeger-operator
+    subjects:
+    - kind: ServiceAccount
+      name: jaeger-operator
+      namespace: jaeger
+  jaeger-admin:
+    roleRef:
+      name: jaeger-operator
+    subjects:
+    {{- range $user := .Values.user.adminUsers }}
+    - apiGroup: rbac.authorization.k8s.io
+      kind: User
+      name: {{ $user }}
+    {{- end }}
+    {{- range $group := $.Values.user.adminGroups }}
+    - apiGroup: rbac.authorization.k8s.io
+      kind: Group
+      name: {{ $group }}
+    {{- end }}
+    {{- range $serviceAccount := .Values.user.serviceAccounts }}
+    - kind: ServiceAccount
+      name: {{ $serviceAccount }}
+      namespace: default
+    {{- end }}
+{{- end }}
