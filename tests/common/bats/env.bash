@@ -84,6 +84,8 @@ env.init() {
 
     yq.set 'common' '.networkPolicies.certManager.letsencrypt.ips' '["0.0.0.0/0"]'
 
+    yq.set 'common' '.networkPolicies.crossplane.packageRegistry.ips' '["0.0.0.0/0"]'
+
     yq.set 'common' '.networkPolicies.coredns.externalDns.ips' '["0.0.0.0/0"]'
 
     yq.set 'sc' '.networkPolicies.dex.connectors.ips' '["0.0.0.0/0"]'

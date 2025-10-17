@@ -7907,6 +7907,28 @@ properties:
             title: Network Policies Rook Ceph Enabled
             default: false
             type: boolean
+      crossplane:
+        title: Network Policies Crossplane
+        description: Configure Crossplane network policy rules.
+        type: object
+        additionalProperties: false
+        properties:
+          enabled:
+            title: Network Policies Crossplane Enabled
+            type: boolean
+            default: true
+          packageRegistry:
+            title: Crossplane Package Registry
+            description: Configure network policy rules to allow Crossplane to access the Package registry
+            type: object
+            additionalProperties: false
+            properties:
+              ips:
+                $ref: '#/$defs/iplist'
+              ports:
+                $ref: '#/$defs/portlist'
+                default:
+                  - 443
       defaultDeny:
         default: false
         type: boolean
@@ -8374,6 +8396,32 @@ properties:
             $ref: '#/$defs/containerImage'
           startupapicheck:
             $ref: '#/$defs/containerImage'
+      crossplane:
+        title: crossplane stack image configuration
+        description: crossplane stack image configuration
+        type: object
+        additionalProperties: false
+        properties:
+          image:
+            $ref: '#/$defs/containerImage'
+          kubectl:
+            $ref: '#/$defs/containerImage'
+          providers:
+            title: crossplane provider images configuration
+            description: crossplane provider images configuration
+            type: object
+            additionalProperties: false
+            patternProperties:
+              "^[a-z-]+$":
+                $ref: '#/$defs/containerImage'
+          functions:
+            title: crossplane function images configuration
+            description: crossplane function images configuration
+            type: object
+            additionalProperties: false
+            patternProperties:
+              "^[a-z-]+$":
+                $ref: '#/$defs/containerImage'
       dex:
         title: dex stack image configuration
         description: dex stack image configuration
@@ -8622,6 +8670,15 @@ properties:
             $ref: '#/$defs/containerImage'
           kubectl:
             $ref: '#/$defs/containerImage'
+  crossplane:
+    title: Crossplane Config
+    description: Configure Crossplane
+    type: object
+    properties:
+      enabled:
+        title: Enable Crossplane
+        default: false
+        type: boolean
 additionalProperties:
   title: Additional Properties
   description: Configure additional properties not covered by the schema.
