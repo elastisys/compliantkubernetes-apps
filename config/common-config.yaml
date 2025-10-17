@@ -81,9 +81,9 @@ crossplane:
   resources:
     requests:
       cpu: 10m
-      memory: 160Mi
+      memory: 300Mi
     limits:
-      cpu: 100m
+      cpu: 200m
       memory: 512Mi
   rbacManager:
     resources:
@@ -91,7 +91,7 @@ crossplane:
         cpu: 5m
         memory: 32Mi
       limits:
-        cpu: 10m
+        cpu: 20m
         memory: 128Mi
   functions:
     auto-ready:
@@ -101,7 +101,7 @@ crossplane:
           memory: 16Mi
         limits:
           cpu: 20m
-          memory: 64Mi
+          memory: 128Mi
     capability:
       resources:
         requests:
@@ -109,32 +109,32 @@ crossplane:
           memory: 16Mi
         limits:
           cpu: 20m
-          memory: 64Mi
+          memory: 128Mi
     go-templating:
       resources:
         requests:
           cpu: 1m
           memory: 16Mi
         limits:
-          cpu: 20m
-          memory: 64Mi
+          cpu: 50m
+          memory: 128Mi
     patch-and-transform:
         resources:
           requests:
             cpu: 1m
-            memory: 16Mi
+            memory: 32Mi
           limits:
-            cpu: 20m
-            memory: 64Mi
+            cpu: 50m
+            memory: 128Mi
   providers:
     helm:
       resources:
         requests:
           cpu: 5m
-          memory: 64Mi
+          memory: 192Mi
         limits:
-          cpu: 50m
-          memory: 256Mi
+          cpu: 300m
+          memory: 512Mi
     kubernetes:
       resources:
         requests:
