@@ -21,9 +21,9 @@ images:
     forwarder: ghcr.io/elastisys/fluentd-forwarder:v4.7.5-ck8s1
     logManager: ghcr.io/elastisys/compliantkubernetes-apps-log-manager:0.3.2
   gatekeeper:
-    image: docker.io/openpolicyagent/gatekeeper:v3.18.2
-    preInstallCRDs: docker.io/openpolicyagent/gatekeeper-crds:v3.18.2
-    postInstallLabelNamespace: docker.io/openpolicyagent/gatekeeper-crds:v3.18.2
+    image: docker.io/openpolicyagent/gatekeeper:v3.20.1
+    preInstallCRDs: docker.io/openpolicyagent/gatekeeper-crds:v3.20.1
+    postInstallLabelNamespace: docker.io/openpolicyagent/gatekeeper-crds:v3.20.1
     kubectl: ghcr.io/elastisys/bitnami/kubectl:1.32.4
   gpuOperator:
     operator: nvcr.io/nvidia/gpu-operator:v24.9.2
