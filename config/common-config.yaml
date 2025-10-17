@@ -97,32 +97,32 @@ crossplane:
     auto-ready:
       resources:
         requests:
-          cpu: 1m
-          memory: 16Mi
+          cpu: 10m
+          memory: 64Mi
         limits:
           cpu: 20m
           memory: 128Mi
     capability:
       resources:
         requests:
-          cpu: 1m
-          memory: 16Mi
+          cpu: 10m
+          memory: 64Mi
         limits:
           cpu: 20m
           memory: 128Mi
     go-templating:
       resources:
         requests:
-          cpu: 1m
-          memory: 16Mi
+          cpu: 25m
+          memory: 64Mi
         limits:
           cpu: 50m
           memory: 128Mi
     patch-and-transform:
         resources:
           requests:
-            cpu: 1m
-            memory: 32Mi
+            cpu: 25m
+            memory: 64Mi
           limits:
             cpu: 50m
             memory: 128Mi
@@ -130,16 +130,16 @@ crossplane:
     helm:
       resources:
         requests:
-          cpu: 5m
-          memory: 192Mi
+          cpu: 150m
+          memory: 256Mi
         limits:
           cpu: 300m
           memory: 512Mi
     kubernetes:
       resources:
         requests:
-          cpu: 5m
-          memory: 64Mi
+          cpu: 25m
+          memory: 128Mi
         limits:
           cpu: 50m
           memory: 256Mi
