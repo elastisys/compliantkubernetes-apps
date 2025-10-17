@@ -4,3 +4,14 @@ defaultRules:
 
 rookMonitor:
   enabled: {{ .Values.rookCeph.monitoring.enabled }}
+
+kubeVIP:
+  enabled: {{ .Values.kubeVIPMonitoring.enabled }}
+  namespace: kube-system
+  service:
+    type: ClusterIP
+    port: 2112
+    targetPort: 2112
+    selectorLabels:
+      app.kubernetes.io/instance: kube-vip-service-loadbalancer
+      app.kubernetes.io/name: kube-vip

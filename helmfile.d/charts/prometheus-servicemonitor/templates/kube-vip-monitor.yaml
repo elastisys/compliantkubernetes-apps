@@ -1,0 +1,36 @@
+{{- if .Values.kubeVIP.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "prometheus-servicemonitor.fullname" . | printf "%s-kube-vip" | trunc 63 | trimSuffix "-" }}
+  namespace: {{ .Values.kubeVIP.namespace }}
+  labels:
+{{ include "prometheus-servicemonitor.kube-vip.labels" . | indent 4 }}
+spec:
+  type: {{ .Values.kubeVIP.service.type }}
+  ports:
+    - port: {{ .Values.kubeVIP.service.port }}
+      targetPort: {{ .Values.kubeVIP.service.targetPort }}
+      protocol: TCP
+      name: monitoring
+  selector: {{- toYaml .Values.kubeVIP.service.selectorLabels | nindent 4 }}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ printf "%s-%s" (include "prometheus-servicemonitor.fullname" .) "kube-vip" | trunc 63 | trimSuffix "-" }}
+  namespace: {{ .Values.kubeVIP.namespace }}
+  labels:
+{{ include "prometheus-servicemonitor.kube-vip.labels" . | indent 4 }}
+spec:
+  endpoints:
+  - interval: 30s
+    port: monitoring
+  jobLabel: component
+  namespaceSelector:
+    matchNames:
+    - {{ .Values.kubeVIP.namespace }}
+  selector:
+    matchLabels:
+{{ include "prometheus-servicemonitor.kube-vip.labels" . | indent 6 }}
+{{- end }}

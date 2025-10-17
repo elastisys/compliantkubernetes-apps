@@ -412,6 +412,9 @@ openstackMonitoring:
   ## Enables openstack api metrics.
   enabled: false
 
+kubeVIPMonitoring:
+  enabled: false
+
 prometheus:
   replicas: 1
   devAlertmanager:

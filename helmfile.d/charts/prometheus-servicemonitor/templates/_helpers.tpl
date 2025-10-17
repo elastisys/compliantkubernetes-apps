@@ -43,3 +43,8 @@ app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
+
+{{- define "prometheus-servicemonitor.kube-vip.labels" -}}
+{{ include "prometheus-servicemonitor.labels" . }}
+app: kube-vip
+{{- end -}}
