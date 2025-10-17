@@ -30,3 +30,9 @@ image:
   {{- end }}
 {{- end }}
 {{- end }}
+
+resourcesCrossplane:
+  {{- toYaml .Values.crossplane.resources | nindent 2 }}
+
+resourcesRBACManager:
+  {{- toYaml .Values.crossplane.rbacManager.resources | nindent 2 }}

@@ -8399,16 +8399,16 @@ properties:
           kubectl:
             $ref: '#/$defs/containerImage'
           providers:
-            title: crossplane provider images configuration
-            description: crossplane provider images configuration
+            title: Crossplane Provider images configuration
+            description: Crossplane Provider images configuration
             type: object
             additionalProperties: false
             patternProperties:
               "^[a-z-]+$":
                 $ref: '#/$defs/containerImage'
           functions:
-            title: crossplane function images configuration
-            description: crossplane function images configuration
+            title: Crossplane Function images configuration
+            description: Crossplane Function images configuration
             type: object
             additionalProperties: false
             patternProperties:
@@ -8671,6 +8671,25 @@ properties:
         title: Enable Crossplane
         default: false
         type: boolean
+      resources:
+        $ref: '#/$defs/kubernetesResourceRequirements'
+      rbacManager:
+        resources:
+          $ref: '#/$defs/kubernetesResourceRequirements'
+      providers:
+        title: Crossplane Provider resource configuration
+        description: Crossplane Provider resource configuration
+        type: object
+        resources:
+          $ref: '#/$defs/kubernetesResourceRequirements'
+        additionalProperties: false
+      functions:
+        title: Crossplane Function resource configuration
+        description: Crossplane Function resource configuration
+        type: object
+        resources:
+          $ref: '#/$defs/kubernetesResourceRequirements'
+        additionalProperties: false
 additionalProperties:
   title: Additional Properties
   description: Configure additional properties not covered by the schema.
