@@ -1168,7 +1168,7 @@ networkPolicies:
       port: 443
 
   crossplane:
-    enabled: true
+    enabled: false
     packageRegistry:
       ips:
         - set-me-if-(.crossplane.enabled)
