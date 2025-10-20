@@ -8375,8 +8375,8 @@ properties:
           accountant:
             $ref: '#/$defs/containerImage'
       certManager:
-        title: Cert-manager stack image configuration
-        description: Cert-manager stack image configuration
+        title: cert-manager stack image configuration
+        description: cert-manager stack image configuration
         type: object
         additionalProperties: false
         properties:
@@ -8423,8 +8423,8 @@ properties:
           image:
             $ref: '#/$defs/containerImage'
       externalDns:
-        title: External-dns stack image configuration
-        description: External-dns stack image configuration
+        title: ExternalDNS stack image configuration
+        description: ExternalDNS stack image configuration
         type: object
         additionalProperties: false
         properties:
@@ -8471,8 +8471,8 @@ properties:
           kubectl:
             $ref: '#/$defs/containerImage'
       gpuOperator:
-        title: Gpu-operator stack image configuration
-        description: Gpu-operator stack image configuration
+        title: GPU operator stack image configuration
+        description: GPU operator stack image configuration
         type: object
         additionalProperties: false
         properties:
@@ -8591,8 +8591,8 @@ properties:
           trivyOperator:
             $ref: '#/$defs/containerImage'
       nodeLocalDns:
-        title: Node-local-dns stack image configuration
-        description: Node-local-dns stack image configuration
+        title: NodeLocal DNSCache stack image configuration
+        description: NodeLocal DNSCache stack image configuration
         type: object
         additionalProperties: false
         properties:
