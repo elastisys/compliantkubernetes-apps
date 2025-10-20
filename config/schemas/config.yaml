@@ -8674,21 +8674,28 @@ properties:
       resources:
         $ref: '#/$defs/kubernetesResourceRequirements'
       rbacManager:
+        title: Crossplane RBAC manager configuration
+        description: Crossplane RBAC manager configuration
+        type: object
         resources:
           $ref: '#/$defs/kubernetesResourceRequirements'
       providers:
         title: Crossplane Provider resource configuration
         description: Crossplane Provider resource configuration
         type: object
-        resources:
-          $ref: '#/$defs/kubernetesResourceRequirements'
+        patternProperties:
+          "^[a-z-]+$":
+            resources:
+              $ref: '#/$defs/kubernetesResourceRequirements'
         additionalProperties: false
       functions:
         title: Crossplane Function resource configuration
         description: Crossplane Function resource configuration
         type: object
-        resources:
-          $ref: '#/$defs/kubernetesResourceRequirements'
+        patternProperties:
+          "^[a-z-]+$":
+            resources:
+              $ref: '#/$defs/kubernetesResourceRequirements'
         additionalProperties: false
 additionalProperties:
   title: Additional Properties
