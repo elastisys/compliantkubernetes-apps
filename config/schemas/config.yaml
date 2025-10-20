@@ -8367,8 +8367,8 @@ properties:
             required:
               - enabled
       calico:
-        title: calico stack image configuration
-        description: calico stack image configuration
+        title: Calico stack image configuration
+        description: Calico stack image configuration
         type: object
         additionalProperties: false
         properties:
@@ -8399,32 +8399,32 @@ properties:
           kubectl:
             $ref: '#/$defs/containerImage'
           providers:
-            title: crossplane provider images configuration
-            description: crossplane provider images configuration
+            title: Crossplane Provider images configuration
+            description: Crossplane Provider images configuration
             type: object
             additionalProperties: false
             patternProperties:
               "^[a-z-]+$":
                 $ref: '#/$defs/containerImage'
           functions:
-            title: crossplane function images configuration
-            description: crossplane function images configuration
+            title: Crossplane Function images configuration
+            description: Crossplane Function images configuration
             type: object
             additionalProperties: false
             patternProperties:
               "^[a-z-]+$":
                 $ref: '#/$defs/containerImage'
       dex:
-        title: dex stack image configuration
-        description: dex stack image configuration
+        title: Dex stack image configuration
+        description: Dex stack image configuration
         type: object
         additionalProperties: false
         properties:
           image:
             $ref: '#/$defs/containerImage'
       externalDns:
-        title: external-dns stack image configuration
-        description: external-dns stack image configuration
+        title: ExternalDNS stack image configuration
+        description: ExternalDNS stack image configuration
         type: object
         additionalProperties: false
         properties:
@@ -8445,8 +8445,8 @@ properties:
           sidekick:
             $ref: '#/$defs/containerImage'
       fluentd:
-        title: fluentd stack image configuration
-        description: fluentd stack image configuration
+        title: Fluentd stack image configuration
+        description: Fluentd stack image configuration
         type: object
         additionalProperties: false
         properties:
@@ -8457,8 +8457,8 @@ properties:
           logManager:
             $ref: '#/$defs/containerImage'
       gatekeeper:
-        title: gatekeeper stack image configuration
-        description: gatekeeper stack image configuration
+        title: Gatekeeper stack image configuration
+        description: Gatekeeper stack image configuration
         type: object
         additionalProperties: false
         properties:
@@ -8471,8 +8471,8 @@ properties:
           kubectl:
             $ref: '#/$defs/containerImage'
       gpuOperator:
-        title: gpu-operator stack image configuration
-        description: gpu-operator stack image configuration
+        title: GPU operator stack image configuration
+        description: GPU operator stack image configuration
         type: object
         additionalProperties: false
         properties:
@@ -8481,8 +8481,8 @@ properties:
           nodeFeatureDiscovery:
             $ref: '#/$defs/containerImage'
       harbor:
-        title: harbor stack image configuration
-        description: harbor stack image configuration
+        title: Harbor stack image configuration
+        description: Harbor stack image configuration
         type: object
         additionalProperties: false
         properties:
@@ -8511,8 +8511,8 @@ properties:
           mpuCleaner:
             $ref: '#/$defs/containerImage'
       hnc:
-        title: hnc stack image configuration
-        description: hnc stack image configuration
+        title: HNC stack image configuration
+        description: HNC stack image configuration
         type: object
         additionalProperties: false
         properties:
@@ -8535,8 +8535,8 @@ properties:
           fileCopier:
             $ref: '#/$defs/containerImage'
       kured:
-        title: kured stack image configuration
-        description: kured stack image configuration
+        title: Kured stack image configuration
+        description: Kured stack image configuration
         type: object
         additionalProperties: false
         properties:
@@ -8557,8 +8557,8 @@ properties:
           crdsMigration:
             $ref: '#/$defs/containerImage'
       monitoring:
-        title: monitoring stack image configuration
-        description: monitoring stack image configuration
+        title: Monitoring stack image configuration
+        description: Monitoring stack image configuration
         type: object
         additionalProperties: false
         properties:
@@ -8591,8 +8591,8 @@ properties:
           trivyOperator:
             $ref: '#/$defs/containerImage'
       nodeLocalDns:
-        title: node-local-dns stack image configuration
-        description: node-local-dns stack image configuration
+        title: NodeLocal DNSCache stack image configuration
+        description: NodeLocal DNSCache stack image configuration
         type: object
         additionalProperties: false
         properties:
@@ -8617,16 +8617,16 @@ properties:
           exporter:
             $ref: '#/$defs/containerImage'
       rclone:
-        title: rclone stack image configuration
-        description: rclone stack image configuration
+        title: Rclone stack image configuration
+        description: Rclone stack image configuration
         type: object
         additionalProperties: false
         properties:
           image:
             $ref: '#/$defs/containerImage'
       tekton:
-        title: tekton stack image configuration
-        description: tekton stack image configuration
+        title: Tekton stack image configuration
+        description: Tekton stack image configuration
         type: object
         additionalProperties: false
         properties:
@@ -8637,16 +8637,16 @@ properties:
           webhook:
             $ref: '#/$defs/containerImage'
       thanos:
-        title: thanos stack image configuration
-        description: thanos stack image configuration
+        title: Thanos stack image configuration
+        description: Thanos stack image configuration
         type: object
         additionalProperties: false
         properties:
           image:
             $ref: '#/$defs/containerImage'
       velero:
-        title: velero stack image configuration
-        description: velero stack image configuration
+        title: Velero stack image configuration
+        description: Velero stack image configuration
         type: object
         additionalProperties: false
         properties:
@@ -8671,6 +8671,25 @@ properties:
         title: Enable Crossplane
         default: false
         type: boolean
+      resources:
+        $ref: '#/$defs/kubernetesResourceRequirements'
+      rbacManager:
+        resources:
+          $ref: '#/$defs/kubernetesResourceRequirements'
+      providers:
+        title: Crossplane Provider resource configuration
+        description: Crossplane Provider resource configuration
+        type: object
+        resources:
+          $ref: '#/$defs/kubernetesResourceRequirements'
+        additionalProperties: false
+      functions:
+        title: Crossplane Function resource configuration
+        description: Crossplane Function resource configuration
+        type: object
+        resources:
+          $ref: '#/$defs/kubernetesResourceRequirements'
+        additionalProperties: false
 additionalProperties:
   title: Additional Properties
   description: Configure additional properties not covered by the schema.
