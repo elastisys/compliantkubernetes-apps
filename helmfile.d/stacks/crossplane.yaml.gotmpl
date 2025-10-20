@@ -2,7 +2,6 @@
 templates:
   crossplane:
     condition: ck8sAnyCluster.enabled
-    installed: {{ and (.Values | get "ck8sAnyCluster.enabled" false) (.Values | get "crossplane.enabled" false) }}
     namespace: crossplane-system
     labels:
       app: crossplane
@@ -11,6 +10,7 @@ templates:
     inherit:
       - template: crossplane
       - template: crossplane-chart
+    installed: {{ and (.Values | get "ck8sAnyCluster.enabled" false) (.Values | get "crossplane.enabled" false) }}
     wait: true
     name: crossplane
     needs:
@@ -34,6 +34,7 @@ templates:
   crossplane-packages:
     disableValidationOnInstall: true
     inherit: [ template: crossplane ]
+    installed: {{ and (.Values | get "ck8sAnyCluster.enabled" false) (.Values | get "crossplane.enabled" false) }}
     wait: true
     chart: charts/crossplane/packages
     version: 0.1.0
