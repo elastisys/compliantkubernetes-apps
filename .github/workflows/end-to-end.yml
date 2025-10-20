@@ -121,23 +121,41 @@ jobs:
         with:
           args: -chdir="/github/workspace/compliantkubernetes-kubespray/kubespray/contrib/terraform/openstack" apply -auto-approve -var-file /github/workspace/apps/pipeline/config/elastx/${{ matrix.cluster }}-config/cluster.tfvars -state /github/workspace/apps/pipeline/config/elastx/${{ matrix.cluster }}-config/terraform.tfstate
 
-      # - name: Prepare DNS
-      #   if: matrix.cluster == 'sc'
-      #   run: |
-      #     ingress_controller_lb_ip_address="$(jq -r .outputs.ingress_controller_lb_ip_address.value $CK8S_CONFIG_PATH/${{ matrix.cluster }}-config/terraform.tfstate)"
-      #     sed -i "s/ip-address/${ingress_controller_lb_ip_address}/g" apps/pipeline/config/safespring/dns-${{ matrix.cluster }}.json
-      #     sed -i "s/ACTION/CREATE/g" apps/pipeline/config/safespring/dns-${{ matrix.cluster }}.json
-      #     cat apps/pipeline/config/safespring/dns-${{ matrix.cluster }}.json
-      # - name: Create DNS records
-      #   if: matrix.cluster == 'sc'
-      #   uses: docker://amazon/aws-cli:2.1.26
-      #   env:
-      #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_DNS_ACCESS_KEY_ID }}
-      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_DNS_SECRET_ACCESS_KEY }}
-      #     # See https://github.com/aws/aws-cli/issues/5262
-      #     AWS_EC2_METADATA_DISABLED: true
-      #   with:
-      #     args: route53 change-resource-record-sets --hosted-zone-id Z2STJRQSJO5PZ0 --change-batch file://apps/pipeline/config/exoscale/dns-${{ matrix.cluster }}.json
+      - name: Prepare sc DNS
+        if: matrix.cluster == 'sc'
+        working-directory: ${{ env.CK8S_CONFIG_PATH }}
+        run: |
+          k8s_master_ip="$(jq -r .outputs.k8s_master_fips.value ${{ matrix.cluster }}-config/terraform.tfstate)"
+          new_records=$(echo $k8s_master_ip | jq 'map({Value: .})')
+          jq --argjson new_records "$new_records" --arg name "kube.ops.pipeline-elastx.dev-ck8s.com" \
+          '
+          (.Changes[] | select(.ResourceRecordSet.Name == $name) | .ResourceRecordSet.ResourceRecords) = $new_records
+          ' \
+          ${{ matrix.cluster }}-dns.json > tmp.json && mv tmp.json  ${{ matrix.cluster }}-dns.json
+          cat  ${{ matrix.cluster }}-dns.json
+
+      - name: Prepare wc DNS
+        if: matrix.cluster == 'wc'
+        working-directory: ${{ env.CK8S_CONFIG_PATH }}
+        run: |
+          k8s_master_ip="$(jq -r .outputs.k8s_master_fips.value ${{ matrix.cluster }}-config/terraform.tfstate)"
+          new_records=$(echo $k8s_master_ip | jq 'map({Value: .})')
+          jq --argjson new_records "$new_records" --arg name "kube.pipeline-elastx.dev-ck8s.com" \
+          '
+          (.Changes[] | select(.ResourceRecordSet.Name == $name) | .ResourceRecordSet.ResourceRecords) = $new_records
+          ' \
+          ${{ matrix.cluster }}-dns.json > tmp.json && mv tmp.json  ${{ matrix.cluster }}-dns.json
+          cat  ${{ matrix.cluster }}-dns.json
+
+      - name: Create DNS records
+        uses: docker://amazon/aws-cli:2.30.4
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_DNS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_DNS_SECRET_ACCESS_KEY }}
+          # See https://github.com/aws/aws-cli/issues/5262
+          AWS_EC2_METADATA_DISABLED: true
+        with:
+          args: route53 change-resource-record-sets --hosted-zone-id Z1001117397DAU71G3RN2 --change-batch file://apps/pipeline/config/elastx/${{ matrix.cluster }}-dns.json
 
   #     - name: Run kubespray
   #       continue-on-error: true

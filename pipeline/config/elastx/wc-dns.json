@@ -1,0 +1,14 @@
+{
+  "Comment": "Manage pipeline-elastx wc cluster DNS records",
+  "Changes": [
+    {
+      "Action": "UPSERT",
+      "ResourceRecordSet": {
+        "Name": "kube.pipeline-elastx.dev-ck8s.com",
+        "Type": "A",
+        "TTL": 300,
+        "ResourceRecords": []
+      }
+    }
+  ]
+}
