@@ -78,6 +78,7 @@ clusterApi:
   - wc
 
 crossplane:
+  enabled: false
   resources:
     requests:
       cpu: 150m
@@ -1484,6 +1485,3 @@ images:
       enabled: false
     repository:
       enabled: false
-
-crossplane:
-  enabled: false
