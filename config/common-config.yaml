@@ -1168,7 +1168,7 @@ networkPolicies:
       port: 443
 
   crossplane:
-    enabled: false
+    enabled: true
     packageRegistry:
       ips:
         - set-me-if-(.crossplane.enabled)
@@ -1417,3 +1417,6 @@ images:
       enabled: false
     repository:
       enabled: false
+
+crossplane:
+  enabled: false
