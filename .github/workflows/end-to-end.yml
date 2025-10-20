@@ -82,7 +82,7 @@ jobs:
         id: kubespray-repo
 
       - name: Checkout ck8s-kubespray
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
         with:
           repository: elastisys/compliantkubernetes-kubespray
           ref: ${{ steps.kubespray-repo.outputs.tag }}
@@ -90,7 +90,7 @@ jobs:
           path: compliantkubernetes-kubespray
 
       - name: Checkout compliantkubernetes-apps
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
         with:
           repository: HaoruiPeng/compliantkubernetes-apps
           ref: main
@@ -157,16 +157,16 @@ jobs:
         with:
           args: route53 change-resource-record-sets --hosted-zone-id Z1001117397DAU71G3RN2 --change-batch file://apps/pipeline/config/elastx/${{ matrix.cluster }}-dns.json
 
-  #     - name: Run kubespray
-  #       continue-on-error: true
-  #       id: runkubespray0
-  #       uses: docker://quay.io/kubespray/kubespray:v2.23.0
-  #       env:
-  #         ANSIBLE_CONFIG: ./compliantkubernetes-kubespray/kubespray/ansible.cfg
-  #       with:
-  #         args: /bin/bash -c "cd compliantkubernetes-kubespray/kubespray && ansible-playbook -i ../../$CK8S_CONFIG_PATH/pipeline-${{ matrix.cluster }}-config/inventory.ini --private-key ../../$CK8S_CONFIG_PATH/id_rsa --become --become-user=root cluster.yml"
+      - name: Run kubespray
+        continue-on-error: true
+        id: runkubespray0
+        uses: docker://quay.io/kubespray/kubespray:v2.27.0
+        env:
+          ANSIBLE_CONFIG: ./compliantkubernetes-kubespray/kubespray/ansible.cfg
+        with:
+          args: /bin/bash -c "cd compliantkubernetes-kubespray/kubespray && ansible-playbook -i ../../${{env.CK8S_CONFIG_PATH}}/${{ matrix.cluster }}-config/inventory.ini --private-key ../../${{env.CK8S_CONFIG_PATH}}/id_rsa --become --become-user=root cluster.yml"
 
-  #     - name: Run kubespray - retry 1
+      # - name: Run kubespray - retry 1
   #       id: runkubespray1
   #       if: steps.runkubespray0.outcome=='failure'
   #       uses: docker://quay.io/kubespray/kubespray:v2.23.0

@@ -96,10 +96,10 @@ group_vars_path="/github/workspace/apps/pipeline/config/elastx/sc-config/group_v
 
 # networking
 # ssh access to nodes
-k8s_allowed_remote_ips = ["194.103.95.251/32", "185.189.28.150/32", "185.189.28.233/32"]
+k8s_allowed_remote_ips = ["0.0.0.0/0"]
 
 # List of CIDR blocks allowed to initiate an API connection
-master_allowed_remote_ips = ["194.103.95.251/32", "185.189.28.150/32", "185.189.28.233/32"]
+master_allowed_remote_ips = ["0.0.0.0/0"]
 
 worker_allowed_ports = [
   { # Node ports

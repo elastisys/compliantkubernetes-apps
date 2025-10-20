@@ -45,7 +45,7 @@ kubelet_config_extra_args:
 calico_ipip_mode: Always
 calico_vxlan_mode: Never
 calico_network_backend: bird
-calico_version: v3.27.4
+calico_version: 3.27.4
 dns_extra_tolerations:
   - effect: NoSchedule
     operator: Exists
