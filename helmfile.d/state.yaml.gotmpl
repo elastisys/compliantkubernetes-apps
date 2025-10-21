@@ -48,17 +48,26 @@ releases:
   - inherit: [ template: networkpolicies-service ]
   - inherit: [ template: networkpolicies-workload ]
 
+  - inherit: [ template: additional-networkpolicy]
+  - inherit: [ template: dns-autoscaler-networkpolicy ]
+  - inherit: [ template: snapshot-controller-networkpolicy ]
+
+  - inherit: [ template: cinder-csi-networkpolicy ]
+  - inherit: [ template: upcloud-csi-networkpolicy ]
+
   - inherit: [ template: monitoring-networkpolicy ]
   - inherit: [ template: monitoring-podsecuritypolicy ]
 
   - inherit: [ template: kube-prometheus-stack ]
   - inherit: [ template: kube-state-metrics-extra-resources ]
+  - inherit: [ template: metrics-server-networkpolicy ]
   - inherit: [ template: metrics-server ]
 
   - inherit: [ template: cert-manager-networkpolicy ]
   - inherit: [ template: cert-manager-controller ]
   - inherit: [ template: cert-manager-issuers ]
 
+  - inherit: [ template: gatekeeper-networkpolicy ]
   - inherit: [ template: gatekeeper-controller ]
   - inherit: [ template: gatekeeper-templates ]
   - inherit: [ template: gatekeeper-constraints ]
@@ -127,10 +136,12 @@ releases:
   - inherit: [ template: hnc-resources ]
   - inherit: [ template: hnc-controller ]
 
+  - inherit: [ template: coredns-networkpolicy ]
   - inherit: [ template: node-local-dns ]
 
   - inherit: [ template: rook-ceph-podsecuritypolicy ]
 
+  - inherit: [ template: kured-networkpolicy ]
   - inherit: [ template: kured-podsecuritypolicy ]
   - inherit: [ template: kured-secret ]
   - inherit: [ template: kured-main ]
@@ -164,6 +175,7 @@ releases:
   - inherit: [ template: harbor-backup ]
   - inherit: [ template: harbor-mpu-cleaner ]
 
+  - inherit: [ template: opensearch-networkpolicy ]
   - inherit: [ template: opensearch-podsecuritypolicy ]
   - inherit: [ template: opensearch-secrets ]
   - inherit: [ template: opensearch-master ]

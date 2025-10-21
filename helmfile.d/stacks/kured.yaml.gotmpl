@@ -6,6 +6,19 @@ templates:
     labels:
       app: kured
 
+  kured-networkpolicy:
+    inherit:
+      - template: kured
+      - template: networkpolicies
+    installed: {{ and (.Values | get "kured.enabled" false) (.Values | get "networkPolicies.kured.enabled" false) }}
+    labels:
+      netpol: kured
+    needs:
+      - kube-system/admin-namespaces
+    values:
+      - values/networkpolicies/common/common.yaml.gotmpl
+      - values/networkpolicies/common/kured.yaml.gotmpl
+
   kured-podsecuritypolicy:
     inherit:
       - template: kured

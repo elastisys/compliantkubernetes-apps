@@ -1,3 +1,10 @@
+{{- $namespaces := list }}
+{{- if eq .Environment.Name "service_cluster" }}
+{{- $namespaces = .Values.networkPolicies.certManager.namespaces }}
+{{- else if eq .Environment.Name "workload_cluster" }}
+{{- $namespaces = concat .Values.user.namespaces .Values.networkPolicies.certManager.namespaces }}
+{{- end -}}
+
 policies:
   cert-manager:
     all-deny:
@@ -79,3 +86,14 @@ policies:
         app.kubernetes.io/component: startupapicheck
       egress:
         - rule: egress-rule-apiserver
+
+  {{- range $namespace := $namespaces }}
+  {{ $namespace }}:
+    allow-cert-manager-resolver:
+      podSelectorLabels:
+        acme.cert-manager.io/http01-solver: "true"
+      ingress:
+        - rule: ingress-rule-ingress
+          ports:
+            - tcp: 8089
+  {{- end }}

@@ -73,7 +73,7 @@ policies:
             - namespaceSelectorLabels:
                 kubernetes.io/metadata.name: opensearch-system
               podSelectorLabels:
-                {{- if .Values.opensearch.client.enabled }}
+                {{- if .Values.opensearch.clientNode.dedicatedPods }}
                 app.kubernetes.io/component: opensearch-client
                 {{- else }}
                 app.kubernetes.io/component: opensearch-master

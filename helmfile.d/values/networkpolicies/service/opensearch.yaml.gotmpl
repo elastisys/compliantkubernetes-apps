@@ -17,7 +17,7 @@ rules:
       - tcp: 9300
 
   egress-rule-plugins:
-    {{- include "old-style.rule.gen" .Values.opensearch.plugins | nindent 4 }}
+    {{- include "old-style.rule.gen" .Values.networkPolicies.opensearch.plugins | nindent 4 }}
 
   egress-rule-master:
     peers:
@@ -44,7 +44,7 @@ rules:
       - tcp: 5556
 
 policies:
-  opensearch:
+  opensearch-system:
     all-deny:
       podSelectorLabels: {}
       egress: {}
@@ -55,7 +55,7 @@ policies:
         app.kubernetes.io/component: opensearch-master
       ingress:
         - rule: ingress-egress-rule-opensearch
-        {{- if not .Values.opensearch.client.enabled }}
+        {{- if not .Values.opensearch.clientNode.dedicatedPods }}
         - rule: ingress-rule-ingress
           ports:
             - tcp: 9200

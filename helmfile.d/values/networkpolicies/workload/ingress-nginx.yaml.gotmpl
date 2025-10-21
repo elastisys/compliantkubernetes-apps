@@ -52,6 +52,9 @@ policies:
           ports:
             - tcp: 80
             - tcp: 443
+        - rule: egress-rule-namespaces
+          peers:
+            - namespaceSelectorLabels: {}
         - name: egress-rule-kube-system-api
           peers:
             - podSelectorLabels:

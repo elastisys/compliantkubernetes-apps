@@ -1,0 +1,4 @@
+{{- if .Values.networkPolicies.additional }}
+additional:
+  {{ toYaml .Values.networkPolicies.additional | nindent 2 }}
+{{- end }}
