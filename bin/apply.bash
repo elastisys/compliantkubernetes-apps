@@ -89,6 +89,6 @@ esac
 check_node_label "$1" elastisys.io/node-group
 update_ips_dryrun "$1" "${environment}"
 check_upgrade "$1"
-config_load "$1"
+config_load "$1" --skip-test-encrypt
 [[ -z "${CK8S_CI_SKIP_APPLY:-}" ]] || exit 0 # Improve mockability in the future
 apps_apply "$1" "${environment}" "${@:2}"
