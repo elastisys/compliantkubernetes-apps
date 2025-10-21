@@ -44,9 +44,6 @@ storage_classes:
 #   - "ext-net"
 # external_openstack_metadata_search_order: "configDrive,metadataService"
 supplementary_addresses_in_ssl_keys:
-  - <master-ip-1>
-  - <master-ip-2>
-  - <master-ip-3>
   - kube.ops.pipeline-elastx.dev-ck8s.com
 kubeconfig_localhost_ansible_host: true
 external_openstack_enable_ingress_hostname: true
