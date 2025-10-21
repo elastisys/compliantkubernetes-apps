@@ -485,12 +485,12 @@ validate_sops_config() {
     exit 1
   fi
 
-  test_encrypt="${1:-true}"
+  skip_test_encrypt="${1:-false}"
 
   # should be able to decrypt $CK8S_CONFIG_PATH/secrets.yaml with some private key
   sops --decrypt "${secrets["secrets_file"]}" >/dev/null
 
-  if [[ "${test_encrypt}" == "true" ]]; then
+  if [[ "${skip_test_encrypt}" == "false" ]]; then
     tmp_secret=$(mktemp --suffix=-secret) tmp_secret=$(mktemp --suffix=-secret)
     append_trap "rm ${tmp_secret}" EXIT
 
@@ -519,14 +519,14 @@ config_load() {
     --skip-validation)
       skip_validation=true
       ;;
-    --test-encrypt)
+    --skip-test-encrypt)
       skip_test_encrypt=true
       ;;
     -v)
       verbose=true
       ;;
     *)
-      log_error "Usage: config_load <sc|wc> [--skip-validation] [-v] [--test-encrypt]"
+      log_error "Usage: config_load <sc|wc> [--skip-validation] [-v] [--skip-test-encrypt]"
       ;;
     esac
     shift
