@@ -22,3 +22,7 @@ overrides_path: "sbom"
 # ignored_image_refs:
 #   - "your-image"
 #   - "your-image:latest"
+
+# ignore images
+ignored_image_refs:
+  - "open-policy-agent/fake-reader"

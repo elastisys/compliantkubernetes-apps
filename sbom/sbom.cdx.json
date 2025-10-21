@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:397e23d3-578d-4dfa-b9d7-2f94a6a7a255",
+  "serialNumber": "urn:uuid:31b68014-6b82-4085-b6a5-e800de8caf42",
   "version": 1,
   "metadata": {
-    "timestamp": "2025-10-14T12:30:51Z",
+    "timestamp": "2025-10-16T14:43:16Z",
     "lifecycles": [
       {
         "phase": "build"
@@ -840,13 +840,13 @@
       }
     },
     {
-      "bom-ref": "pkg:helm/gatekeeper@3.18.2",
+      "bom-ref": "pkg:helm/gatekeeper@3.20.1",
       "type": "library",
       "supplier": {
         "name": "open-policy-agent"
       },
       "name": "gatekeeper",
-      "version": "3.18.2",
+      "version": "3.20.1",
       "description": "A Helm chart for Gatekeeper",
       "licenses": [
         {
@@ -855,7 +855,7 @@
           }
         }
       ],
-      "purl": "pkg:helm/gatekeeper@3.18.2",
+      "purl": "pkg:helm/gatekeeper@3.20.1",
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -2957,15 +2957,15 @@
       "purl": "pkg:oci/ceph/ceph@v17.2.6?repository_url=quay.io"
     },
     {
-      "bom-ref": "pkg:oci/curlimages/curl@7.83.1",
+      "bom-ref": "pkg:oci/curlimages/curl@8.12.0",
       "type": "container",
       "supplier": {
         "name": "curlimages"
       },
       "name": "curlimages/curl",
-      "version": "7.83.1",
-      "cpe": "cpe:2.3:a:curlimages:curl:7.83.1:*:*:*:*:*:*:*",
-      "purl": "pkg:oci/curlimages/curl@7.83.1"
+      "version": "8.12.0",
+      "cpe": "cpe:2.3:a:curlimages:curl:8.12.0:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/curlimages/curl@8.12.0"
     },
     {
       "bom-ref": "pkg:oci/curlimages/curl@8.9.1",
@@ -4519,26 +4519,26 @@
       "purl": "pkg:oci/oauth2-proxy/oauth2-proxy@v7.12.0?repository_url=quay.io"
     },
     {
-      "bom-ref": "pkg:oci/openpolicyagent/gatekeeper-crds@v3.18.2",
+      "bom-ref": "pkg:oci/openpolicyagent/gatekeeper-crds@v3.20.1",
       "type": "container",
       "supplier": {
         "name": "openpolicyagent"
       },
       "name": "openpolicyagent/gatekeeper-crds",
-      "version": "v3.18.2",
-      "cpe": "cpe:2.3:a:openpolicyagent:gatekeeper-crds:3.18.2:*:*:*:*:*:*:*",
-      "purl": "pkg:oci/openpolicyagent/gatekeeper-crds@v3.18.2"
+      "version": "v3.20.1",
+      "cpe": "cpe:2.3:a:openpolicyagent:gatekeeper-crds:3.20.1:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/openpolicyagent/gatekeeper-crds@v3.20.1"
     },
     {
-      "bom-ref": "pkg:oci/openpolicyagent/gatekeeper-crds@v3.18.2?repository_url=docker.io",
+      "bom-ref": "pkg:oci/openpolicyagent/gatekeeper-crds@v3.20.1?repository_url=docker.io",
       "type": "container",
       "supplier": {
         "name": "openpolicyagent"
       },
       "name": "docker.io/openpolicyagent/gatekeeper-crds",
-      "version": "v3.18.2",
-      "cpe": "cpe:2.3:a:openpolicyagent:gatekeeper-crds:3.18.2:*:*:*:*:*:*:*",
-      "purl": "pkg:oci/openpolicyagent/gatekeeper-crds@v3.18.2?repository_url=docker.io"
+      "version": "v3.20.1",
+      "cpe": "cpe:2.3:a:openpolicyagent:gatekeeper-crds:3.20.1:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/openpolicyagent/gatekeeper-crds@v3.20.1?repository_url=docker.io"
     },
     {
       "bom-ref": "pkg:oci/openpolicyagent/gatekeeper@latest",
@@ -4552,26 +4552,26 @@
       "purl": "pkg:oci/openpolicyagent/gatekeeper@latest"
     },
     {
-      "bom-ref": "pkg:oci/openpolicyagent/gatekeeper@v3.18.2",
+      "bom-ref": "pkg:oci/openpolicyagent/gatekeeper@v3.20.1",
       "type": "container",
       "supplier": {
         "name": "openpolicyagent"
       },
       "name": "openpolicyagent/gatekeeper",
-      "version": "v3.18.2",
-      "cpe": "cpe:2.3:a:openpolicyagent:gatekeeper:3.18.2:*:*:*:*:*:*:*",
-      "purl": "pkg:oci/openpolicyagent/gatekeeper@v3.18.2"
+      "version": "v3.20.1",
+      "cpe": "cpe:2.3:a:openpolicyagent:gatekeeper:3.20.1:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/openpolicyagent/gatekeeper@v3.20.1"
     },
     {
-      "bom-ref": "pkg:oci/openpolicyagent/gatekeeper@v3.18.2?repository_url=docker.io",
+      "bom-ref": "pkg:oci/openpolicyagent/gatekeeper@v3.20.1?repository_url=docker.io",
       "type": "container",
       "supplier": {
         "name": "openpolicyagent"
       },
       "name": "docker.io/openpolicyagent/gatekeeper",
-      "version": "v3.18.2",
-      "cpe": "cpe:2.3:a:openpolicyagent:gatekeeper:3.18.2:*:*:*:*:*:*:*",
-      "purl": "pkg:oci/openpolicyagent/gatekeeper@v3.18.2?repository_url=docker.io"
+      "version": "v3.20.1",
+      "cpe": "cpe:2.3:a:openpolicyagent:gatekeeper:3.20.1:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/openpolicyagent/gatekeeper@v3.20.1?repository_url=docker.io"
     },
     {
       "bom-ref": "pkg:oci/opensearchproject/opensearch-dashboards@2.19.3",
@@ -5185,7 +5185,7 @@
         "pkg:helm/gatekeeper-metrics@0.1.0",
         "pkg:helm/gatekeeper-mutations@0.1.0",
         "pkg:helm/gatekeeper-templates@0.1.0",
-        "pkg:helm/gatekeeper@3.18.2",
+        "pkg:helm/gatekeeper@3.20.1",
         "pkg:helm/gpu-operator@v24.9.2",
         "pkg:helm/grafana-dashboards@0.3.0",
         "pkg:helm/grafana-label-enforcer@0.1.0",
@@ -5390,11 +5390,11 @@
       ]
     },
     {
-      "ref": "pkg:helm/gatekeeper@3.18.2",
+      "ref": "pkg:helm/gatekeeper@3.20.1",
       "dependsOn": [
-        "pkg:oci/curlimages/curl@7.83.1",
-        "pkg:oci/openpolicyagent/gatekeeper-crds@v3.18.2",
-        "pkg:oci/openpolicyagent/gatekeeper@v3.18.2"
+        "pkg:oci/curlimages/curl@8.12.0",
+        "pkg:oci/openpolicyagent/gatekeeper-crds@v3.20.1",
+        "pkg:oci/openpolicyagent/gatekeeper@v3.20.1"
       ]
     },
     {
@@ -5863,7 +5863,7 @@
       "dependsOn": []
     },
     {
-      "ref": "pkg:oci/curlimages/curl@7.83.1",
+      "ref": "pkg:oci/curlimages/curl@8.12.0",
       "dependsOn": []
     },
     {
@@ -6179,11 +6179,11 @@
       "dependsOn": []
     },
     {
-      "ref": "pkg:oci/openpolicyagent/gatekeeper-crds@v3.18.2",
+      "ref": "pkg:oci/openpolicyagent/gatekeeper-crds@v3.20.1",
       "dependsOn": []
     },
     {
-      "ref": "pkg:oci/openpolicyagent/gatekeeper@v3.18.2",
+      "ref": "pkg:oci/openpolicyagent/gatekeeper@v3.20.1",
       "dependsOn": []
     },
     {
