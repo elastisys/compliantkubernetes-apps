@@ -77,6 +77,74 @@ clusterApi:
   - sc
   - wc
 
+crossplane:
+  enabled: false
+  resources:
+    requests:
+      cpu: 150m
+      memory: 400Mi
+    limits:
+      cpu: 200m
+      memory: 512Mi
+  rbacManager:
+    resources:
+      requests:
+        cpu: 5m
+        memory: 32Mi
+      limits:
+        cpu: 20m
+        memory: 128Mi
+  functions:
+    auto-ready:
+      resources:
+        requests:
+          cpu: 10m
+          memory: 64Mi
+        limits:
+          cpu: 20m
+          memory: 128Mi
+    capability:
+      resources:
+        requests:
+          cpu: 10m
+          memory: 64Mi
+        limits:
+          cpu: 20m
+          memory: 128Mi
+    go-templating:
+      resources:
+        requests:
+          cpu: 25m
+          memory: 64Mi
+        limits:
+          cpu: 50m
+          memory: 128Mi
+    patch-and-transform:
+        resources:
+          requests:
+            cpu: 25m
+            memory: 64Mi
+          limits:
+            cpu: 50m
+            memory: 128Mi
+  providers:
+    helm:
+      resources:
+        requests:
+          cpu: 150m
+          memory: 256Mi
+        limits:
+          cpu: 300m
+          memory: 512Mi
+    kubernetes:
+      resources:
+        requests:
+          cpu: 25m
+          memory: 128Mi
+        limits:
+          cpu: 50m
+          memory: 256Mi
+
 ## Configuration of storageclasses.
 storageClasses:
   # Name of the default storageclass.
@@ -1169,6 +1237,14 @@ networkPolicies:
       ips:
         - set-me-if-(.trivy.enabled)
       port: 443
+
+  crossplane:
+    enabled: true
+    packageRegistry:
+      ips:
+        - set-me-if-(.crossplane.enabled)
+      ports:
+        - 443
 
   kured:
     enabled: true

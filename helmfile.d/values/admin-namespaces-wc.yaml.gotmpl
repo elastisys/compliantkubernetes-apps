@@ -4,6 +4,13 @@ namespaces:
       pod-security.kubernetes.io/audit: restricted
       pod-security.kubernetes.io/enforce: restricted
       pod-security.kubernetes.io/warn: restricted
+  {{ if .Values.crossplane.enabled }}
+  - name: crossplane-system
+    labels:
+      pod-security.kubernetes.io/audit: restricted
+      pod-security.kubernetes.io/enforce: restricted
+      pod-security.kubernetes.io/warn: restricted
+  {{ end }}
   {{ if .Values.falco.enabled }}
   - name: falco
     labels:

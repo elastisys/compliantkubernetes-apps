@@ -7919,6 +7919,28 @@ properties:
             title: Network Policies Rook Ceph Enabled
             default: false
             type: boolean
+      crossplane:
+        title: Network Policies Crossplane
+        description: Configure Crossplane network policy rules.
+        type: object
+        additionalProperties: false
+        properties:
+          enabled:
+            title: Network Policies Crossplane Enabled
+            type: boolean
+            default: true
+          packageRegistry:
+            title: Crossplane Package Registry
+            description: Configure network policy rules to allow Crossplane to access the Package registry
+            type: object
+            additionalProperties: false
+            properties:
+              ips:
+                $ref: '#/$defs/iplist'
+              ports:
+                $ref: '#/$defs/portlist'
+                default:
+                  - 443
       defaultDeny:
         default: false
         type: boolean
@@ -8365,8 +8387,8 @@ properties:
             required:
               - enabled
       calico:
-        title: calico stack image configuration
-        description: calico stack image configuration
+        title: Calico stack image configuration
+        description: Calico stack image configuration
         type: object
         additionalProperties: false
         properties:
@@ -8386,17 +8408,43 @@ properties:
             $ref: '#/$defs/containerImage'
           startupapicheck:
             $ref: '#/$defs/containerImage'
+      crossplane:
+        title: crossplane stack image configuration
+        description: crossplane stack image configuration
+        type: object
+        additionalProperties: false
+        properties:
+          image:
+            $ref: '#/$defs/containerImage'
+          kubectl:
+            $ref: '#/$defs/containerImage'
+          providers:
+            title: Crossplane Provider images configuration
+            description: Crossplane Provider images configuration
+            type: object
+            additionalProperties: false
+            patternProperties:
+              "^[a-z-]+$":
+                $ref: '#/$defs/containerImage'
+          functions:
+            title: Crossplane Function images configuration
+            description: Crossplane Function images configuration
+            type: object
+            additionalProperties: false
+            patternProperties:
+              "^[a-z-]+$":
+                $ref: '#/$defs/containerImage'
       dex:
-        title: dex stack image configuration
-        description: dex stack image configuration
+        title: Dex stack image configuration
+        description: Dex stack image configuration
         type: object
         additionalProperties: false
         properties:
           image:
             $ref: '#/$defs/containerImage'
       externalDns:
-        title: external-dns stack image configuration
-        description: external-dns stack image configuration
+        title: ExternalDNS stack image configuration
+        description: ExternalDNS stack image configuration
         type: object
         additionalProperties: false
         properties:
@@ -8417,8 +8465,8 @@ properties:
           sidekick:
             $ref: '#/$defs/containerImage'
       fluentd:
-        title: fluentd stack image configuration
-        description: fluentd stack image configuration
+        title: Fluentd stack image configuration
+        description: Fluentd stack image configuration
         type: object
         additionalProperties: false
         properties:
@@ -8429,8 +8477,8 @@ properties:
           logManager:
             $ref: '#/$defs/containerImage'
       gatekeeper:
-        title: gatekeeper stack image configuration
-        description: gatekeeper stack image configuration
+        title: Gatekeeper stack image configuration
+        description: Gatekeeper stack image configuration
         type: object
         additionalProperties: false
         properties:
@@ -8443,8 +8491,8 @@ properties:
           kubectl:
             $ref: '#/$defs/containerImage'
       gpuOperator:
-        title: gpu-operator stack image configuration
-        description: gpu-operator stack image configuration
+        title: GPU operator stack image configuration
+        description: GPU operator stack image configuration
         type: object
         additionalProperties: false
         properties:
@@ -8453,8 +8501,8 @@ properties:
           nodeFeatureDiscovery:
             $ref: '#/$defs/containerImage'
       harbor:
-        title: harbor stack image configuration
-        description: harbor stack image configuration
+        title: Harbor stack image configuration
+        description: Harbor stack image configuration
         type: object
         additionalProperties: false
         properties:
@@ -8483,8 +8531,8 @@ properties:
           mpuCleaner:
             $ref: '#/$defs/containerImage'
       hnc:
-        title: hnc stack image configuration
-        description: hnc stack image configuration
+        title: HNC stack image configuration
+        description: HNC stack image configuration
         type: object
         additionalProperties: false
         properties:
@@ -8507,8 +8555,8 @@ properties:
           fileCopier:
             $ref: '#/$defs/containerImage'
       kured:
-        title: kured stack image configuration
-        description: kured stack image configuration
+        title: Kured stack image configuration
+        description: Kured stack image configuration
         type: object
         additionalProperties: false
         properties:
@@ -8529,8 +8577,8 @@ properties:
           crdsMigration:
             $ref: '#/$defs/containerImage'
       monitoring:
-        title: monitoring stack image configuration
-        description: monitoring stack image configuration
+        title: Monitoring stack image configuration
+        description: Monitoring stack image configuration
         type: object
         additionalProperties: false
         properties:
@@ -8563,8 +8611,8 @@ properties:
           trivyOperator:
             $ref: '#/$defs/containerImage'
       nodeLocalDns:
-        title: node-local-dns stack image configuration
-        description: node-local-dns stack image configuration
+        title: NodeLocal DNSCache stack image configuration
+        description: NodeLocal DNSCache stack image configuration
         type: object
         additionalProperties: false
         properties:
@@ -8589,16 +8637,16 @@ properties:
           exporter:
             $ref: '#/$defs/containerImage'
       rclone:
-        title: rclone stack image configuration
-        description: rclone stack image configuration
+        title: Rclone stack image configuration
+        description: Rclone stack image configuration
         type: object
         additionalProperties: false
         properties:
           image:
             $ref: '#/$defs/containerImage'
       tekton:
-        title: tekton stack image configuration
-        description: tekton stack image configuration
+        title: Tekton stack image configuration
+        description: Tekton stack image configuration
         type: object
         additionalProperties: false
         properties:
@@ -8609,16 +8657,16 @@ properties:
           webhook:
             $ref: '#/$defs/containerImage'
       thanos:
-        title: thanos stack image configuration
-        description: thanos stack image configuration
+        title: Thanos stack image configuration
+        description: Thanos stack image configuration
         type: object
         additionalProperties: false
         properties:
           image:
             $ref: '#/$defs/containerImage'
       velero:
-        title: velero stack image configuration
-        description: velero stack image configuration
+        title: Velero stack image configuration
+        description: Velero stack image configuration
         type: object
         additionalProperties: false
         properties:
@@ -8634,6 +8682,41 @@ properties:
             $ref: '#/$defs/containerImage'
           kubectl:
             $ref: '#/$defs/containerImage'
+  crossplane:
+    title: Crossplane Config
+    description: Configure Crossplane
+    type: object
+    properties:
+      enabled:
+        title: Enable Crossplane
+        default: false
+        type: boolean
+      resources:
+        $ref: '#/$defs/kubernetesResourceRequirements'
+      rbacManager:
+        title: Crossplane RBAC manager configuration
+        description: Crossplane RBAC manager configuration
+        type: object
+        resources:
+          $ref: '#/$defs/kubernetesResourceRequirements'
+      providers:
+        title: Crossplane Provider resource configuration
+        description: Crossplane Provider resource configuration
+        type: object
+        patternProperties:
+          "^[a-z-]+$":
+            resources:
+              $ref: '#/$defs/kubernetesResourceRequirements'
+        additionalProperties: false
+      functions:
+        title: Crossplane Function resource configuration
+        description: Crossplane Function resource configuration
+        type: object
+        patternProperties:
+          "^[a-z-]+$":
+            resources:
+              $ref: '#/$defs/kubernetesResourceRequirements'
+        additionalProperties: false
 additionalProperties:
   title: Additional Properties
   description: Configure additional properties not covered by the schema.
