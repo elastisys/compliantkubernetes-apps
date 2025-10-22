@@ -55,13 +55,13 @@ templates:
     disableValidationOnInstall: true
     inherit: [ template: system ]
     installed: {{ .Values | get "ck8sAnyCluster.enabled" false }}
-    chart: charts/node-local-dns
-    version: 0.1.1
-    name: node-local-dns
+    chart: charts/modules/node-local-dns
+    version: 0.1.0
+    name: module-node-local-dns
     labels:
       app: node-local-dns
     needs:
-      - monitoring/kube-prometheus-stack # creates prometheus-operator/servicemonitors
+      - crossplane-system/crossplane-packages
     values:
       - values/node-local-dns.yaml.gotmpl
 

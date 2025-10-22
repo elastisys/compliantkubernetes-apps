@@ -15,6 +15,10 @@ kubectlImage:
 {{- end }}
 {{- end }}
 
+{{- $configurations := (list
+  "module-node-local-dns"
+) }}
+
 {{- $functions := (list
   "auto-ready"
   "capability"
@@ -26,6 +30,23 @@ kubectlImage:
   "kubernetes"
   "helm"
 ) }}
+
+configurations:
+{{- range $configuration := $configurations }}
+  {{ $configuration }}:
+    {{- $image := $.Values.images | dig "crossplane" "configurations" $configuration "" }}
+    {{- $image = merge (include "container_uri.parse" $image | fromJson) $imagesGlobal }}
+    {{- with $image }}
+    image:
+      {{- with include "gen.reg-rep-img" . }}
+      repository: {{ . }}
+      {{- end }}
+      {{- if or .tag .digest }}
+      tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
+      {{- end }}
+    {{- end }}
+{{- end }}
+
 
 functions:
 {{- range $function := $functions }}
