@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:26700c95-a64b-4685-977b-d4665e1f05ba",
+  "serialNumber": "urn:uuid:a080eced-95de-4647-825d-db748f0b7fe0",
   "version": 1,
   "metadata": {
-    "timestamp": "2025-10-10T15:10:12Z",
+    "timestamp": "2025-10-22T15:45:57Z",
     "lifecycles": [
       {
         "phase": "build"
@@ -5308,26 +5308,26 @@
       "purl": "pkg:oci/weaveworks/kured@latest"
     },
     {
-      "bom-ref": "pkg:oci/welkin/function-capability@fieldpath?repository_url=harbor.long-running.dev-ck8s.com",
+      "bom-ref": "pkg:oci/welkin/function-capability@v0.4.0?repository_url=harbor.long-running.dev-ck8s.com",
       "type": "container",
       "supplier": {
         "name": "welkin"
       },
       "name": "harbor.long-running.dev-ck8s.com/welkin/function-capability",
-      "version": "fieldpath",
-      "cpe": "cpe:2.3:a:welkin:function-capability:fieldpath:*:*:*:*:*:*:*",
-      "purl": "pkg:oci/welkin/function-capability@fieldpath?repository_url=harbor.long-running.dev-ck8s.com"
+      "version": "v0.4.0",
+      "cpe": "cpe:2.3:a:welkin:function-capability:0.4.0:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/welkin/function-capability@v0.4.0?repository_url=harbor.long-running.dev-ck8s.com"
     },
     {
-      "bom-ref": "pkg:oci/welkin/module-node-local-dns@syncapps?repository_url=harbor.long-running.dev-ck8s.com",
+      "bom-ref": "pkg:oci/welkin/module-node-local-dns@v0.2.0?repository_url=harbor.long-running.dev-ck8s.com",
       "type": "container",
       "supplier": {
         "name": "welkin"
       },
       "name": "harbor.long-running.dev-ck8s.com/welkin/module-node-local-dns",
-      "version": "syncapps",
-      "cpe": "cpe:2.3:a:welkin:module-node-local-dns:syncapps:*:*:*:*:*:*:*",
-      "purl": "pkg:oci/welkin/module-node-local-dns@syncapps?repository_url=harbor.long-running.dev-ck8s.com"
+      "version": "v0.2.0",
+      "cpe": "cpe:2.3:a:welkin:module-node-local-dns:0.2.0:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/welkin/module-node-local-dns@v0.2.0?repository_url=harbor.long-running.dev-ck8s.com"
     }
   ],
   "dependencies": [
