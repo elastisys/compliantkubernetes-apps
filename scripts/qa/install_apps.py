@@ -19,6 +19,7 @@ from boilerplate import STEP_ARGS, AppsConfig, StepArgs, _get_json, _run, _set_s
 from config import Config, dig
 
 BIN_DIR: Path = SCRIPT_DIR / ".." / ".." / "bin"
+TESTS_DIR: Path = SCRIPT_DIR / ".." / ".." / "tests"
 
 ADMIN_USER: str = "admin@example.com"
 APP_DEV_USER: str = "dev@example.com"
@@ -348,6 +349,24 @@ def install_dex(args: Args) -> None:
     )
 
 
+def open_network_policies(config: Config) -> None:
+    """Open network policies"""
+    for cluster in ["sc", "wc"]:
+        allow_all_policy = (
+            f"{TESTS_DIR}/common/network-policies/{config['networkPlugin']}-allow-all.yaml"
+        )
+        _run_ck8s(*f"ops kubectl {cluster} apply -f {allow_all_policy}".split())
+
+
+def close_network_policies(config: Config) -> None:
+    """Close network policies"""
+    for cluster in ["sc", "wc"]:
+        allow_all_policy = (
+            f"{TESTS_DIR}/common/network-policies/{config['networkPlugin']}-allow-all.yaml"
+        )
+        _run_ck8s(*f"ops kubectl {cluster} delete -f {allow_all_policy}".split())
+
+
 def reconfigure_ips(
     common_config: AppsConfig, sc_config: AppsConfig, wc_config: AppsConfig, args: Args
 ) -> None:
@@ -436,6 +455,7 @@ def main() -> None:
     _step(initialize_apps)()
     _step(configure_apps)(common_config, sc_config, wc_config, args)
     _step(configure_secrets)(secrets_path, args)
+    _step(open_network_policies)(args.config)
     _step(install_ingress, doc_suffix="in SC")("sc", args)
     _step(install_external_dns, doc_suffix="in SC")(
         sc_config,
@@ -454,6 +474,7 @@ def main() -> None:
     else:
         _step(apply_apps, doc_suffix="in SC")("sc")
         _step(apply_apps, doc_suffix="in WC")("wc")
+    _step(close_network_policies)(args.config)
 
 
 def _parse_arguments(**environment: str) -> tuple[StepArgs, Args]:
