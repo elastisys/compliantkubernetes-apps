@@ -73,6 +73,10 @@ hnc:
 ingressNginx:
   controller:
     tolerations: *tolerateElastisys
+    service:
+      internal:
+        annotations:
+          loadbalancer.openstack.org/proxy-protocol: "false"
   defaultBackend:
     tolerations: *tolerateElastisys
     affinity: *affinityElastisys
@@ -104,17 +108,14 @@ networkPolicies:
   global:
     wcApiserver:
       ips:
-        - set-me
+        - 0.0.0.0/0
     wcNodes:
       ips:
-        - set-me
+        - 0.0.0.0/0
 user:
   namespaces:
-    - set-me
     - production
     - staging
   adminUsers:
-    - set-me
     - admin@example.com
-  adminGroups:
-    - set-me
+  adminGroups: []

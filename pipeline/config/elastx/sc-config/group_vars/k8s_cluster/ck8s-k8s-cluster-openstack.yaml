@@ -4,7 +4,7 @@ external_cloud_provider: openstack
 calico_mtu: 1480
 external_openstack_cloud_controller_extra_args:
   # Must be different for every cluster in the same openstack project
-  cluster-name: sc.cluster.local
+  cluster-name: pipeline-elastx-sc
 cinder_csi_enabled: true
 cinder_topology: true
 persistent_volumes_enabled: true

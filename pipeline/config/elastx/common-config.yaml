@@ -12,7 +12,7 @@ issuers:
 clusterAdmin:
   users: []
   groups:
-    - ck8sdevops@elastisys.com
+    - self-managed@elastisys.com
 opa:
   imageRegistry:
     URL:
@@ -40,15 +40,15 @@ networkPolicies:
         - 0.0.0.0/0
     objectStorage:
       ips:
-        - set-me
+        - 0.0.0.0/0
       ports:
-        - set-me
+        - 443
     scIngress:
       ips:
-        - set-me
+        - 0.0.0.0/0
     wcIngress:
       ips:
-        - set-me
+        - 0.0.0.0/0
   coredns:
     externalDns:
       ips:
@@ -74,3 +74,10 @@ trivy:
       - key: node-role.kubernetes.io/control-plane
         operator: Exists
         effect: NoSchedule
+ingressNginx:
+  controller:
+    config:
+      useProxyProtocol: false
+    service:
+      annotations:
+        loadbalancer.openstack.org/proxy-protocol: "false"

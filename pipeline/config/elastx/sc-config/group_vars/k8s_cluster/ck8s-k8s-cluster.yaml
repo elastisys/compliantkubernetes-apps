@@ -1,5 +1,5 @@
-kube_oidc_auth: true
-kube_oidc_url: https://dex.monitoring-ck8s.com
+kube_oidc_auth: false
+kube_oidc_url: https://dex.sme.monitoring-ck8s.com
 kube_oidc_client_id: kubelogin
 kube_oidc_client_secret: PgRIRH8UKOt8ZABS7tpX
 kube_oidc_username_claim: email
@@ -11,11 +11,11 @@ kube_oidc_apiserver_endpoint: kube.ops.pipeline-elastx.dev-ck8s.com
 kube_oidc_apiserver_port: "6443"
 kubeconfig_file_name: kube_config_sc.yaml
 artifacts_dir: '{{ inventory_dir }}/../.state'
-create_oidc_kubeconfig: true
+create_oidc_kubeconfig: false
 cluster_admin_users: []
 cluster_admin_groups:
-  - ck8sdevops@elastisys.com
-kubeconfig_localhost: false
+  - self-managed@elastisys.com
+kubeconfig_localhost: true
 kube_apiserver_enable_admission_plugins:
   - NamespaceLifecycle
   - LimitRanger

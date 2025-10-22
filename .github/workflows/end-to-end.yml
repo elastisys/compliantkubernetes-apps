@@ -74,20 +74,20 @@ jobs:
       OS_IDENTITY_API_VERSION: ${{ vars.OS_IDENTITY_API_VERSION }}
 
     steps:
-      # - name: Get latest ck8s-kubespray release
-      #   uses: oprypin/find-latest-tag@v1
-      #   with:
-      #     repository: elastisys/compliantkubernetes-kubespray
-      #     releases-only: true
-      #   id: kubespray-repo
+      - name: Get latest ck8s-kubespray release
+        uses: oprypin/find-latest-tag@v1
+        with:
+          repository: elastisys/compliantkubernetes-kubespray
+          releases-only: true
+        id: kubespray-repo
 
-      # - name: Checkout ck8s-kubespray
-      #   uses: actions/checkout@v5
-      #   with:
-      #     repository: elastisys/compliantkubernetes-kubespray
-      #     ref: ${{ steps.kubespray-repo.outputs.tag }}
-      #     submodules: recursive
-      #     path: compliantkubernetes-kubespray
+      - name: Checkout ck8s-kubespray
+        uses: actions/checkout@v5
+        with:
+          repository: elastisys/compliantkubernetes-kubespray
+          ref: ${{ steps.kubespray-repo.outputs.tag }}
+          submodules: recursive
+          path: compliantkubernetes-kubespray
 
       - name: Checkout compliantkubernetes-apps
         uses: actions/checkout@v5
@@ -102,147 +102,167 @@ jobs:
           ssh-keygen -q -t rsa -N "" -f apps/pipeline/config/elastx/id_rsa
           sed -i "s!PUBLIC_SSH_KEY_HERE!$(cat apps/pipeline/config/elastx/id_rsa.pub)!g" apps/pipeline/config/elastx/${{ matrix.cluster }}-config/group_vars/all/ck8s-ssh-keys.yaml
 
-      # - name: Init terraform
-      #   uses: docker://hashicorp/terraform:1.3.9
-      #   with:
-      #     args: -chdir="/github/workspace/compliantkubernetes-kubespray/kubespray/contrib/terraform/openstack" init
+      - name: Init terraform
+        uses: docker://hashicorp/terraform:1.3.9
+        with:
+          args: -chdir="/github/workspace/compliantkubernetes-kubespray/kubespray/contrib/terraform/openstack" init
 
-      # - name: Run terraform
-      #   continue-on-error: true
-      #   id: runterraform0
-      #   uses: docker://hashicorp/terraform:1.3.9
-      #   with:
-      #     args: -chdir="/github/workspace/compliantkubernetes-kubespray/kubespray/contrib/terraform/openstack" apply -auto-approve -var-file /github/workspace/apps/pipeline/config/elastx/${{ matrix.cluster }}-config/cluster.tfvars -state /github/workspace/apps/pipeline/config/elastx/${{ matrix.cluster }}-config/terraform.tfstate
+      - name: Run terraform
+        continue-on-error: true
+        id: runterraform0
+        uses: docker://hashicorp/terraform:1.3.9
+        with:
+          args: -chdir="/github/workspace/compliantkubernetes-kubespray/kubespray/contrib/terraform/openstack" apply -auto-approve -var-file /github/workspace/apps/pipeline/config/elastx/${{ matrix.cluster }}-config/cluster.tfvars -state /github/workspace/apps/pipeline/config/elastx/${{ matrix.cluster }}-config/terraform.tfstate
 
-      # - name: Run terraform - retry 1
-      #   id: runterraform1
-      #   if: steps.runterraform0.outcome=='failure'
-      #   uses: docker://hashicorp/terraform:1.3.9
-      #   with:
-      #     args: -chdir="/github/workspace/compliantkubernetes-kubespray/kubespray/contrib/terraform/openstack" apply -auto-approve -var-file /github/workspace/apps/pipeline/config/elastx/${{ matrix.cluster }}-config/cluster.tfvars -state /github/workspace/apps/pipeline/config/elastx/${{ matrix.cluster }}-config/terraform.tfstate
+      - name: Run terraform - retry 1
+        id: runterraform1
+        if: steps.runterraform0.outcome=='failure'
+        uses: docker://hashicorp/terraform:1.3.9
+        with:
+          args: -chdir="/github/workspace/compliantkubernetes-kubespray/kubespray/contrib/terraform/openstack" apply -auto-approve -var-file /github/workspace/apps/pipeline/config/elastx/${{ matrix.cluster }}-config/cluster.tfvars -state /github/workspace/apps/pipeline/config/elastx/${{ matrix.cluster }}-config/terraform.tfstate
 
-      # - name: Prepare sc DNS
-      #   if: matrix.cluster == 'sc'
-      #   working-directory: ${{ env.CK8S_CONFIG_PATH }}
-      #   run: |
-      #     k8s_master_ip="$(jq -r .outputs.k8s_master_fips.value ${{ matrix.cluster }}-config/terraform.tfstate)"
-      #     new_records=$(echo $k8s_master_ip | jq 'map({Value: .})')
-      #     jq --argjson new_records "$new_records" --arg name "kube.ops.pipeline-elastx.dev-ck8s.com" \
-      #     '
-      #     (.Changes[] | select(.ResourceRecordSet.Name == $name) | .ResourceRecordSet.ResourceRecords) = $new_records
-      #     ' \
-      #     ${{ matrix.cluster }}-dns.json > tmp.json && mv tmp.json  ${{ matrix.cluster }}-dns.json
-      #     cat  ${{ matrix.cluster }}-dns.json
+      - name: Setup subnetIDs
+        working-directory: ${{ env.CK8S_CONFIG_PATH }}
+        run: |
+          subnet_id="$(jq -r .outputs.private_subnet_id.value ${{ matrix.cluster }}-config/terraform.tfstate)"
+          yq -i ".external_openstack_lbaas_subnet_id = \"$subnet_id\"" "${{ matrix.cluster }}-config/group_vars/k8s_cluster/ck8s-k8s-cluster-openstack.yaml"
 
-      # - name: Prepare wc DNS
-      #   if: matrix.cluster == 'wc'
-      #   working-directory: ${{ env.CK8S_CONFIG_PATH }}
-      #   run: |
-      #     k8s_master_ip="$(jq -r .outputs.k8s_master_fips.value ${{ matrix.cluster }}-config/terraform.tfstate)"
-      #     new_records=$(echo $k8s_master_ip | jq 'map({Value: .})')
-      #     jq --argjson new_records "$new_records" --arg name "kube.pipeline-elastx.dev-ck8s.com" \
-      #     '
-      #     (.Changes[] | select(.ResourceRecordSet.Name == $name) | .ResourceRecordSet.ResourceRecords) = $new_records
-      #     ' \
-      #     ${{ matrix.cluster }}-dns.json > tmp.json && mv tmp.json  ${{ matrix.cluster }}-dns.json
-      #     cat  ${{ matrix.cluster }}-dns.json
+      - name: Prepare sc DNS
+        if: matrix.cluster == 'sc'
+        working-directory: ${{ env.CK8S_CONFIG_PATH }}
+        run: |
+          k8s_master_ip="$(jq -r .outputs.k8s_master_fips.value ${{ matrix.cluster }}-config/terraform.tfstate)"
+          for ip in $(echo "$k8s_master_ip" | jq -r '.[]'); do
+            yq -i ".supplementary_addresses_in_ssl_keys += [\"$ip\"]" "${{ matrix.cluster }}-config/group_vars/k8s_cluster/ck8s-k8s-cluster-openstack.yaml"
+          done
+          new_records=$(echo $k8s_master_ip | jq 'map({Value: .})')
+          jq --argjson new_records "$new_records" --arg name "kube.ops.pipeline-elastx.dev-ck8s.com" \
+          '
+          (.Changes[] | select(.ResourceRecordSet.Name == $name) | .ResourceRecordSet.ResourceRecords) = $new_records
+          ' \
+          dns/${{ matrix.cluster }}-api.json > tmp.json && mv tmp.json  dns/${{ matrix.cluster }}-api.json
 
-      # - name: Create DNS records
-      #   uses: docker://amazon/aws-cli:2.30.4
-      #   env:
-      #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_DNS_ACCESS_KEY_ID }}
-      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_DNS_SECRET_ACCESS_KEY }}
-      #     # See https://github.com/aws/aws-cli/issues/5262
-      #     AWS_EC2_METADATA_DISABLED: true
-      #   with:
-      #     args: route53 change-resource-record-sets --hosted-zone-id Z1001117397DAU71G3RN2 --change-batch file://apps/pipeline/config/elastx/${{ matrix.cluster }}-dns.json
+      - name: Prepare wc DNS
+        if: matrix.cluster == 'wc'
+        working-directory: ${{ env.CK8S_CONFIG_PATH }}
+        run: |
+          k8s_master_ip="$(jq -r .outputs.k8s_master_fips.value ${{ matrix.cluster }}-config/terraform.tfstate)"
+          for ip in $(echo "$k8s_master_ip" | jq -r '.[]'); do
+            yq -i ".supplementary_addresses_in_ssl_keys += [\"$ip\"]" "${{ matrix.cluster }}-config/group_vars/k8s_cluster/ck8s-k8s-cluster-openstack.yaml"
+          done
+          new_records=$(echo $k8s_master_ip | jq 'map({Value: .})')
+          jq --argjson new_records "$new_records" --arg name "kube.pipeline-elastx.dev-ck8s.com" \
+          '
+          (.Changes[] | select(.ResourceRecordSet.Name == $name) | .ResourceRecordSet.ResourceRecords) = $new_records
+          ' \
+          dns/${{ matrix.cluster }}-api.json > tmp.json && mv tmp.json  dns/${{ matrix.cluster }}-api.json
 
-      # - name: Run kubespray
-      #   continue-on-error: true
-      #   id: runkubespray0
-      #   uses: docker://quay.io/kubespray/kubespray:v2.28.0
-      #   env:
-      #     ANSIBLE_CONFIG: ./compliantkubernetes-kubespray/kubespray/ansible.cfg
-      #   with:
-      #     args: /bin/bash -c "cd compliantkubernetes-kubespray/kubespray &&
-      #           ansible-playbook
-      #           -i ../../${{env.CK8S_CONFIG_PATH}}/${{ matrix.cluster }}-config/inventory.ini
-      #           -i compliantkubernetes-kubespray/bin/node-labels-and-taints-inventory.bash
-      #           --private-key ../../${{env.CK8S_CONFIG_PATH}}/id_rsa
-      #           --become --become-user=root cluster.yml"
+      - name: Create DNS records
+        uses: docker://amazon/aws-cli:2.30.4
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_DNS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_DNS_SECRET_ACCESS_KEY }}
+          # See https://github.com/aws/aws-cli/issues/5262
+          AWS_EC2_METADATA_DISABLED: true
+        with:
+          args: route53 change-resource-record-sets --hosted-zone-id Z1001117397DAU71G3RN2 --change-batch file://apps/pipeline/config/elastx/dns/${{ matrix.cluster }}-api.json
 
-      # - name: Run kubespray - retry 1
-      #   id: runkubespray1
-      #   if: steps.runkubespray0.outcome=='failure'
-      #   uses: docker://quay.io/kubespray/kubespray:v2.28.0
-      #   env:
-      #     ANSIBLE_CONFIG: ./compliantkubernetes-kubespray/kubespray/ansible.cfg
-      #   with:
-      #     args: /bin/bash -c "cd compliantkubernetes-kubespray/kubespray &&
-      #           ansible-playbook
-      #           -i ../../${{env.CK8S_CONFIG_PATH}}/${{ matrix.cluster }}-config/inventory.ini
-      #           -i compliantkubernetes-kubespray/bin/node-labels-and-taints-inventory.bash
-      #           --private-key ../../${{env.CK8S_CONFIG_PATH}}/id_rsa
-      #           --become --become-user=root
-      #           cluster.yml"
+      - name: Run kubespray
+        continue-on-error: true
+        id: runkubespray0
+        uses: docker://quay.io/kubespray/kubespray:v2.28.0
+        env:
+          ANSIBLE_CONFIG: ./compliantkubernetes-kubespray/kubespray/ansible.cfg
+        with:
+          args: /bin/bash -c "cd compliantkubernetes-kubespray/kubespray &&
+                ansible-playbook
+                -i ../../${{env.CK8S_CONFIG_PATH}}/${{ matrix.cluster }}-config/inventory.ini
+                -i compliantkubernetes-kubespray/bin/node-labels-and-taints-inventory.bash
+                --private-key ../../${{env.CK8S_CONFIG_PATH}}/id_rsa
+                --become --become-user=root cluster.yml"
 
+      - name: Run kubespray - retry 1
+        id: runkubespray1
+        if: steps.runkubespray0.outcome=='failure'
+        uses: docker://quay.io/kubespray/kubespray:v2.28.0
+        env:
+          ANSIBLE_CONFIG: ./compliantkubernetes-kubespray/kubespray/ansible.cfg
+        with:
+          args: /bin/bash -c "cd compliantkubernetes-kubespray/kubespray &&
+                ansible-playbook
+                -i ../../${{env.CK8S_CONFIG_PATH}}/${{ matrix.cluster }}-config/inventory.ini
+                -i compliantkubernetes-kubespray/bin/node-labels-and-taints-inventory.bash
+                --private-key ../../${{env.CK8S_CONFIG_PATH}}/id_rsa
+                --become --become-user=root
+                cluster.yml"
 
-      # - name: Get kubeconfig
-      #   if: ${{ steps.runkubespray0.outcome=='success' && steps.runkubespray1.outcome=='success' }}
-      #   id: get-kubeconfig
-      #   uses: docker://quay.io/kubespray/kubespray:v2.28.0
-      #   env:
-      #     ANSIBLE_CONFIG: ./compliantkubernetes-kubespray/kubespray/ansible.cfg
-      #   with:
-      #     args: /bin/bash -c "cd compliantkubernetes-kubespray/kubespray &&
-      #           ansible-playbook
-      #           -i ../../${{env.CK8S_CONFIG_PATH}}/${{ matrix.cluster }}-config/inventory.ini
-      #           --private-key ../../${{env.CK8S_CONFIG_PATH}}/id_rsa
-      #           --become --become-user=root
-      #           ../playbooks/kubeconfig.yml"
+      - name: Get kubeconfig
+        if: steps.runkubespray0.outcome=='success' || steps.runkubespray1.outcome=='success'
+        id: get-kubeconfig
+        uses: docker://quay.io/kubespray/kubespray:v2.28.0
+        env:
+          ANSIBLE_CONFIG: ./compliantkubernetes-kubespray/kubespray/ansible.cfg
+        with:
+          args: /bin/bash -c "cd compliantkubernetes-kubespray/kubespray &&
+                ansible-playbook
+                -i ../../${{env.CK8S_CONFIG_PATH}}/${{ matrix.cluster }}-config/inventory.ini
+                --private-key ../../${{env.CK8S_CONFIG_PATH}}/id_rsa
+                --become --become-user=root
+                ../playbooks/kubeconfig.yml"
 
-      # - name: Adding cluster-admin ClusterRoleBinding
-      #   id: add-admin-rbac
-      #   if: steps.get-kubeconfig.outcome=='success'
-      #   uses: docker://quay.io/kubespray/kubespray:v2.28.0
-      #   env:
-      #     ANSIBLE_CONFIG: ./compliantkubernetes-kubespray/kubespray/ansible.cfg
-      #   with:
-      #     args: /bin/bash -c "cd compliantkubernetes-kubespray/kubespray &&
-      #           ansible-playbook
-      #           -i ../../${{env.CK8S_CONFIG_PATH}}/${{ matrix.cluster }}-config/inventory.ini
-      #           --private-key ../../${{env.CK8S_CONFIG_PATH}}/id_rsa
-      #           --become --become-user=root
-      #           ../playbooks/cluster_admin_rbac.yml"
+      - name: Check kubeconfig
+        id: check-kubeconfig
+        if: steps.get-kubeconfig.outcome=='success'
+        run: cat "${{ env.CK8S_CONFIG_PATH }}/.state/kube_config_${{ matrix.cluster }}.yaml"
 
+      - name: Adding cluster-admin ClusterRoleBinding
+        id: add-admin-rbac
+        if: steps.get-kubeconfig.outcome=='success'
+        uses: docker://quay.io/kubespray/kubespray:v2.28.0
+        env:
+          ANSIBLE_CONFIG: ./compliantkubernetes-kubespray/kubespray/ansible.cfg
+        with:
+          args: /bin/bash -c "cd compliantkubernetes-kubespray/kubespray &&
+                ansible-playbook
+                -i ../../${{env.CK8S_CONFIG_PATH}}/${{ matrix.cluster }}-config/inventory.ini
+                --private-key ../../${{env.CK8S_CONFIG_PATH}}/id_rsa
+                --become --become-user=root
+                ../playbooks/cluster_admin_rbac.yml"
 
-      # - name: Master cis benchmark patching
-      #   id: master-cis
-      #   if: steps.get-kubeconfig.outcome=='success'
-      #   uses: docker://quay.io/kubespray/kubespray:v2.28.0
-      #   env:
-      #     ANSIBLE_CONFIG: ./compliantkubernetes-kubespray/kubespray/ansible.cfg
-      #   with:
-      #     args: /bin/bash -c "cd compliantkubernetes-kubespray/kubespray &&
-      #           ansible-playbook
-      #           -i ../../${{env.CK8S_CONFIG_PATH}}/${{ matrix.cluster }}-config/inventory.ini
-      #           --private-key ../../${{env.CK8S_CONFIG_PATH}}/id_rsa
-      #           --become --become-user=root
-      #           ../playbooks/master_cis_benchmark_patch.yml"
+      - name: Master cis benchmark patching
+        id: master-cis
+        if: steps.get-kubeconfig.outcome=='success'
+        uses: docker://quay.io/kubespray/kubespray:v2.28.0
+        env:
+          ANSIBLE_CONFIG: ./compliantkubernetes-kubespray/kubespray/ansible.cfg
+        with:
+          args: /bin/bash -c "cd compliantkubernetes-kubespray/kubespray &&
+                ansible-playbook
+                -i ../../${{env.CK8S_CONFIG_PATH}}/${{ matrix.cluster }}-config/inventory.ini
+                --private-key ../../${{env.CK8S_CONFIG_PATH}}/id_rsa
+                --become --become-user=root
+                ../playbooks/master_cis_benchmark_patch.yml"
 
-      # - name: Worker cis benchmark patching
-      #   id: node-cis
-      #   if: steps.get-kubeconfig.outcome=='success'
-      #   uses: docker://quay.io/kubespray/kubespray:v2.28.0
-      #   env:
-      #     ANSIBLE_CONFIG: ./compliantkubernetes-kubespray/kubespray/ansible.cfg
-      #   with:
-      #     args: /bin/bash -c "cd compliantkubernetes-kubespray/kubespray &&
-      #           ansible-playbook
-      #           -i ../../${{env.CK8S_CONFIG_PATH}}/${{ matrix.cluster }}-config/inventory.ini
-      #           --private-key ../../${{env.CK8S_CONFIG_PATH}}/id_rsa
-      #           --become --become-user=root
-      #           ../playbooks/worker_cis_benchmark_patch.yml"
+      - name: Worker cis benchmark patching
+        id: node-cis
+        if: steps.get-kubeconfig.outcome=='success'
+        uses: docker://quay.io/kubespray/kubespray:v2.28.0
+        env:
+          ANSIBLE_CONFIG: ./compliantkubernetes-kubespray/kubespray/ansible.cfg
+        with:
+          args: /bin/bash -c "cd compliantkubernetes-kubespray/kubespray &&
+                ansible-playbook
+                -i ../../${{env.CK8S_CONFIG_PATH}}/${{ matrix.cluster }}-config/inventory.ini
+                --private-key ../../${{env.CK8S_CONFIG_PATH}}/id_rsa
+                --become --become-user=root
+                ../playbooks/worker_cis_benchmark_patch.yml"
+
+      - name: Label nodes
+        if: matrix.cluster == 'wc'
+        env:
+          KUBECONFIG: "${{ env.CK8S_CONFIG_PATH }}/.state/kube_config_${{ matrix.cluster }}.yaml"
+        run: |
+          kubectl get nodes -o custom-columns=NAME:.metadata.name --no-headers | grep "elastisys" | xargs -I {} kubectl label node {} elastisys.io/node-group=elastisys
 
       - name: Import PGP key and configure GPG agent
         run: ./apps/pipeline/setup-pgp.bash
@@ -255,37 +275,40 @@ jobs:
         env:
           S3_ACCESS_KEY: ${{ secrets.ELASTX_API_ACCESS_KEY }}
           S3_SECRET_KEY: ${{ secrets.ELASTX_API_SECRET_KEY }}
-
+          DEX_CONNECTOR: ${{ secrets.DEX_CONNECTOR }}
         run: |
+          echo "${{ env.DEX_CONNECTOR }}" | base64 -d > tmp.yaml
+          yq -i ".dex.connectors += [load(\"tmp.yaml\")]" "secrets.yaml"
+          rm tmp.yaml
           sops --config ".sops.yaml" -e -i "secrets.yaml"
           sops --config ".sops.yaml" --set "[\"objectStorage\"] {\"s3\": {\"accessKey\": \"${{ env.S3_ACCESS_KEY }}\", \"secretKey\": \"${{ env.S3_SECRET_KEY }}\"}}" "secrets.yaml"
           sed -i "s/access_key_value/${{env.S3_ACCESS_KEY}}/g" ".state/s3cfg.ini"
           sed -i "s/secret_key_value/${{env.S3_SECRET_KEY}}/g" ".state/s3cfg.ini"
 
-  #     - name: Initialize apps
-  #       env:
-  #         CK8S_ENVIRONMENT_NAME: pipeline-exoscale
-  #         CK8S_CLOUD_PROVIDER: exoscale
-  #         CK8S_FLAVOR: dev
-  #       run: ./apps/bin/ck8s init both
-  #       id: initialize-apps
+      - name: Initialize apps
+        env:
+          CK8S_ENVIRONMENT_NAME: pipeline-elastx
+          CK8S_CLOUD_PROVIDER: elastx
+          CK8S_FLAVOR: prod
+        run: ./apps/bin/ck8s init both
+        id: initialize-apps
 
       - name: Create buckets
         if: matrix.cluster == 'sc'
         run: |
           ./apps/scripts/S3/entry.sh --s3cfg "${{ env.CK8S_CONFIG_PATH}}/.state/s3cfg.ini" create
           sops --config "${{ env.CK8S_CONFIG_PATH}}/.sops.yaml" -e -i "${{ env.CK8S_CONFIG_PATH}}/.state/s3cfg.ini"
+        id: create-buckets
 
-  #     - name: Bootstrap rook
-  #       env:
-  #         KUBECONFIG: /__w/compliantkubernetes-apps/compliantkubernetes-apps/apps/pipeline/config/exoscale/pipeline-${{ matrix.cluster }}-config/artifacts/admin.conf
-  #         CK8S_CONFIG_PATH: /__w/compliantkubernetes-apps/compliantkubernetes-apps/apps/pipeline/config/exoscale
-  #         CK8S_APPS_PIPELINE: "true"
-  #         CLUSTER: ${{ matrix.cluster }}
-  #       run: |
-  #         ./scripts/pipeline/bootstrap-rook.sh
-  #       working-directory: ./compliantkubernetes-kubespray/rook
-  #       id: bootstrap-rook
+      # - name: Bootstrap rook
+      #   working-directory: ./compliantkubernetes-kubespray/rook
+      #   env:
+      #     KUBECONFIG: ${{ env.CK8S_CONFIG_PATH }}/.state/kube_config_${{ matrix.cluster }}.yaml
+      #     CK8S_APPS_PIPELINE: true
+      #     CLUSTER: ${{ matrix.cluster }}
+      #   run: |
+      #     ./scripts/pipeline/bootstrap-rook.sh
+      #   id: bootstrap-rook
 
   #     - name: Test rook
   #       env:
@@ -298,36 +321,83 @@ jobs:
   #       working-directory: ./compliantkubernetes-kubespray/rook
   #       id: test-rook
 
-  #     - name: Gather configs
-  #       if: always() && steps.initialize-apps.outcome == 'success' && matrix.cluster == 'sc'
-  #       shell: bash
-  #       working-directory: ./apps/pipeline/config/exoscale
-  #       run: |
-  #         cp defaults/common-config.yaml common-defaults.yaml
-  #         cp defaults/sc-config.yaml sc-defaults.yaml
-  #         cp defaults/wc-config.yaml wc-defaults.yaml
-  #         tar -czf configs.tar.gz common-defaults.yaml common-config.yaml sc-defaults.yaml sc-config.yaml wc-defaults.yaml wc-config.yaml
-  #       id: gather-configs
+      - name: Gather configs
+        if: always() && steps.initialize-apps.outcome == 'success' && matrix.cluster == 'sc'
+        shell: bash
+        working-directory: ${{ env.CK8S_CONFIG_PATH }}
+        run: |
+          cp defaults/common-config.yaml common-defaults.yaml
+          cp defaults/sc-config.yaml sc-defaults.yaml
+          cp defaults/wc-config.yaml wc-defaults.yaml
+          tar -czf configs.tar.gz common-defaults.yaml common-config.yaml sc-defaults.yaml sc-config.yaml wc-defaults.yaml wc-config.yaml
+        id: gather-configs
 
-  #     - name: Upload configs
-  #       if: always() && steps.gather-configs.outcome == 'success'
-  #       uses: actions/upload-artifact@v3
-  #       with:
-  #         name: compliantkubernetes-apps-pipeline-config
-  #         path: ./apps/pipeline/config/exoscale/configs.tar.gz
+      - name: Upload configs
+        if: always() && steps.gather-configs.outcome == 'success'
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: compliantkubernetes-apps-pipeline-config
+          path: ./apps/pipeline/config/elastx/configs.tar.gz
 
-  #     - name: Install apps
-  #       if: steps.bootstrap-rook.outcome == 'success' && steps.test-rook.outcome == 'success'
-  #       run: ./apps/pipeline/apply-${{ matrix.cluster }}.bash
-  #       shell: bash
-  #       id: install-apps
+      - name: Creat admin namespaces
+        run: ./apps/bin/ck8s ops helmfile ${{ matrix.cluster }} -l app=admin-namespaces apply
 
-  #     - name: Wait for OpenSearch to be ready
-  #       if: steps.install-apps.outcome == 'success' && matrix.cluster == 'wc'
-  #       run: ./apps/pipeline/opensearch.bash
-  #       continue-on-error: true
-  #       shell: bash
-  #       id: opensearch
+      - name: Creat dev namespaces
+        if: matrix.cluster == 'wc'
+        run: ./apps/bin/ck8s ops helmfile ${{ matrix.cluster }} -l app=dev-namespaces apply
+
+      - name: Create Google SA secret for dex
+        if: matrix.cluster == 'sc'
+        env:
+          GOOGLE_SA: ${{ secrets.GOOGLE_SA }}
+        run: |
+          yq -i ".data[\"sa.json\"] = \"$GOOGLE_SA\"" "${{ env.CK8S_CONFIG_PATH }}/dex-google-group-claim/secret/google-sa-secret.yml"
+          ./apps/bin/ck8s ops kubectl ${{ matrix.cluster }} apply --server-side -f "${{ env.CK8S_CONFIG_PATH }}/dex-google-group-claim/secret/google-sa-secret.yml"
+          sops --config "${{ env.CK8S_CONFIG_PATH }}/.sops.yaml" -e -i "${{ env.CK8S_CONFIG_PATH }}/dex-google-group-claim/secret/google-sa-secret.yml"
+
+      - name: Install gatekeeper and Nginx ingress controller
+        run: |
+          ./apps/bin/ck8s ops helmfile ${{ matrix.cluster }} -l name=kube-prometheus-stack apply
+          ./apps/bin/ck8s ops helmfile ${{ matrix.cluster }} -l app=gatekeeper apply
+          ./apps/bin/ck8s ops helmfile ${{ matrix.cluster }} -l app=ingress-nginx apply
+          ./apps/bin/ck8s ops kubectl ${{ matrix.cluster }} -n ingress-nginx wait --for=jsonpath='{.status.loadBalancer.ingress}' service/ingress-nginx-controller
+
+      - name: Update Ingress DNS records
+        run: |
+          ingress_ip=$(./apps/bin/ck8s ops kubectl ${{ matrix.cluster }} -n ingress-nginx get service ingress-nginx-controller -o jsonpath='{.status.loadBalancer.ingress[].ip}')
+          ingress_ip_json=$(echo "{\"Value\": \"$ip\"}" | jq)
+          jq --argjson value "$ingress_ip_json" \
+          '
+          .Changes[] | .ResourceRecordSet.ResourceRecords += [ $value ]'
+          ' \
+          "${{ env.CK8S_CONFIG_PATH}}/dns/${{matrix.cluster}}-ingress.json" > tmp.json &&
+          mv tmp.json "${{ env.CK8S_CONFIG_PATH }}}/dns/${{matrix.cluster}}-ingress.json"
+
+      - name: Create ingress DNS records
+        uses: docker://amazon/aws-cli:2.30.4
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_DNS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_DNS_SECRET_ACCESS_KEY }}
+          # See https://github.com/aws/aws-cli/issues/5262
+          AWS_EC2_METADATA_DISABLED: true
+        with:
+          args: route53 change-resource-record-sets --hosted-zone-id Z1001117397DAU71G3RN2 --change-batch file://apps/pipeline/config/elastx/dns/${{ matrix.cluster }}-ingress.json
+
+      - name: Update ips
+        shell: bash
+        run: ./apps/bin/update-ips.bash ${{ matrix.cluster }} apply
+
+      - name: Install apps
+        run: ./apps/pipeline/apply-${{ matrix.cluster }}.bash
+        shell: bash
+        id: install-apps
+
+      # - name: Wait for OpenSearch to be ready
+      #   if: steps.install-apps.outcome == 'success' && matrix.cluster == 'sc'
+      #   run: ./apps/pipeline/opensearch.bash
+      #   continue-on-error: true
+      #   shell: bash
+      #   id: opensearch
 
   #     - name: Test apps
   #       if: always() && (steps.install-apps.outcome != 'cancelled' && steps.install-apps.outcome != 'skipped')
@@ -374,21 +444,33 @@ jobs:
   #       with:
   #         name: rook-ceph-events
   #         path: ./compliantkubernetes-kubespray/rook/events
+      - name: Clear apps
+        continue-on-error: true
+        if: always()
+        id: cleanapps0
+        shell: bash
+        run: ./apps/pipeline/clean-${{ matrix.cluster }}.bash
 
-      # - name: Destroy terraform
-      #   continue-on-error: true
-      #   id: destroyterraform0
-      #   if: always()
-      #   uses: docker://hashicorp/terraform:1.3.9
-      #   with:
-      #     args: -chdir="/github/workspace/compliantkubernetes-kubespray/kubespray/contrib/terraform/openstack" destroy -auto-approve -var-file /github/workspace/apps/pipeline/config/elastx/${{ matrix.cluster }}-config/cluster.tfvars -state /github/workspace/apps/pipeline/config/elastx/${{ matrix.cluster }}-config/terraform.tfstate
+      - name: Clear apps - retry
+        if: always() && steps.cleanapps0.outcome=='failure'
+        id: cleanapps1
+        shell: bash
+        run: ./apps/pipeline/clean-${{ matrix.cluster }}.bash
 
-      # - name: Destroy terraform - retry 1
-      #   id: destroyterraform1
-      #   if: always() && steps.destroyterraform0.outcome=='failure'
-      #   uses: docker://hashicorp/terraform:1.3.9
-      #   with:
-      #     args: -chdir="/github/workspace/compliantkubernetes-kubespray/kubespray/contrib/terraform/openstack" destroy -auto-approve -var-file /github/workspace/apps/pipeline/config/elastx/${{ matrix.cluster }}-config/cluster.tfvars -state /github/workspace/apps/pipeline/config/elastx/${{ matrix.cluster }}-config/terraform.tfstate
+      - name: Destroy terraform
+        continue-on-error: true
+        id: destroyterraform0
+        if: always()
+        uses: docker://hashicorp/terraform:1.3.9
+        with:
+          args: -chdir="/github/workspace/compliantkubernetes-kubespray/kubespray/contrib/terraform/openstack" destroy -auto-approve -var-file /github/workspace/apps/pipeline/config/elastx/${{ matrix.cluster }}-config/cluster.tfvars -state /github/workspace/apps/pipeline/config/elastx/${{ matrix.cluster }}-config/terraform.tfstate
+
+      - name: Destroy terraform - retry 1
+        id: destroyterraform1
+        if: always() && steps.destroyterraform0.outcome=='failure'
+        uses: docker://hashicorp/terraform:1.3.9
+        with:
+          args: -chdir="/github/workspace/compliantkubernetes-kubespray/kubespray/contrib/terraform/openstack" destroy -auto-approve -var-file /github/workspace/apps/pipeline/config/elastx/${{ matrix.cluster }}-config/cluster.tfvars -state /github/workspace/apps/pipeline/config/elastx/${{ matrix.cluster }}-config/terraform.tfstate
 
   #     - name: Prepare DNS cleanup
   #       if: always() && (matrix.cluster == 'sc')

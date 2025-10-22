@@ -22,9 +22,7 @@ keys=$(gpg --list-keys --with-colons --with-keygrip)
 keygrip=$(echo "${keys}" | awk -F: '$1 == "grp" {print $10;}' | tail -n1)
 keyfpr=$(echo "${keys}" | awk -F: '$1 == "fpr" {print $10;}' | tail -n1)
 
-export keyfpr
-
 echo "${PGP_PASSPHRASE}" |
   /usr/lib/gnupg2/gpg-preset-passphrase --preset "${keygrip}"
 
-yq -i '.creation_rules[].pgp=env(keyfpr)' "${CK8S_CONFIG_PATH}"/.sops.yaml
+yq -i ".creation_rules[].pgp = \"$keyfpr\"" "${CK8S_CONFIG_PATH}/.sops.yaml"

@@ -6,42 +6,42 @@ grafana:
       allowedDomains:
         - elastisys.com
       userGroups:
-        grafanaAdmin: ck8sdevops@elastisys.com
+        grafanaAdmin: self-managed@elastisys.com
   user:
     oidc:
       allowedDomains:
         - elastisys.com
-        - set-me
+        - example.com
       skipRoleSync: true
       userGroups:
-        grafanaAdmin: ck8sdevops@elastisys.com
+        grafanaAdmin: self-managed@elastisys.com
 opensearch:
   extraRoleMappings:
     - mapping_name: kibana_user
       definition:
         users:
-          - set-me
+          - admin@example.com
     - mapping_name: kubernetes_log_reader
       definition:
         users:
-          - set-me
+          - admin@example.com
     - mapping_name: alerting_ack_alerts
       definition:
         users:
-          - set-me
+          - admin@example.com
     - mapping_name: alerting_read_access
       definition:
         users:
-          - set-me
+          - admin@example.com
     - mapping_name: alerting_full_access
       definition:
         users:
-          - set-me
+          - admin@example.com
     - mapping_name: all_access
       definition:
         users: []
         backend_roles:
-          - ck8sdevops@elastisys.com
+          - self-managed@elastisys.com
 alerts:
   opsGenieHeartbeat:
     name: pipeline-elastx
@@ -55,7 +55,10 @@ alerts:
       ThanosCompactHalted: https://github.com/elastisys/welkin-runbooks/blob/main/ops-guide/thanos/alerts/README.md
 harbor:
   oidc:
-    adminGroupName: ck8sdevops@elastisys.com
+    adminGroupName: self-managed@elastisys.com
+thanos:
+  objectStorage:
+    type: s3
 dex:
   google:
     groupSupport: true
@@ -141,7 +144,7 @@ networkPolicies:
           - rule: egress-rule-sc-ingress
           - name: egress-rule-apiserver-wc
             peers:
-              - cidr: set-me
+              - cidr: 0.0.0.0/0
             ports:
               - tcp: 6443
           - name: egress-rule-ingress-nginx
@@ -162,7 +165,7 @@ networkPolicies:
           - rule: egress-rule-apiserver
           - name: egress-rule-apiserver-wc
             peers:
-              - cidr: set-me
+              - cidr: 0.0.0.0/0
             ports:
               - tcp: 6443
       smoke-test-verify-contact-opensearch-pod:
@@ -199,11 +202,7 @@ networkPolicies:
   global:
     scApiserver:
       ips:
-        - set-me
+        - 0.0.0.0/0
     scNodes:
       ips:
-        - set-me
-objectStorage:
-  swift:
-    projectId: set-me
-    projectName: set-me
+        - 0.0.0.0/0
