@@ -10,7 +10,7 @@ set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 
 WRAPPER="${REPO_ROOT}/scripts/run-from-container.sh"
-IMAGE="ghcr.io/elastisys/sbom-generator:latest"
+IMAGE="ghcr.io/elastisys/sbom-generator:0.1"
 CONFIG="${REPO_ROOT}/sbom/sbom.config.yaml"
 COMMITTED_SBOM="${REPO_ROOT}/sbom/sbom.cdx.json"
 
@@ -47,5 +47,6 @@ else
   echo "[sbom] Drift detected: SBOM has meaningful changes." >&2
   echo "[sbom] Hint: run 'sbom/generate.sh' to update SBOM." >&2
   echo "[sbom] If charts were updated, review and update evaluations in sbom/overrides.yaml." >&2
+  echo "If this fails in CI but works locally, ensure your branch is up to date with the main branch (rebase if necessary)." >&2
 fi
 exit ${status}
