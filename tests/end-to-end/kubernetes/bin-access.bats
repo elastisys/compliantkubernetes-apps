@@ -28,6 +28,16 @@ teardown_file() {
   assert_success
 }
 
+@test "static user has restricted access" {
+  run kubectl auth whoami
+  assert_output --partial "dev@example.com"
+  for ns in default kube-system staging; do
+    run kubectl -n "${ns}" auth can-i --list --no-headers
+    assert_success
+    assert_output "$(cat "${BATS_TEST_DIRNAME}/resources/dev-access-list-${ns}")"
+  done
+}
+
 @test "static user can delegate admin access" {
   run kubectl auth whoami
   assert_output --partial "dev@example.com"
