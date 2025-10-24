@@ -87,13 +87,7 @@ networkPolicies:
   crossplane:
     packageRegistry:
       ips:
-        - 3.77.103.135/32 # xpkg.crossplane.io
-        - 3.67.33.93/32 # xpkg.crossplane.io
-        - 4.225.11.196/32 # ghcr.io
-        - 185.199.108.154/32 # pkg-containers.githubusercontent.com
-        - 185.199.109.154/32 # pkg-containers.githubusercontent.com
-        - 185.199.110.154/32 # pkg-containers.githubusercontent.com
-        - 185.199.111.154/32 # pkg-containers.githubusercontent.com
+        - 0.0.0.0/0
   ingressNginx:
     ingressOverride:
       enabled: false

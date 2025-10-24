@@ -13,15 +13,7 @@ policies:
         - rule: egress-rule-apiserver
         - rule: egress-rule-dns
         {{- if and (.Values | get "networkPolicies.crossplane.packageRegistry.ips" list) (.Values | get "networkPolicies.crossplane.packageRegistry.ports" list) }}
-        - name: egress-rule-package-registry
-          peers:
-            {{- range .Values | get "networkPolicies.crossplane.packageRegistry.ips" list }}
-            - cidr: {{ . }}
-            {{- end }}
-          ports:
-            {{- range .Values | get "networkPolicies.crossplane.packageRegistry.ports" list }}
-            - tcp: {{ . }}
-            {{- end }}
+        - rule: egress-rule-package-registry
         {{- end }}
         {{- range $function, $image := .Values.images.crossplane.functions }}
         - name: egress-rule-{{ $function }}
@@ -49,4 +41,7 @@ policies:
         pkg.crossplane.io/provider: provider-{{ $provider }}
       egress:
         - rule: egress-rule-apiserver
+        {{- if eq $provider "helm" }}
+        - rule: egress-rule-package-registry
+        {{- end }}
     {{- end }}
