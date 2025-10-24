@@ -148,7 +148,7 @@ These guidelines aim to help in creating better quality reference documentation.
 - Should include a follow up explanation for more details when required, e.g:
     - `.grafana` - "Welkin hosts two instances of Grafana one for the Platform Administrator and one for the Application Developer"
 - Should include a follow up explanation for conditionals, e.g:
-    - `.networkPolicies.ingressNginx.ingressOverride` - "When enabled a list of IPs must be set that should override the allowed ingress traffic."
+    - `.issuers.letsencrypt` - "When enabled an email must be set that Let's encrypt uses to contact you about issues related to your account."
 - Should include a follow up explanation for requirements, e.g:
     - `.velero` - "This requires that `.objectStorage` is configured, and will use the bucket or container set in `.objectStorage.buckets.velero`."
 - Should include a reference to upstream documentation, and applicable mapping rules, wrapped in a note GFM alert, e.g.:
