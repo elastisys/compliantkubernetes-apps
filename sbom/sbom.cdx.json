@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:f6e8f5f3-e850-40a1-b7ee-5d5a7d253801",
+  "serialNumber": "urn:uuid:599a482c-949d-4a42-87c3-a1e83871815d",
   "version": 1,
   "metadata": {
-    "timestamp": "2025-10-02T13:16:42Z",
+    "timestamp": "2025-10-24T11:43:09Z",
     "lifecycles": [
       {
         "phase": "build"
@@ -3283,6 +3283,17 @@
       "purl": "pkg:oci/elastisys/fluentd-forwarder@v4.7.5-ck8s1?repository_url=ghcr.io"
     },
     {
+      "bom-ref": "pkg:oci/elastisys/function-capability@v0.4.0?repository_url=ghcr.io",
+      "type": "container",
+      "supplier": {
+        "name": "elastisys"
+      },
+      "name": "ghcr.io/elastisys/function-capability",
+      "version": "v0.4.0",
+      "cpe": "cpe:2.3:a:elastisys:function-capability:0.4.0:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/elastisys/function-capability@v0.4.0?repository_url=ghcr.io"
+    },
+    {
       "bom-ref": "pkg:oci/elastisys/hnc-manager@latest?repository_url=ghcr.io",
       "type": "container",
       "supplier": {
@@ -5305,17 +5316,6 @@
       "version": "latest",
       "cpe": "cpe:2.3:a:weaveworks:kured:*:*:*:*:*:*:*:*",
       "purl": "pkg:oci/weaveworks/kured@latest"
-    },
-    {
-      "bom-ref": "pkg:oci/welkin/function-capability@v0.2.0?repository_url=harbor.long-running.dev-ck8s.com",
-      "type": "container",
-      "supplier": {
-        "name": "welkin"
-      },
-      "name": "harbor.long-running.dev-ck8s.com/welkin/function-capability",
-      "version": "v0.2.0",
-      "cpe": "cpe:2.3:a:welkin:function-capability:0.2.0:*:*:*:*:*:*:*",
-      "purl": "pkg:oci/welkin/function-capability@v0.2.0?repository_url=harbor.long-running.dev-ck8s.com"
     }
   ],
   "dependencies": [
