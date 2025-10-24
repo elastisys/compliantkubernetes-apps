@@ -1,23 +1,24 @@
 {{- range $name, $values := .Values.functions }}
-{{- if gt (len (printf "function-%s" $name)) 63 }}
-{{- printf "function name is too long 'function-%s', needs to be maximum 63 characters" $name | fail }}
+{{- $functionName := printf "function-%s" $name }}
+{{- if gt (len $functionName) 63 }}
+{{- printf "function name is too long '%s', needs to be maximum 63 characters" $functionName | fail }}
 {{- end }}
 ---
 apiVersion: pkg.crossplane.io/v1beta1
 kind: Function
 metadata:
-  name: function-{{ $name }}
+  name: {{ $functionName }}
 spec:
   package: {{ $values.image.repository }}:{{ $values.image.tag }}
   runtimeConfigRef:
     apiVersion: pkg.crossplane.io/v1beta1
     kind: DeploymentRuntimeConfig
-    name: function-{{ $name }}
+    name: {{ $functionName }}
 ---
 apiVersion: pkg.crossplane.io/v1beta1
 kind: DeploymentRuntimeConfig
 metadata:
-  name: function-{{ $name }}
+  name: {{ $functionName }}
 spec:
   deploymentTemplate:
     spec:
