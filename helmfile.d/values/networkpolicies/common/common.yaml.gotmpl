@@ -131,3 +131,13 @@ rules:
           kubernetes.io/metadata.name: monitoring
         podSelectorLabels:
           app.kubernetes.io/name: prometheus
+
+  egress-rule-package-registry:
+    peers:
+      {{- range $netpol.crossplane.packageRegistry.ips }}
+      - cidr: {{ . }}
+      {{- end }}
+    ports:
+      {{- range $netpol.crossplane.packageRegistry.ports }}
+      - tcp: {{ . }}
+      {{- end }}

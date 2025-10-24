@@ -15,22 +15,9 @@ kubectlImage:
 {{- end }}
 {{- end }}
 
-{{- $functions := (list
-  "auto-ready"
-  "capability"
-  "go-templating"
-  "patch-and-transform"
-) }}
-
-{{- $providers := (list
-  "kubernetes"
-  "helm"
-) }}
-
 functions:
-{{- range $function := $functions }}
+{{- range $function, $image := .Values.images.crossplane.functions }}
   {{ $function }}:
-    {{- $image := $.Values.images | dig "crossplane" "functions" $function "" }}
     {{- $image = merge (include "container_uri.parse" $image | fromJson) $imagesGlobal }}
     {{- with $image }}
     image:
@@ -45,9 +32,8 @@ functions:
 {{- end }}
 
 providers:
-{{- range $provider := $providers }}
+{{- range $provider, $image := .Values.images.crossplane.providers }}
   {{ $provider }}:
-    {{- $image := $.Values.images | dig "crossplane" "providers" $provider "" }}
     {{- $image = merge (include "container_uri.parse" $image | fromJson) $imagesGlobal }}
     {{- with $image }}
     image:
