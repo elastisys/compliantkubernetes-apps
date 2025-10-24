@@ -126,21 +126,23 @@ Prerequisites:
 - Docker or Podman installed.
 - Optional: set `CK8S_GITHUB_TOKEN` to avoid GitHub API rate limiting (forwarded to the container if set). This should not be required by default behaviour.
 
-Use the script (version is optional; defaults to `latest`).
+Use the script (version is optional and defaults to `latest`, for release it must be set).
+
 Any additional flags are forwarded to the `sbom-generator` image:
 
 ```bash
 ./sbom/generate.sh X.Y.Z --require-evaluation
 # Then commit and push the SBOM artifact
 git add sbom/sbom.cdx.json
-git commit -m "docs: update SBOM for vX.Y.Z"
+git commit -m "docs: Update SBOM for vX.Y.Z"
 git push
 ```
 
 If `--require-evaluation` fails, it lists the components still marked with the default evaluation (from `sbom/sbom.config.yaml`).
 Update `sbom/overrides.yaml` with an `evaluation` for each listed path, then rerun the command.
 
-Tip: to verify drift without updating files, run `sbom/diff.sh`.
+> [!tip]
+> To verify drift without updating files, run `./sbom/diff.sh`.
 
 ## Code freeze
 
@@ -150,16 +152,7 @@ Mark the staging pull request ready for review.
 
 ## Release
 
-When the staging branch has been merged, finalize the release by tagging the HEAD of the release branch and push the tag.
-
-```bash
-git switch release-X.Y
-git pull
-git tag vX.Y.Z
-git push --tags
-```
-
-A [GitHub actions workflow pipeline](/.github/workflows/release.yml) will create a GitHub release from the tag.
+When the staging branch has been merged to the release branch, the release [GitHub workflow](/.github/workflows/release.yml) will automatically create a new GitHub release.
 
 ## Update public release notes
 
