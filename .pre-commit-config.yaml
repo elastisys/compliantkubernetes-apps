@@ -1,18 +1,25 @@
 repos:
   - repo: local
     hooks:
-      - id: avoid-old-website-urls
-        name: Avoid old URLs and use "https://elastisys.io/welkin" instead
-        entry: "elastisys.io/compliantkubernetes"
+      - id: avoid-direct-cli-tools
+        name: Avoid direct use of kubectl, helmfile, and helm in migrations (excluding comments, helpers, paths, logs, and strings)
+        entry: >-
+          (?m)^(?!\s*#)(?!.*log_(info|warn|error|fatal)\s+["']).*(?:^|\s)(?<!/)(kubectl(?![_a-zA-Z])|helmfile(?![_a-zA-Z])|helm(?![_a-zA-Z]))(?=\s|$)
         language: pygrep
         types: [text]
-        exclude: ^.pre-commit-config.yaml$
+        files: '^migration/[^/]+/[^/]+/[^/]+\.sh$'
       - id: avoid-old-names
         name: Avoid old names and use use "Welkin" instead
         entry: "(Compliant[ ]Kubernetes|C[kK]8[sS][^_]|Complaint)"
         language: pygrep
         types: [text]
         exclude: ^(.pre-commit-config.yaml|changelog/0.43.md|.github/workflows/push-to-ghcr.yml)$
+      - id: avoid-old-website-urls
+        name: Avoid old URLs and use "https://elastisys.io/welkin" instead
+        entry: "elastisys.io/compliantkubernetes"
+        language: pygrep
+        types: [text]
+        exclude: ^.pre-commit-config.yaml$
       - id: consistent-trademark
         name: Either use the trademark "Elastisys Welkin®" consistently or "Welkin" on its own
         entry: "(?<!Elastisys )\\bWelkin®"
@@ -20,7 +27,7 @@ repos:
         types: [text]
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.6.0
+    rev: v6.0.0
     hooks:
       - id: check-executables-have-shebangs
       - id: check-merge-conflict
@@ -63,6 +70,15 @@ repos:
         args:
           - template
 
+      - id: sbom-diff
+        name: check SBOM drift
+        language: system
+        entry: bash
+        args: [sbom/diff.sh]
+        files: ^(helmfile\.d/|sbom/)
+        pass_filenames: false
+        require_serial: true
+
       - id: shellcheck
         name: check scripts
         types: [shell]
@@ -97,16 +113,8 @@ repos:
         require_serial: true
         entry: tests/common/check-js.bash
 
-      - id: avoid-direct-cli-tools
-        name: Avoid direct use of kubectl, helmfile, and helm in migrations (excluding comments, helpers, paths, logs, and strings)
-        entry: >-
-          (?m)^(?!\s*#)(?!.*log_(info|warn|error|fatal)\s+["']).*(?:^|\s)(?<!/)(kubectl(?![_a-zA-Z])|helmfile(?![_a-zA-Z])|helm(?![_a-zA-Z]))(?=\s|$)
-        language: pygrep
-        types: [text]
-        files: '^migration/[^/]+/[^/]+/[^/]+\.sh$'
-
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.3.0
+    rev: v2.4.1
     hooks:
       - id: codespell
         name: check spelling
@@ -116,7 +124,7 @@ repos:
           - .codespellignore
 
   - repo: https://github.com/DavidAnson/markdownlint-cli2
-    rev: v0.14.0
+    rev: v0.18.1
     hooks:
       - id: markdownlint-cli2
         name: lint markdown files
@@ -132,14 +140,3 @@ repos:
           - prettier@3.6.2
         files: ^tests/.*\.js$
         args: [--write]
-
-  - repo: local
-    hooks:
-      - id: sbom-diff
-        name: check SBOM drift
-        language: system
-        entry: bash
-        args: [sbom/diff.sh]
-        files: ^(helmfile\.d/|sbom/)
-        pass_filenames: false
-        require_serial: true

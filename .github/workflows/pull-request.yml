@@ -15,7 +15,7 @@ jobs:
   pull-request:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Fetch pull request
         run: jq -r ".pull_request.body" "${{ github.event_path }}" > /tmp/pull-request-body.md
       - name: Validate pull request

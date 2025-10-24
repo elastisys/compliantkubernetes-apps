@@ -12,17 +12,19 @@ Elastisys Welkin® Apps
 
 **Sections**:
 
-- [Before QA steps](#before-qa-steps)
-- [Install QA steps](#install-qa-steps)
-- [Upgrade QA steps](#upgrade-qa-steps)
-- [After QA steps](#after-qa-steps)
-- [Release steps](#release-steps)
-- [Final steps](#final-steps)
+<!-- markdownlint-disable MD051 -->
 
-### Before QA steps
+- [Before QA steps](#user-content-before-qa-steps)
+- [Install QA steps](#user-content-install-qa-steps)
+- [Upgrade QA steps](#user-content-upgrade-qa-steps)
+- [After QA steps](#user-content-after-qa-steps)
+- [Release steps](#user-content-release-steps)
+- [Final steps](#user-content-final-steps)
+
+### <a id="before-qa-steps" href="#user-content-before-qa-steps">#</a> Before QA steps
 
 > [!note]
-> Whenever you need to change access from platform administrator to application developer `admin@example.com` prefer to re-login rather than impersonation `--as=admin@example.com`.
+> Whenever you need to change access from platform administrator to application developer `dev@example.com` prefer to re-login rather than impersonation `--as=dev@example.com`.
 > For this you have two options:
 >
 > - Either set a different cache directory `export KUBECACHEDIR=${HOME}/.kube-static/cache` when switching to application developer and restore `unset KUBECACHEDIR` when switching to platform administrator.
@@ -32,7 +34,7 @@ Elastisys Welkin® Apps
 - [ ] Complete [the feature freeze step](https://github.com/elastisys/compliantkubernetes-apps/tree/main/release#feature-freeze)
 - [ ] Complete [the staging step](https://github.com/elastisys/compliantkubernetes-apps/tree/main/release#staging)
 
-### Install QA steps
+### <a id="install-qa-steps" href="#user-content-install-qa-steps">#</a> Install QA steps
 
 > _Apps install scenario_
 
@@ -50,20 +52,32 @@ Elastisys Welkin® Apps
 - [ ] Cluster API (beta)
 - [ ] Kubespray (prod)
 
+**Network Plugin**:
+
+- [ ] Calico (prod)
+- [ ] Cilium (alpha)
+
 **Configuration**:
 
 - [ ] Flavor - Prod
 - [ ] Dex IdP - Google
-- [ ] Dex Static User - Enabled and `admin@example.com` added as an application developer
+- [ ] Dex Static Users - Enabled, `admin@example.com` and `dev@example.com` added
     <details><summary>Commands</summary>
 
-    ```bash
+    ```sh
     # configure
-    yq -i '.grafana.user.oidc.allowedDomains += ["example.com"]' "${CK8S_CONFIG_PATH}/sc-config.yaml"
-    yq -i '.grafana.ops.oidc.allowedDomains += ["example.com"]' "${CK8S_CONFIG_PATH}/sc-config.yaml"
-    yq -i 'with(.opensearch.extraRoleMappings[]; with(select(.mapping_name != "all_access"); .definition.users += ["admin@example.com"]))' "${CK8S_CONFIG_PATH}/sc-config.yaml"
-    yq -i '.user.adminUsers += ["admin@example.com"]' "${CK8S_CONFIG_PATH}/wc-config.yaml"
     yq -i '.dex.enableStaticLogin = true' "${CK8S_CONFIG_PATH}/sc-config.yaml"
+    yq -i '.grafana.ops.oidc.skipRoleSync = true' "${CK8S_CONFIG_PATH}/sc-config.yaml"
+    yq -i '.grafana.ops.oidc.allowedDomains += ["example.com"]' "${CK8S_CONFIG_PATH}/sc-config.yaml"
+    yq -i '.grafana.user.oidc.skipRoleSync = true' "${CK8S_CONFIG_PATH}/sc-config.yaml"
+    yq -i '.grafana.user.oidc.allowedDomains += ["example.com"]' "${CK8S_CONFIG_PATH}/sc-config.yaml"
+    yq -i 'with(.opensearch.extraRoleMappings[]; with(select(.mapping_name == "all_access"); .definition.users += ["admin@example.com"]))' "${CK8S_CONFIG_PATH}/sc-config.yaml"
+    yq -i 'with(.opensearch.extraRoleMappings[]; with(select(.mapping_name != "all_access"); .definition.users += ["dev@example.com"]))' "${CK8S_CONFIG_PATH}/sc-config.yaml"
+    yq -i '.clusterAdmin.users += ["admin@example.com"]' "${CK8S_CONFIG_PATH}/common-config.yaml"
+    yq -i '.user.adminUsers += ["dev@example.com"]' "${CK8S_CONFIG_PATH}/wc-config.yaml"
+    sops --set '["dex"]["extraStaticLogins"][0] {"email":"dev@example.com","userID":"08a8684b-db88-4b73-90a9-3cd1661f5467","username":"dev","password":"password","hash":"$2a$10$2b2cU8CPhOTaGrs1HRQuAueS7JTT5ZHsHSzYiFPm1leZck7Mc8T4W"}' "${CK8S_CONFIG_PATH}/secrets.yaml"
+    # only needed if you intend to test gpu support <!-- TODO: Move --->
+    yq -i '.opa.imageRegistry.URL += ["nvcr.io/nvidia/k8s/cuda-sample"]' "${CK8S_CONFIG_PATH}/wc-config.yaml"
 
     # apply
     ./bin/ck8s apply sc
@@ -85,245 +99,77 @@ Elastisys Welkin® Apps
 
     </details>
 - [ ] Rclone sync - Enabled and preferably configured to a different infrastructure provider.
-- [ ] Set the environment variable `NAMESPACE` to an application developer namespace (this cannot be a subnamespace)
-- [ ] Set the environment variable `DOMAIN` to the environment domain
-
-#### Status tests
-
-> [!note]
-> As platform administrator
-
-- [ ] Check that the deployment is idempotent
-
-    ```bash
-    ./bin/ck8s dry-run sc
-    # should not report any changes
-
-    ./bin/ck8s dry-run wc
-    # should not report any changes
-    ```
-
-    If changes are reported, apply once and try again, if changes are still reported then there is an issue that must be fixed.
-
-- [ ] Successful `./bin/ck8s test sc|wc`
 - [ ] If possible let the environment stabilise into a steady state after the install
     - Best is to perform the install at the end of the day to give it the night to stabilise.
     - Otherwise give it at least one to two hours to stabilise if possible.
+- [ ] Set the environment variable `NAMESPACE` to an application developer namespace (this cannot be a subnamespace)
+- [ ] Set the environment variable `DOMAIN` to the environment domain
 
 #### Automated tests
 
 > [!note]
-> As platform administrator
+> Many checks have turned into automated end-to-end tests, and some may currently be a bit rough around the edges.
+> Do take note of any issues you have with them so we can improve upon them.
+> If you have any questions about them ask QAE or in their absence QA goto.
 
-- [ ] Successful `make build-main` from the `tests/` directory
-- [ ] Successful `make run-end-to-end` from the `tests/` directory
+> [!important]
+> From the `tests/` directory.
 
-#### Kubernetes access
+> [!tip]
+> By default the Cypress tests will run headless, if you want visual feedback during testing you can export the variable `CK8S_HEADED_CYPRESS=true` before running.
 
-> [!note]
-> As platform administrator
+- [ ] Successful `make build-main`.
+- [ ] Successful `make run-end-to-end/apps`
+- [ ] Successful `make run-end-to-end/general`
+- [ ] Successful `make run-end-to-end/kubernetes`
+- [ ] Successful `make run-end-to-end/cert-manager`
+- [ ] Successful `make run-end-to-end/ingress`
+- [ ] Successful `make run-end-to-end/hnc`
+- [ ] Successful `make run-end-to-end/opa-gatekeeper`
+- [ ] Successful `make run-end-to-end/harbor`
+- [ ] Successful `make run-end-to-end/alertmanager`
+- [ ] Successful `make run-end-to-end/prometheus`
+- [ ] Successful `make run-end-to-end/grafana`
+- [ ] Successful `make run-end-to-end/fluentd`
+- [ ] Successful `make run-end-to-end/opensearch`
+- [ ] Successful `make run-end-to-end/log-manager`
+- [ ] Successful `make run-end-to-end/falco`
+- [ ] Successful `make run-end-to-end/netpol`
+- [ ] Successful `make run-end-to-end/velero`
 
-- [ ] Can login as platform administrator via Dex with IdP
+> [!warning]
+> The log-manager tests has an involved setup which may fail, so the function of log-manager might need to be checked manually.
+>
+> With Cilium as network plugin it is expected that the Grafana and NetworkPolicy tests will fail, and the dashboard must be checked manually, you can track [their implementation here](https://github.com/elastisys/compliantkubernetes-apps/issues/2726).
 
-> [!note]
-> As application developer `admin@example.com`
-
-- [ ] Can login as application developer `admin@example.com` via Dex with static user
-- [ ] Can list access
-
-    ```bash
-    kubectl -n "${NAMESPACE}" auth can-i --list
-    ```
-
-- [ ] Can delegate admin access
-
-    ```console
-    $ kubectl -n "${NAMESPACE}" edit rolebinding extra-workload-admins
-      # Add some subject
-      subjects:
-        # You can specify more than one "subject"
-        - apiGroup: rbac.authorization.k8s.io
-          kind: User
-          name: jane # "name" is case sensitive
-    ```
-
-- [ ] Can delegate view access
-
-    ```console
-    $ kubectl edit clusterrolebinding extra-user-view
-      # Add some subject
-      subjects:
-        # You can specify more than one "subject"
-        - apiGroup: rbac.authorization.k8s.io
-          kind: User
-          name: jane # "name" is case sensitive
-    ```
-
-- [ ] Cannot run with root by default
-
-    ```bash
-    kubectl apply -n "${NAMESPACE}" -f - <<EOF
-    ---
-    apiVersion: networking.k8s.io/v1
-    kind: NetworkPolicy
-    metadata:
-      name: allow-root-nginx
-    spec:
-      podSelector:
-        matchLabels:
-          app: root-nginx
-      policyTypes:
-        - Ingress
-        - Egress
-      ingress:
-        - {}
-      egress:
-        - {}
-    ---
-    apiVersion: v1
-    kind: Pod
-    metadata:
-      labels:
-        app: root-nginx
-      name: root-nginx
-    spec:
-      restartPolicy: Never
-      containers:
-        - name: nginx
-          image: nginx:stable
-          resources:
-            requests:
-              memory: 64Mi
-              cpu: 250m
-            limits:
-              memory: 128Mi
-              cpu: 500m
-    EOF
-    ```
-
-#### Hierarchical Namespaces
+#### Application developer scenario
 
 > [!note]
-> As application developer `admin@example.com`
+> As application developer `dev@example.com`
+>
+> The following checklist items aim to verify relevant parts of the public docs.
+> It should be done with an exploratory mindset, and therefore some don't have well defined steps.
+>
+> This could be either in the context of what you would use as an application developer, what is new for this release, or in a situation with an error that would have you need to check that status of the application.
 
-- [ ] [Can create a subnamespace by following the application developer docs](https://elastisys.io/welkin/user-guide/namespaces/#namespace-management)
-    <details><summary>Commands</summary>
-
-    ```bash
-    kubectl apply -n "${NAMESPACE}" -f - <<EOF
-    apiVersion: hnc.x-k8s.io/v1alpha2
-    kind: SubnamespaceAnchor
-    metadata:
-      name: ${NAMESPACE}-qa-test
-    EOF
-
-    kubectl get ns "${NAMESPACE}-qa-test"
-
-    kubectl get subns -n "${NAMESPACE}" "${NAMESPACE}-qa-test" -o yaml
-    ```
-
-    </details>
-- [ ] Ensure the default roles, rolebindings, and NetworkPolicies propagated
-    <details><summary>Commands</summary>
-
-    ```bash
-    kubectl get role,rolebinding,netpol -n "${NAMESPACE}"
-    kubectl get role,rolebinding,netpol -n "${NAMESPACE}-qa-test"
-    ```
-
-    </details>
-
-#### Harbor
+**Prepare container image**:
 
 > [!note]
-> As application developer `admin@example.com`
+> If the `end-to-end/harbor` tests completed successfully the dev user should already be admin, else login as admin and promote it first.
 
-- [ ] Can login as application developer via Dex with static user
-    <details><summary>Steps</summary>
-
-    - Login to Harbor with `admin@example.com`
+- [ ] Can login to Harbor as application developer via Dex with `dev@example.com`
 
     ```bash
     xdg-open "https://harbor.${DOMAIN}"
     ```
 
-    - Login to Harbor with the admin user and promote `admin@example.com` to admin
-    - Re-login with `admin@example.com`
-
-    </details>
 - [ ] [Can create projects and push images by following the application developer docs](https://elastisys.io/welkin/user-guide/registry/#running-example)
 - [ ] [Can configure image pull secret by following the application developer docs](https://elastisys.io/welkin/user-guide/kubernetes-api/#configure-an-image-pull-secret)
 - [ ] Can scan image for vulnerabilities
-- [ ] Configure project to disallow vulnerabilities
-    - Try to pull image with vulnerabilities, should fail
 
-    ```bash
-    docker pull "harbor.${DOMAIN}/${REGISTRY_PROJECT}/welkin-user-demo:${TAG}"
-    ```
+**Install helm chart**:
 
-- [ ] Configure project to allow vulnerabilities
-    - Try to pull image with vulnerabilities, should succeed
-
-    ```bash
-    docker pull "harbor.${DOMAIN}/${REGISTRY_PROJECT}/welkin-user-demo:${TAG}"
-    ```
-
-#### Gatekeeper
-
-> [!note]
-> As application developer `admin@example.com`
-
-- [ ] Can list OPA rules
-
-    ```bash
-    kubectl get constraints
-    ```
-
-> [!note]
-> Using [the user demo helm chart](https://github.com/elastisys/welkin/tree/main/user-demo/deploy/welkin-user-demo)
->
-> - Set `NAMESPACE` to an application developer namespaces
-> - Set `PUBLIC_DOCS_PATH` to the path of the public docs repo
-
-- [ ] With invalid image repository, try to deploy, should warn due to constraint
-
-    ```bash
-    helm -n "${NAMESPACE}" upgrade --atomic --install demo "${PUBLIC_DOCS_PATH}/user-demo/deploy/welkin-user-demo" \
-      --set image.repository="${REGISTRY_PROJECT}/welkin-user-demo" \
-      --set image.tag="${TAG}" \
-      --set ingress.hostname="demoapp.${DOMAIN}"
-    ```
-
-- [ ] With invalid image tag, try to deploy, should fail due to constraint
-
-    ```bash
-    helm -n "${NAMESPACE}" upgrade --atomic --install demo "${PUBLIC_DOCS_PATH}/user-demo/deploy/welkin-user-demo" \
-      --set image.repository="harbor.${DOMAIN}/${REGISTRY_PROJECT}/welkin-user-demo" \
-      --set image.tag=latest \
-      --set ingress.hostname="demoapp.${DOMAIN}"
-    ```
-
-- [ ] With unset NetworkPolicies, try to deploy, should warn due to constraint
-
-    ```bash
-    helm -n "${NAMESPACE}" upgrade --atomic --install demo "${PUBLIC_DOCS_PATH}/user-demo/deploy/welkin-user-demo" \
-      --set image.repository="harbor.${DOMAIN}/${REGISTRY_PROJECT}/welkin-user-demo" \
-      --set image.tag="${TAG}" \
-      --set ingress.hostname="demoapp.${DOMAIN}" \
-      --set networkPolicy.enabled=false
-    ```
-
-- [ ] With unset resources, try to deploy, should fail due to constraint
-
-    ```bash
-    helm -n "${NAMESPACE}" upgrade --atomic --install demo "${PUBLIC_DOCS_PATH}/user-demo/deploy/welkin-user-demo" \
-      --set image.repository="harbor.${DOMAIN}/${REGISTRY_PROJECT}/welkin-user-demo" \
-      --set image.tag="${TAG}" \
-      --set ingress.hostname="demoapp.${DOMAIN}" \
-      --set resources.requests=null
-    ```
-
-- [ ] With valid values, try to deploy, should succeed
+- [ ] Can install chart
 
     ```bash
     helm -n "${NAMESPACE}" upgrade --atomic --install demo "${PUBLIC_DOCS_PATH}/user-demo/deploy/welkin-user-demo" \
@@ -332,45 +178,23 @@ Elastisys Welkin® Apps
       --set ingress.hostname="demoapp.${DOMAIN}"
     ```
 
-#### cert-manager and Ingress-NGINX
+- [ ] Can access user demo via Ingress with valid certificate
 
-> [!note]
-> As platform administrator
+    ```bash
+    xdg-open "https://demoapp.${DOMAIN}"
+    ```
 
-- [ ] All certificates ready including user demo
-- [ ] All ingresses ready including user demo
-    - [ ] Endpoints are reachable
-    - [ ] Status includes correct IP addresses
+**Observability Metrics**:
 
-#### Metrics
-
-> [!note]
-> As platform administrator
-
-- [ ] Can login to platform administrator Grafana via Dex with IdP
-- [ ] Dashboards are available and viewable
-- [ ] Metrics are available from all clusters
-
-> [!note]
-> As application developer `admin@example.com`
-
-- [ ] Can login to application developer Grafana via Dex with static user
-    <details><summary>Steps</summary>
-
-    - Login to Grafana with `admin@example.com`
+- [ ] Can login to Grafana as application developer via Dex with `dev@example.com`
 
     ```bash
     xdg-open "https://grafana.${DOMAIN}"
     ```
 
-    - Login to Grafana with the admin user and promote `admin@example.com` to admin
-    - Re-login with `admin@example.com`
-
-    </details>
-- [ ] Welcome dashboard presented first
-- [ ] Dashboards are available and viewable
-- [ ] Metrics are available from all clusters
-- [ ] Metrics are available from user demo application
+- [ ] Can see expected dashboards
+- [ ] Can see expected metrics
+- [ ] Can see metrics from the user demo application
     <details><summary>Steps</summary>
 
     - Go to explore page in Grafana
@@ -378,7 +202,7 @@ Elastisys Welkin® Apps
     - Metrics should show up
 
     </details>
-- [ ] [CISO dashboards available and working](https://elastisys.io/welkin/ciso-guide/)
+- [ ] Can see the [CISO dashboards with metrics](https://elastisys.io/welkin/ciso-guide/)
     <details><summary>List</summary>
 
     - [Backup / Backup Status](https://elastisys.io/welkin/ciso-guide/backup/)
@@ -390,123 +214,208 @@ Elastisys Welkin® Apps
     - [Vulnerability / Trivy Operator Dashboard](https://elastisys.io/welkin/ciso-guide/vulnerability/)
 
     </details>
+- [ ] Can see [ServiceMonitor and PrometheusRule from the user demo application in Prometheus](https://elastisys.io/welkin/user-guide/metrics/#accessing-the-prometheus-ui)
+- [ ] Can see [alerts from the user demo application in Alertmanager](https://elastisys.io/welkin/user-guide/alerts/#accessing-user-alertmanager)
 
-#### Alerts
+**Observability Logs**:
+
+- [ ] Can login to OpenSearch as application developer via Dex with `dev@example.com`
+
+    ```bash
+    xdg-open "https://opensearch.${DOMAIN}"
+    ```
+
+- [ ] Can see expected dashboards
+- [ ] Can see expected logs
+- [ ] Can see logs from the user demo application
+- [ ] Can see the [CISO dashboards with logs](https://elastisys.io/welkin/ciso-guide/audit-logs/)
+
+#### Platform administrator scenario
 
 > [!note]
 > As platform administrator
+>
+> The following checklist items should be done with an exploratory mindset, and therefore they don't have well defined steps.
+>
+> This could be either in the context of what you normally use, what you normally _do not_ use, what is new for this release, or in a situation with an error that would have you need to check that status of the environment.
 
-- [ ] No alert open except `Watchdog`, `CPUThrottlingHigh` and `FalcoAlert`
-    - Can be seen in the alert section in platform administrator Grafana
+**Observability Metrics**:
 
-> [!note]
-> As application developer `admin@example.com`
-
-- [ ] [Access Prometheus following the application developer docs](https://elastisys.io/welkin/user-guide/metrics/#accessing-the-prometheus-ui)
-- [ ] Prometheus picked up user demo ServiceMonitor and PrometheusRule
-- [ ] [Access Alertmanager following the application developer docs](https://elastisys.io/welkin/user-guide/alerts/#accessing-user-alertmanager)
-- [ ] Alertmanager `Watchdog` firing
-
-#### Logs
-
-> [!note]
-> As platform administrator
-
-- [ ] Able to run log-manager compaction jobs successfully
-    <details><summary>Commands</summary>
+- [ ] Can login to Grafana as platform administrator via Dex
 
     ```bash
-    # these commands must be changed if running non-standard cluster names
-    ENVIRONMENT_NAME="<environment-name>"
-    kubectl -n fluentd-system create job --from "cronjob/audit-${ENVIRONMENT_NAME}-sc-compaction" "audit-${ENVIRONMENT_NAME}-sc-compaction-qa"
-    kubectl -n fluentd-system create job --from "cronjob/audit-${ENVIRONMENT_NAME}-wc-compaction" "audit-${ENVIRONMENT_NAME}-wc-compaction-qa"
-    kubectl -n fluentd-system create job --from "cronjob/sc-logs-logs-compaction" "sc-logs-logs-compaction"
+    xdg-open "https://grafana.ops.${DOMAIN}"
     ```
 
-    Check the resulting bucket (S3) or container (Azure) that the all logs are collected into zstd compressed chunks, only logs from the current day should be gzipped as sent by Fluentd.
+- [ ] Can see expected dashboards
+- [ ] Can see expected metrics
+- [ ] Can see expected alerts
+- [ ] Check the metrics in Grafana and review any indications of errors and warnings
+    <!-- TODO: Create an Grafana dashboard to assist in checking logs for QA --->
+    If there are clear issues then this should be fixed.
+    If there are no clear issues, or if fixing the issues would require substantial work, then talk with the QAE, or TLs if they are unavailable, about either accepting or taking additional actions.
 
-    </details>
-- [ ] Able to run log-manager retention jobs successfully
-    <details><summary>Commands</summary>
+**Observability Logs**:
+
+- [ ] Can login to OpenSearch as platform administrator via Dex
 
     ```bash
-    # these commands must be changed if running non-standard cluster names
-    ENVIRONMENT_NAME="<environment-name>"
-    kubectl -n fluentd-system create job --from "cronjob/audit-${ENVIRONMENT_NAME}-sc-retention" "audit-${ENVIRONMENT_NAME}-sc-retention-qa"
-    kubectl -n fluentd-system create job --from "cronjob/audit-${ENVIRONMENT_NAME}-wc-retention" "audit-${ENVIRONMENT_NAME}-wc-retention-qa"
-    kubectl -n fluentd-system create job --from "cronjob/sc-logs-logs-retention" "sc-logs-logs-retention"
+    xdg-open "https://opensearch.${DOMAIN}"
     ```
 
-    Check the resulting bucket (S3) or container (Azure) that the old logs are removed and current logs are kept, you may reconfigure the retention span to further test it.
-
-    </details>
-- [ ] Able to run OpenSearch curator jobs successfully
-    <details><summary>Commands</summary>
-
-    ```bash
-    # as long as curator is enabled it should run every five minutes
-    kubectl -n opensearch-system get job -lapp.kubernetes.io/name=opensearch-curator
-    ```
-
-    Check the index management within OpenSearch to ensure that old indices are removed, you may reconfigure the retention span to further test it.
-
-    </details>
-- [ ] Can login to OpenSearch Dashboards via Dex with IdP
-- [ ] Indices created (Authlog, Kubeaudit, Kubernetes, Other)
-- [ ] Indices managed (Authlog, Kubeaudit, Kubernetes, Other)
-- [ ] Logs available (Authlog, Kubeaudit, Kubernetes, Other)
-- [ ] Snapshots configured
-- [ ] Check the logs in OpenSearch and review any errors and warnings
+- [ ] Can see expected dashboards
+- [ ] Can see expected logs
+- [ ] Check the logs in OpenSearch and review any indications of errors and warnings
     <!-- TODO: Create an OpenSearch dashboard to assist in checking logs for QA --->
     If there are clear issues then this should be fixed.
     If there are no clear issues, or if fixing the issues would require substantial work, then talk with the QAE, or TLs if they are unavailable, about either accepting or taking additional actions.
 
-> [!note]
-> As application developer `admin@example.com`
+#### GPU support
 
-- [ ] Can login to OpenSearch Dashboards via Dex with static user
-- [ ] Welcome dashboard presented first
-- [ ] Logs available (Kubeaudit, Kubernetes)
-- [ ] [CISO dashboards available and working](https://elastisys.io/welkin/ciso-guide/audit-logs/)
-
-#### Falco
+> [!important]
+> GPU support checks should be done on _one_ of the scenarios, either install or upgrade.
+> If you are using Cluster API as the installer you must setup GPU nodes with auto-scaling as that is tested.
+> If you are using Cluster API as the installer follow [this guide](https://github.com/elastisys/mse-internal-docs/blob/main/docs/ops-manual/enable-and-operate-gpu.md) to configure the GPU worker pool.
 
 > [!note]
 > As platform administrator
 
-- [ ] Deploy the [falcosecurity/event-generator](https://github.com/falcosecurity/event-generator#with-kubernetes) to generate events in wc
+- [ ] Verify the GPU Operator installation and that it's healthy
     <details><summary>Commands</summary>
 
-    ```bash
-    # Install
+    List all the GPU operator components.
 
-    kubectl create namespace event-generator
-    kubectl label namespace event-generator owner=operator
+    ```console
+    $ ./bin/ck8s ops kubectl wc get pods -n gpu-operator
+    NAME                                                              READY   STATUS    RESTARTS       AGE
+    gpu-operator-74dc66799f-htkmz                                     1/1     Running   0              2d6h
+    nvidia-gpu-operator-node-feature-discovery-gc-5dcd75f76-wq82r     1/1     Running   0              2d6h
+    nvidia-gpu-operator-node-feature-discovery-master-56484df44p9cn   1/1     Running   0              30d
+    nvidia-gpu-operator-node-feature-discovery-worker-444cn           1/1     Running   0              69d
+    nvidia-gpu-operator-node-feature-discovery-worker-l2nld           1/1     Running   0              4d2h
+    nvidia-gpu-operator-node-feature-discovery-worker-vs6bg           1/1     Running   0              2d7h
+    ```
 
-    helm repo add falcosecurity https://falcosecurity.github.io/charts
-    helm repo update
+    Verify all the components are working fine without any errors.
 
-    helm -n event-generator install event-generator falcosecurity/event-generator \
-      --set securityContext.runAsNonRoot=true \
-      --set securityContext.runAsGroup=65534 \
-      --set securityContext.runAsUser=65534 \
-      --set podSecurityContext.fsGroup=65534 \
-      --set config.actions=""
+    </details>
 
-    # Uninstall
+- [ ]  Validate regular reconciliation
+    <details><summary>Commands</summary>
 
-    helm -n event-generator uninstall event-generator
-    kubectl delete namespace event-generator
+    Run the command then wait for the events to occur.
+    See the details below on how the operator performs its reconciliation cycle and what log messages you should expect.
+
+    ```console
+    $ ./bin/ck8s ops kubectl wc logs -n gpu-operator -f --tail=0 deploy/gpu-operator
+
+    {"level":"info","ts":1739356589.0991879,"logger":"controllers.Upgrade","msg":"Reconciling Upgrade","upgrade":{"name":"cluster-policy"}}
+    {"level":"info","ts":1739356589.0992486,"logger":"controllers.Upgrade","msg":"Using label selector","upgrade":{"name":"cluster-policy"},"key":"app","value":"nvidia-driver-daemonset"}
+    {"level":"info","ts":1739356589.0993133,"logger":"controllers.Upgrade","msg":"Building state"}
+    {"level":"info","ts":1739356589.1098218,"logger":"controllers.Upgrade","msg":"Propagate state to state manager","upgrade":{"name":"cluster-policy"}}
+    {"level":"info","ts":1739356589.109842,"logger":"controllers.Upgrade","msg":"State Manager, got state update"}
+    {"level":"info","ts":1739356589.1098468,"logger":"controllers.Upgrade","msg":"Node states:","Unknown":0,"upgrade-done":0,"upgrade-required":0,"cordon-required":0,"wait-for-jobs-required":0,"pod-deletion-required":0,"upgrade-failed":0,"drain-required":0,"pod-restart-required":0,"validation-required":0,"uncordon-required":0}
+    {"level":"info","ts":1739356589.1098578,"logger":"controllers.Upgrade","msg":"Upgrades in progress","currently in progress":0,"max parallel upgrades":1,"upgrade slots available":0,"currently unavailable nodes":0,"total number of nodes":0,"maximum nodes that can be unavailable":0}
+    {"level":"info","ts":1739356589.1098645,"logger":"controllers.Upgrade","msg":"ProcessDoneOrUnknownNodes"}
+    {"level":"info","ts":1739356589.1098678,"logger":"controllers.Upgrade","msg":"ProcessDoneOrUnknownNodes"}
+    {"level":"info","ts":1739356589.1098716,"logger":"controllers.Upgrade","msg":"ProcessUpgradeRequiredNodes"}
+    {"level":"info","ts":1739356589.1098745,"logger":"controllers.Upgrade","msg":"ProcessCordonRequiredNodes"}
+    {"level":"info","ts":1739356589.1098773,"logger":"controllers.Upgrade","msg":"ProcessWaitForJobsRequiredNodes"}
+    {"level":"info","ts":1739356589.1098807,"logger":"controllers.Upgrade","msg":"ProcessPodDeletionRequiredNodes"}
+    {"level":"info","ts":1739356589.1098847,"logger":"controllers.Upgrade","msg":"ProcessDrainNodes"}
+    {"level":"info","ts":1739356589.1098878,"logger":"controllers.Upgrade","msg":"Node drain is disabled by policy, skipping this step"}
+    {"level":"info","ts":1739356589.1098914,"logger":"controllers.Upgrade","msg":"ProcessPodRestartNodes"}
+    {"level":"info","ts":1739356589.1098948,"logger":"controllers.Upgrade","msg":"Starting Pod Delete"}
+    {"level":"info","ts":1739356589.1098971,"logger":"controllers.Upgrade","msg":"No pods scheduled to restart"}
+    {"level":"info","ts":1739356589.1099007,"logger":"controllers.Upgrade","msg":"ProcessUpgradeFailedNodes"}
+    {"level":"info","ts":1739356589.1099038,"logger":"controllers.Upgrade","msg":"ProcessValidationRequiredNodes"}
+    {"level":"info","ts":1739356589.1099067,"logger":"controllers.Upgrade","msg":"ProcessUncordonRequiredNodes"}
+    {"level":"info","ts":1739356589.10991,"logger":"controllers.Upgrade","msg":"State Manager, finished processing"}
     ```
 
     </details>
 
-- [ ] Logs are available in OpenSearch Dashboards
-- [ ] Logs are relevant
+    - [ ] Verify that the operator is continuously checking and updating the GPU state for reconciliation messages as shown above
+    - [ ] Verify that the operator can successfully complete actions for `upgrade-required`, `cordon-required`, and `pod-deletion-required`. Once completed, ensure that no pending actions are reported
+    - [ ] Ensure healthy key processing flow like `ProcessValidationRequiredNodes` and `ProcessUncordonRequiredNodes` run without errors
 
-#### Network Policies
+> [!note]
+> As application developer `dev@example.com`
 
-- [ ] No dropped packets in NetworkPolicy Grafana dashboard
+- [ ] Able to deploy the GPU application workload jobs successfully
+    <details><summary>Commands</summary>
+
+    ```bash
+    kubectl apply -n "${NAMESPACE}" -f - <<EOF
+    apiVersion: batch/v1
+    kind: Job
+    metadata:
+      name: cuda-vectoradd-job
+    spec:
+      template:
+        metadata:
+          labels:
+            app: cuda-vectoradd
+        spec:
+          restartPolicy: OnFailure
+          tolerations:
+          - key: "elastisys.io/node-type"
+            operator: "Equal"
+            value: "gpu"
+            effect: "NoSchedule"
+          containers:
+          - name: cuda-vectoradd
+            image: nvcr.io/nvidia/k8s/cuda-sample:vectoradd-cuda12.5.0-ubuntu22.04
+            resources:
+              limits:
+                nvidia.com/gpu: 1
+                memory: 128Mi
+                cpu: 500m
+              requests:
+                memory: 64Mi
+                cpu: 250m
+            securityContext:
+              allowPrivilegeEscalation: false
+              runAsNonRoot: true
+              runAsUser: 1000
+              capabilities:
+                drop:
+                  - ALL
+              seccompProfile:
+                type: RuntimeDefault
+    EOF
+    ```
+
+    </details>
+- [ ]  Verify GPU workload scheduled on GPU node
+
+    ```bash
+    ./bin/ck8s ops kubectl wc get pods -n "${NAMESPACE}" -l job-name=cuda-vectoradd-job -o wide
+    ```
+
+- [ ] Verify GPU resources allocated to the Pod
+
+    ```bash
+    ./bin/ck8s ops kubectl wc describe pod <pod-name> -n "${NAMESPACE}"| grep "nvidia.com/gpu"
+    ```
+
+- [ ] _With Cluster API_: Verify on-demand GPU node provisioned when requested
+
+    ```bash
+    ./bin/ck8s ops kubectl wc get nodes -l elastisys.io/node-type=gpu -o wide
+    ```
+
+- [ ] Clean up GPU test Workload
+
+    ```bash
+    ./bin/ck8s ops kubectl wc delete job cuda-vectoradd-job -n "${NAMESPACE}"
+    ```
+
+- [ ] _With Cluster API_: Verify on-demand GPU node de-provisioned when not used
+
+    ```bash
+    ./bin/ck8s ops kubectl wc get nodes -l elastisys.io/node-type=gpu -o wide
+    ```
 
 #### Take backups and snapshots
 
@@ -650,7 +559,7 @@ Follow the public disaster recovery documentation to perform restores from the p
 - [ ] Can [restore Velero snapshot](https://elastisys.io/welkin/operator-manual/disaster-recovery/#restore_2)
     - _Examples of deleted data: Complete or partial removal of application developer Kubernetes resources._
 
-### Upgrade QA steps
+### <a id="upgrade-qa-steps" href="#user-content-upgrade-qa-steps">#</a> Upgrade QA steps
 
 > _Apps upgrade scenario_
 
@@ -668,20 +577,32 @@ Follow the public disaster recovery documentation to perform restores from the p
 - [ ] Cluster API (beta)
 - [ ] Kubespray (prod)
 
+**Network Plugin**:
+
+- [ ] Calico (prod)
+- [ ] Cilium (alpha)
+
 **Configuration**:
 
 - [ ] Flavor - Prod
 - [ ] Dex IdP - Google
-- [ ] Dex Static User - Enabled and `admin@example.com` added as an application developer
+- [ ] Dex Static Users - Enabled, `admin@example.com` and `dev@example.com` added
     <details><summary>Commands</summary>
 
-    ```bash
+    ```sh
     # configure
-    yq -i '.grafana.user.oidc.allowedDomains += ["example.com"]' "${CK8S_CONFIG_PATH}/sc-config.yaml"
-    yq -i '.grafana.ops.oidc.allowedDomains += ["example.com"]' "${CK8S_CONFIG_PATH}/sc-config.yaml"
-    yq -i 'with(.opensearch.extraRoleMappings[]; with(select(.mapping_name != "all_access"); .definition.users += ["admin@example.com"]))' "${CK8S_CONFIG_PATH}/sc-config.yaml"
-    yq -i '.user.adminUsers += ["admin@example.com"]' "${CK8S_CONFIG_PATH}/wc-config.yaml"
     yq -i '.dex.enableStaticLogin = true' "${CK8S_CONFIG_PATH}/sc-config.yaml"
+    yq -i '.grafana.ops.oidc.skipRoleSync = true' "${CK8S_CONFIG_PATH}/sc-config.yaml"
+    yq -i '.grafana.ops.oidc.allowedDomains += ["example.com"]' "${CK8S_CONFIG_PATH}/sc-config.yaml"
+    yq -i '.grafana.user.oidc.skipRoleSync = true' "${CK8S_CONFIG_PATH}/sc-config.yaml"
+    yq -i '.grafana.user.oidc.allowedDomains += ["example.com"]' "${CK8S_CONFIG_PATH}/sc-config.yaml"
+    yq -i 'with(.opensearch.extraRoleMappings[]; with(select(.mapping_name == "all_access"); .definition.users += ["admin@example.com"]))' "${CK8S_CONFIG_PATH}/sc-config.yaml"
+    yq -i 'with(.opensearch.extraRoleMappings[]; with(select(.mapping_name != "all_access"); .definition.users += ["dev@example.com"]))' "${CK8S_CONFIG_PATH}/sc-config.yaml"
+    yq -i '.clusterAdmin.users += ["admin@example.com"]' "${CK8S_CONFIG_PATH}/common-config.yaml"
+    yq -i '.user.adminUsers += ["dev@example.com"]' "${CK8S_CONFIG_PATH}/wc-config.yaml"
+    sops --set '["dex"]["extraStaticLogins"][0] {"email":"dev@example.com","userID":"08a8684b-db88-4b73-90a9-3cd1661f5467","username":"dev","password":"password","hash":"$2a$10$2b2cU8CPhOTaGrs1HRQuAueS7JTT5ZHsHSzYiFPm1leZck7Mc8T4W"}' "${CK8S_CONFIG_PATH}/secrets.yaml"
+    # only needed if you intend to test gpu support <!-- TODO: Move --->
+    yq -i '.opa.imageRegistry.URL += ["nvcr.io/nvidia/k8s/cuda-sample"]' "${CK8S_CONFIG_PATH}/wc-config.yaml"
 
     # apply
     ./bin/ck8s apply sc
@@ -832,25 +753,6 @@ Follow the public disaster recovery documentation to take backups:
 #### Upgrade
 
 - [ ] Can upgrade according to [the migration docs for this version](https://github.com/elastisys/compliantkubernetes-apps/tree/main/migration)
-
-#### Status tests
-
-> [!note]
-> As platform administrator
-
-- [ ] Check that the deployment is idempotent
-
-    ```bash
-    ./bin/ck8s dry-run sc
-    # should not report any changes
-
-    ./bin/ck8s dry-run wc
-    # should not report any changes
-    ```
-
-    If changes are reported, apply once and try again, if changes are still reported then there is an issue that must be fixed.
-
-- [ ] Successful `./bin/ck8s test sc|wc`
 - [ ] If possible let the environment stabilise into a steady state after the upgrade
     - Best is to perform the upgrade at the end of the day to give it the night to stabilise.
     - Otherwise give it at least one to two hours to stabilise if possible.
@@ -858,217 +760,68 @@ Follow the public disaster recovery documentation to take backups:
 #### Automated tests
 
 > [!note]
-> As platform administrator
+> Many checks have turned into automated end-to-end tests, and some may currently be a bit rough around the edges.
+> Do take note of any issues you have with them so we can improve upon them.
+> If you have any questions about them ask QAE or in their absence QA goto.
 
-- [ ] Successful `make build-main` from the `tests/` directory
-- [ ] Successful `make run-end-to-end` from the `tests/` directory
+> [!important]
+> From the `tests/` directory.
 
-#### Kubernetes access
+> [!tip]
+> By default the Cypress tests will run headless, if you want visual feedback during testing you can export the variable `CK8S_HEADED_CYPRESS=true` before running.
 
-> [!note]
-> As platform administrator
+- [ ] Successful `make build-main`.
+- [ ] Successful `make run-end-to-end/apps`
+- [ ] Successful `make run-end-to-end/general`
+- [ ] Successful `make run-end-to-end/kubernetes`
+- [ ] Successful `make run-end-to-end/cert-manager`
+- [ ] Successful `make run-end-to-end/ingress`
+- [ ] Successful `make run-end-to-end/hnc`
+- [ ] Successful `make run-end-to-end/opa-gatekeeper`
+- [ ] Successful `make run-end-to-end/harbor`
+- [ ] Successful `make run-end-to-end/alertmanager`
+- [ ] Successful `make run-end-to-end/prometheus`
+- [ ] Successful `make run-end-to-end/grafana`
+- [ ] Successful `make run-end-to-end/fluentd`
+- [ ] Successful `make run-end-to-end/opensearch`
+- [ ] Successful `make run-end-to-end/log-manager`
+- [ ] Successful `make run-end-to-end/falco`
+- [ ] Successful `make run-end-to-end/netpol`
+- [ ] Successful `make run-end-to-end/velero`
 
-- [ ] Can login as platform administrator via Dex with IdP
+> [!warning]
+> The log-manager tests has an involved setup which may fail, so the function of log-manager might need to be checked manually.
+>
+> With Cilium as network plugin it is expected that the Grafana and NetworkPolicy tests will fail, and the dashboard must be checked manually, you can track [their implementation here](https://github.com/elastisys/compliantkubernetes-apps/issues/2726).
 
-> [!note]
-> As application developer `admin@example.com`
-
-- [ ] Can login as application developer `admin@example.com` via Dex with static user
-- [ ] Can list access
-
-    ```bash
-    kubectl -n "${NAMESPACE}" auth can-i --list
-    ```
-
-- [ ] Can delegate admin access
-
-    ```console
-    $ kubectl -n "${NAMESPACE}" edit rolebinding extra-workload-admins
-      # Add some subject
-      subjects:
-        # You can specify more than one "subject"
-        - apiGroup: rbac.authorization.k8s.io
-          kind: User
-          name: jane # "name" is case sensitive
-    ```
-
-- [ ] Can delegate view access
-
-    ```console
-    $ kubectl edit clusterrolebinding extra-user-view
-      # Add some subject
-      subjects:
-        # You can specify more than one "subject"
-        - apiGroup: rbac.authorization.k8s.io
-          kind: User
-          name: jane # "name" is case sensitive
-    ```
-
-- [ ] Cannot run with root by default
-
-    ```bash
-    kubectl apply -n "${NAMESPACE}" -f - <<EOF
-    ---
-    apiVersion: networking.k8s.io/v1
-    kind: NetworkPolicy
-    metadata:
-      name: allow-root-nginx
-    spec:
-      podSelector:
-        matchLabels:
-          app: root-nginx
-      policyTypes:
-        - Ingress
-        - Egress
-      ingress:
-        - {}
-      egress:
-        - {}
-    ---
-    apiVersion: v1
-    kind: Pod
-    metadata:
-      labels:
-        app: root-nginx
-      name: root-nginx
-    spec:
-      restartPolicy: Never
-      containers:
-        - name: nginx
-          image: nginx:stable
-          resources:
-            requests:
-              memory: 64Mi
-              cpu: 250m
-            limits:
-              memory: 128Mi
-              cpu: 500m
-    EOF
-    ```
-
-#### Hierarchical Namespaces
+#### Application developer scenario
 
 > [!note]
-> As application developer `admin@example.com`
+> As application developer `dev@example.com`
+>
+> The following checklist items aim to verify relevant parts of the public docs.
+> It should be done with an exploratory mindset, and therefore some don't have well defined steps.
+>
+> This could be either in the context of what you would use as an application developer, what is new for this release, or in a situation with an error that would have you need to check that status of the application.
 
-- [ ] [Can create a subnamespace by following the application developer docs](https://elastisys.io/welkin/user-guide/namespaces/#namespace-management)
-    <details><summary>Commands</summary>
-
-    ```bash
-    kubectl apply -n "${NAMESPACE}" -f - <<EOF
-    apiVersion: hnc.x-k8s.io/v1alpha2
-    kind: SubnamespaceAnchor
-    metadata:
-      name: ${NAMESPACE}-qa-test
-    EOF
-
-    kubectl get ns "${NAMESPACE}-qa-test"
-
-    kubectl get subns -n "${NAMESPACE}" "${NAMESPACE}-qa-test" -o yaml
-    ```
-
-    </details>
-- [ ] Ensure the default roles, rolebindings, and NetworkPolicies propagated
-    <details><summary>Commands</summary>
-
-    ```bash
-    kubectl get role,rolebinding,netpol -n "${NAMESPACE}"
-    kubectl get role,rolebinding,netpol -n "${NAMESPACE}-qa-test"
-    ```
-
-    </details>
-
-#### Harbor
+**Prepare container image**:
 
 > [!note]
-> As application developer `admin@example.com`
+> If the `end-to-end/harbor` tests completed successfully the dev user should already be admin, else login as admin and promote it first.
 
-- [ ] Can login as application developer via Dex with static user
-    <details><summary>Steps</summary>
-
-    - Login to Harbor with `admin@example.com`
+- [ ] Can login to Harbor as application developer via Dex with `dev@example.com`
 
     ```bash
     xdg-open "https://harbor.${DOMAIN}"
     ```
 
-    - Login to Harbor with the admin user and promote `admin@example.com` to admin
-    - Re-login with `admin@example.com`
-
-    </details>
 - [ ] [Can create projects and push images by following the application developer docs](https://elastisys.io/welkin/user-guide/registry/#running-example)
 - [ ] [Can configure image pull secret by following the application developer docs](https://elastisys.io/welkin/user-guide/kubernetes-api/#configure-an-image-pull-secret)
 - [ ] Can scan image for vulnerabilities
-- [ ] Configure project to disallow vulnerabilities
-    - Try to pull image with vulnerabilities, should fail
 
-    ```bash
-    docker pull "harbor.${DOMAIN}/${REGISTRY_PROJECT}/welkin-user-demo:${TAG}"
-    ```
+**Install helm chart**:
 
-- [ ] Configure project to allow vulnerabilities
-    - Try to pull image with vulnerabilities, should succeed
-
-    ```bash
-    docker pull "harbor.${DOMAIN}/${REGISTRY_PROJECT}/welkin-user-demo:${TAG}"
-    ```
-
-#### Gatekeeper
-
-> [!note]
-> As application developer `admin@example.com`
-
-- [ ] Can list OPA rules
-
-    ```bash
-    kubectl get constraints
-    ```
-
-> [!note]
-> Using [the user demo helm chart](https://github.com/elastisys/welkin/tree/main/user-demo/deploy/welkin-user-demo)
->
-> - Set `NAMESPACE` to an application developer namespaces
-> - Set `PUBLIC_DOCS_PATH` to the path of the public docs repo
-
-- [ ] With invalid image repository, try to deploy, should warn due to constraint
-
-    ```bash
-    helm -n "${NAMESPACE}" upgrade --atomic --install demo "${PUBLIC_DOCS_PATH}/user-demo/deploy/welkin-user-demo" \
-      --set image.repository="${REGISTRY_PROJECT}/welkin-user-demo" \
-      --set image.tag="${TAG}" \
-      --set ingress.hostname="demoapp.${DOMAIN}"
-    ```
-
-- [ ] With invalid image tag, try to deploy, should fail due to constraint
-
-    ```bash
-    helm -n "${NAMESPACE}" upgrade --atomic --install demo "${PUBLIC_DOCS_PATH}/user-demo/deploy/welkin-user-demo" \
-      --set image.repository="harbor.${DOMAIN}/${REGISTRY_PROJECT}/welkin-user-demo" \
-      --set image.tag=latest \
-      --set ingress.hostname="demoapp.${DOMAIN}"
-    ```
-
-- [ ] With unset NetworkPolicies, try to deploy, should warn due to constraint
-
-    ```bash
-    helm -n "${NAMESPACE}" upgrade --atomic --install demo "${PUBLIC_DOCS_PATH}/user-demo/deploy/welkin-user-demo" \
-      --set image.repository="harbor.${DOMAIN}/${REGISTRY_PROJECT}/welkin-user-demo" \
-      --set image.tag="${TAG}" \
-      --set ingress.hostname="demoapp.${DOMAIN}" \
-      --set networkPolicy.enabled=false
-    ```
-
-- [ ] With unset resources, try to deploy, should fail due to constraint
-
-    ```bash
-    helm -n "${NAMESPACE}" upgrade --atomic --install demo "${PUBLIC_DOCS_PATH}/user-demo/deploy/welkin-user-demo" \
-      --set image.repository="harbor.${DOMAIN}/${REGISTRY_PROJECT}/welkin-user-demo" \
-      --set image.tag="${TAG}" \
-      --set ingress.hostname="demoapp.${DOMAIN}" \
-      --set resources.requests=null
-    ```
-
-- [ ] With valid values, try to deploy, should succeed
+- [ ] Can install chart
 
     ```bash
     helm -n "${NAMESPACE}" upgrade --atomic --install demo "${PUBLIC_DOCS_PATH}/user-demo/deploy/welkin-user-demo" \
@@ -1077,54 +830,23 @@ Follow the public disaster recovery documentation to take backups:
       --set ingress.hostname="demoapp.${DOMAIN}"
     ```
 
-#### cert-manager and Ingress-NGINX
+- [ ] Can access user demo via Ingress with valid certificate
 
-> [!note]
-> As platform administrator
+    ```bash
+    xdg-open "https://demoapp.${DOMAIN}"
+    ```
 
-- [ ] All certificates ready including user demo
-- [ ] All ingresses ready including user demo
-    - [ ] Endpoints are reachable
-    - [ ] Status includes correct IP addresses
+**Observability Metrics**:
 
-#### Metrics
-
-> [!note]
-> As platform administrator
-
-- [ ] Can login to platform administrator Grafana via Dex with IdP
-- [ ] Dashboards are available and viewable
-- [ ] Metrics are available from all clusters
-- [ ] Check the volume of metrics scraped by Prometheus and ingested by Thanos and compare it to before the upgrade
-    <!-- TODO: Create a Grafana dashboard to assist in measuring metrics for QA --->
-    If there is a large change compared to before the upgrade that cannot be supported by the changes done in the release then this should be investigated as this may point towards:
-
-    - Errors caused by incompatible or misbehaving components or configurations
-    - Unintentional addition or removal of components
-
-    If there are clear issues then this should be fixed.
-    If there are no clear issues, or if fixing the issues would require substantial work, then talk with the QAE, or TLs if they are unavailable, about either accepting or taking additional actions.
-
-> [!note]
-> As application developer `admin@example.com`
-
-- [ ] Can login to application developer Grafana via Dex with static user
-    <details><summary>Steps</summary>
-
-    - Login to Grafana with `admin@example.com`
+- [ ] Can login to Grafana as application developer via Dex with `dev@example.com`
 
     ```bash
     xdg-open "https://grafana.${DOMAIN}"
     ```
 
-    - Login to Grafana with the admin user and promote `admin@example.com` to admin
-    - Re-login with `admin@example.com`
-
-    </details>
-- [ ] Welcome dashboard presented first
-- [ ] Dashboards are available and viewable
-- [ ] Metrics are available from all clusters
-- [ ] Metrics are available from user demo application
+- [ ] Can see expected dashboards
+- [ ] Can see expected metrics
+- [ ] Can see metrics from the user demo application
     <details><summary>Steps</summary>
 
     - Go to explore page in Grafana
@@ -1132,7 +854,7 @@ Follow the public disaster recovery documentation to take backups:
     - Metrics should show up
 
     </details>
-- [ ] [CISO dashboards available and working](https://elastisys.io/welkin/ciso-guide/)
+- [ ] Can see the [CISO dashboards with metrics](https://elastisys.io/welkin/ciso-guide/)
     <details><summary>List</summary>
 
     - [Backup / Backup Status](https://elastisys.io/welkin/ciso-guide/backup/)
@@ -1144,72 +866,66 @@ Follow the public disaster recovery documentation to take backups:
     - [Vulnerability / Trivy Operator Dashboard](https://elastisys.io/welkin/ciso-guide/vulnerability/)
 
     </details>
+- [ ] Can see [ServiceMonitor and PrometheusRule from the user demo application in Prometheus](https://elastisys.io/welkin/user-guide/metrics/#accessing-the-prometheus-ui)
+- [ ] Can see [alerts from the user demo application in Alertmanager](https://elastisys.io/welkin/user-guide/alerts/#accessing-user-alertmanager)
 
-#### Alerts
+**Observability Logs**:
+
+- [ ] Can login to OpenSearch as application developer via Dex with `dev@example.com`
+
+    ```bash
+    xdg-open "https://opensearch.${DOMAIN}"
+    ```
+
+- [ ] Can see expected dashboards
+- [ ] Can see expected logs
+- [ ] Can see logs from the user demo application
+- [ ] Can see the [CISO dashboards with logs](https://elastisys.io/welkin/ciso-guide/audit-logs/)
+
+#### Platform administrator scenario
 
 > [!note]
 > As platform administrator
+>
+> The following checklist items should be done with an exploratory mindset, and therefore they don't have well defined steps.
+>
+> This could be either in the context of what you normally use, what you normally _do not_ use, what is new for this release, or in a situation with an error that would have you need to check that status of the environment.
 
-- [ ] No alert open except `Watchdog`, `CPUThrottlingHigh` and `FalcoAlert`
-    - Can be seen in the alert section in platform administrator Grafana
+**Observability Metrics**:
 
-> [!note]
-> As application developer `admin@example.com`
-
-- [ ] [Access Prometheus following the application developer docs](https://elastisys.io/welkin/user-guide/metrics/#accessing-the-prometheus-ui)
-- [ ] Prometheus picked up user demo ServiceMonitor and PrometheusRule
-- [ ] [Access Alertmanager following the application developer docs](https://elastisys.io/welkin/user-guide/alerts/#accessing-user-alertmanager)
-- [ ] Alertmanager `Watchdog` firing
-
-#### Logs
-
-> [!note]
-> As platform administrator
-
-- [ ] Able to run log-manager compaction jobs successfully
-    <details><summary>Commands</summary>
+- [ ] Can login to Grafana as platform administrator via Dex
 
     ```bash
-    # these commands must be changed if running non-standard cluster names
-    ENVIRONMENT_NAME="<environment-name>"
-    kubectl -n fluentd-system create job --from "cronjob/audit-${ENVIRONMENT_NAME}-sc-compaction" "audit-${ENVIRONMENT_NAME}-sc-compaction-qa"
-    kubectl -n fluentd-system create job --from "cronjob/audit-${ENVIRONMENT_NAME}-wc-compaction" "audit-${ENVIRONMENT_NAME}-wc-compaction-qa"
-    kubectl -n fluentd-system create job --from "cronjob/sc-logs-logs-compaction" "sc-logs-logs-compaction"
+    xdg-open "https://grafana.ops.${DOMAIN}"
     ```
 
-    Check the resulting bucket (S3) or container (Azure) that the all logs are collected into zstd compressed chunks, only logs from the current day should be gzipped as sent by Fluentd.
+- [ ] Can see expected dashboards
+- [ ] Can see expected metrics
+- [ ] Can see expected alerts
+- [ ] Check the volume of metrics scraped by Prometheus and ingested by Thanos and compare it to before the upgrade
+    <!-- TODO: Create a Grafana dashboard to assist in measuring metrics for QA --->
+    If there is a large change compared to before the upgrade that cannot be supported by the changes done in the release then this should be investigated as this may point towards:
 
-    </details>
-- [ ] Able to run log-manager retention jobs successfully
-    <details><summary>Commands</summary>
+    - Errors caused by incompatible or misbehaving components or configurations
+    - Unintentional addition or removal of components
+
+    If there are clear issues then this should be fixed.
+    If there are no clear issues, or if fixing the issues would require substantial work, then talk with the QAE, or TLs if they are unavailable, about either accepting or taking additional actions.
+- [ ] Check the metrics in Grafana and review any indications of errors and warnings
+    <!-- TODO: Create an Grafana dashboard to assist in checking logs for QA --->
+    If there are clear issues then this should be fixed.
+    If there are no clear issues, or if fixing the issues would require substantial work, then talk with the QAE, or TLs if they are unavailable, about either accepting or taking additional actions.
+
+**Observability Logs**:
+
+- [ ] Can login to OpenSearch as platform administrator via Dex
 
     ```bash
-    # these commands must be changed if running non-standard cluster names
-    ENVIRONMENT_NAME="<environment-name>"
-    kubectl -n fluentd-system create job --from "cronjob/audit-${ENVIRONMENT_NAME}-sc-retention" "audit-${ENVIRONMENT_NAME}-sc-retention-qa"
-    kubectl -n fluentd-system create job --from "cronjob/audit-${ENVIRONMENT_NAME}-wc-retention" "audit-${ENVIRONMENT_NAME}-wc-retention-qa"
-    kubectl -n fluentd-system create job --from "cronjob/sc-logs-logs-retention" "sc-logs-logs-retention"
+    xdg-open "https://opensearch.${DOMAIN}"
     ```
 
-    Check the resulting bucket (S3) or container (Azure) that the old logs are removed and current logs are kept, you may reconfigure the retention span to further test it.
-
-    </details>
-- [ ] Able to run OpenSearch curator jobs successfully
-    <details><summary>Commands</summary>
-
-    ```bash
-    # as long as curator is enabled it should run every five minutes
-    kubectl -n opensearch-system get job -lapp.kubernetes.io/name=opensearch-curator
-    ```
-
-    Check the index management within OpenSearch to ensure that old indices are removed, you may reconfigure the retention span to further test it.
-
-    </details>
-- [ ] Can login to OpenSearch Dashboards via Dex with IdP
-- [ ] Indices created (Authlog, Kubeaudit, Kubernetes, Other)
-- [ ] Indices managed (Authlog, Kubeaudit, Kubernetes, Other)
-- [ ] Logs available (Authlog, Kubeaudit, Kubernetes, Other)
-- [ ] Snapshots configured
+- [ ] Can see expected dashboards
+- [ ] Can see expected logs
 - [ ] Check the volume of logs collected by Fluentd and ingested by OpenSearch and compare it to before the upgrade
     <!-- TODO: Create an OpenSearch dashboard to assist in measuring logs for QA --->
     If there is a large change compared to before the upgrade that cannot be supported by the changes done in the release then this should be investigated as this may point towards:
@@ -1219,57 +935,157 @@ Follow the public disaster recovery documentation to take backups:
 
     If there are clear issues then this should be fixed.
     If there are no clear issues, or if fixing the issues would require substantial work, then talk with the QAE, or TLs if they are unavailable, about either accepting or taking additional actions.
-- [ ] Check the logs in OpenSearch and review any errors and warnings
+- [ ] Check the logs in OpenSearch and review any indications of errors and warnings
     <!-- TODO: Create an OpenSearch dashboard to assist in checking logs for QA --->
     If there are clear issues then this should be fixed.
     If there are no clear issues, or if fixing the issues would require substantial work, then talk with the QAE, or TLs if they are unavailable, about either accepting or taking additional actions.
 
-> [!note]
-> As application developer `admin@example.com`
+#### GPU support
 
-- [ ] Can login to OpenSearch Dashboards via Dex with static user
-- [ ] Welcome dashboard presented first
-- [ ] Logs available (Kubeaudit, Kubernetes)
-- [ ] [CISO dashboards available and working](https://elastisys.io/welkin/ciso-guide/audit-logs/)
-
-#### Falco
+> [!important]
+> GPU support checks should be done on _one_ of the scenarios, either install or upgrade.
+> If you are using Cluster API as the installer you must setup GPU nodes with auto-scaling as that is tested.
+> If you are using Cluster API as the installer follow [this guide](https://github.com/elastisys/mse-internal-docs/blob/main/docs/ops-manual/enable-and-operate-gpu.md) to configure the GPU worker pool.
 
 > [!note]
 > As platform administrator
 
-- [ ] Deploy the [falcosecurity/event-generator](https://github.com/falcosecurity/event-generator#with-kubernetes) to generate events in wc
+- [ ] Verify the GPU Operator installation and that it's healthy
     <details><summary>Commands</summary>
 
-    ```bash
-    # Install
+    List all the GPU operator components.
 
-    kubectl create namespace event-generator
-    kubectl label namespace event-generator owner=operator
+    ```console
+    $ ./bin/ck8s ops kubectl wc get pods -n gpu-operator
+    NAME                                                              READY   STATUS    RESTARTS       AGE
+    gpu-operator-74dc66799f-htkmz                                     1/1     Running   0              2d6h
+    nvidia-gpu-operator-node-feature-discovery-gc-5dcd75f76-wq82r     1/1     Running   0              2d6h
+    nvidia-gpu-operator-node-feature-discovery-master-56484df44p9cn   1/1     Running   0              30d
+    nvidia-gpu-operator-node-feature-discovery-worker-444cn           1/1     Running   0              69d
+    nvidia-gpu-operator-node-feature-discovery-worker-l2nld           1/1     Running   0              4d2h
+    nvidia-gpu-operator-node-feature-discovery-worker-vs6bg           1/1     Running   0              2d7h
+    ```
 
-    helm repo add falcosecurity https://falcosecurity.github.io/charts
-    helm repo update
+    Verify all the components are working fine without any errors.
 
-    helm -n event-generator install event-generator falcosecurity/event-generator \
-      --set securityContext.runAsNonRoot=true \
-      --set securityContext.runAsGroup=65534 \
-      --set securityContext.runAsUser=65534 \
-      --set podSecurityContext.fsGroup=65534 \
-      --set config.actions=""
+    </details>
 
-    # Uninstall
+- [ ]  Validate regular reconciliation
+    <details><summary>Commands</summary>
 
-    helm -n event-generator uninstall event-generator
-    kubectl delete namespace event-generator
+    Run the command then wait for the events to occur.
+    See the details below on how the operator performs its reconciliation cycle and what log messages you should expect.
+
+    ```console
+    $ ./bin/ck8s ops kubectl wc logs -n gpu-operator -f --tail=0 deploy/gpu-operator
+
+    {"level":"info","ts":1739356589.0991879,"logger":"controllers.Upgrade","msg":"Reconciling Upgrade","upgrade":{"name":"cluster-policy"}}
+    {"level":"info","ts":1739356589.0992486,"logger":"controllers.Upgrade","msg":"Using label selector","upgrade":{"name":"cluster-policy"},"key":"app","value":"nvidia-driver-daemonset"}
+    {"level":"info","ts":1739356589.0993133,"logger":"controllers.Upgrade","msg":"Building state"}
+    {"level":"info","ts":1739356589.1098218,"logger":"controllers.Upgrade","msg":"Propagate state to state manager","upgrade":{"name":"cluster-policy"}}
+    {"level":"info","ts":1739356589.109842,"logger":"controllers.Upgrade","msg":"State Manager, got state update"}
+    {"level":"info","ts":1739356589.1098468,"logger":"controllers.Upgrade","msg":"Node states:","Unknown":0,"upgrade-done":0,"upgrade-required":0,"cordon-required":0,"wait-for-jobs-required":0,"pod-deletion-required":0,"upgrade-failed":0,"drain-required":0,"pod-restart-required":0,"validation-required":0,"uncordon-required":0}
+    {"level":"info","ts":1739356589.1098578,"logger":"controllers.Upgrade","msg":"Upgrades in progress","currently in progress":0,"max parallel upgrades":1,"upgrade slots available":0,"currently unavailable nodes":0,"total number of nodes":0,"maximum nodes that can be unavailable":0}
+    {"level":"info","ts":1739356589.1098645,"logger":"controllers.Upgrade","msg":"ProcessDoneOrUnknownNodes"}
+    {"level":"info","ts":1739356589.1098678,"logger":"controllers.Upgrade","msg":"ProcessDoneOrUnknownNodes"}
+    {"level":"info","ts":1739356589.1098716,"logger":"controllers.Upgrade","msg":"ProcessUpgradeRequiredNodes"}
+    {"level":"info","ts":1739356589.1098745,"logger":"controllers.Upgrade","msg":"ProcessCordonRequiredNodes"}
+    {"level":"info","ts":1739356589.1098773,"logger":"controllers.Upgrade","msg":"ProcessWaitForJobsRequiredNodes"}
+    {"level":"info","ts":1739356589.1098807,"logger":"controllers.Upgrade","msg":"ProcessPodDeletionRequiredNodes"}
+    {"level":"info","ts":1739356589.1098847,"logger":"controllers.Upgrade","msg":"ProcessDrainNodes"}
+    {"level":"info","ts":1739356589.1098878,"logger":"controllers.Upgrade","msg":"Node drain is disabled by policy, skipping this step"}
+    {"level":"info","ts":1739356589.1098914,"logger":"controllers.Upgrade","msg":"ProcessPodRestartNodes"}
+    {"level":"info","ts":1739356589.1098948,"logger":"controllers.Upgrade","msg":"Starting Pod Delete"}
+    {"level":"info","ts":1739356589.1098971,"logger":"controllers.Upgrade","msg":"No pods scheduled to restart"}
+    {"level":"info","ts":1739356589.1099007,"logger":"controllers.Upgrade","msg":"ProcessUpgradeFailedNodes"}
+    {"level":"info","ts":1739356589.1099038,"logger":"controllers.Upgrade","msg":"ProcessValidationRequiredNodes"}
+    {"level":"info","ts":1739356589.1099067,"logger":"controllers.Upgrade","msg":"ProcessUncordonRequiredNodes"}
+    {"level":"info","ts":1739356589.10991,"logger":"controllers.Upgrade","msg":"State Manager, finished processing"}
     ```
 
     </details>
 
-- [ ] Logs are available in OpenSearch Dashboards
-- [ ] Logs are relevant
+    - [ ] Verify that the operator is continuously checking and updating the GPU state for reconciliation messages as shown above
+    - [ ] Verify that the operator can successfully complete actions for `upgrade-required`, `cordon-required`, and `pod-deletion-required`. Once completed, ensure that no pending actions are reported
+    - [ ] Ensure healthy key processing flow like `ProcessValidationRequiredNodes` and `ProcessUncordonRequiredNodes` run without errors
 
-#### Network Policies
+> [!note]
+> As application developer `dev@example.com`
 
-- [ ] No dropped packets in NetworkPolicy Grafana dashboard
+- [ ] Able to deploy the GPU application workload jobs successfully
+    <details><summary>Commands</summary>
+
+    ```bash
+    kubectl apply -n "${NAMESPACE}" -f - <<EOF
+    apiVersion: batch/v1
+    kind: Job
+    metadata:
+      name: cuda-vectoradd-job
+    spec:
+      template:
+        metadata:
+          labels:
+            app: cuda-vectoradd
+        spec:
+          restartPolicy: OnFailure
+          tolerations:
+          - key: "elastisys.io/node-type"
+            operator: "Equal"
+            value: "gpu"
+            effect: "NoSchedule"
+          containers:
+          - name: cuda-vectoradd
+            image: nvcr.io/nvidia/k8s/cuda-sample:vectoradd-cuda12.5.0-ubuntu22.04
+            resources:
+              limits:
+                nvidia.com/gpu: 1
+                memory: 128Mi
+                cpu: 500m
+              requests:
+                memory: 64Mi
+                cpu: 250m
+            securityContext:
+              allowPrivilegeEscalation: false
+              runAsNonRoot: true
+              runAsUser: 1000
+              capabilities:
+                drop:
+                  - ALL
+              seccompProfile:
+                type: RuntimeDefault
+    EOF
+    ```
+
+    </details>
+- [ ]  Verify GPU workload scheduled on GPU node
+
+    ```bash
+    ./bin/ck8s ops kubectl wc get pods -n "${NAMESPACE}" -l job-name=cuda-vectoradd-job -o wide
+    ```
+
+- [ ] Verify GPU resources allocated to the Pod
+
+    ```bash
+    ./bin/ck8s ops kubectl wc describe pod <pod-name> -n "${NAMESPACE}"| grep "nvidia.com/gpu"
+    ```
+
+- [ ] _With Cluster API_: Verify on-demand GPU node provisioned when requested
+
+    ```bash
+    ./bin/ck8s ops kubectl wc get nodes -l elastisys.io/node-type=gpu -o wide
+    ```
+
+- [ ] Clean up GPU test Workload
+
+    ```bash
+    ./bin/ck8s ops kubectl wc delete job cuda-vectoradd-job -n "${NAMESPACE}"
+    ```
+
+- [ ] _With Cluster API_: Verify on-demand GPU node de-provisioned when not used
+
+    ```bash
+    ./bin/ck8s ops kubectl wc get nodes -l elastisys.io/node-type=gpu -o wide
+    ```
 
 #### Restore backups and snapshots
 
@@ -1290,7 +1106,7 @@ Follow the public disaster recovery documentation to perform restores from the p
 - [ ] Can [restore Velero snapshot](https://elastisys.io/welkin/operator-manual/disaster-recovery/#restore_2)
     - _Examples of deleted data: Complete or partial removal of application developer Kubernetes resources._
 
-### After QA steps
+### <a id="after-qa-steps" href="#user-content-after-qa-steps">#</a> After QA steps
 
 - [ ] Update the Welcoming Dashboards "What's New" section.
 
@@ -1304,10 +1120,10 @@ Follow the public disaster recovery documentation to perform restores from the p
 - [ ] Complete [the code freeze step](https://github.com/elastisys/compliantkubernetes-apps/tree/main/release#code-freeze)
 - [ ] The staging pull request must be approved
 
-### Release steps
+### <a id="release-steps" href="#user-content-release-steps">#</a> Release steps
 
 - [ ] Complete [the release step](https://github.com/elastisys/compliantkubernetes-apps/tree/main/release#release)
 - [ ] Complete [the update public release notes step](https://github.com/elastisys/compliantkubernetes-apps/tree/main/release#update-public-release-notes)
 - [ ] Complete [the update main branch step](https://github.com/elastisys/compliantkubernetes-apps/tree/main/release#update-the-main-branch)
 
-### Final steps
+### <a id="final-steps" href="#user-content-final-steps">#</a> Final steps
