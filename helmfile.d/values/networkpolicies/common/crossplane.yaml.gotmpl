@@ -1,10 +1,3 @@
-{{- $functions := (list
-  "auto-ready"
-  "capability"
-  "go-templating"
-  "patch-and-transform"
-) }}
-
 policies:
   crossplane-system:
     all-deny:
@@ -30,12 +23,12 @@ policies:
             - tcp: {{ . }}
             {{- end }}
         {{- end }}
-{{- range $function := $functions }}
+        {{- range $function, $image := .Values.images.crossplane.functions }}
         - name: egress-rule-{{ $function }}
           peers:
             - podSelectorLabels:
                 pkg.crossplane.io/functions: {{ $function }}
-{{- end }}
+        {{- end }}
 
     crossplane-rbac-manager:
       podSelectorLabels:
@@ -50,14 +43,10 @@ policies:
       egress:
         - rule: egress-rule-apiserver
 
-    provider-helm:
+    {{- range $provider, $image := .Values.images.crossplane.providers }}
+    provider-{{ $provider }}:
       podSelectorLabels:
-        pkg.crossplane.io/provider: provider-kubernetes
+        pkg.crossplane.io/provider: provider-{{ $provider }}
       egress:
         - rule: egress-rule-apiserver
-
-    provider-kubernetes:
-      podSelectorLabels:
-        pkg.crossplane.io/provider: provider-kubernetes
-      egress:
-        - rule: egress-rule-apiserver
+    {{- end }}
