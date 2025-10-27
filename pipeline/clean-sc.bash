@@ -1,0 +1,134 @@
+#!/usr/bin/env bash
+
+: "${CK8S_CONFIG_PATH:?Missing CK8S_CONFIG_PATH}"
+
+echo "WARNING:"
+echo "This script will remove compliant kubernetes apps from your service cluster."
+echo -e "Your current \u1b[33mCK8S_CONFIG_PATH\033[m is set to: \u1b[33;4m${CK8S_CONFIG_PATH}\033[m"
+
+here="$(dirname "$(readlink -f "$0")")"
+root="$(dirname "$(dirname "$(readlink -f "$0")")")"
+
+# shellcheck source=bin/common.bash
+source "${root}/bin/common.bash"
+
+config_load sc
+
+clusterAPIEnabled=$(yq '.clusterApi.enabled' "${config[config_file_sc]}")
+
+GATE_VALWEBHOOK=$(
+  "${root}/bin/ck8s" ops \
+    kubectl sc get \
+    validatingwebhookconfigurations \
+    -l gatekeeper.sh/system=yes \
+    -oname
+)
+
+if [ -n "${GATE_VALWEBHOOK}" ]; then
+  # Destroy gatekeeper validatingwebhook which could potentially prevent other resources from being deleted
+  "${root}/bin/ck8s" ops kubectl sc delete "${GATE_VALWEBHOOK}"
+fi
+
+# Makes sure to uninstall Velero properly: https://velero.io/docs/v1.13/uninstalling/
+"${root}/bin/ck8s" ops velero sc uninstall
+
+# Destroy all helm releases
+"${root}/bin/ck8s" ops helmfile sc -l app!=cert-manager -l app!=admin-rbac destroy
+
+# Clean up namespaces and any other resources left behind by the apps
+"${root}/bin/ck8s" ops kubectl sc delete ns dex opensearch-system harbor fluentd-system gatekeeper-system thanos ingress-nginx monitoring kured falco velero
+
+# Clean up any leftover challenges
+mapfile -t CHALLENGES < <(
+  "${root}/bin/ck8s" ops kubectl sc get challenge --all-namespaces -oyaml |
+    yq '.items[] | .metadata.name + "," + .metadata.namespace'
+)
+for challenge in "${CHALLENGES[@]}"; do
+  IFS=, read -r name namespace <<<"${challenge}"
+  "${root}/bin/ck8s" ops \
+    kubectl sc patch challenge "${name}" -n "${namespace}" \
+    -p '{"metadata":{"finalizers":null}}' --type=merge
+done
+
+if [ "${clusterAPIEnabled}" = "false" ]; then
+  # Destroy cert-manager helm release
+  "${root}/bin/ck8s" ops helmfile sc -l app=cert-manager destroy
+else
+  log_info "Cluster API provisioned cluster, skipping deletion of cert-manager Helm release"
+fi
+
+if [[ -f "${CK8S_CONFIG_PATH}/cluster-index.yaml" ]]; then
+  # Destroy local-cluster minio release, otherwise pvc cleanup will get stuck
+  helmfile -e local_cluster -f "${here}/../helmfile.d" -l app=minio destroy
+fi
+
+# Remove any lingering persistent volume claims
+"${root}/bin/ck8s" ops kubectl sc delete pvc --all-namespaces --all
+
+# Velero-specific removal: https://velero.io/docs/v1.10/uninstalling/
+"${root}/bin/ck8s" ops kubectl sc delete crds -l component=velero
+
+if [ "${clusterAPIEnabled}" = "false" ]; then
+  # Cert-manager specific removal
+  "${root}/bin/ck8s" ops kubectl sc delete namespace cert-manager
+  "${root}/bin/ck8s" ops kubectl sc delete crds -l app.kubernetes.io/name=cert-manager
+else
+  log_info "Cluster API provisioned cluster, skipping deletion of cert-manager namespace and CRDs"
+fi
+
+# Dex specific removal
+# Keep for now, we won't use Dex CRDs in the future
+"${root}/bin/ck8s" ops kubectl sc delete crds \
+  authcodes.dex.coreos.com \
+  authrequests.dex.coreos.com \
+  connectors.dex.coreos.com \
+  oauth2clients.dex.coreos.com \
+  offlinesessionses.dex.coreos.com \
+  passwords.dex.coreos.com \
+  refreshtokens.dex.coreos.com \
+  signingkeies.dex.coreos.com \
+  devicerequests.dex.coreos.com \
+  devicetokens.dex.coreos.com
+
+# Prometheus specific removal
+PROM_CRDS=$(
+  "${root}/bin/ck8s" ops \
+    kubectl sc api-resources \
+    --api-group=monitoring.coreos.com \
+    -o name
+)
+if [ -n "$PROM_CRDS" ]; then
+  # shellcheck disable=SC2086
+  # We definitely want word splitting here.
+  "${root}/bin/ck8s" ops kubectl sc delete crds $PROM_CRDS
+fi
+
+# Trivy specific removal
+TRIVY_CRDS=$(
+  "${root}/bin/ck8s" ops \
+    kubectl sc api-resources \
+    --api-group=aquasecurity.github.io \
+    -o name
+)
+
+# Delete CRDs
+if [ -n "$TRIVY_CRDS" ]; then
+  # shellcheck disable=SC2086
+  # We definitely want word splitting here.
+  "${root}/bin/ck8s" ops kubectl sc delete crds $TRIVY_CRDS
+fi
+
+# Delete Gatekeeper CRDs
+GATE_CRDS=$("${root}/bin/ck8s" ops kubectl sc get crds -l gatekeeper.sh/system=yes -oname)
+if [ -n "$GATE_CRDS" ]; then
+  # shellcheck disable=SC2086
+  "${root}/bin/ck8s" ops kubectl sc delete --ignore-not-found=true $GATE_CRDS
+fi
+
+GATE_CONS=$("${root}/bin/ck8s" ops kubectl sc get crds -l gatekeeper.sh/constraint=yes -oname)
+if [ -n "$GATE_CONS" ]; then
+  # shellcheck disable=SC2086
+  "${root}/bin/ck8s" ops kubectl sc delete --ignore-not-found=true $GATE_CONS
+fi
+
+"${root}/bin/ck8s" ops helmfile sc -l app=admin-rbac destroy

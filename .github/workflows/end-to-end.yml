@@ -365,13 +365,14 @@ jobs:
       - name: Update Ingress DNS records
         run: |
           ingress_ip=$(./apps/bin/ck8s ops kubectl ${{ matrix.cluster }} -n ingress-nginx get service ingress-nginx-controller -o jsonpath='{.status.loadBalancer.ingress[].ip}')
-          ingress_ip_json=$(echo "{\"Value\": \"$ip\"}" | jq)
+          ingress_ip_json=$(echo "{\"Value\": \"$ingress_ip\"}" | jq)
+          echo $ingress_ip_json
           jq --argjson value "$ingress_ip_json" \
           '
-          .Changes[] | .ResourceRecordSet.ResourceRecords += [ $value ]'
+          .Changes[].ResourceRecordSet.ResourceRecords += [ $value ]
           ' \
-          "${{ env.CK8S_CONFIG_PATH}}/dns/${{matrix.cluster}}-ingress.json" > tmp.json &&
-          mv tmp.json "${{ env.CK8S_CONFIG_PATH }}}/dns/${{matrix.cluster}}-ingress.json"
+          ${{ env.CK8S_CONFIG_PATH }}/dns/${{ matrix.cluster }}-ingress.json > tmp.json && mv tmp.json ${{ env.CK8S_CONFIG_PATH }}/dns/${{ matrix.cluster }}-ingress.json
+          cat ${{ env.CK8S_CONFIG_PATH }}/dns/${{ matrix.cluster }}-ingress.json
 
       - name: Create ingress DNS records
         uses: docker://amazon/aws-cli:2.30.4
