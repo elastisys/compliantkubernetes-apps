@@ -47,5 +47,6 @@ else
   echo "[sbom] Drift detected: SBOM has meaningful changes." >&2
   echo "[sbom] Hint: run 'sbom/generate.sh' to update SBOM." >&2
   echo "[sbom] If charts were updated, review and update evaluations in sbom/overrides.yaml." >&2
+  echo "If this fails in CI but works locally, ensure your branch is up to date with the main branch (rebase if necessary)." >&2
 fi
 exit ${status}

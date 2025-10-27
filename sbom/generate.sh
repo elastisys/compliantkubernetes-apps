@@ -55,8 +55,7 @@ CONFIG="${REPO_ROOT}/sbom/sbom.config.yaml"
 
 # Use container wrapper for consistent docker/podman behavior
 WRAPPER="${REPO_ROOT}/scripts/run-from-container.sh"
-# Allow overriding the image tag while defaulting to the published 0.1 release.
-CONTAINER_IMAGE="${CK8S_SBOM_GENERATOR_IMAGE:-ghcr.io/elastisys/sbom-generator:0.1}"
+CONTAINER_IMAGE="ghcr.io/elastisys/sbom-generator:0.1"
 
 if [[ ! -x "${WRAPPER}" ]]; then
   echo "Missing or non-executable ${WRAPPER}." >&2
