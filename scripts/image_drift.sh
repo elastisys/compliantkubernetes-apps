@@ -72,8 +72,6 @@ for MAP_OBJECT in $(jq -c '.parameters[]' "$IMAGE_MAP_FILE"); do
   CHART_PATH=$(echo "$MAP_OBJECT" | jq -r '.drift_chartPath // empty')
   TAG_SOURCE_TYPE=$(echo "$MAP_OBJECT" | jq -r '.drift_tagSourceType // empty')
   UPSTREAM_PATH=$(echo "$MAP_OBJECT" | jq -r '.drift_tagPath // ""')
-  # Use 'false' as default if field is missing (equivalent to flags 0 and 2)
-  IS_MIRROR=$(echo "$MAP_OBJECT" | jq -r '.drift_isMirror // false')
 
   # Skip entries missing drift configuration
   if [ -z "$CHART_PATH" ] || [ -z "$TAG_SOURCE_TYPE" ]; then
@@ -106,7 +104,6 @@ for MAP_OBJECT in $(jq -c '.parameters[]' "$IMAGE_MAP_FILE"); do
 
   LOCAL_TAG_NORMALIZED="${LOCAL_TAG#[vV]}"
 
-  UPSTREAM_TAG=""
   SOURCE_FILE_INFO=""
 
   if [ "$TAG_SOURCE_TYPE" = "chart.yaml" ]; then
@@ -143,7 +140,7 @@ for MAP_OBJECT in $(jq -c '.parameters[]' "$IMAGE_MAP_FILE"); do
     continue
   fi
 
-  UPSTREAM_TAG_NORMALIZED=$(echo "$RAW_UPSTREAM_TAG" | sed 's/^[vV]//')
+  UPSTREAM_TAG_NORMALIZED="${RAW_UPSTREAM_TAG#[vV]}"
 
   if [ "$LOCAL_TAG_NORMALIZED" != "$UPSTREAM_TAG_NORMALIZED" ]; then
     echo "DRIFT DETECTED for $KEY (Chart Path: $CHART_PATH)"
