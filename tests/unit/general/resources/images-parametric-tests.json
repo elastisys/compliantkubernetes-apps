@@ -7,15 +7,16 @@
       "template_file": "sc/ingress-nginx/templates/controller-daemonset.yaml",
       "drift_chartPath": "kubernetes-ingress-nginx/ingress-nginx",
       "drift_tagSourceType": "values.yaml",
-      "drift_tagPath": ".controller.image.tag" 
+      "drift_tagPath": ".controller.image.tag"
     },
     {
       "image_property": "ingressNginx.controller",
       "helmfile_selector": "app=ingress-nginx",
       "container_name": "controller",
       "drift_chartPath": "kubernetes-ingress-nginx/ingress-nginx",
+      "template_file": "sc/ingress-nginx/templates/controller-daemonset.yaml",
       "drift_tagSourceType": "values.yaml",
-      "drift_tagPath": ".controller.image.tag" 
+      "drift_tagPath": ".controller.image.tag"
     },
     {
       "image_property": "ingressNginx.defaultBackend",
@@ -203,7 +204,7 @@
       "container_name": "gpu-operator",
       "template_file": "sc/gpu-operator/templates/operator.yaml"
     },
-    {
+     {
       "image_property": "harbor.core",
       "helmfile_selector": "app=harbor",
       "container_name": "core",
@@ -225,7 +226,7 @@
       "image_property": "harbor.portal",
       "helmfile_selector": "app=harbor",
       "container_name": "portal",
-      "template_file": "sc/harbor/templates/portal-deployment.yaml",
+      "template_file": "sc/harbor/templates/portal/deployment.yaml",
       "drift_chartPath": "goharbor/harbor",
       "drift_tagSourceType": "values.yaml",
       "drift_tagPath": ".portal.image.tag"
@@ -485,12 +486,6 @@
       "drift_tagSourceType": "chart.yaml"
     },
     {
-    "image_property": "monitoring.prometheus",
-    "drift_chartPath": "prometheus-community/kube-prometheus-stack",
-    "drift_tagSourceType": "values.yaml",
-    "drift_tagPath": ".prometheus.prometheusSpec.image.tag"
-  },
-    {
       "image_property": "monitoring.prometheusOperator",
       "helmfile_selector": "app=prometheus",
       "container_name": "kube-prometheus-stack",
@@ -552,12 +547,6 @@
       "template_file": "sc/metrics-server/templates/deployment.yaml",
       "drift_chartPath": "kubernetes-metrics-server/metrics-server",
       "drift_tagSourceType": "chart.yaml"
-    },
-    {
-    "image_property": "monitoring.alertmanager",
-    "drift_chartPath": "prometheus-community/kube-prometheus-stack",
-    "drift_tagSourceType": "values.yaml",
-    "drift_tagPath": ".alertmanager.alertmanagerSpec.image.tag"
     },
     {
       "image_property": "monitoring.trivyOperator",
