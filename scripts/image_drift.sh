@@ -146,8 +146,8 @@ for MAP_OBJECT in $(jq -c '.parameters[]' "$IMAGE_MAP_FILE"); do
     echo "DRIFT DETECTED for $KEY (Chart Path: $CHART_PATH)"
     echo "  Local version(images.yaml):    $LOCAL_TAG_NORMALIZED"
     echo "  Upstream version: $RAW_UPSTREAM_TAG | Source: ($SOURCE_FILE_INFO)"
-    read -r -p "Update images.yaml for '$KEY' to upstream tag '$RAW_UPSTREAM_TAG'? [y/N]: " ans
-    case "$ans" in
+    read -r -p "Update images.yaml for '$KEY' to upstream tag '$RAW_UPSTREAM_TAG'? [y/N]: " answer
+    case "$answer" in
     [yY] | [yY][eE][sS])
       update_images_yaml_tag "$KEY" "$LOCAL_FULL_IMAGE" "$RAW_UPSTREAM_TAG"
       ;;
