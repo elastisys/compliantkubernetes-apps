@@ -15,6 +15,7 @@ templates:
       netpol: cert-manager
     needs:
       - kube-system/admin-namespaces
+      - kube-system/dev-namespaces
     values:
       - values/networkpolicies/common/common.yaml.gotmpl
       - values/networkpolicies/common/cert-manager.yaml.gotmpl

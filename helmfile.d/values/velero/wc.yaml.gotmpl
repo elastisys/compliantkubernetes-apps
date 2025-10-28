@@ -134,6 +134,9 @@ schedules:
     template:
       storageLocation: default
       snapshotMoveData: {{ .Values.velero.useVolumeSnapshots }}
+      resourcePolicy:
+        kind: configmap
+        name: velero-resource-policy-configmap
       excludedNamespaces:
         {{- with .Values.velero.excludedNamespaces }}
         {{- toYaml . | nindent 8 }}
@@ -221,6 +224,18 @@ configMaps:
     data:
       secCtxRunAsUser: "1000"
       secCtxRunAsGroup: "1000"
+
+  resource-policy-configmap:
+    labels:
+      velero.io/plugin-config: "test"
+    data:
+      version: "v1"
+      volumePolicies:
+      - conditions:
+          volumeTypes:
+            - "emptyDir"
+        action:
+          type: "skip"
 
 {{- if eq .Values.velero.uploaderType "kopia" }}
 extraVolumes:
