@@ -1948,6 +1948,26 @@ properties:
               Alert when the total storage usage is above the set number.
             default: 1500
             type: number
+          HarborP99LatencyHigherThan55Seconds:
+            title: Config for HarborP99LatencyHigherThan55Seconds alert
+            description: |-
+              Configuration options for HarborP99LatencyHigherThan55Seconds alert.
+            type: object
+            properties:
+              enabled:
+                title: Enable HarborP99LatencyHigherThan55Seconds alert
+                default: true
+                type: boolean
+          HarborP50LatencyHigherThan10Seconds:
+            title: Config for HarborP50LatencyHigherThan10Seconds alert
+            description: |-
+              Configuration options for HarborP50LatencyHigherThan10Seconds alert.
+            type: object
+            properties:
+              enabled:
+                title: Enable HarborP50LatencyHigherThan10Seconds alert
+                default: true
+                type: boolean
         type: object
       backup:
         title: Backup Job Config
