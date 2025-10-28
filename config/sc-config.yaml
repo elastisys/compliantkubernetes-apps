@@ -443,6 +443,10 @@ harbor:
     # Alert if values are above the below threshold
     maxTotalStorageUsedGB: 1500
     maxTotalArtifacts: 3000
+    HarborP99LatencyHigherThan55Seconds:
+      enabled: true
+    HarborP50LatencyHigherThan10Seconds:
+      enabled: true
   mpuCleaner:
     enabled: true
     maxAgeDays: 7
