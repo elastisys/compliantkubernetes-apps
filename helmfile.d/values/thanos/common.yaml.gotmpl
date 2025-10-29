@@ -28,45 +28,69 @@ bucketweb:
     enabled: false
   pdb:
     create: false
+  service:
+    ipFamilyPolicy: {{ .Values.global.ipFamilyPolicy }}
+    ipFamilies: {{ toYaml .Values.global.ipFamilies | nindent 6 }}
 compactor:
   enabled: false
   networkPolicy:
     enabled: false
   pdb:
     create: false
+  service:
+    ipFamilyPolicy: {{ .Values.global.ipFamilyPolicy }}
+    ipFamilies: {{ toYaml .Values.global.ipFamilies | nindent 6 }}
 receive:
   enabled: false
   networkPolicy:
     enabled: false
   pdb:
     create: false
+  service:
+    ipFamilyPolicy: {{ .Values.global.ipFamilyPolicy }}
+    ipFamilies: {{ toYaml .Values.global.ipFamilies | nindent 6 }}
 receiveDistributor:
   enabled: false
   networkPolicy:
     enabled: false
   pdb:
     create: false
+  service:
+    ipFamilyPolicy: {{ .Values.global.ipFamilyPolicy }}
+    ipFamilies: {{ toYaml .Values.global.ipFamilies | nindent 6 }}
 ruler:
   enabled: false
   networkPolicy:
     enabled: false
   pdb:
     create: false
+  service:
+    ipFamilyPolicy: {{ .Values.global.ipFamilyPolicy }}
+    ipFamilies: {{ toYaml .Values.global.ipFamilies | nindent 6 }}
 query:
   enabled: false
   networkPolicy:
     enabled: false
   pdb:
     create: false
+  service:
+    ipFamilyPolicy: {{ .Values.global.ipFamilyPolicy }}
+    ipFamilies: {{ toYaml .Values.global.ipFamilies | nindent 6 }}
 queryFrontend:
   enabled: false
   networkPolicy:
     enabled: false
   pdb:
     create: false
+  service:
+    ipFamilyPolicy: {{ .Values.global.ipFamilyPolicy }}
+    ipFamilies: {{ toYaml .Values.global.ipFamilies | nindent 6 }}
 storegateway:
   enabled: false
   networkPolicy:
     enabled: false
   pdb:
     create: false
+  service:
+    ipFamilyPolicy: {{ .Values.global.ipFamilyPolicy }}
+    ipFamilies: {{ toYaml .Values.global.ipFamilies | nindent 6 }}

@@ -7,7 +7,7 @@ set -euo pipefail
 # it against the existing SBOM at --output-path. Exits non-zero on
 # meaningful differences.
 
-REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+REPO_ROOT="$(readlink --canonicalize "$(dirname "${BASH_SOURCE[0]}")/..")"
 
 WRAPPER="${REPO_ROOT}/scripts/run-from-container.sh"
 IMAGE="ghcr.io/elastisys/sbom-generator:0.2"
