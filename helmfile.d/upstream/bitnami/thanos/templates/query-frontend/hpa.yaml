@@ -15,6 +15,10 @@ metadata:
   annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
   {{- end }}
 spec:
+  {{- if .Values.queryFrontend.autoscaling.behavior }}
+  behavior:
+    {{- toYaml .Values.queryFrontend.autoscaling.behavior | nindent 4 }}
+  {{- end }}
   scaleTargetRef:
     apiVersion: {{ include "common.capabilities.deployment.apiVersion" . }}
     kind: Deployment
@@ -26,24 +30,16 @@ spec:
     - type: Resource
       resource:
         name: memory
-        {{- if semverCompare "<1.23-0" (include "common.capabilities.kubeVersion" .) }}
-        targetAverageUtilization: {{ .Values.queryFrontend.autoscaling.targetMemory }}
-        {{- else }}
         target:
           type: Utilization
           averageUtilization: {{ .Values.queryFrontend.autoscaling.targetMemory }}
-        {{- end }}
     {{- end }}
     {{- if .Values.queryFrontend.autoscaling.targetCPU }}
     - type: Resource
       resource:
         name: cpu
-        {{- if semverCompare "<1.23-0" (include "common.capabilities.kubeVersion" .) }}
-        targetAverageUtilization: {{ .Values.queryFrontend.autoscaling.targetCPU }}
-        {{- else }}
         target:
           type: Utilization
           averageUtilization: {{ .Values.queryFrontend.autoscaling.targetCPU }}
-        {{- end }}
     {{- end }}
 {{- end }}
