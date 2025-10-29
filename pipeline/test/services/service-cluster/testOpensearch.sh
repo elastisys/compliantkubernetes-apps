@@ -251,7 +251,12 @@ check_opensearch_mappings() {
   indices_data=$(curl -s --insecure -u admin:"${adminPassword}" -X GET "https://opensearch.${opsDomain}/_cat/indices" | awk '{print $3}' | tr '\n' ' ')
   IFS=' ' read -ra indices <<<"$indices_data"
   for index in "${indices[@]}"; do
-    fields_limit=$(curl -s --insecure -u admin:"${adminPassword}" -X GET "https://opensearch.${opsDomain}/${index}/_settings" | jq -r ".[\"${index}\"].settings.index.mapping.total_fields.limit")
+    index_settings=$(curl -s --insecure -u admin:"${adminPassword}" -X GET "https://opensearch.${opsDomain}/${index}/_settings?include_defaults=true")
+    fields_limit=$(jq -r ".[\"${index}\"].settings.index.mapping.total_fields.limit" <<<"${index_settings}")
+    # If it's not in regular settings it might be indexPerNamespace and in the default settings instead
+    if [[ "${fields_limit}" == "null" ]]; then
+      fields_limit=$(jq -r ".[\"${index}\"].defaults.index.mapping.total_fields.limit" <<<"${index_settings}")
+    fi
     fields_count=$(curl -s --insecure -u admin:"${adminPassword}" -X GET "https://opensearch.${opsDomain}/${index}/_field_caps?fields=*" | jq -r ".fields | keys | length")
 
     if [[ $fields_limit != "null" ]]; then
