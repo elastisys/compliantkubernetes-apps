@@ -1,201 +1,42 @@
 # Changes made here will override the default values as well as the common config for this cluster.
 # See the default configuration under "defaults/" to see available and suggested options.
 grafana:
-  ops:
-    oidc:
-      allowedDomains:
-        - elastisys.com
-      userGroups:
-        grafanaAdmin: ck8sdevops@elastisys.com
   user:
     oidc:
       allowedDomains:
-        - elastisys.com
         - example.com
-      skipRoleSync: true
-      userGroups:
-        grafanaAdmin: ck8sdevops@elastisys.com
-opensearch:
-  extraRoleMappings:
-    - mapping_name: kibana_user
-      definition:
-        users:
-          - admin@example.com
-    - mapping_name: kubernetes_log_reader
-      definition:
-        users:
-          - admin@example.com
-    - mapping_name: alerting_ack_alerts
-      definition:
-        users:
-          - admin@example.com
-    - mapping_name: alerting_read_access
-      definition:
-        users:
-          - admin@example.com
-    - mapping_name: alerting_full_access
-      definition:
-        users:
-          - admin@example.com
-    - mapping_name: all_access
-      definition:
-        users: []
-        backend_roles:
-          - ck8sdevops@elastisys.com
-alerts:
-  opsGenieHeartbeat:
-    name: pipeline-safespring
-  runbookUrls:
-    harbor:
-      HarborTotalNumberOfArtifactsAboveLimit: https://github.com/elastisys/welkin-runbooks/blob/main/ops-guide/harbor/alerts/harbor-artifacts-above-limit.md
-    opensearch:
-      group: https://github.com/elastisys/welkin-runbooks/blob/main/ops-guide/opensearch/alerts/README.md
-    thanos:
-      ThanosStoreGrpcErrorRate: https://github.com/elastisys/welkin-runbooks/blob/main/ops-guide/thanos/alerts/thanos-storegateway-throttled.md
-      ThanosCompactHalted: https://github.com/elastisys/welkin-runbooks/blob/main/ops-guide/thanos/alerts/README.md
+  ops:
+    oidc:
+      allowedDomains:
+        - example.com
 harbor:
+  persistence:
+    type: objectStorage
   oidc:
-    adminGroupName: ck8sdevops@elastisys.com
-dex:
-  google:
-    groupSupport: true
-    SASecretName: google-sa
-welcomingDashboard:
-  extraTextGrafana: Support\n\nDid not find the answers you were looking for in the docs? Please contact us via [Jira Service Desk](https://elastisys.atlassian.net/servicedesk/customer/portals)\n\nPhone +4610-405 42 12
-  extraTextOpensearch: Support\\n\\nDid not find the answers you were looking for in the docs? Please contact us via [Jira Service Desk](https://elastisys.atlassian.net/servicedesk/customer/portals)\\n\\nPhone +4610-405 42 12
+    groupClaimName: not-used
+    adminGroupName: not-used
+  backup:
+    enabled: true
+opensearch:
+  masterNode:
+    storageSize: 1Gi
+    javaOpts: -Xms512m -Xmx512m
+    resources:
+      requests:
+        memory: 1024Mi
+        cpu: 100m
+      limits:
+        memory: 1024Mi
+        cpu: 1
+  snapshot:
+    enabled: true
+  extraRoleMappings: []
+fluentd:
+  enabled: true
+s3Exporter:
+  interval: 120s
+  scrapeTimeout: 30s
 networkPolicies:
-  harbor:
-    jobservice:
-      ips:
-        - 0.0.0.0/0
-    trivy:
-      ips:
-        - 0.0.0.0/0
-    registries:
-      ips:
-        - 0.0.0.0/0
-  monitoring:
-    grafana:
-      externalDashboardProvider:
-        ips:
-          - 0.0.0.0/0
-  opensearch:
-    plugins:
-      ips:
-        - 0.0.0.0/0
-  dex:
-    connectors:
-      ips:
-        - 0.0.0.0/0
-  tektonPipelines:
-    pipeline:
-      start-job:
-        podSelectorLabels:
-          app.kubernetes.io/instance: upgrade-apps-pipeline
-        ingress: {}
-        egress:
-          - rule: egress-rule-apiserver
-      cleanup-job:
-        podSelectorLabels:
-          app: cleanup-runs
-        ingress: {}
-        egress:
-          - rule: egress-rule-apiserver
-          - rule: egress-rule-dns
-      clone-config-pod:
-        podSelectorLabels:
-          tekton.dev/task: git-clone
-        ingress: {}
-        egress:
-          - rule: egress-rule-dns
-          - name: egress-rule-github-access
-            peers:
-              - cidr: 0.0.0.0/0
-            ports:
-              - tcp: 22
-              - tcp: 9418
-      add-alert-silence-pod:
-        podSelectorLabels:
-          tekton.dev/pipeline: upgrade-apps-pipeline
-          tekton.dev/pipelineTask: add-alert-silence
-        ingress: {}
-        egress:
-          - rule: egress-rule-dns
-          - rule: egress-rule-apiserver
-          - name: egress-rule-alertmanager
-            peers:
-              - namespaceSelectorLabels:
-                  kubernetes.io/metadata.name: monitoring
-                podSelectorLabels:
-                  app.kubernetes.io/name: alertmanager
-            ports:
-              - tcp: 9093
-      upgrade-apps-pod:
-        podSelectorLabels:
-          tekton.dev/pipeline: upgrade-apps-pipeline
-          tekton.dev/pipelineTask: upgrade-apps
-        ingress: {}
-        egress:
-          - rule: egress-rule-dns
-          - rule: egress-rule-apiserver
-          - rule: egress-rule-sc-ingress
-          - name: egress-rule-apiserver-wc
-            peers:
-              - cidr: 0.0.0.0/0
-            ports:
-              - tcp: 6443
-          - name: egress-rule-ingress-nginx
-            peers:
-              - namespaceSelectorLabels:
-                  kubernetes.io/metadata.name: ingress-nginx
-                podSelectorLabels:
-                  app.kubernetes.io/name: ingress-nginx
-            ports:
-              - tcp: 443
-      smoke-test-verify-k8s-api-permissions-pod:
-        podSelectorLabels:
-          tekton.dev/pipelineTask: verify-k8s-api-permissions
-          tekton.dev/task: verify-k8s-api-permissions
-        ingress: {}
-        egress:
-          - rule: egress-rule-dns
-          - rule: egress-rule-apiserver
-          - name: egress-rule-apiserver-wc
-            peers:
-              - cidr: 0.0.0.0/0
-            ports:
-              - tcp: 6443
-      smoke-test-verify-contact-opensearch-pod:
-        podSelectorLabels:
-          tekton.dev/task: verify-contact-opensearch
-        ingress: {}
-        egress:
-          - rule: egress-rule-dns
-          - rule: egress-rule-sc-ingress
-          - name: egress-rule-ingress-nginx
-            peers:
-              - namespaceSelectorLabels:
-                  kubernetes.io/metadata.name: ingress-nginx
-                podSelectorLabels:
-                  app.kubernetes.io/name: ingress-nginx
-            ports:
-              - tcp: 443
-      expire-alert-silence-pod:
-        podSelectorLabels:
-          tekton.dev/pipeline: upgrade-apps-pipeline
-          tekton.dev/pipelineTask: expire-alert-silence
-        ingress: {}
-        egress:
-          - rule: egress-rule-dns
-          - rule: egress-rule-apiserver
-          - name: egress-rule-alertmanager
-            peers:
-              - namespaceSelectorLabels:
-                  kubernetes.io/metadata.name: monitoring
-                podSelectorLabels:
-                  app.kubernetes.io/name: alertmanager
-            ports:
-              - tcp: 9093
   global:
     scApiserver:
       ips:
@@ -203,3 +44,28 @@ networkPolicies:
     scNodes:
       ips:
         - 0.0.0.0/0
+  harbor:
+    registries:
+      ips:
+        - 0.0.0.0/0
+    jobservice:
+      ips:
+        - "0.0.0.0/0"
+    trivy:
+      ips:
+        - "0.0.0.0/0"
+  monitoring:
+    grafana:
+      externalDataSources:
+        enabled: false
+      externalDashboardProvider:
+        ips:
+          - 0.0.0.0/0
+  opensearch:
+    plugins:
+      ips:
+        - "0.0.0.0/0"
+  dex:
+    connectors:
+      ips:
+        - "0.0.0.0/0"

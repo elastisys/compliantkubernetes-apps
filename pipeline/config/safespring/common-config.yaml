@@ -1,8 +1,20 @@
 # Changes made here will override the default values for both the service and workload cluster.
 # See the default configuration under "defaults/" to see available and suggested options.
 global:
-  baseDomain: pipeline-safespring.dev-ck8s.com
-  opsDomain: ops.pipeline-safespring.dev-ck8s.com
+  ck8sVersion: any
+  baseDomain: pipeline-exoscale.elastisys.se
+  opsDomain: ops.pipeline-exoscale.elastisys.se
+objectStorage:
+  s3:
+    region: ch-gva-2
+    regionEndpoint: https://sos-ch-gva-2.exo.io
+ingressNginx:
+  controller:
+    service:
+      type: not-used
+      annotations: not-used
+velero:
+  enabled: true
 issuers:
   letsencrypt:
     prod:
@@ -11,51 +23,26 @@ issuers:
       email: letsencrypt@elastisys.com
 clusterAdmin:
   users:
-    - haorui.peng@elastisys.com
-  groups:
-    - ck8sdevops@elastisys.com
-opa:
-  imageRegistry:
-    URL:
-      - harbor.pipeline-safespring.dev-ck8s.com
-      - quay.io/jetstack/cert-manager-acmesolver
-kured:
-  tolerations:
-    - key: node-role.kubernetes.io/master
-      operator: Exists
-      effect: NoSchedule
-    - key: node-role.kubernetes.io/control-plane
-      operator: Exists
-      effect: NoSchedule
-    - key: elastisys.io/node-type
-      operator: Exists
-      effect: NoSchedule
-  notification:
-    slack:
-      enabled: true
-      channel: kured-notification
+    - admin@example.com
 networkPolicies:
   global:
-    trivy:
-      ips:
-        - 0.0.0.0/0
     objectStorage:
       ips:
-        - 0.0.0.0/0
+      - 0.0.0.0/0
       ports:
-        - 443
+      - 443
     scIngress:
       ips:
         - 0.0.0.0/0
     wcIngress:
       ips:
         - 0.0.0.0/0
-  coredns:
-    externalDns:
+    trivy:
       ips:
         - 0.0.0.0/0
-  kured:
-    notificationSlack:
+      port: 443
+  certManager:
+    letsencrypt:
       ips:
         - 0.0.0.0/0
   falco:
@@ -66,12 +53,13 @@ networkPolicies:
     alertReceivers:
       ips:
         - 0.0.0.0/0
-trivy:
-  nodeCollector:
-    tolerations:
-      - key: elastisys.io/node-type
-        operator: Exists
-        effect: NoSchedule
-      - key: node-role.kubernetes.io/control-plane
-        operator: Exists
-        effect: NoSchedule
+  coredns:
+    externalDns:
+      ips:
+        - 0.0.0.0/0
+    serviceIp:
+      ips:
+        - 0.0.0.0/0
+
+externalDns:
+  txtOwnerId: not-used

@@ -68,6 +68,7 @@ welcomingDashboard:
   extraTextOpensearch: Support\\n\\nDid not find the answers you were looking for in the docs? Please contact us via [Jira Service Desk](https://elastisys.atlassian.net/servicedesk/customer/portals)\\n\\nPhone +4610-405 42 12
 networkPolicies:
   harbor:
+    enabled: false
     jobservice:
       ips:
         - 0.0.0.0/0
@@ -78,19 +79,29 @@ networkPolicies:
       ips:
         - 0.0.0.0/0
   monitoring:
+    enabled: false
     grafana:
       externalDashboardProvider:
         ips:
           - 0.0.0.0/0
   opensearch:
+    enabled: false
     plugins:
       ips:
         - 0.0.0.0/0
   dex:
+    enabled: false
     connectors:
       ips:
         - 0.0.0.0/0
+  thanos:
+    enabled: false
+  fluentd:
+    enabled: false
+  s3Exporter:
+    enabled: false
   tektonPipelines:
+    enabled: false
     pipeline:
       start-job:
         podSelectorLabels:
