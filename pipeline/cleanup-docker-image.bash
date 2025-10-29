@@ -25,12 +25,20 @@ else
   #   }
   # So to fetch the id we need to match to any entry that has the commit hash and fetch that id
   # The jq filter here is not foolproof and can return multiple versions if there's more than one version ID with the same tag.
+  # VERSION_ID=$(curl -s \
+  #   -H "Accept: application/vnd.github+json" \
+  #   -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+  #   -H "X-GitHub-Api-Version: 2025-10-29" \
+  #   https://api.github.com/orgs/packages/container/compliantkubernetes-apps-pipeline/versions |
+  #   jq '.[] | select(.metadata.container.tags | any(. == "'"${GITHUB_SHA}"'")).id')
+  echo "$GITHUB_SHA"
+
   VERSION_ID=$(curl -s \
     -H "Accept: application/vnd.github+json" \
     -H "Authorization: Bearer ${GITHUB_TOKEN}" \
     -H "X-GitHub-Api-Version: 2022-11-28" \
-    https://api.github.com/orgs/elastisys/packages/container/compliantkubernetes-apps-pipeline/versions |
-    jq '.[] | select(.metadata.container.tags | any(. == "'"${GITHUB_SHA}"'")).id')
+    "https://api.github.com/user/packages/container/compliantkubernetes-apps-pipeline/versions" |
+    jq ".[] | select( .metadata.container.tags | any( .== \"${GITHUB_SHA}\")).id")
 
   echo "Deleting Github package tag: ${GITHUB_SHA} (Version ID: ${VERSION_ID})" >&2
 
@@ -44,5 +52,5 @@ else
     -H "Accept: application/vnd.github+json" \
     -H "Authorization: Bearer ${GITHUB_TOKEN}" \
     -H "X-GitHub-Api-Version: 2022-11-28" \
-    "https://api.github.com/orgs/elastisys/packages/container/compliantkubernetes-apps-pipeline/versions/${VERSION_ID}"
+    "https://api.github.com/user/packages/container/compliantkubernetes-apps-pipeline/versions/${VERSION_ID}"
 fi

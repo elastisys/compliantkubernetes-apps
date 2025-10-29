@@ -77,6 +77,7 @@ ingressNginx:
       internal:
         annotations:
           loadbalancer.openstack.org/proxy-protocol: "false"
+          service.beta.kubernetes.io/openstack-internal-load-balancer: "true"
   defaultBackend:
     tolerations: *tolerateElastisys
     affinity: *affinityElastisys
@@ -117,6 +118,10 @@ networkPolicies:
   fluentd:
     enabled: false
   alertmanager:
+    enabled: false
+  ingressNginx:
+    enabled: false
+  gatekeeper:
     enabled: false
 user:
   namespaces:

@@ -60,6 +60,7 @@ thanos:
   objectStorage:
     type: s3
 dex:
+  enableStaticLogin: true
   google:
     groupSupport: true
     SASecretName: google-sa

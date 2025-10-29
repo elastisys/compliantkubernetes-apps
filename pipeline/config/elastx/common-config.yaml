@@ -33,7 +33,7 @@ kured:
       effect: NoSchedule
   notification:
     slack:
-      enabled: true
+      enabled: false
       channel: kured-notification
 networkPolicies:
   global:
@@ -89,6 +89,8 @@ networkPolicies:
     enabled: false
   dnsAutoscaler:
     enabled: false
+  opensearch:
+    enabled: false
 trivy:
   nodeCollector:
     tolerations:
@@ -104,4 +106,5 @@ ingressNginx:
       useProxyProtocol: false
     service:
       annotations:
+        service.beta.kubernetes.io/openstack-internal-load-balancer: "true"
         loadbalancer.openstack.org/proxy-protocol: "false"

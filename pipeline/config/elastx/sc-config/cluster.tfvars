@@ -39,19 +39,19 @@ number_of_k8s_masters_no_floating_ip_no_etcd = 0
 k8s_masters = {
   "control-plane-1" = {
     "az"          = "sto1"
-    "flavor"      = "6b576115-1e0d-4f8e-bc3a-8d45732a44b5" #2C-4GB-60GB
+    "flavor"      = "60002ff6-980e-4424-b125-e9b6794043e9" #2C-4GB-60GB
     "floating_ip" = true
     "etcd" = true
   },
   "control-plane-2" = {
     "az"          = "sto2"
-    "flavor"      = "6b576115-1e0d-4f8e-bc3a-8d45732a44b5" #2C-4GB-60GB
+    "flavor"      = "60002ff6-980e-4424-b125-e9b6794043e9" #2C-4GB-60GB
     "floating_ip" = true
     "etcd" = true
   },
   "control-plane-3" = {
     "az"          = "sto3"
-    "flavor"      = "6b576115-1e0d-4f8e-bc3a-8d45732a44b5" #2C-4GB-60GB
+    "flavor"      = "60002ff6-980e-4424-b125-e9b6794043e9" #2C-4GB-60GB
     "floating_ip" = true
     "etcd" = true
   }
@@ -67,28 +67,28 @@ number_of_k8s_nodes_no_floating_ip = 0
 k8s_nodes = {
   "worker-0" = {
     "az"          = "sto1"
-    "flavor"      = "64fb665a-4c02-4cba-aeed-2bf2d28dae60" #2C-8GB-80GB
+    "flavor"      = "60002ff6-980e-4424-b125-e9b6794043e9" #2C-8GB-80GB
     "floating_ip" = true
   },
   "worker-1" = {
     "az"          = "sto2"
-    "flavor"      = "64fb665a-4c02-4cba-aeed-2bf2d28dae60" #2C-8GB-80GB
+    "flavor"      = "60002ff6-980e-4424-b125-e9b6794043e9" #2C-8GB-80GB
     "floating_ip" = true
   },
   "worker-2" = {
     "az"          = "sto3"
-    "flavor"      = "64fb665a-4c02-4cba-aeed-2bf2d28dae60" #2C-8GB-80GB
+    "flavor"      = "60002ff6-980e-4424-b125-e9b6794043e9" #2C-8GB-80GB
     "floating_ip" = true
   },
   "worker-3" = {
     "az"          = "sto1"
-    "flavor"      = "64fb665a-4c02-4cba-aeed-2bf2d28dae60" #2C-8GB-80GB
+    "flavor"      = "60002ff6-980e-4424-b125-e9b6794043e9" #2C-8GB-80GB
     "floating_ip" = true
   },
-    "worker-4" = {
-    "az"          = "sto2"
-    "flavor"      = "64fb665a-4c02-4cba-aeed-2bf2d28dae60" #2C-8GB-80GB
-    "floating_ip" = true
+  "worker-4" = {
+  "az"          = "sto2"
+  "flavor"      = "60002ff6-980e-4424-b125-e9b6794043e9" #2C-8GB-80GB
+  "floating_ip" = true
   }
 }
 
@@ -137,7 +137,7 @@ floatingip_pool = "elx-public1"
 use_access_ip = 0
 
 router_id = "640d6657-06a9-4b71-af19-d6b8e737960f"
-subnet_cidr = "172.16.2.0/24"
+subnet_cidr = "172.16.100.0/24"
 
 # Or any name servers that is preferred.
 dns_nameservers = [

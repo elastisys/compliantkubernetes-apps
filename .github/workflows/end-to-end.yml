@@ -4,16 +4,16 @@ on:
   workflow_dispatch:
     inputs:
       logLevel:
-        description: 'Log level'
+        description: "Log level"
         required: true
-        default: 'warning'
+        default: "warning"
         type: choice
         options:
-        - info
-        - warning
-        - debug
+          - info
+          - warning
+          - debug
       environment:
-        description: 'Environment to run tests against'
+        description: "Environment to run tests against"
         type: environment
         required: true
 
@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout compliantkubernetes-apps
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
         with:
           repository: HaoruiPeng/compliantkubernetes-apps
           ref: main
@@ -175,11 +175,11 @@ jobs:
           ANSIBLE_CONFIG: ./compliantkubernetes-kubespray/kubespray/ansible.cfg
         with:
           args: /bin/bash -c "cd compliantkubernetes-kubespray/kubespray &&
-                ansible-playbook
-                -i ../../${{env.CK8S_CONFIG_PATH}}/${{ matrix.cluster }}-config/inventory.ini
-                -i compliantkubernetes-kubespray/bin/node-labels-and-taints-inventory.bash
-                --private-key ../../${{env.CK8S_CONFIG_PATH}}/id_rsa
-                --become --become-user=root cluster.yml"
+            ansible-playbook
+            -i ../../${{env.CK8S_CONFIG_PATH}}/${{ matrix.cluster }}-config/inventory.ini
+            -i compliantkubernetes-kubespray/bin/node-labels-and-taints-inventory.bash
+            --private-key ../../${{env.CK8S_CONFIG_PATH}}/id_rsa
+            --become --become-user=root cluster.yml"
 
       - name: Run kubespray - retry 1
         id: runkubespray1
@@ -189,12 +189,12 @@ jobs:
           ANSIBLE_CONFIG: ./compliantkubernetes-kubespray/kubespray/ansible.cfg
         with:
           args: /bin/bash -c "cd compliantkubernetes-kubespray/kubespray &&
-                ansible-playbook
-                -i ../../${{env.CK8S_CONFIG_PATH}}/${{ matrix.cluster }}-config/inventory.ini
-                -i compliantkubernetes-kubespray/bin/node-labels-and-taints-inventory.bash
-                --private-key ../../${{env.CK8S_CONFIG_PATH}}/id_rsa
-                --become --become-user=root
-                cluster.yml"
+            ansible-playbook
+            -i ../../${{env.CK8S_CONFIG_PATH}}/${{ matrix.cluster }}-config/inventory.ini
+            -i compliantkubernetes-kubespray/bin/node-labels-and-taints-inventory.bash
+            --private-key ../../${{env.CK8S_CONFIG_PATH}}/id_rsa
+            --become --become-user=root
+            cluster.yml"
 
       - name: Get kubeconfig
         if: steps.runkubespray0.outcome=='success' || steps.runkubespray1.outcome=='success'
@@ -204,11 +204,11 @@ jobs:
           ANSIBLE_CONFIG: ./compliantkubernetes-kubespray/kubespray/ansible.cfg
         with:
           args: /bin/bash -c "cd compliantkubernetes-kubespray/kubespray &&
-                ansible-playbook
-                -i ../../${{env.CK8S_CONFIG_PATH}}/${{ matrix.cluster }}-config/inventory.ini
-                --private-key ../../${{env.CK8S_CONFIG_PATH}}/id_rsa
-                --become --become-user=root
-                ../playbooks/kubeconfig.yml"
+            ansible-playbook
+            -i ../../${{env.CK8S_CONFIG_PATH}}/${{ matrix.cluster }}-config/inventory.ini
+            --private-key ../../${{env.CK8S_CONFIG_PATH}}/id_rsa
+            --become --become-user=root
+            ../playbooks/kubeconfig.yml"
 
       - name: Check kubeconfig
         id: check-kubeconfig
@@ -223,11 +223,11 @@ jobs:
           ANSIBLE_CONFIG: ./compliantkubernetes-kubespray/kubespray/ansible.cfg
         with:
           args: /bin/bash -c "cd compliantkubernetes-kubespray/kubespray &&
-                ansible-playbook
-                -i ../../${{env.CK8S_CONFIG_PATH}}/${{ matrix.cluster }}-config/inventory.ini
-                --private-key ../../${{env.CK8S_CONFIG_PATH}}/id_rsa
-                --become --become-user=root
-                ../playbooks/cluster_admin_rbac.yml"
+            ansible-playbook
+            -i ../../${{env.CK8S_CONFIG_PATH}}/${{ matrix.cluster }}-config/inventory.ini
+            --private-key ../../${{env.CK8S_CONFIG_PATH}}/id_rsa
+            --become --become-user=root
+            ../playbooks/cluster_admin_rbac.yml"
 
       - name: Master cis benchmark patching
         id: master-cis
@@ -237,11 +237,11 @@ jobs:
           ANSIBLE_CONFIG: ./compliantkubernetes-kubespray/kubespray/ansible.cfg
         with:
           args: /bin/bash -c "cd compliantkubernetes-kubespray/kubespray &&
-                ansible-playbook
-                -i ../../${{env.CK8S_CONFIG_PATH}}/${{ matrix.cluster }}-config/inventory.ini
-                --private-key ../../${{env.CK8S_CONFIG_PATH}}/id_rsa
-                --become --become-user=root
-                ../playbooks/master_cis_benchmark_patch.yml"
+            ansible-playbook
+            -i ../../${{env.CK8S_CONFIG_PATH}}/${{ matrix.cluster }}-config/inventory.ini
+            --private-key ../../${{env.CK8S_CONFIG_PATH}}/id_rsa
+            --become --become-user=root
+            ../playbooks/master_cis_benchmark_patch.yml"
 
       - name: Worker cis benchmark patching
         id: node-cis
@@ -251,18 +251,18 @@ jobs:
           ANSIBLE_CONFIG: ./compliantkubernetes-kubespray/kubespray/ansible.cfg
         with:
           args: /bin/bash -c "cd compliantkubernetes-kubespray/kubespray &&
-                ansible-playbook
-                -i ../../${{env.CK8S_CONFIG_PATH}}/${{ matrix.cluster }}-config/inventory.ini
-                --private-key ../../${{env.CK8S_CONFIG_PATH}}/id_rsa
-                --become --become-user=root
-                ../playbooks/worker_cis_benchmark_patch.yml"
+            ansible-playbook
+            -i ../../${{env.CK8S_CONFIG_PATH}}/${{ matrix.cluster }}-config/inventory.ini
+            --private-key ../../${{env.CK8S_CONFIG_PATH}}/id_rsa
+            --become --become-user=root
+            ../playbooks/worker_cis_benchmark_patch.yml"
 
       - name: Label nodes
         if: matrix.cluster == 'wc'
         env:
           KUBECONFIG: "${{ env.CK8S_CONFIG_PATH }}/.state/kube_config_${{ matrix.cluster }}.yaml"
         run: |
-          kubectl get nodes -o custom-columns=NAME:.metadata.name --no-headers | grep "elastisys" | xargs -I {} kubectl label node {} elastisys.io/node-group=elastisys
+          kubectl get nodes -o custom-columns=NAME:.metadata.name --no-headers | grep "elastisys" | xargs -I {} kubectl label node {} elastisys.io/node-group=elastisys elastisys.io/node-type=elastisys
 
       - name: Import PGP key and configure GPG agent
         run: ./apps/pipeline/setup-pgp.bash
@@ -299,27 +299,6 @@ jobs:
           ./apps/scripts/S3/entry.sh --s3cfg "${{ env.CK8S_CONFIG_PATH}}/.state/s3cfg.ini" create
           sops --config "${{ env.CK8S_CONFIG_PATH}}/.sops.yaml" -e -i "${{ env.CK8S_CONFIG_PATH}}/.state/s3cfg.ini"
         id: create-buckets
-
-      # - name: Bootstrap rook
-      #   working-directory: ./compliantkubernetes-kubespray/rook
-      #   env:
-      #     KUBECONFIG: ${{ env.CK8S_CONFIG_PATH }}/.state/kube_config_${{ matrix.cluster }}.yaml
-      #     CK8S_APPS_PIPELINE: true
-      #     CLUSTER: ${{ matrix.cluster }}
-      #   run: |
-      #     ./scripts/pipeline/bootstrap-rook.sh
-      #   id: bootstrap-rook
-
-  #     - name: Test rook
-  #       env:
-  #         KUBECONFIG: /__w/compliantkubernetes-apps/compliantkubernetes-apps/apps/pipeline/config/exoscale/pipeline-${{ matrix.cluster }}-config/artifacts/admin.conf
-  #         CK8S_CONFIG_PATH: /__w/compliantkubernetes-apps/compliantkubernetes-apps/apps/pipeline/config/exoscale
-  #         CK8S_APPS_PIPELINE: "true"
-  #         CLUSTER: ${{ matrix.cluster }}
-  #       run: |
-  #         ./scripts/pipeline/wait-for-rook.sh ${{ matrix.cluster }}
-  #       working-directory: ./compliantkubernetes-kubespray/rook
-  #       id: test-rook
 
       - name: Gather configs
         if: always() && steps.initialize-apps.outcome == 'success' && matrix.cluster == 'sc'
@@ -361,6 +340,7 @@ jobs:
           ./apps/bin/ck8s ops helmfile ${{ matrix.cluster }} -l app=gatekeeper apply
           ./apps/bin/ck8s ops helmfile ${{ matrix.cluster }} -l app=ingress-nginx apply
           ./apps/bin/ck8s ops kubectl ${{ matrix.cluster }} -n ingress-nginx wait --for=jsonpath='{.status.loadBalancer.ingress}' service/ingress-nginx-controller
+        id: install-ingress
 
       - name: Update Ingress DNS records
         run: |
@@ -379,7 +359,6 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_DNS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_DNS_SECRET_ACCESS_KEY }}
-          # See https://github.com/aws/aws-cli/issues/5262
           AWS_EC2_METADATA_DISABLED: true
         with:
           args: route53 change-resource-record-sets --hosted-zone-id Z1001117397DAU71G3RN2 --change-batch file://apps/pipeline/config/elastx/dns/${{ matrix.cluster }}-ingress.json
@@ -393,67 +372,82 @@ jobs:
         shell: bash
         id: install-apps
 
-      # - name: Wait for OpenSearch to be ready
-      #   if: steps.install-apps.outcome == 'success' && matrix.cluster == 'sc'
-      #   run: ./apps/pipeline/opensearch.bash
-      #   continue-on-error: true
-      #   shell: bash
-      #   id: opensearch
+      - name: Signal that apps in service cluster are installed
+        if: steps.install-apps.outcome == 'success' &&  matrix.cluster  == 'sc'
+        uses: actions/upload-artifact@v5
+        with:
+          name: apps-service-done
+          path: /dev/null
 
-  #     - name: Test apps
-  #       if: always() && (steps.install-apps.outcome != 'cancelled' && steps.install-apps.outcome != 'skipped')
-  #       run: ./apps/bin/ck8s test ${{ matrix.cluster }} apps --logging-enabled
-  #       env:
-  #         PIPELINE: "true"
-  #       id: test-apps
+      - name: Wait for service cluster to be ready
+        if: matrix.cluster == 'wc' && steps.install-apps.outcome != 'cancelled' && steps.install-apps.outcome != 'skipped'
+        uses: lexbritvin/wait-action@v1
+        with:
+          condition-type: "artifact"
+          artifact-name: apps-service-done
+          timeout-seconds: 1200
+        id: wc-wait-service-apps
 
-  #     - name: Finalise deploy rook
-  #       env:
-  #         KUBECONFIG: /__w/compliantkubernetes-apps/compliantkubernetes-apps/apps/pipeline/config/exoscale/pipeline-${{ matrix.cluster }}-config/artifacts/admin.conf
-  #         CK8S_CONFIG_PATH: /__w/compliantkubernetes-apps/compliantkubernetes-apps/apps/pipeline/config/exoscale
-  #         CK8S_APPS_PIPELINE: "true"
-  #         CLUSTER: ${{ matrix.cluster }}
-  #       run: |
-  #         ./scripts/pipeline/finalise-deploy-rook.sh
-  #       working-directory: ./compliantkubernetes-kubespray/rook
-  #       id: finalise-rook
+      - name: Restart Fluentd
+        if: matrix.cluster == 'wc'
+        run: |
+          ./apps/bin/ck8s ops kubectl wc -n fluentd-system rollout restart daemonset fluentd-forwarder
+          ./apps/bin/ck8s ops kubectl wc -n fluentd-system rollout restart statefulset fluentd-aggregator
 
-  #     - name: Upload logs
-  #       if: steps.install-apps.outcome == 'failure' || steps.test-apps.outcome == 'failure'
-  #       uses: actions/upload-artifact@v3
-  #       with:
-  #         name: compliantkubernetes-apps-logs
-  #         path: ./logs
+        id: fluentd
 
-  #     - name: Upload events
-  #       if: steps.install-apps.outcome == 'failure' || steps.test-apps.outcome == 'failure'
-  #       uses: actions/upload-artifact@v3
-  #       with:
-  #         name: compliantkubernetes-apps-events
-  #         path: ./events
+      - name: Test apps in sc
+        if: matrix.cluster == 'sc'
+        run: ./apps/bin/ck8s test ${{ matrix.cluster }} apps --logging-enabled
+        env:
+          PIPELINE: "true"
+        id: test-apps-sc
 
-  #     - name: Upload rook-ceph logs
-  #       if: steps.finalise-rook.outcome == 'failure' || steps.bootstrap-rook.outcome == 'failure' || steps.test-rook.outcome == 'failure' || steps.install-apps.outcome == 'failure'
-  #       uses: actions/upload-artifact@v3
-  #       with:
-  #         name: rook-ceph-logs
-  #         path: ./compliantkubernetes-kubespray/rook/logs
+      - name: Test apps in wc
+        if: matrix.cluster == 'wc'
+        run: ./apps/bin/ck8s test ${{ matrix.cluster }} apps --logging-enabled
+        env:
+          PIPELINE: "true"
+        id: test-apps-wc
 
-  #     - name: Upload rook-ceph events
-  #       if: steps.finalise-rook.outcome == 'failure' || steps.bootstrap-rook.outcome == 'failure' || steps.test-rook.outcome == 'failure' || steps.install-apps.outcome == 'failure'
-  #       uses: actions/upload-artifact@v3
-  #       with:
-  #         name: rook-ceph-events
-  #         path: ./compliantkubernetes-kubespray/rook/events
+      - name: Signal that apps test on workload cluster is done
+        if: always() &&  matrix.cluster  == 'wc'
+        uses: actions/upload-artifact@v5
+        with:
+          name: test-workload-done
+          path: /dev/null
+
+      - name: Wait for workload cluster to finish test
+        if: always() &&  matrix.cluster == 'sc'
+        uses: lexbritvin/wait-action@v1
+        with:
+          condition-type: "artifact"
+          artifact-name: test-workload-done
+          timeout-seconds: 1200
+
+      - name: Upload logs
+        if: always() && (steps.install-apps.outcome == 'failure' || steps.test-apps-sc.outcome == 'failure' || steps.test-apps-wc.outcome == 'failure')
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: compliantkubernetes-apps-logs-${{ matrix.cluster }}
+          path: ./logs
+
+      - name: Upload events
+        if: always() && (steps.install-apps.outcome == 'failure' || steps.test-apps-sc.outcome == 'failure' || steps.test-apps-wc.outcome == 'failure')
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: compliantkubernetes-apps-events-${{ matrix.cluster }}
+          path: ./events
+
       - name: Clear apps
         continue-on-error: true
-        if: always()
+        if: always() && (steps.install-ingress.outcome != 'skipped' || steps.install-apps.outcome != 'skipped')
         id: cleanapps0
         shell: bash
         run: ./apps/pipeline/clean-${{ matrix.cluster }}.bash
 
       - name: Clear apps - retry
-        if: always() && steps.cleanapps0.outcome=='failure'
+        if: always() && steps.cleanapps0.outcome == 'failure'
         id: cleanapps1
         shell: bash
         run: ./apps/pipeline/clean-${{ matrix.cluster }}.bash
@@ -473,44 +467,51 @@ jobs:
         with:
           args: -chdir="/github/workspace/compliantkubernetes-kubespray/kubespray/contrib/terraform/openstack" destroy -auto-approve -var-file /github/workspace/apps/pipeline/config/elastx/${{ matrix.cluster }}-config/cluster.tfvars -state /github/workspace/apps/pipeline/config/elastx/${{ matrix.cluster }}-config/terraform.tfstate
 
-  #     - name: Prepare DNS cleanup
-  #       if: always() && (matrix.cluster == 'sc')
-  #       run: |
-  #         sed -i "s/CREATE/DELETE/g" apps/pipeline/config/exoscale/dns-${{ matrix.cluster }}.json
-  #         cat apps/pipeline/config/exoscale/dns-${{ matrix.cluster }}.json
-  #     - name: Delete DNS records
-  #       if: always() && (matrix.cluster == 'sc')
-  #       uses: docker://amazon/aws-cli:2.1.26
-  #       env:
-  #         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_DNS_ACCESS_KEY_ID }}
-  #         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_DNS_SECRET_ACCESS_KEY }}
-  #         AWS_EC2_METADATA_DISABLED: true
-  #       with:
-  #         args: route53 change-resource-record-sets --hosted-zone-id Z2STJRQSJO5PZ0 --change-batch file://apps/pipeline/config/exoscale/dns-${{ matrix.cluster }}.json
+      - name: Prepare DNS cleanup
+        if: always()
+        run: |
+          sed -i "s/CREATE/DELETE/g" apps/pipeline/config/elastx/dns/${{ matrix.cluster }}-api.json
+          sed -i "s/CREATE/DELETE/g" apps/pipeline/config/elastx/dns/${{ matrix.cluster }}-ingress.json
+          cat apps/pipeline/config/elastx/dns/${{ matrix.cluster }}-api.json
+          cat apps/pipeline/config/elastx/dns/${{ matrix.cluster }}-ingress.json
 
-  #     - name: Delete buckets
-  #       if: always() && (matrix.cluster == 'sc')
-  #       env:
-  #         SAFESPRING_API_KEY: ${{ secrets.SAFESPRING_API_KEY }}
-  #         SAFESPRING_API_SECRET: ${{ secrets.SAFESPRING_API_SECRET }}
-  #       run: |
-  #         ./apps/scripts/S3/entry.sh --s3cfg s3cfg.ini delete
+      - name: Delete DNS records
+        if: always()
+        uses: docker://amazon/aws-cli:2.30.4
+        continue-on-error: true
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_DNS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_DNS_SECRET_ACCESS_KEY }}
+          AWS_EC2_METADATA_DISABLED: true
+        with:
+          args:
+            route53 change-resource-record-sets --hosted-zone-id Z1001117397DAU71G3RN2 --change-batch file://apps/pipeline/config/elastx/dns/${{ matrix.cluster }}-ingress.json
+            route53 change-resource-record-sets --hosted-zone-id Z1001117397DAU71G3RN2 --change-batch file://apps/pipeline/config/elastx/dns/${{ matrix.cluster }}-api.json
 
-  # clean-apps-image:
-  #   needs: apps
-  #   if: always()
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout compliantkubernetes-apps
-  #       uses: actions/checkout@v3
-  #       with:
-  #         repository: elastisys/compliantkubernetes-apps
-  #         ref: main
-  #     - name: Cleanup docker image
-  #       run: ./pipeline/cleanup-docker-image.bash
-  #       env:
-  #         GITHUB_ACTOR: ${{ github.actor }}
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Delete buckets
+        continue-on-error: true
+        if: (steps.create-buckets.outcome != 'skipped' && steps.create-buckets.outcome != 'cancelled') && (matrix.cluster == 'sc')
+        run: |
+          sops --config "${{ env.CK8S_CONFIG_PATH}}/.sops.yaml" -d -i "${{ env.CK8S_CONFIG_PATH}}/.state/s3cfg.ini"
+          ./apps/scripts/S3/entry.sh --s3cfg "${{ env.CK8S_CONFIG_PATH}}/.state/s3cfg.ini" delete
+          sops --config "${{ env.CK8S_CONFIG_PATH}}/.sops.yaml" -e -i "${{ env.CK8S_CONFIG_PATH}}/.state/s3cfg.ini"
+        id: delete-buckets
+
+  clean-apps-image:
+    needs: apps
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout compliantkubernetes-apps
+        uses: actions/checkout@v5
+        with:
+          repository: HaoruiPeng/compliantkubernetes-apps
+          ref: main
+      - name: Cleanup docker image
+        run: ./pipeline/cleanup-docker-image.bash
+        env:
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   # alert:
   #   runs-on: ubuntu-latest

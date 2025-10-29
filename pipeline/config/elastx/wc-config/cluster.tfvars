@@ -39,19 +39,19 @@ number_of_k8s_masters_no_floating_ip_no_etcd = 0
 k8s_masters = {
   "control-plane-1" = {
     "az"          = "sto1"
-    "flavor"      = "6b576115-1e0d-4f8e-bc3a-8d45732a44b5" #2C-4GB-60GB
+    "flavor"      = "60002ff6-980e-4424-b125-e9b6794043e9" #2C-4GB-60GB
     "floating_ip" = true
     "etcd" = true
   },
   "control-plane-2" = {
     "az"          = "sto2"
-    "flavor"      = "6b576115-1e0d-4f8e-bc3a-8d45732a44b5" #2C-4GB-60GB
+    "flavor"      = "60002ff6-980e-4424-b125-e9b6794043e9" #2C-4GB-60GB
     "floating_ip" = true
     "etcd" = true
   },
   "control-plane-3" = {
     "az"          = "sto3"
-    "flavor"      = "6b576115-1e0d-4f8e-bc3a-8d45732a44b5" #2C-4GB-60GB
+    "flavor"      = "60002ff6-980e-4424-b125-e9b6794043e9" #2C-4GB-60GB
     "floating_ip" = true
     "etcd" = true
   }
@@ -67,27 +67,27 @@ number_of_k8s_nodes_no_floating_ip = 0
 k8s_nodes = {
   "elastisys-0" = {
     "az"          = "sto1"
-    "flavor"      = "6b576115-1e0d-4f8e-bc3a-8d45732a44b5" #2C-4GB-60GB
+    "flavor"      = "60002ff6-980e-4424-b125-e9b6794043e9" #2C-8GB-80GB
     "floating_ip" = true
   },
   "elastisys-1" = {
     "az"          = "sto2"
-    "flavor"      = "6b576115-1e0d-4f8e-bc3a-8d45732a44b5" #2C-4GB-60GB
+    "flavor"      = "60002ff6-980e-4424-b125-e9b6794043e9" #2C-8GB-80GB
     "floating_ip" = true
   },
   "worker-0" = {
     "az"          = "sto1"
-    "flavor"      = "64fb665a-4c02-4cba-aeed-2bf2d28dae60" #2C-8GB-80GB
+    "flavor"      = "60002ff6-980e-4424-b125-e9b6794043e9" #2C-8GB-80GB
     "floating_ip" = true
   },
   "worker-1" = {
     "az"          = "sto2"
-    "flavor"      = "64fb665a-4c02-4cba-aeed-2bf2d28dae60" #2C-8GB-80GB
+    "flavor"      = "60002ff6-980e-4424-b125-e9b6794043e9" #2C-8GB-80GB
     "floating_ip" = true
   },
   "worker-2" = {
     "az"          = "sto3"
-    "flavor"      = "64fb665a-4c02-4cba-aeed-2bf2d28dae60" #2C-8GB-80GB
+    "flavor"      = "60002ff6-980e-4424-b125-e9b6794043e9" #2C-8GB-80GB
     "floating_ip" = true
   }
 }
@@ -138,7 +138,7 @@ floatingip_pool = "elx-public1"
 # If 1, nodes with floating IPs will transmit internal cluster traffic via floating IPs; if 0 private IPs will be used instead. Default value is 1.
 use_access_ip = 0
 
-subnet_cidr = "172.16.3.0/24"
+subnet_cidr = "172.16.101.0/24"
 # Or any name servers that is preferred.
 dns_nameservers = [
   "1.1.1.1",
