@@ -1,6 +1,9 @@
 #!/bin/bash
 set -euo pipefail
 
+HERE="$(readlink -f "${0}")"
+ROOT="$(dirname "$(dirname "${HERE}")")"
+
 # --- Input Validation and Configuration ---
 if [ "${#}" -ne 1 ]; then
   echo "Usage: $0 <UPSTREAM_CHART_PATH>"
@@ -10,8 +13,8 @@ if [ "${#}" -ne 1 ]; then
 fi
 
 INPUT_PATH="${1}"
-IMAGES_YAML_PATH="./helmfile.d/lists/images.yaml"
-IMAGE_MAP_FILE="./tests/unit/general/resources/images-parametric-tests.json"
+IMAGES_YAML_PATH="${ROOT}/helmfile.d/lists/images.yaml"
+IMAGE_MAP_FILE="${ROOT}/tests/unit/general/resources/images-parametric-tests.json"
 
 if [ ! -f "${IMAGE_MAP_FILE}" ]; then
   echo "ERROR: Mapping file '${IMAGE_MAP_FILE}' not found. Please ensure it is in the same directory."
