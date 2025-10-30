@@ -8,10 +8,7 @@ if ! command -v releaser >/dev/null; then
   exit 1
 fi
 
-function missing_env_var() {
-  echo "Error: Environment variable ${1} is not set." >&2
-  exit 1
-}
+: "${CK8S_GITHUB_TOKEN:?Missing CK8S_GITHUB_TOKEN}"
 
 function usage() {
   echo "Usage: ${0} VERSION" >&2
@@ -19,7 +16,6 @@ function usage() {
 }
 
 [ ${#} -eq 1 ] || usage
-[ -n "${CK8S_GITHUB_TOKEN:-}" ] || missing_env_var "CK8S_GITHUB_TOKEN"
 
 full_version="${1}"
 series="$(echo "${full_version}" | cut -d '.' -f 1,2)"
