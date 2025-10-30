@@ -1,6 +1,6 @@
 # trivy-operator
 
-![Version: 0.26.0](https://img.shields.io/badge/Version-0.26.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.24.0](https://img.shields.io/badge/AppVersion-0.24.0-informational?style=flat-square)
+![Version: 0.31.0](https://img.shields.io/badge/Version-0.31.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.29.0](https://img.shields.io/badge/AppVersion-0.29.0-informational?style=flat-square)
 
 Keeps security report resources updated
 
@@ -13,6 +13,8 @@ Keeps security report resources updated
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | affinity | object | `{}` | affinity set the operator affinity |
+| alternateReportStorage | object | `{"enabled":false,"mountPath":"/mnt/data/trivy-operator","podSecurityContext":{"fsGroup":10000,"runAsUser":10000},"storage":"10Gi","storageClassName":"","volumeName":"trivy-operator-pvc"}` | alternateReportStorage is the flag to enable alternate storage for all trivy reports (crds) in the form json files inside of a persistent volume |
+| alternateReportStorage.storageClassName | string | `""` | storageClassName for the PVC (optional, uses cluster default if not specified) |
 | automountServiceAccountToken | bool | `true` | automountServiceAccountToken the flag to enable automount for service account token |
 | compliance.cron | string | `"0 */6 * * *"` | cron this flag control the cron interval for compliance report generation |
 | compliance.failEntriesLimit | int | `10` | failEntriesLimit the flag to limit the number of fail entries per control check in the cluster compliance detail report this limit is for preventing the report from being too large per control checks |
@@ -22,6 +24,7 @@ Keeps security report resources updated
 | extraEnv | list | `[]` | extraEnv is a list of extra environment variables for the trivy-operator. |
 | fullnameOverride | string | `""` | fullnameOverride override operator full name |
 | global | object | `{"image":{"registry":""}}` | global values provide a centralized configuration for 'image.registry', reducing the potential for errors. If left blank, the chart will default to the individually set 'image.registry' values |
+| hostAliases | list | `[]` | hostAliases for `deployment` (TrivyOperator) and `statefulset` (TrivyServer) |
 | image.pullPolicy | string | `"IfNotPresent"` | pullPolicy set the operator pullPolicy |
 | image.pullSecrets | list | `[]` | pullSecrets set the operator pullSecrets |
 | image.registry | string | `"mirror.gcr.io"` |  |
@@ -70,6 +73,7 @@ Keeps security report resources updated
 | operator.namespace | string | `""` | namespace to install the operator, defaults to the .Release.Namespace |
 | operator.noProxy | string | `nil` | noProxy is a comma separated list of IPs and domain names that are not subject to proxy settings. |
 | operator.podLabels | object | `{}` | additional labels for the operator pod |
+| operator.pprofBindAddress | string | `""` | pprofBindAddress the address to bind the pprof server to. By default, it is not enabled. |
 | operator.privateRegistryScanSecretsNames | object | `{}` | privateRegistryScanSecretsNames is map of namespace:secrets, secrets are comma seperated which can be used to authenticate in private registries in case if there no imagePullSecrets provided example : {"mynamespace":"mySecrets,anotherSecret"} |
 | operator.rbacAssessmentScannerEnabled | bool | `true` | rbacAssessmentScannerEnabled the flag to enable rbac assessment scanner |
 | operator.replicas | int | `1` | replicas the number of replicas of the operator's pod |
@@ -128,6 +132,7 @@ Keeps security report resources updated
 | trivy.additionalVulnerabilityReportFields | string | `""` | additionalVulnerabilityReportFields is a comma separated list of additional fields which can be added to the VulnerabilityReport. Supported parameters: Description, Links, CVSS, Target, Class, PackagePath and PackageType |
 | trivy.clientServerSkipUpdate | bool | `false` | clientServerSkipUpdate is the flag to enable skip databases update for Trivy client. Only applicable in ClientServer mode. |
 | trivy.command | string | `"image"` | command. One of `image`, `filesystem` or `rootfs` scanning, depending on the target type required for the scan. For 'filesystem' and `rootfs` scanning, ensure that the `trivyOperator.scanJobPodTemplateContainerSecurityContext` is configured to run as the root user (runAsUser = 0). |
+| trivy.configFile | string | `nil` | configFile can be used to tell Trivy to use specific options available only in the config file (e.g. Mirror registries). |
 | trivy.createConfig | bool | `true` | createConfig indicates whether to create config objects |
 | trivy.dbRegistry | string | `"mirror.gcr.io"` |  |
 | trivy.dbRepository | string | `"aquasec/trivy-db"` |  |
@@ -135,6 +140,7 @@ Keeps security report resources updated
 | trivy.dbRepositoryPassword | string | `nil` | The password for dbRepository authentication  |
 | trivy.dbRepositoryUsername | string | `nil` | The username for dbRepository authentication  |
 | trivy.debug | bool | `false` | debug One of `true` or `false`. Enables debug mode. |
+| trivy.existingSecret | bool | `false` | existingSecret if a secret containing gitHubToken, serverToken or serverCustomHeaders has been created outside the chart (e.g external-secrets, sops, etc...). Keys must be at least one of the following: trivy.githubToken, trivy.serverToken, trivy.serverCustomHeaders Overrides trivy.gitHubToken, trivy.serverToken, trivy.serverCustomHeaders values. Note: The secret has to be named "trivy-operator-trivy-config". |
 | trivy.externalRegoPoliciesEnabled | bool | `false` | The Flag to enable the usage of external rego policies config-map, this should be used when the user wants to use their own rego policies  |
 | trivy.filesystemScanCacheDir | string | `"/var/trivyoperator/trivy-db"` | filesystemScanCacheDir the flag to set custom path for trivy filesystem scan `cache-dir` parameter. Only applicable in filesystem scan mode. |
 | trivy.githubToken | string | `nil` | githubToken is the GitHub access token used by Trivy to download the vulnerabilities database from GitHub. Only applicable in Standalone mode. |
@@ -146,7 +152,7 @@ Keeps security report resources updated
 | trivy.image.pullPolicy | string | `"IfNotPresent"` | pullPolicy is the imge pull policy used for trivy image , valid values are (Always, Never, IfNotPresent) |
 | trivy.image.registry | string | `"mirror.gcr.io"` | registry of the Trivy image |
 | trivy.image.repository | string | `"aquasec/trivy"` | repository of the Trivy image |
-| trivy.image.tag | string | `"0.59.1"` | tag version of the Trivy image |
+| trivy.image.tag | string | `"0.66.0"` | tag version of the Trivy image |
 | trivy.imageScanCacheDir | string | `"/tmp/trivy/.cache"` | imageScanCacheDir the flag to set custom path for trivy image scan `cache-dir` parameter. Only applicable in image scan mode. |
 | trivy.includeDevDeps | bool | `false` | includeDevDeps include development dependencies in the report (supported: npm, yarn) (default: false) note: this flag is only applicable when trivy.command is set to filesystem |
 | trivy.insecureRegistries | object | `{}` | The registry to which insecure connections are allowed. There can be multiple registries with different keys. |
@@ -162,6 +168,7 @@ Keeps security report resources updated
 | trivy.registry | object | `{"mirror":{}}` | Mirrored registries. There can be multiple registries with different keys. Make sure to quote registries containing dots |
 | trivy.resources | object | `{"limits":{"cpu":"500m","memory":"500M"},"requests":{"cpu":"100m","memory":"100M"}}` | resources resource requests and limits for scan job containers |
 | trivy.sbomSources | string | `""` | sbomSources trivy will try to retrieve SBOM from the specified sources (oci,rekor) |
+| trivy.server.extraServerVolumes | object | `{"volumeMounts":[],"volumes":[]}` | volumes set trivy-server volumes |
 | trivy.server.podSecurityContext | object | `{"fsGroup":65534,"runAsNonRoot":true,"runAsUser":65534}` | podSecurityContext set trivy-server podSecurityContext |
 | trivy.server.replicas | int | `1` | the number of replicas of the trivy-server |
 | trivy.server.resources | object | `{"limits":{"cpu":1,"memory":"1Gi"},"requests":{"cpu":"200m","memory":"512Mi"}}` | resources set trivy-server resource |
@@ -196,7 +203,7 @@ Keeps security report resources updated
 | trivyOperator.policiesConfig | string | `""` | policiesConfig Custom Rego Policies to be used by the config audit scanner See https://github.com/aquasecurity/trivy-operator/blob/main/docs/tutorials/writing-custom-configuration-audit-policies.md for more details. |
 | trivyOperator.reportRecordFailedChecksOnly | bool | `true` | reportRecordFailedChecksOnly flag is to record only failed checks on misconfiguration reports (config-audit and rbac assessment) |
 | trivyOperator.reportResourceLabels | string | `""` | reportResourceLabels comma-separated scanned resource labels which the user wants to include in the Prometheus metrics report. Example: `owner,app` |
-| trivyOperator.scanJobAffinity | list | `[]` | scanJobAffinity affinity to be applied to the scanner pods and node-collector |
+| trivyOperator.scanJobAffinity | object | `{}` | scanJobAffinity affinity to be applied to the scanner pods and node-collector |
 | trivyOperator.scanJobAnnotations | string | `""` | scanJobAnnotations comma-separated representation of the annotations which the user wants the scanner jobs and pods to be annotated with. Example: `foo=bar,env=stage` will annotate the scanner jobs and pods with the annotations `foo: bar` and `env: stage` |
 | trivyOperator.scanJobAutomountServiceAccountToken | bool | `false` | scanJobAutomountServiceAccountToken the flag to enable automount for service account token on scan job |
 | trivyOperator.scanJobCompressLogs | bool | `true` | scanJobCompressLogs control whether scanjob output should be compressed or plain |
@@ -208,6 +215,7 @@ Keeps security report resources updated
 | trivyOperator.scanJobPodTemplateLabels | string | `""` | scanJobPodTemplateLabels comma-separated representation of the labels which the user wants the scanner pods to be labeled with. Example: `foo=bar,env=stage` will labeled the scanner pods with the labels `foo: bar` and `env: stage` |
 | trivyOperator.scanJobPodTemplatePodSecurityContext | object | `{}` | scanJobPodTemplatePodSecurityContext podSecurityContext the user wants the scanner and node collector pods to be amended with. Example:   RunAsUser: 10000   RunAsGroup: 10000   RunAsNonRoot: true |
 | trivyOperator.scanJobTolerations | list | `[]` | scanJobTolerations tolerations to be applied to the scanner pods so that they can run on nodes with matching taints |
+| trivyOperator.scanJobsInSameNamespace | bool | `false` | scanJobsInSameNamespace control whether to run vulnerability scan jobs in same namespace of workload |
 | trivyOperator.skipInitContainers | bool | `false` | skipInitContainers when this flag is set to true, the initContainers will be skipped for the scanner and node collector pods |
 | trivyOperator.skipResourceByLabels | string | `""` | skipResourceByLabels comma-separated labels keys which trivy-operator will skip scanning on resources with matching labels |
 | trivyOperator.useGCRServiceAccount | bool | `true` | useGCRServiceAccount the flag to enable the usage of GCR service account for scanning images in GCR |
