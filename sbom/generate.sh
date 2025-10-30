@@ -55,7 +55,7 @@ CONFIG="${REPO_ROOT}/sbom/sbom.config.yaml"
 
 # Use container wrapper for consistent docker/podman behavior
 WRAPPER="${REPO_ROOT}/scripts/run-from-container.sh"
-CONTAINER_IMAGE="ghcr.io/elastisys/sbom-generator:latest"
+IMAGE="ghcr.io/elastisys/sbom-generator:0.2"
 
 if [[ ! -x "${WRAPPER}" ]]; then
   echo "Missing or non-executable ${WRAPPER}." >&2
@@ -74,7 +74,7 @@ if [[ -n "${CK8S_GITHUB_TOKEN:-}" ]]; then
   extra_env+=(--env CK8S_GITHUB_TOKEN)
 fi
 "${WRAPPER}" --env XDG_CACHE_HOME="${XDG_CACHE_HOME}" "${extra_env[@]}" \
-  "${CONTAINER_IMAGE}" "${forward_args[@]}" generate \
+  "${IMAGE}" "${forward_args[@]}" generate \
   --config "${CONFIG}" \
   --output-path "${SBOM_OUTPUT}" \
   --version "${version_arg}" \
@@ -82,7 +82,7 @@ fi
 
 echo "Validating SBOM ${SBOM_OUTPUT} ..."
 "${WRAPPER}" --env XDG_CACHE_HOME="${XDG_CACHE_HOME}" "${extra_env[@]}" \
-  "${CONTAINER_IMAGE}" "${forward_args[@]}" validate "${SBOM_OUTPUT}" --config "${CONFIG}"
+  "${IMAGE}" "${forward_args[@]}" validate "${SBOM_OUTPUT}" --config "${CONFIG}"
 
 # Ensure file ends with a single newline to satisfy linters
 if [[ -s "${SBOM_OUTPUT}" ]]; then
