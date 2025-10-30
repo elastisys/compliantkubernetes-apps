@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:4d4a4fd4-4dbf-4160-89ed-32372cac4c24",
+  "serialNumber": "urn:uuid:82b3e71c-544c-4701-938b-68a8a410f653",
   "version": 1,
   "metadata": {
-    "timestamp": "2025-11-03T10:12:27Z",
+    "timestamp": "2025-11-06T07:38:38Z",
     "lifecycles": [
       {
         "phase": "build"
@@ -2664,13 +2664,13 @@
       }
     },
     {
-      "bom-ref": "pkg:helm/trivy-operator@0.26.0",
+      "bom-ref": "pkg:helm/trivy-operator@0.31.0",
       "type": "library",
       "supplier": {
         "name": "aquasecurity"
       },
       "name": "trivy-operator",
-      "version": "0.26.0",
+      "version": "0.31.0",
       "description": "Keeps security report resources updated",
       "licenses": [
         {
@@ -2679,7 +2679,7 @@
           }
         }
       ],
-      "purl": "pkg:helm/trivy-operator@0.26.0",
+      "purl": "pkg:helm/trivy-operator@0.31.0",
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -2799,26 +2799,26 @@
       "purl": "pkg:oci/aquasec/trivy-checks@1"
     },
     {
-      "bom-ref": "pkg:oci/aquasec/trivy-operator@0.24.0?repository_url=mirror.gcr.io",
+      "bom-ref": "pkg:oci/aquasec/trivy-operator@0.29.0?repository_url=mirror.gcr.io",
       "type": "container",
       "supplier": {
         "name": "aquasec"
       },
       "name": "mirror.gcr.io/aquasec/trivy-operator",
-      "version": "0.24.0",
-      "cpe": "cpe:2.3:a:aquasec:trivy-operator:0.24.0:*:*:*:*:*:*:*",
-      "purl": "pkg:oci/aquasec/trivy-operator@0.24.0?repository_url=mirror.gcr.io"
+      "version": "0.29.0",
+      "cpe": "cpe:2.3:a:aquasec:trivy-operator:0.29.0:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/aquasec/trivy-operator@0.29.0?repository_url=mirror.gcr.io"
     },
     {
-      "bom-ref": "pkg:oci/aquasec/trivy@0.59.1",
+      "bom-ref": "pkg:oci/aquasec/trivy@0.66.0",
       "type": "container",
       "supplier": {
         "name": "aquasec"
       },
       "name": "aquasec/trivy",
-      "version": "0.59.1",
-      "cpe": "cpe:2.3:a:aquasec:trivy:0.59.1:*:*:*:*:*:*:*",
-      "purl": "pkg:oci/aquasec/trivy@0.59.1"
+      "version": "0.66.0",
+      "cpe": "cpe:2.3:a:aquasec:trivy:0.66.0:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/aquasec/trivy@0.66.0"
     },
     {
       "bom-ref": "pkg:oci/aquasecurity/node-collector@0.3.1",
@@ -4382,7 +4382,7 @@
         "pkg:helm/thanos-ruler@0.1.0",
         "pkg:helm/thanos@15.13.1",
         "pkg:helm/tigera-operator@v3.26.4",
-        "pkg:helm/trivy-operator@0.26.0",
+        "pkg:helm/trivy-operator@0.31.0",
         "pkg:helm/user-crds@0.1.0",
         "pkg:helm/user-rbac@0.1.0",
         "pkg:helm/velero@10.0.11"
@@ -5111,11 +5111,11 @@
       ]
     },
     {
-      "ref": "pkg:helm/trivy-operator@0.26.0",
+      "ref": "pkg:helm/trivy-operator@0.31.0",
       "dependsOn": [
         "pkg:oci/aquasec/trivy-checks@1",
-        "pkg:oci/aquasec/trivy-operator@0.24.0?repository_url=mirror.gcr.io",
-        "pkg:oci/aquasec/trivy@0.59.1",
+        "pkg:oci/aquasec/trivy-operator@0.29.0?repository_url=mirror.gcr.io",
+        "pkg:oci/aquasec/trivy@0.66.0",
         "pkg:oci/aquasecurity/node-collector@0.3.1"
       ]
     },
@@ -5143,11 +5143,11 @@
       "dependsOn": []
     },
     {
-      "ref": "pkg:oci/aquasec/trivy-operator@0.24.0?repository_url=mirror.gcr.io",
+      "ref": "pkg:oci/aquasec/trivy-operator@0.29.0?repository_url=mirror.gcr.io",
       "dependsOn": []
     },
     {
-      "ref": "pkg:oci/aquasec/trivy@0.59.1",
+      "ref": "pkg:oci/aquasec/trivy@0.66.0",
       "dependsOn": []
     },
     {
