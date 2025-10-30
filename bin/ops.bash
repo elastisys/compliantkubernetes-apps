@@ -54,9 +54,9 @@ ops_helm() {
 ops_helmfile() {
   # Skip validation when fetching completions
   if [ "$2" == "__complete" ]; then
-    config_load "$1" --skip-validation
+    config_load "$1" --skip-validation --skip-test-encrypt
   else
-    config_load "$1"
+    config_load "$1" --skip-test-encrypt
   fi
 
   case "${1}" in
