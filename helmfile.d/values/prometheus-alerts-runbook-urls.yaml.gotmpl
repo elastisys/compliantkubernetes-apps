@@ -209,10 +209,16 @@ runbookUrls:
     {{- dict "name" "OpenStackReconcileFailed" "config" .openstack | include "tpl.missing-runbook" }}
     {{- dict "name" "OpenStackReconcileDuration" "config" .openstack | include "tpl.missing-runbook" }}
   packetsDropped:
+    # calico
     {{- dict "name" "FrequentPacketsDroppedToWorkload" "config" .packetsDropped | include "tpl.missing-runbook" }}
     {{- dict "name" "ScarcePacketsDroppedToWorkload" "config" .packetsDropped | include "tpl.missing-runbook" }}
     {{- dict "name" "FrequentPacketsDroppedFromWorkload" "config" .packetsDropped | include "tpl.missing-runbook" }}
     {{- dict "name" "ScarcePacketsDroppedFromWorkload" "config" .packetsDropped | include "tpl.missing-runbook" }}
+    # cilium
+    {{- dict "name" "FrequentIngressPacketsDropped" "config" .packetsDropped | include "tpl.missing-runbook" }}
+    {{- dict "name" "ScarceIngressPacketsDropped" "config" .packetsDropped | include "tpl.missing-runbook" }}
+    {{- dict "name" "FrequentEgressPacketsDropped" "config" .packetsDropped | include "tpl.missing-runbook" }}
+    {{- dict "name" "ScarceEgressPacketsDropped" "config" .packetsDropped | include "tpl.missing-runbook" }}
   prometheusOperator:
     {{- dict "name" "PrometheusOperatorListErrors" "subpath" "prometheus-operator" "config" .nodeNetwork | include "tpl.prometheus-operator" }}
     {{- dict "name" "PrometheusOperatorWatchErrors" "subpath" "prometheus-operator" "config" .nodeNetwork | include "tpl.prometheus-operator" }}
