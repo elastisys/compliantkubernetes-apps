@@ -126,3 +126,21 @@ find_schemas() {
 
   assert_success
 }
+
+@test "pointers should not be broken" {
+  declare -a schemas && find_schemas
+  local pointers refs
+  pointers="$(mktemp)"
+  refs="$(mktemp)"
+
+  for schema in "${schemas[@]}"; do
+    # shellcheck disable=SC2016
+    yq '.. | select(has("$ref"))."$ref"' "${schema}" | sort -u >"${refs}"
+    yq '.. | path | with(.[] | select(to_string|match("[/~]")); .|= (to_json|sub("~", "~0") | sub("/", "~1"))) | "#/"+join("/")' "${schema}" >"${pointers}"
+
+    run grep --fixed-strings --invert-match --line-regexp --file="${pointers}" "${refs}"
+
+    refute_output
+  done
+  rm -f "${pointers}" "${refs}"
+}
