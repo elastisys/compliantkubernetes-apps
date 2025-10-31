@@ -8692,8 +8692,6 @@ properties:
         properties:
           image:
             $ref: '#/$defs/containerImage'
-          pluginCsi:
-            $ref: '#/$defs/containerImage'
           pluginAws:
             $ref: '#/$defs/containerImage'
           pluginGcp:
