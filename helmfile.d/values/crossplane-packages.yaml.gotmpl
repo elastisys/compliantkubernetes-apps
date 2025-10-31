@@ -15,6 +15,21 @@ kubectlImage:
 {{- end }}
 {{- end }}
 
+configurations:
+{{- range $configuration, $image := .Values.images.crossplane.configurations }}
+  {{ $configuration }}:
+    {{- $image = merge (include "container_uri.parse" $image | fromJson) $imagesGlobal }}
+    {{- with $image }}
+    image:
+      {{- with include "gen.reg-rep-img" . }}
+      repository: {{ . }}
+      {{- end }}
+      {{- if or .tag .digest }}
+      tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
+      {{- end }}
+    {{- end }}
+{{- end }}
+
 functions:
 {{- range $function, $image := .Values.images.crossplane.functions }}
   {{ $function }}:
