@@ -520,6 +520,8 @@ record_upgrade_done() {
   kubectl_do "${1}" delete configmap --namespace kube-system welkin-apps-upgrade >/dev/null
 }
 
+# shellcheck source=scripts/migration/crossplane.sh
+source "${ROOT}/scripts/migration/crossplane.sh"
 # shellcheck source=scripts/migration/helm.sh
 source "${ROOT}/scripts/migration/helm.sh"
 # shellcheck source=scripts/migration/helmfile.sh
