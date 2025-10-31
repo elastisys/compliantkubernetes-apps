@@ -13,7 +13,7 @@ helm_do() {
     log_fatal "Second argument must be a helm operation, not an option"
   fi
 
-  if [[ "${CK8S_DRY_RUN_INSTALL}" == "true" ]]; then
+  if [[ "${CK8S_DRY_RUN_INSTALL:-"true"}" == "true" ]]; then
     # List of common Helm subcommands that generally DO NOT support --dry-run
     case "${command}" in
     get | list | ls | history | diff | repo | search | show | status | test | version) ;;
