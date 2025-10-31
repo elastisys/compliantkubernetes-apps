@@ -1,0 +1,15 @@
+apiVersion: kubernetes.m.crossplane.io/v1alpha1
+kind: ProviderConfig
+metadata:
+  name: node-local-dns-local
+spec:
+  credentials:
+    source: InjectedIdentity
+---
+apiVersion: helm.m.crossplane.io/v1beta1
+kind: ProviderConfig
+metadata:
+  name: node-local-dns-local
+spec:
+  credentials:
+    source: InjectedIdentity
