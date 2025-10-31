@@ -116,7 +116,8 @@ runbookUrls:
     {{- dict "name" "HarborTrivyDown" "config" .harbor | include "tpl.missing-runbook" }}
     {{- dict "name" "HarborJobServiceDown" "config" .harbor | include "tpl.missing-runbook" }}
     {{- dict "name" "HarborStorageUsageAboveThreshold" "config" .harbor | include "tpl.missing-runbook" }}
-    {{- dict "name" "HarborP99LatencyHigherThan10Seconds" "config" .harbor | include "tpl.missing-runbook" }}
+    {{- dict "name" "HarborP99LatencyHigherThan55Seconds" "config" .harbor | include "tpl.missing-runbook" }}
+    {{- dict "name" "HarborP50LatencyHigherThan10Seconds" "config" .harbor | include "tpl.missing-runbook" }}
     {{- dict "name" "HarborErrorRateHigh" "config" .harbor | include "tpl.missing-runbook" }}
     {{- dict "name" "HarborTotalNumberOfArtifactsAboveThreshold" "config" .harbor | include "tpl.missing-runbook" }}
   hnc:
