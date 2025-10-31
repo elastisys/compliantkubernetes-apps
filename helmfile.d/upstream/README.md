@@ -60,6 +60,12 @@ Pull the chart:
 ./scripts/charts.sh pull <chart-name>
 ```
 
+Check image drift and optionally update image tags if necessary (../lists/images.yaml):
+
+```bash
+./scripts/image_drift.sh <UPSTREAM_CHART_PATH>
+```
+
 ## Other functions
 
 Check for chart changes:

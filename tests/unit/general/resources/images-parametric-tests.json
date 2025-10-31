@@ -4,19 +4,37 @@
       "image_property": "ingressNginx.controllerChroot",
       "helmfile_selector": "app=ingress-nginx",
       "container_name": "controller",
-      "template_file": "sc/ingress-nginx/templates/controller-daemonset.yaml"
+      "template_file": "sc/ingress-nginx/templates/controller-daemonset.yaml",
+      "drift_chartpath": "kubernetes-ingress-nginx/ingress-nginx",
+      "drift_tagsourcetype": "values.yaml",
+      "drift_tagpath": ".controller.image.tag"
+    },
+    {
+      "image_property": "ingressNginx.controller",
+      "helmfile_selector": "app=ingress-nginx",
+      "container_name": "controller",
+      "drift_chartpath": "kubernetes-ingress-nginx/ingress-nginx",
+      "template_file": "sc/ingress-nginx/templates/controller-daemonset.yaml",
+      "drift_tagsourcetype": "values.yaml",
+      "drift_tagpath": ".controller.image.tag"
     },
     {
       "image_property": "ingressNginx.defaultBackend",
       "helmfile_selector": "app=ingress-nginx",
       "container_name": "ingress-nginx-default-backend",
-      "template_file": "sc/ingress-nginx/templates/default-backend-deployment.yaml"
+      "template_file": "sc/ingress-nginx/templates/default-backend-deployment.yaml",
+      "drift_chartpath": "kubernetes-ingress-nginx/ingress-nginx",
+      "drift_tagsourcetype": "values.yaml",
+      "drift_tagpath": ".defaultBackend.image.tag"
     },
     {
       "image_property": "ingressNginx.admissionWebhooksPatch",
       "helmfile_selector": "app=ingress-nginx",
       "container_name": "patch",
-      "template_file": "sc/ingress-nginx/templates/admission-webhooks/job-patch/job-patchWebhook.yaml"
+      "template_file": "sc/ingress-nginx/templates/admission-webhooks/job-patch/job-patchWebhook.yaml",
+      "drift_chartpath": "kubernetes-ingress-nginx/ingress-nginx",
+      "drift_tagsourcetype": "values.yaml",
+      "drift_tagpath": ".controller.admissionWebhooks.patch.image.tag"
     },
     {
       "image_property": "ingressNginx.fileCopier",
@@ -34,61 +52,83 @@
       "image_property": "certManager.controller",
       "helmfile_selector": "app=cert-manager",
       "container_name": "cert-manager-controller",
-      "template_file": "sc/cert-manager/templates/deployment.yaml"
+      "template_file": "sc/cert-manager/templates/deployment.yaml",
+      "drift_chartpath": "jetstack/cert-manager",
+      "drift_tagsourcetype": "chart.yaml"
     },
     {
       "image_property": "certManager.webhook",
       "helmfile_selector": "app=cert-manager",
       "container_name": "cert-manager-webhook",
-      "template_file": "sc/cert-manager/templates/webhook-deployment.yaml"
+      "template_file": "sc/cert-manager/templates/webhook-deployment.yaml",
+      "drift_chartpath": "jetstack/cert-manager",
+      "drift_tagsourcetype": "chart.yaml"
     },
     {
       "image_property": "certManager.cainjector",
       "helmfile_selector": "app=cert-manager",
       "container_name": "cert-manager-cainjector",
-      "template_file": "sc/cert-manager/templates/cainjector-deployment.yaml"
+      "template_file": "sc/cert-manager/templates/cainjector-deployment.yaml",
+      "drift_chartpath": "jetstack/cert-manager",
+      "drift_tagsourcetype": "chart.yaml"
     },
     {
       "image_property": "certManager.startupapicheck",
       "helmfile_selector": "app=cert-manager",
       "container_name": "cert-manager-startupapicheck",
-      "template_file": "sc/cert-manager/templates/startupapicheck-job.yaml"
+      "template_file": "sc/cert-manager/templates/startupapicheck-job.yaml",
+      "drift_chartpath": "jetstack/cert-manager",
+      "drift_tagsourcetype": "chart.yaml"
     },
     {
       "image_property": "dex.image",
       "helmfile_selector": "app=dex",
       "container_name": "dex",
-      "template_file": "sc/dex/templates/deployment.yaml"
+      "template_file": "sc/dex/templates/deployment.yaml",
+      "drift_tagsourcetype": "chart.yaml",
+      "drift_chartpath": "dexidp/dex"
     },
     {
       "image_property": "externalDns.image",
       "helmfile_selector": "app=external-dns",
       "container_name": "external-dns",
-      "template_file": "sc/external-dns/templates/deployment.yaml"
+      "template_file": "sc/external-dns/templates/deployment.yaml",
+      "drift_tagsourcetype": "chart.yaml",
+      "drift_chartpath": "kubernetes-external-dns/external-dns"
     },
     {
       "image_property": "falco.image",
       "helmfile_selector": "app=falco",
       "container_name": "falco",
-      "template_file": "sc/falco/templates/daemonset.yaml"
+      "template_file": "sc/falco/templates/daemonset.yaml",
+      "drift_chartpath": "falcosecurity/falco",
+      "drift_tagsourcetype": "chart.yaml"
     },
     {
       "image_property": "falco.driverLoaderInit",
       "helmfile_selector": "app=falco",
       "container_name": "falco-driver-loader",
-      "template_file": "sc/falco/templates/daemonset.yaml"
+      "template_file": "sc/falco/templates/daemonset.yaml",
+      "drift_chartpath": "falcosecurity/falco",
+      "drift_tagsourcetype": "chart.yaml"
     },
     {
       "image_property": "falco.falcoctl",
       "helmfile_selector": "app=falco",
       "container_name": "falcoctl-artifact-install",
-      "template_file": "sc/falco/templates/daemonset.yaml"
+      "template_file": "sc/falco/templates/daemonset.yaml",
+      "drift_chartpath": "falcosecurity/falco",
+      "drift_tagsourcetype": "values.yaml",
+      "drift_tagpath": ".falcoctl.image.tag"
     },
     {
       "image_property": "falco.sidekick",
       "helmfile_selector": "app=falco",
       "container_name": "falcosidekick",
-      "template_file": "sc/falco/charts/falcosidekick/templates/deployment.yaml"
+      "template_file": "sc/falco/charts/falcosidekick/templates/deployment.yaml",
+      "drift_chartpath": "falcosecurity/falco/charts/falcosidekick",
+      "drift_tagsourcetype": "values.yaml",
+      "drift_tagpath": ".image.tag"
     },
     {
       "image_property": "fluentd.aggregator",
@@ -124,19 +164,27 @@
       "image_property": "gatekeeper.image",
       "helmfile_selector": "app=gatekeeper",
       "container_name": "manager",
-      "template_file": "sc/gatekeeper/templates/gatekeeper-audit-deployment.yaml"
+      "template_file": "sc/gatekeeper/templates/gatekeeper-audit-deployment.yaml",
+      "drift_chartpath": "open-policy-agent-gatekeeper/gatekeeper",
+      "drift_tagsourcetype": "chart.yaml"
     },
     {
       "image_property": "gatekeeper.preInstallCRDs",
       "helmfile_selector": "app=gatekeeper",
       "container_name": "crds-upgrade",
-      "template_file": "sc/gatekeeper/templates/upgrade-crds-hook.yaml"
+      "template_file": "sc/gatekeeper/templates/upgrade-crds-hook.yaml",
+      "drift_chartpath": "open-policy-agent-gatekeeper/gatekeeper",
+      "drift_tagsourcetype": "values.yaml",
+      "drift_tagpath": ".preInstall.crdRepository.image.tag"
     },
     {
       "image_property": "gatekeeper.postInstallLabelNamespace",
       "helmfile_selector": "app=gatekeeper",
       "container_name": "kubectl-label",
-      "template_file": "sc/gatekeeper/templates/namespace-post-install.yaml"
+      "template_file": "sc/gatekeeper/templates/namespace-post-install.yaml",
+      "drift_chartpath": "open-policy-agent-gatekeeper/gatekeeper",
+      "drift_tagsourcetype": "values.yaml",
+      "drift_tagpath": ".postInstall.labelNamespace.image.tag"
     },
     {
       "image_property": "gatekeeper.kubectl",
@@ -156,47 +204,77 @@
       "container_name": "gpu-operator",
       "template_file": "sc/gpu-operator/templates/operator.yaml"
     },
-    {
+     {
       "image_property": "harbor.core",
       "helmfile_selector": "app=harbor",
       "container_name": "core",
-      "template_file": "sc/harbor/templates/core/core-dpl.yaml"
+      "template_file": "sc/harbor/templates/core/core-dpl.yaml",
+      "drift_chartpath": "goharbor/harbor",
+      "drift_tagsourcetype": "values.yaml",
+      "drift_tagpath": ".core.image.tag"
     },
     {
       "image_property": "harbor.exporter",
       "helmfile_selector": "app=harbor",
       "container_name": "exporter",
-      "template_file": "sc/harbor/templates/exporter/exporter-dpl.yaml"
+      "template_file": "sc/harbor/templates/exporter/exporter-dpl.yaml",
+      "drift_chartpath": "goharbor/harbor",
+      "drift_tagsourcetype": "values.yaml",
+      "drift_tagpath": ".exporter.image.tag"
+    },
+    {
+      "image_property": "harbor.portal",
+      "helmfile_selector": "app=harbor",
+      "container_name": "portal",
+      "template_file": "sc/harbor/templates/portal/deployment.yaml",
+      "drift_chartpath": "goharbor/harbor",
+      "drift_tagsourcetype": "values.yaml",
+      "drift_tagpath": ".portal.image.tag"
     },
     {
       "image_property": "harbor.jobservice",
       "helmfile_selector": "app=harbor",
       "container_name": "jobservice",
-      "template_file": "sc/harbor/templates/jobservice/jobservice-dpl.yaml"
+      "template_file": "sc/harbor/templates/jobservice/jobservice-dpl.yaml",
+      "drift_chartpath": "goharbor/harbor",
+      "drift_tagsourcetype": "values.yaml",
+      "drift_tagpath": ".jobservice.image.tag"
     },
     {
       "image_property": "harbor.registry",
       "helmfile_selector": "app=harbor",
       "container_name": "registry",
-      "template_file": "sc/harbor/templates/registry/registry-dpl.yaml"
+      "template_file": "sc/harbor/templates/registry/registry-dpl.yaml",
+      "drift_chartpath": "goharbor/harbor",
+      "drift_tagsourcetype": "values.yaml",
+      "drift_tagpath": ".registry.registry.image.tag"
     },
     {
       "image_property": "harbor.registryController",
       "helmfile_selector": "app=harbor",
       "container_name": "registryctl",
-      "template_file": "sc/harbor/templates/registry/registry-dpl.yaml"
+      "template_file": "sc/harbor/templates/registry/registry-dpl.yaml",
+      "drift_chartpath": "goharbor/harbor",
+      "drift_tagsourcetype": "values.yaml",
+      "drift_tagpath": ".registry.controller.image.tag"
     },
     {
       "image_property": "harbor.database",
       "helmfile_selector": "app=harbor",
       "container_name": "database",
-      "template_file": "sc/harbor/templates/database/database-ss.yaml"
+      "template_file": "sc/harbor/templates/database/database-ss.yaml",
+      "drift_chartpath": "goharbor/harbor",
+      "drift_tagsourcetype": "values.yaml",
+      "drift_tagpath": ".database.internal.image.tag"
     },
     {
       "image_property": "harbor.redis",
       "helmfile_selector": "app=harbor",
       "container_name": "redis",
-      "template_file": "sc/harbor/templates/redis/statefulset.yaml"
+      "template_file": "sc/harbor/templates/redis/statefulset.yaml",
+      "drift_chartpath": "goharbor/harbor",
+      "drift_tagsourcetype": "values.yaml",
+      "drift_tagpath": ".redis.internal.image.tag"
     },
     {
       "image_property": "harbor.trivyAdapter",
@@ -232,19 +310,25 @@
       "image_property": "kured.image",
       "helmfile_selector": "app=kured",
       "container_name": "kured",
-      "template_file": "sc/kured/templates/daemonset.yaml"
+      "template_file": "sc/kured/templates/daemonset.yaml",
+      "drift_chartpath": "kubereboot/kured",
+      "drift_tagsourcetype": "chart.yaml"
     },
     {
       "image_property": "kyverno.main",
       "helmfile_selector": "app=kyverno",
       "container_name": "kyverno",
-      "template_file": "sc/kyverno/templates/admission-controller/deployment.yaml"
+      "template_file": "sc/kyverno/templates/admission-controller/deployment.yaml",
+      "drift_chartpath": "kyverno/kyverno",
+      "drift_tagsourcetype": "chart.yaml"
     },
     {
       "image_property": "kyverno.init",
       "helmfile_selector": "app=kyverno",
       "container_name": "kyverno-pre",
-      "template_file": "sc/kyverno/templates/admission-controller/deployment.yaml"
+      "template_file": "sc/kyverno/templates/admission-controller/deployment.yaml",
+      "drift_chartpath": "kyverno/kyverno",
+      "drift_tagsourcetype": "chart.yaml"
     },
     {
       "image_property": "kyverno.webhooksCleanup",
@@ -268,13 +352,17 @@
       "image_property": "opensearch.image",
       "helmfile_selector": "app=opensearch",
       "container_name": "opensearch",
-      "template_file": "sc/opensearch/templates/statefulset.yaml"
+      "template_file": "sc/opensearch/templates/statefulset.yaml",
+      "drift_chartpath": "opensearch-project/opensearch",
+      "drift_tagsourcetype": "chart.yaml"
     },
     {
       "image_property": "opensearch.dashboards",
       "helmfile_selector": "app=opensearch",
       "container_name": "dashboards",
-      "template_file": "sc/opensearch-dashboards/templates/deployment.yaml"
+      "template_file": "sc/opensearch-dashboards/templates/deployment.yaml",
+      "drift_chartpath": "opensearch-project/opensearch-dashboards",
+      "drift_tagsourcetype": "chart.yaml"
     },
     {
       "image_property": "opensearch.configurerJob",
@@ -292,7 +380,9 @@
       "image_property": "opensearch.exporter",
       "helmfile_selector": "app=opensearch",
       "container_name": "exporter",
-      "template_file": "sc/prometheus-elasticsearch-exporter/templates/deployment.yaml"
+      "template_file": "sc/prometheus-elasticsearch-exporter/templates/deployment.yaml",
+      "drift_chartpath": "prometheus-community/prometheus-elasticsearch-exporter",
+      "drift_tagsourcetype": "chart.yaml"
     },
     {
       "image_property": "rclone.image",
@@ -328,13 +418,18 @@
       "image_property": "monitoring.configReloader",
       "helmfile_selector": "app=thanos",
       "container_name": "config-reloader",
-      "template_file": "sc/thanos/templates/ruler/statefulset.yaml"
+      "template_file": "sc/thanos/templates/ruler/statefulset.yaml",
+      "drift_chartpath": "prometheus-community/kube-prometheus-stack",
+      "drift_tagsourcetype": "chart.yaml"
     },
     {
       "image_property": "velero.image",
       "helmfile_selector": "app=velero",
       "container_name": "node-agent",
-      "template_file": "sc/velero/templates/node-agent-daemonset.yaml"
+      "template_file": "sc/velero/templates/node-agent-daemonset.yaml",
+      "drift_chartpath": "vmware-tanzu/velero",
+      "drift_tagsourcetype": "values.yaml",
+      "drift_tagpath": ".image.tag"
     },
     {
       "image_property": "velero.pluginAws",
@@ -358,7 +453,9 @@
       "image_property": "monitoring.nodeExporter",
       "helmfile_selector": "app=prometheus",
       "container_name": "node-exporter",
-      "template_file": "sc/kube-prometheus-stack/charts/prometheus-node-exporter/templates/daemonset.yaml"
+      "template_file": "sc/kube-prometheus-stack/charts/prometheus-node-exporter/templates/daemonset.yaml",
+      "drift_chartpath": "prometheus-community/kube-prometheus-stack/charts/prometheus-node-exporter",
+      "drift_tagsourcetype": "chart.yaml"
     },
     {
       "image_property": "monitoring.nodeExporter",
@@ -370,7 +467,9 @@
       "image_property": "monitoring.kubeStateMetrics",
       "helmfile_selector": "app=prometheus",
       "container_name": "kube-state-metrics",
-      "template_file": "sc/kube-prometheus-stack/charts/kube-state-metrics/templates/deployment.yaml"
+      "template_file": "sc/kube-prometheus-stack/charts/kube-state-metrics/templates/deployment.yaml",
+      "drift_chartpath": "prometheus-community/kube-prometheus-stack/charts/kube-state-metrics",
+      "drift_tagsourcetype": "chart.yaml"
     },
     {
       "image_property": "monitoring.kubeStateMetrics",
@@ -382,7 +481,9 @@
       "image_property": "monitoring.prometheusOperator",
       "helmfile_selector": "app=prometheus",
       "container_name": "kube-prometheus-stack",
-      "template_file": "sc/kube-prometheus-stack/templates/prometheus-operator/deployment.yaml"
+      "template_file": "sc/kube-prometheus-stack/templates/prometheus-operator/deployment.yaml",
+      "drift_chartpath": "prometheus-community/kube-prometheus-stack",
+      "drift_tagsourcetype": "chart.yaml"
     },
     {
       "image_property": "monitoring.prometheusOperator",
@@ -400,19 +501,26 @@
       "image_property": "monitoring.grafana",
       "helmfile_selector": "app=grafana",
       "container_name": "grafana",
-      "template_file": "sc/grafana/templates/deployment.yaml"
+      "template_file": "sc/grafana/templates/deployment.yaml",
+      "drift_chartpath": "grafana/grafana",
+      "drift_tagsourcetype": "chart.yaml"
     },
     {
       "image_property": "monitoring.grafanaSidecar",
       "helmfile_selector": "app=grafana",
       "container_name": "grafana-sc-dashboard",
-      "template_file": "sc/grafana/templates/deployment.yaml"
+      "template_file": "sc/grafana/templates/deployment.yaml",
+      "drift_chartpath": "grafana/grafana",
+      "drift_tagsourcetype": "values.yaml",
+      "drift_tagpath": ".sidecar.image.tag"
     },
     {
       "image_property": "monitoring.blackboxExporter",
       "helmfile_selector": "app=prometheus",
       "container_name": "blackbox-exporter",
-      "template_file": "sc/prometheus-blackbox-exporter/templates/deployment.yaml"
+      "template_file": "sc/prometheus-blackbox-exporter/templates/deployment.yaml",
+      "drift_chartpath": "prometheus-community/prometheus-blackbox-exporter",
+      "drift_tagsourcetype": "chart.yaml"
     },
     {
       "image_property": "monitoring.blackboxExporter",
@@ -436,13 +544,17 @@
       "image_property": "monitoring.metricsServer",
       "helmfile_selector": "app=metrics-server",
       "container_name": "metrics-server",
-      "template_file": "sc/metrics-server/templates/deployment.yaml"
+      "template_file": "sc/metrics-server/templates/deployment.yaml",
+      "drift_chartpath": "kubernetes-metrics-server/metrics-server",
+      "drift_tagsourcetype": "chart.yaml"
     },
     {
       "image_property": "monitoring.trivyOperator",
       "helmfile_selector": "app=trivy-operator",
       "container_name": "trivy-operator",
-      "template_file": "sc/trivy-operator/templates/deployment.yaml"
+      "template_file": "sc/trivy-operator/templates/deployment.yaml",
+      "drift_chartpath": "aquasecurity/trivy-operator",
+      "drift_tagsourcetype": "chart.yaml"
     }
   ]
 }
