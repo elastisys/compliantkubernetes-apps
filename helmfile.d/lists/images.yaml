@@ -19,7 +19,7 @@ images:
       go-templating: xpkg.crossplane.io/crossplane-contrib/function-go-templating:v0.11.0
       patch-and-transform: xpkg.crossplane.io/crossplane-contrib/function-patch-and-transform:v0.9.0
     configurations:
-      module-node-local-dns: harbor.long-running.dev-ck8s.com/welkin/module-node-local-dns:v0.2.0
+      module-node-local-dns: ghcr.io/elastisys/module-node-local-dns:v0.2.0
   dex:
     image: ghcr.io/dexidp/dex:v2.40.0
   externalDns:
