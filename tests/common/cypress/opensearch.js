@@ -22,7 +22,7 @@ Cypress.Commands.add('opensearchTestIndexPattern', (indexPattern) => {
   cy.get('nav').contains('li', 'discover', { matchCase: false }).click()
 
   // select index pattern
-  cy.contains('div', 'kubeaudit*').click()
+  cy.get('[data-test-subj="comboBoxInput"]').click()
   cy.contains('button', indexPattern).click()
 
   cy.contains('no results match your search criteria', { matchCase: false }).should('not.exist')
