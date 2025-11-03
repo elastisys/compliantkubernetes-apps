@@ -21,10 +21,28 @@ if [ ! -f "${IMAGE_MAP_FILE}" ]; then
   exit 1
 fi
 
+compare_versions() {
+  local local_v="${1}"
+  local up_v="${2}"
+
+  if [[ "${local_v}" == "${up_v}" ]]; then
+    return 0
+  fi
+
+  local first
+  first="$(printf '%s\n' "${local_v}" "${up_v}" | sort -V | head -n1)"
+
+  if [[ "${first}" == "${up_v}" ]]; then
+    return 1
+  else
+    return 2
+  fi
+}
+
 update_images_yaml_tag() {
-  local key="{$1}"
-  local current_ref="{$2}"
-  local new_tag="{$3}"
+  local key="${1}"
+  local current_ref="${2}"
+  local new_tag="${3}"
 
   local repo="${current_ref%:*}"
   local updated="${repo}:${new_tag}"
@@ -148,16 +166,40 @@ for MAP_OBJECT in "${_ALL_MAP_OBJECTS[@]}"; do
   UPSTREAM_TAG_NORMALIZED="${RAW_UPSTREAM_TAG#[vV]}"
 
   if [ "${LOCAL_TAG_NORMALIZED}" != "${UPSTREAM_TAG_NORMALIZED}" ]; then
-    echo "DRIFT DETECTED for ${KEY} (Chart Path: ${CHART_PATH})"
-    echo "  Local version(images.yaml):    ${LOCAL_TAG_NORMALIZED}"
-    echo "  Upstream version: ${RAW_UPSTREAM_TAG} | Source: (${SOURCE_FILE_INFO})"
-    read -r -p "Update images.yaml for '${KEY}' to upstream tag '${RAW_UPSTREAM_TAG}'? [y/N]: " answer
-    case "${answer}" in
-    [yY] | [yY][eE][sS])
-      update_images_yaml_tag "${KEY}" "${LOCAL_FULL_IMAGE}" "${RAW_UPSTREAM_TAG}"
+    if compare_versions "${LOCAL_TAG_NORMALIZED}" "${UPSTREAM_TAG_NORMALIZED}"; then
+      rc=0
+    else
+      rc=$?
+    fi
+    case "${rc}" in
+    1)
+      # local > upstream: probably intentional (CVE/bugfix)
+      echo "✔ NOTICE: ${KEY} — local is newer (${LOCAL_TAG_NORMALIZED}) than upstream (${UPSTREAM_TAG_NORMALIZED})."
+      echo "    Likely intentional (e.g., CVE or bug fix). No action needed."
+      echo "    Local (images.yaml): ${LOCAL_TAG_RAW}"
+      echo "    Upstream: ${RAW_UPSTREAM_TAG} | Source: (${SOURCE_FILE_INFO})"
+      ;;
+    2)
+      # upstream > local: recommend updating
+      echo "❌ DRIFT:  ${KEY} — local is older (${LOCAL_TAG_NORMALIZED}) than upstream (${UPSTREAM_TAG_NORMALIZED})."
+      echo "      Consider updating to match upstream."
+      echo "      Local (images.yaml): ${LOCAL_TAG_RAW}"
+      echo "      Upstream: ${RAW_UPSTREAM_TAG} | Source: (${SOURCE_FILE_INFO})"
+      read -r -p "Update images.yaml for '${KEY}' to upstream tag '${RAW_UPSTREAM_TAG}'? [y/N]: " answer
+      case "${answer}" in
+      [yY] | [yY][eE][sS])
+        update_images_yaml_tag "${KEY}" "${LOCAL_FULL_IMAGE}" "${RAW_UPSTREAM_TAG}"
+        ;;
+      *)
+        echo "Skipped updating '${KEY}'."
+        ;;
+      esac
       ;;
     *)
-      echo "Skipped updating '${KEY}'."
+      # fallback
+      echo "❌ DRIFT DETECTED for ${KEY} (Chart Path: ${CHART_PATH})"
+      echo "      Local (images.yaml): ${LOCAL_TAG_RAW}"
+      echo "      Upstream: ${RAW_UPSTREAM_TAG} | Source: (${SOURCE_FILE_INFO})"
       ;;
     esac
   else
