@@ -22,17 +22,12 @@ if [ ! -f "${IMAGE_MAP_FILE}" ]; then
 fi
 
 compare_versions() {
-  local local_v="${1}"
-  local up_v="${2}"
 
-  if [[ "${local_v}" == "${up_v}" ]]; then
+  local local_v="${1#[vV]}"
+  local up_v="${2#[vV]}"
+  if dpkg --compare-versions "${local_v}" eq "${up_v}"; then
     return 0
-  fi
-
-  local first
-  first="$(printf '%s\n' "${local_v}" "${up_v}" | sort -V | head -n1)"
-
-  if [[ "${first}" == "${up_v}" ]]; then
+  elif dpkg --compare-versions "${local_v}" gt "${up_v}"; then
     return 1
   else
     return 2
