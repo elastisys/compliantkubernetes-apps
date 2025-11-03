@@ -291,8 +291,8 @@ These are the general steps to do when replacing old Helm chart(s) with a Module
 1. Update the stack in `helmfile.d/stacks/$STACK.yaml.gotmpl`
 
     ```diff
-    + chart: charts/old-chart
-    - chart: charts/modules/$NAME
+    - chart: charts/old-chart
+    + chart: charts/modules/$NAME
     ```
 
     ```diff
