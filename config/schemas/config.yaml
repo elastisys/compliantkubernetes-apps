@@ -3573,6 +3573,18 @@ properties:
             examples:
               - - namespace: example-namespace
                   name: example-controller
+      additionalValidationResources:
+        title: Additional Validation Resources
+        description: Allow Gatekeeper the ability to look at and use Gatekeeper constraints on specified additional resources.
+        type: array
+      additionalValidationDeleteResources:
+        title: Additional Validation Delete Resources
+        description: Allow Gatekeeper the ability to look at and use Gatekeeper constraints with the less used DELETE operation, on specified additional resources.
+        type: array
+      additionalMutationResources:
+        title: Additional Mutation Resources
+        description: Allow Gatekeeper the ability to look at and use Gatekeeper mutations on specified additional resources.
+        type: array
   kured:
     additionalProperties: false
     title: Kured Config
