@@ -110,6 +110,15 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
         xargs -L1 kubectl patch svc -p '{"spec":{"ipFamilyPolicy":"PreferDualStack","ipFamilies":["IPv4","IPv6"]}}' --type=merge -n
     ```
 
+> [!caution]
+> v0.48.0 and v0.48.1 both have a known bug related to the main migration apply snippet causing it to skip `dev-rbac` and `prometheus` releases for the workload cluster.
+> After upgrade apply run:
+>
+> ```sh
+> ./bin/ck8s ops helmfile wc -lapp=dev-rbac -lapp=prometheus diff
+> ./bin/ck8s ops helmfile wc -lapp=dev-rbac -lapp=prometheus apply
+> ```
+
 ## Manual method
 
 ### Prepare upgrade - _non-disruptive_
