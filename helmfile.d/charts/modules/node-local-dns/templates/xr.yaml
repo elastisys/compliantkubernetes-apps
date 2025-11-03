@@ -1,7 +1,6 @@
 apiVersion: module.elastisys.com/v1alpha1
 kind: NodeLocalDNS
 metadata:
-  namespace: kube-system
   name: node-local-dns
 spec:
   providerConfigs:
