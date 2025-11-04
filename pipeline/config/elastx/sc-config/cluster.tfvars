@@ -86,9 +86,9 @@ k8s_nodes = {
     "floating_ip" = true
   },
   "worker-4" = {
-  "az"          = "sto2"
-  "flavor"      = "60002ff6-980e-4424-b125-e9b6794043e9" #2C-8GB-80GB
-  "floating_ip" = true
+    "az"          = "sto2"
+    "flavor"      = "60002ff6-980e-4424-b125-e9b6794043e9" #2C-8GB-80GB
+    "floating_ip" = true
   }
 }
 
