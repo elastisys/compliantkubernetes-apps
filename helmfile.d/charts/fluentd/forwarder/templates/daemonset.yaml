@@ -187,9 +187,9 @@ spec:
         - name: varlibdockercontainers
           mountPath: {{ .Values.hostLogDir.dockerContainers }}
           readOnly: true
-        - name: libsystemddir
-          mountPath: {{ .Values.hostLogDir.libSystemdDir }}
-          readOnly: true
+#        - name: libsystemddir
+#          mountPath: {{ .Values.hostLogDir.libSystemdDir }}
+#          readOnly: true
         - name: config-volume
           mountPath: {{ .Values.fluentConfDir }}
 {{- if .Values.extraVolumeMounts }}
@@ -225,9 +225,9 @@ spec:
         hostPath:
           path: {{ .Values.hostLogDir.dockerContainers }}
       # It is needed to copy systemd library to decompress journals
-      - name: libsystemddir
-        hostPath:
-          path: {{ .Values.hostLogDir.libSystemdDir }}
+#      - name: libsystemddir
+#        hostPath:
+#          path: {{ .Values.hostLogDir.libSystemdDir }}
       - name: config-volume
         configMap:
           name: {{ include "fluentd-elasticsearch.fullname" . }}

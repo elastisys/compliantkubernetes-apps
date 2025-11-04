@@ -68,17 +68,17 @@ spec:
             name: metrics
           securityContext:
             privileged: true
-          volumeMounts:
-          - mountPath: /calico-secrets
-            name: etcd-certs
+          #volumeMounts: # seems to be empty on my dev cluster and doesn't work with Talos because read-only /etc
+          #- mountPath: /calico-secrets
+          #  name: etcd-certs
           resources:
 {{ toYaml .Values.resources | indent 12 }}
       tolerations:
 {{ toYaml .Values.tolerations | indent 8 }}
       hostNetwork: true
-      volumes:
-      - hostPath:
-          path: /etc/calico/certs
-          type: ""
-        name: etcd-certs
+      #volumes: # seems to be empty on my dev cluster and doesn't work with Talos because read-only /etc
+      #- hostPath:
+      #    path: /etc/calico/certs
+      #    type: ""
+      #  name: etcd-certs
       serviceAccount: "calico-node"

@@ -743,12 +743,12 @@ nodeCollector:
     - name: var-lib-kube-controller-manager
       mountPath: /var/lib/kube-controller-manager
       readOnly: true
-    - name: etc-systemd
-      mountPath: /etc/systemd
-      readOnly: true
-    - name: lib-systemd
-      mountPath: /lib/systemd/
-      readOnly: true
+#    - name: etc-systemd
+#      mountPath: /etc/systemd
+#      readOnly: true
+#    - name: lib-systemd
+#      mountPath: /lib/systemd/
+#      readOnly: true
     - name: etc-kubernetes
       mountPath: /etc/kubernetes
       readOnly: true
@@ -770,12 +770,12 @@ nodeCollector:
     - name: var-lib-kube-controller-manager
       hostPath:
         path: /var/lib/kube-controller-manager
-    - name: etc-systemd
-      hostPath:
-        path: /etc/systemd
-    - name: lib-systemd
-      hostPath:
-        path: /lib/systemd
+#    - name: etc-systemd
+#      hostPath:
+#        path: /etc/systemd
+#    - name: lib-systemd
+#      hostPath:
+#        path: /lib/systemd
     - name: etc-kubernetes
       hostPath:
         path: /etc/kubernetes
