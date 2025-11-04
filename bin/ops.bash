@@ -23,11 +23,12 @@ gatekeeper_cleanup() {
   with_kubeconfig "${kubeconfig}" bash -ceu '
     echo "Running Gatekeeper Cleanup Resources"
 
-    kubectl -n '"$ns"' delete job '"$rel"'-wait --ignore-not-found || true
-    kubectl -n '"$ns"' delete configmap '"$rel"'-wait --ignore-not-found || true
-    kubectl -n '"$ns"' delete serviceaccount '"$rel"'-hook --ignore-not-found || true
-    kubectl delete clusterrole '"$rel"'-wait --ignore-not-found || true
-    kubectl delete clusterrolebinding '"$rel"'-wait --ignore-not-found || true
+    kubectl -n '"${ns}"' delete job '"${rel}"'-wait --ignore-not-found
+    kubectl -n '"${ns}"' delete configmap '"${rel}"'-wait --ignore-not-found
+    kubectl -n '"${ns}"' delete serviceaccount '"${rel}"' --ignore-not-found
+    kubectl -n '"${ns}"' delete serviceaccount '"${rel}"'-hook --ignore-not-found
+    kubectl delete clusterrole '"${rel}"'-wait --ignore-not-found
+    kubectl delete clusterrolebinding '"${rel}"'-wait --ignore-not-found
   '
 }
 
