@@ -113,20 +113,21 @@ networkPolicies:
     wcNodes:
       ips:
         - 0.0.0.0/0
-  monitoring:
-    enabled: false
-  fluentd:
-    enabled: false
-  alertmanager:
-    enabled: false
-  ingressNginx:
-    enabled: false
-  gatekeeper:
-    enabled: false
+  # monitoring:
+  #   enabled: false
+  # fluentd:
+  #   enabled: false
+  # alertmanager:
+  #   enabled: false
+  # ingressNginx:
+  #   enabled: false
+  # gatekeeper:
+  #   enabled: false
 user:
   namespaces:
     - production
     - staging
   adminUsers:
     - admin@example.com
-  adminGroups: []
+  adminGroups:
+    - admin@example.com

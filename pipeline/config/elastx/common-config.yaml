@@ -10,9 +10,10 @@ issuers:
     staging:
       email: letsencrypt@elastisys.com
 clusterAdmin:
-  users: []
+  users:
+    - admin@example.com
   groups:
-    - self-managed@elastisys.com
+    - admin@example.com
 opa:
   imageRegistry:
     URL:
@@ -52,45 +53,45 @@ networkPolicies:
       ips:
         - 0.0.0.0/0
   coredns:
-    enabled: false
+    # enabled: false
     externalDns:
       ips:
         - 0.0.0.0/0
   kured:
-    enabled: false
+    # enabled: false
     notificationSlack:
       ips:
         - 0.0.0.0/0
   falco:
-    enabled: false
+    # enabled: false
     plugins:
       ips:
         - 0.0.0.0/0
   alertmanager:
-    enabled: false
+    # enabled: false
     alertReceivers:
       ips:
         - 0.0.0.0/0
-  velero:
-    enabled: false
-  certManager:
-    enabled: false
-  ingressNginx:
-    enabled: false
-  externalDns:
-    enabled: false
-  gatekeeper:
-    enabled: false
-  kubeSystem:
-    enabled: false
-    openstack:
-      enabled: false
-  kyverno:
-    enabled: false
-  dnsAutoscaler:
-    enabled: false
-  opensearch:
-    enabled: false
+  # velero:
+  #   enabled: false
+  # certManager:
+  #   enabled: false
+  # ingressNginx:
+  #   enabled: false
+  # externalDns:
+  #   enabled: false
+  # gatekeeper:
+  #   enabled: false
+  # kubeSystem:
+  #   enabled: false
+  #   openstack:
+  #     enabled: false
+  # kyverno:
+  #   enabled: false
+  # dnsAutoscaler:
+  #   enabled: false
+  # opensearch:
+  #   enabled: false
 trivy:
   nodeCollector:
     tolerations:

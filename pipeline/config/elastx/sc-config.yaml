@@ -5,8 +5,9 @@ grafana:
     oidc:
       allowedDomains:
         - elastisys.com
+        - example.com
       userGroups:
-        grafanaAdmin: self-managed@elastisys.com
+        grafanaAdmin: admin@example.com
   user:
     oidc:
       allowedDomains:
@@ -14,7 +15,7 @@ grafana:
         - example.com
       skipRoleSync: true
       userGroups:
-        grafanaAdmin: self-managed@elastisys.com
+        grafanaAdmin: admin@example.com
 opensearch:
   extraRoleMappings:
     - mapping_name: kibana_user
@@ -39,9 +40,11 @@ opensearch:
           - admin@example.com
     - mapping_name: all_access
       definition:
-        users: []
+        users:
+          - admin@example.com
+          - dev@example.com
         backend_roles:
-          - self-managed@elastisys.com
+          - admin@example.com
 alerts:
   opsGenieHeartbeat:
     name: pipeline-elastx
@@ -55,7 +58,7 @@ alerts:
       ThanosCompactHalted: https://github.com/elastisys/welkin-runbooks/blob/main/ops-guide/thanos/alerts/README.md
 harbor:
   oidc:
-    adminGroupName: self-managed@elastisys.com
+    adminGroupName: admin@example.com
 thanos:
   objectStorage:
     type: s3
@@ -69,7 +72,7 @@ welcomingDashboard:
   extraTextOpensearch: Support\\n\\nDid not find the answers you were looking for in the docs? Please contact us via [Jira Service Desk](https://elastisys.atlassian.net/servicedesk/customer/portals)\\n\\nPhone +4610-405 42 12
 networkPolicies:
   harbor:
-    enabled: false
+    # enabled: false
     jobservice:
       ips:
         - 0.0.0.0/0
@@ -80,29 +83,29 @@ networkPolicies:
       ips:
         - 0.0.0.0/0
   monitoring:
-    enabled: false
+    # enabled: false
     grafana:
       externalDashboardProvider:
         ips:
           - 0.0.0.0/0
   opensearch:
-    enabled: false
+    # enabled: false
     plugins:
       ips:
         - 0.0.0.0/0
   dex:
-    enabled: false
+    # enabled: false
     connectors:
       ips:
         - 0.0.0.0/0
-  thanos:
-    enabled: false
-  fluentd:
-    enabled: false
-  s3Exporter:
-    enabled: false
+  # thanos:
+  #   enabled: false
+  # fluentd:
+  #   enabled: false
+  # s3Exporter:
+  #   enabled: false
   tektonPipelines:
-    enabled: false
+    # enabled: false
     pipeline:
       start-job:
         podSelectorLabels:
