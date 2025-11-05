@@ -3,6 +3,13 @@ clusterRoles:
   strimzi-cluster-operator-global:
     rules:
     - apiGroups:
+        - "rbac.authorization.k8s.io"
+      resources:
+      -  clusterrolebindings
+      verbs:
+        - get
+        - list
+    - apiGroups:
         - "storage.k8s.io"
       resources:
         - storageclasses
@@ -113,6 +120,13 @@ clusterRoles:
         - update
   strimzi-admin:
     rules:
+    - apiGroups:
+        - "rbac.authorization.k8s.io"
+      resources:
+        -  clusterrolebindings
+      verbs:
+        - get
+        - list
     - apiGroups:
         - "kafka.strimzi.io"
       resources:
