@@ -1,5 +1,8 @@
 name: End-to-end
 
+# on:
+#   schedule:
+#     - cron: "0 4 * * *"
 on:
   workflow_dispatch:
     inputs:
@@ -10,6 +13,7 @@ on:
 
 jobs:
   build-apps-image:
+    environment: test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout compliantkubernetes-apps
@@ -54,7 +58,7 @@ jobs:
         cluster:
           - sc
           - wc
-    environment: ${{ inputs.environment }}
+    environment: test
 
     env:
       CK8S_CONFIG_PATH: ./apps/pipeline/config/elastx
@@ -68,6 +72,10 @@ jobs:
       OS_REGION_NAME: ${{ vars.OS_REGION_NAME }}
       OS_INTERFACE: ${{ vars.OS_INTERFACE }}
       OS_IDENTITY_API_VERSION: ${{ vars.OS_IDENTITY_API_VERSION }}
+      CK8S_CLOUD_PROVIDER: elastx
+      CK8S_ENVIRONMENT_NAME: pipeline-elastx
+      CK8S_FLAVOR: prod
+      CK8S_K8S_INSTALLER: kubespray
 
     steps:
       - name: Checkout code
@@ -95,6 +103,7 @@ jobs:
           ref: main
           path: apps
           fetch-depth: 0 # Fetches all tags
+
       - name: Generate and insert public SSH key
         run: |
           ssh-keygen -q -t rsa -N "" -f apps/pipeline/config/elastx/id_rsa
@@ -317,7 +326,7 @@ jobs:
         with:
           condition-type: "artifact"
           artifact-name: compliantkubernetes-apps-pipeline-config
-          timeout-seconds: 1200
+          timeout-minutes: 20
         id: wait-configs
 
       - name: Download configs
@@ -336,13 +345,6 @@ jobs:
           mv kube_config_wc.yaml ./.state/kube_config_wc.yaml
         id: unpack-configs
 
-      # - name: Creat admin namespaces
-      #   run: ./apps/bin/ck8s ops helmfile ${{ matrix.cluster }} -l app=admin-namespaces apply
-
-      # - name: Creat dev namespaces
-      #   if: matrix.cluster == 'wc'
-      #   run: ./apps/bin/ck8s ops helmfile ${{ matrix.cluster }} -l app=dev-namespaces apply
-
       - name: Create Google SA secret for dex
         if: matrix.cluster == 'sc'
         env:
@@ -350,14 +352,6 @@ jobs:
         run: |
           yq -i ".data[\"sa.json\"] = \"$GOOGLE_SA\"" "${{ env.CK8S_CONFIG_PATH }}/dex-google-group-claim/secret/google-sa-secret.yml"
           sops --config "${{ env.CK8S_CONFIG_PATH }}/.sops.yaml" -e -i "${{ env.CK8S_CONFIG_PATH }}/dex-google-group-claim/secret/google-sa-secret.yml"
-
-      # - name: Install gatekeeper and Nginx ingress controller
-      #   run: |
-      #     ./apps/bin/ck8s ops helmfile ${{ matrix.cluster }} -l name=kube-prometheus-stack apply
-      #     ./apps/bin/ck8s ops helmfile ${{ matrix.cluster }} -l app=gatekeeper apply
-      #     ./apps/bin/ck8s ops helmfile ${{ matrix.cluster }} -l app=ingress-nginx apply
-      #     ./apps/bin/ck8s ops kubectl ${{ matrix.cluster }} -n ingress-nginx wait --for=jsonpath='{.status.loadBalancer.ingress}' service/ingress-nginx-controller
-      #   id: install-ingress
 
       - name: Create QA configs
         if: matrix.cluster == 'sc'
@@ -372,16 +366,20 @@ jobs:
           GCP_CLIENT_ID: ${{ secrets.GCP_CLIENT_ID }}
           GCP_CLIENT_SECRET: ${{ secrets.GCP_CLIENT_SECRET }}
         run: |
+          ls
           yq -i ".dex.gcp.clientID = \"${GCP_CLIENT_ID}\"" qa-config.json
           yq -i ".dex.gcp.clientSecret = \"${GCP_CLIENT_SECRET}\"" qa-config.json
-          yq -i ".dnsProvider.aws.secrets.accessKey = \"${AWS_ACCESS_KEY_ID}\" qa-config.json
-          yq -i ".dnsProvider.aws.secrets.secretKey = \"${AWS_SECRET_ACCESS_KEY}\" qa-config.json
-          yq -i ".objectStorage.secrets.s3.accessKey = \"${S3_ACCESS_KEY}\" qa-config.json
-          yq -i ".objectStorage.secrets.s3.secretKey = \"${S3_SECRET_KEY}\" qa-config.json
+          yq -i ".dnsProvider.aws.secrets.accessKey = \"${AWS_ACCESS_KEY_ID}\"" qa-config.json
+          yq -i ".dnsProvider.aws.secrets.secretKey = \"${AWS_SECRET_ACCESS_KEY}\"" qa-config.json
+          yq -i ".objectStorage.secrets.s3.accessKey = \"${S3_ACCESS_KEY}\"" qa-config.json
+          yq -i ".objectStorage.secrets.s3.secretKey = \"${S3_SECRET_KEY}\"" qa-config.json
 
       - name: Install apps
         if: steps.qa-config.outcome == 'success' && matrix.cluster == 'sc'
-        run: ./scripts/qa/install_apps.py -c ${{ env.CK8S_CONFIG_PATH }}/qa-config.json
+        run: |
+          git config --global --add safe.directory /__w/compliantkubernetes-apps/compliantkubernetes-apps
+          git config --global --add safe.directory apps
+          ./scripts/qa/install_apps.py -c ${{ env.CK8S_CONFIG_PATH }}/qa-config.json
         id: install-apps
 
       - name: Notify apps installation complete
@@ -396,7 +394,7 @@ jobs:
         with:
           condition-type: "artifact"
           artifact-name: apps-installed
-          timeout-seconds: 1800
+          timeout-minutes: 40
 
       - name: Update Ingress DNS records
         run: |
@@ -419,42 +417,10 @@ jobs:
         with:
           args: route53 change-resource-record-sets --hosted-zone-id Z1001117397DAU71G3RN2 --change-batch file://apps/pipeline/config/elastx/dns/${{ matrix.cluster }}-ingress.json
 
-      # - name: Update ips
-      #   shell: bash
-      #   run: ./apps/bin/update-ips.bash ${{ matrix.cluster }} apply
-
-      # - name: Install apps
-      #   run: ./apps/pipeline/apply-${{ matrix.cluster }}.bash
-      #   shell: bash
-      #   id: install-apps
-
-      # - name: Signal that apps in service cluster are installed
-      #   if: steps.install-apps.outcome == 'success' &&  matrix.cluster  == 'sc'
-      #   uses: actions/upload-artifact@v5
-      #   with:
-      #     name: apps-service-done
-      #     path: /dev/null
-
-      # - name: Wait for service cluster to be ready
-      #   if: matrix.cluster == 'wc' && steps.install-apps.outcome != 'cancelled' && steps.install-apps.outcome != 'skipped'
-      #   uses: lexbritvin/wait-action@v1
-      #   with:
-      #     condition-type: "artifact"
-      #     artifact-name: apps-service-done
-      #     timeout-seconds: 1200
-      #   id: wc-wait-service-apps
-
-      # - name: Restart wc Fluentd
-      #   if: matrix.cluster == 'wc'
-      #   run: |
-      #     ./apps/bin/ck8s ops kubectl wc -n fluentd-system rollout restart daemonset fluentd-forwarder
-      #     ./apps/bin/ck8s ops kubectl wc -n fluentd-system rollout restart statefulset fluentd-aggregator
-
-      #   id: fluentd
-
       - name: Test apps in sc
         if: matrix.cluster == 'sc'
         continue-on-error: true
+        timeout-minutes: 15
         run: ./apps/bin/ck8s test ${{ matrix.cluster }} apps --logging-enabled
         env:
           PIPELINE: "true"
@@ -462,6 +428,7 @@ jobs:
 
       - name: Test apps in wc
         if: matrix.cluster == 'wc'
+        timeout-minutes: 15
         continue-on-error: true
         run: ./apps/bin/ck8s test ${{ matrix.cluster }} apps --logging-enabled
         env:
@@ -481,7 +448,7 @@ jobs:
         with:
           condition-type: "artifact"
           artifact-name: wc-apps-done
-          timeout-seconds: 1200
+          timeout-minutes: 20
         id: wait-wc
 
       - name: Run end-to-end tests
@@ -489,6 +456,22 @@ jobs:
         if: steps.wait-wc.outcome == 'success'
         id: e2e-test
         run: ./apps/pipeline/test/end-to-end.bash
+
+      - name: Signal that end-to-end test is finished
+        if: always() && matrix.cluster == 'sc'
+        uses: actions/upload-artifact@v5
+        with:
+          name: e2e-done
+          path: /dev/null
+
+      - name: Wait for end-to-end test to finish
+        if: always() && matrix.cluster == 'wc'
+        uses: lexbritvin/wait-action@v1
+        with:
+          condition-type: "artifact"
+          artifact-name: e2e-done
+          timeout-minutes: 60
+        id: wait-e2e
 
       - name: Upload logs
         if: always()
@@ -563,6 +546,7 @@ jobs:
         id: delete-buckets
 
   clean-apps-image:
+    environment: test
     needs: apps
     if: always()
     runs-on: ubuntu-latest
@@ -578,51 +562,51 @@ jobs:
           GITHUB_ACTOR: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  # alert:
-  #   runs-on: ubuntu-latest
-  #   needs: [clean-apps-image]
-  #   if: always() && github.ref == 'refs/heads/main' # Make sure this runs even if some jobs fail, and only on main
-  #   steps:
-  #     - id: get-sha
-  #       run: |
-  #         echo "sha=$( curl https://api.github.com/repos/elastisys/compliantkubernetes-apps/git/ref/heads/main | jq .object.sha | tr -d '"')" >> $GITHUB_OUTPUT
-  #     - id: get-sha-short
-  #       run: |
-  #         echo "sha=$( echo ${{ steps.get-sha.outputs.sha }} | cut -c -8)" >> $GITHUB_OUTPUT
-  #     - id: result
-  #       run: |
-  #         curl -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/jobs \
-  #         --header 'Authorization: token ${{ secrets.GITHUB_TOKEN }}' \
-  #         --header 'Accept: application/vnd.github.v3+json' > response.json
+  alert:
+    runs-on: ubuntu-latest
+    needs: [clean-apps-image]
+    if: always() && github.ref == 'refs/heads/main'
+    steps:
+      - id: get-sha
+        run: |
+          echo "sha=$( curl https://api.github.com/repos/elastisys/compliantkubernetes-apps/git/ref/heads/main | jq .object.sha | tr -d '"')" >> $GITHUB_OUTPUT
+      - id: get-sha-short
+        run: |
+          echo "sha=$( echo ${{ steps.get-sha.outputs.sha }} | cut -c -8)" >> $GITHUB_OUTPUT
+      - id: result
+        run: |
+          curl -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/jobs \
+          --header 'Authorization: token ${{ secrets.GITHUB_TOKEN }}' \
+          --header 'Accept: application/vnd.github.v3+json' > response.json
 
-  #         cat response.json | jq -r '.jobs[] | select(.conclusion=="failure") | .id' > jobs.failed
-  #         if [ -s jobs.failed ]
-  #         then
-  #           while read i
-  #           do
-  #             cat response.json | jq --arg i $i -r '[.jobs[] | select(.id=='$i') | "The JOB: ", .name, " failed at STEPS: ", ([(.steps[] | select(.conclusion=="failure") | .name)] | join("; "))] | join("")' >> steps.failed
-  #           done < jobs.failed
-  #           export RESULT="$(cat steps.failed)"
-  #         else
-  #           export RESULT="All good."
-  #         fi
-  #         RESULT="${RESULT//'%'/'%25'}"
-  #         RESULT="${RESULT//$'\n'/'%0A'}"
-  #         RESULT="${RESULT//$'\r'/'%0D'}"
-  #         echo "result=$(echo "$RESULT")" >> $GITHUB_OUTPUT
-  #     - uses: technote-space/workflow-conclusion-action@v1
-  #     - name: Send Slack alert
-  #       uses: elastisys/action-slack@v3
-  #       with:
-  #         status: custom
-  #         fields: repo,message,commit,author,action,workflow,job,took,ref
-  #         custom_payload: |
-  #           {
-  #             attachments: [{
-  #               color: `${process.env.WORKFLOW_CONCLUSION}` === 'success' ? 'good' : `${process.env.WORKFLOW_CONCLUSION}` === 'failure' ? 'danger' : 'warning',
-  #               text: `Pipeline: ${process.env.AS_WORKFLOW}\n\ncompliantkubernetes-apps commit: <https://github.com/elastisys/compliantkubernetes-apps/commit/${{ steps.get-sha.outputs.sha }}|${{ steps.get-sha-short.outputs.sha }}>\n\n Status: ${process.env.WORKFLOW_CONCLUSION}\nTook: ${process.env.AS_TOOK}\nDetails: ${{ steps.result.outputs.result }}`,
-  #             }]
-  #           }
-  #       env:
-  #         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }} # required
-  #       if: always() # Notify for both successes and failures
+          cat response.json | jq -r '.jobs[] | select(.conclusion=="failure") | .id' > jobs.failed
+          if [ -s jobs.failed ]
+          then
+            while read i
+            do
+              cat response.json | jq --arg i $i -r '[.jobs[] | select(.id=='$i') | "The JOB: ", .name, " failed at STEPS: ", ([(.steps[] | select(.conclusion=="failure") | .name)] | join("; "))] | join("")' >> steps.failed
+            done < jobs.failed
+            export RESULT="$(cat steps.failed)"
+          else
+            export RESULT="All good."
+          fi
+          RESULT="${RESULT//'%'/'%25'}"
+          RESULT="${RESULT//$'\n'/'%0A'}"
+          RESULT="${RESULT//$'\r'/'%0D'}"
+          echo "result=$(echo "$RESULT")" >> $GITHUB_OUTPUT
+      - uses: technote-space/workflow-conclusion-action@v1
+      - name: Send Slack alert
+        uses: elastisys/action-slack@v3
+        with:
+          status: custom
+          fields: repo,message,commit,author,action,workflow,job,took,ref
+          custom_payload: |
+            {
+              attachments: [{
+                color: `${process.env.WORKFLOW_CONCLUSION}` === 'success' ? 'good' : `${process.env.WORKFLOW_CONCLUSION}` === 'failure' ? 'danger' : 'warning',
+                text: `Pipeline: ${process.env.AS_WORKFLOW}\n\ncompliantkubernetes-apps commit: <https://github.com/elastisys/compliantkubernetes-apps/commit/${{ steps.get-sha.outputs.sha }}|${{ steps.get-sha-short.outputs.sha }}>\n\n Status: ${process.env.WORKFLOW_CONCLUSION}\nTook: ${process.env.AS_TOOK}\nDetails: ${{ steps.result.outputs.result }}`,
+              }]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }} # required
+        if: always() # Notify for both successes and failures

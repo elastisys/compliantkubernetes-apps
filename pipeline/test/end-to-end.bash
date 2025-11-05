@@ -13,6 +13,8 @@ fi
 
 cd "${root}/tests" || exit
 
+make build-main
+
 mapfile -t dirs < <(find end-to-end -mindepth 1 -maxdepth 1 -type d ! -name '.*' -printf '%f\n')
 
 for dir in "${dirs[@]}"; do

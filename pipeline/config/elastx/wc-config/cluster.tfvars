@@ -7,7 +7,7 @@ public_key_path = "/github/workspace/apps/pipeline/config/elastx/id_rsa.pub"
 # image to use for bastion, masters, standalone etcd instances, and nodes
 # you can find the available images with `openstack image list`
 # image = "ubuntu-24.04-server-latest"
-image_uuid = "25751ca5-99e5-4d8b-bf9c-33ae950214c2"
+image_uuid = "3a341474-6c80-42df-aafb-bb591fc9d96a"
 
 # user on the node (ex. core on Container Linux, ubuntu on Ubuntu, etc.)
 ssh_user = "ubuntu"
@@ -39,19 +39,19 @@ number_of_k8s_masters_no_floating_ip_no_etcd = 0
 k8s_masters = {
   "control-plane-1" = {
     "az"          = "sto1"
-    "flavor"      = "60002ff6-980e-4424-b125-e9b6794043e9" #2C-4GB-60GB
+    "flavor"      = "4e4318bb-8cd9-4274-8150-4eaeb478b8e5" #2C-4GB-60GB
     "floating_ip" = true
     "etcd" = true
   },
   "control-plane-2" = {
     "az"          = "sto2"
-    "flavor"      = "60002ff6-980e-4424-b125-e9b6794043e9" #2C-4GB-60GB
+    "flavor"      = "4e4318bb-8cd9-4274-8150-4eaeb478b8e5" #2C-4GB-60GB
     "floating_ip" = true
     "etcd" = true
   },
   "control-plane-3" = {
     "az"          = "sto3"
-    "flavor"      = "60002ff6-980e-4424-b125-e9b6794043e9" #2C-4GB-60GB
+    "flavor"      = "4e4318bb-8cd9-4274-8150-4eaeb478b8e5" #2C-4GB-60GB
     "floating_ip" = true
     "etcd" = true
   }
@@ -67,27 +67,27 @@ number_of_k8s_nodes_no_floating_ip = 0
 k8s_nodes = {
   "elastisys-0" = {
     "az"          = "sto1"
-    "flavor"      = "60002ff6-980e-4424-b125-e9b6794043e9" #2C-8GB-80GB
+    "flavor"      = "4e4318bb-8cd9-4274-8150-4eaeb478b8e5" #2C-8GB-80GB
     "floating_ip" = true
   },
   "elastisys-1" = {
     "az"          = "sto2"
-    "flavor"      = "60002ff6-980e-4424-b125-e9b6794043e9" #2C-8GB-80GB
+    "flavor"      = "4e4318bb-8cd9-4274-8150-4eaeb478b8e5" #2C-8GB-80GB
     "floating_ip" = true
   },
   "worker-0" = {
     "az"          = "sto1"
-    "flavor"      = "60002ff6-980e-4424-b125-e9b6794043e9" #2C-8GB-80GB
+    "flavor"      = "4e4318bb-8cd9-4274-8150-4eaeb478b8e5" #2C-8GB-80GB
     "floating_ip" = true
   },
   "worker-1" = {
     "az"          = "sto2"
-    "flavor"      = "60002ff6-980e-4424-b125-e9b6794043e9" #2C-8GB-80GB
+    "flavor"      = "4e4318bb-8cd9-4274-8150-4eaeb478b8e5" #2C-8GB-80GB
     "floating_ip" = true
   },
   "worker-2" = {
     "az"          = "sto3"
-    "flavor"      = "60002ff6-980e-4424-b125-e9b6794043e9" #2C-8GB-80GB
+    "flavor"      = "4e4318bb-8cd9-4274-8150-4eaeb478b8e5" #2C-8GB-80GB
     "floating_ip" = true
   }
 }
