@@ -453,7 +453,6 @@ jobs:
 
       - name: Run end-to-end tests
         continue-on-error: true
-        shell: bash
         # if: steps.wait-wc.outcome == 'success'
         id: e2e-test
         run: ./apps/pipeline/test/end-to-end.bash

@@ -5,7 +5,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 ARG TZ=Etc/UTC
 
 RUN apt-get update && \
-    apt-get install -y apache2-utils bats curl dnsutils gettext-base git gpg iputils-ping jq net-tools pwgen s3cmd ssh unzip wget && \
+    apt-get install -y apache2-utils bats curl dnsutils gettext-base git gpg iputils-ping jq net-tools pwgen s3cmd ssh unzip wget build-essential && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
