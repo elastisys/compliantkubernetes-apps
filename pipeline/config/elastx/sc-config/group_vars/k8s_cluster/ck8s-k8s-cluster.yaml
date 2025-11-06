@@ -1,8 +1,4 @@
 kube_oidc_auth: false
-kube_oidc_url: https://dex.sme.monitoring-ck8s.com
-kube_oidc_client_id: kubelogin
-kube_oidc_client_secret: PgRIRH8UKOt8ZABS7tpX
-kube_oidc_username_claim: email
 kubeconfig_cluster_name: pipeline-elastx-sc
 ## don't add "groups" when connecting directly to google
 # kube_oidc_groups_claim: "groups"
@@ -12,9 +8,8 @@ kube_oidc_apiserver_port: "6443"
 kubeconfig_file_name: kube_config_sc.yaml
 artifacts_dir: '{{ inventory_dir }}/../.state'
 create_oidc_kubeconfig: false
-cluster_admin_users: []
-cluster_admin_groups:
-  - self-managed@elastisys.com
+cluster_admin_users: admin@example.com
+cluster_admin_groups: []
 kubeconfig_localhost: true
 kube_apiserver_enable_admission_plugins:
   - NamespaceLifecycle

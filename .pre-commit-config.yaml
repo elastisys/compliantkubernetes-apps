@@ -43,7 +43,7 @@ repos:
       - id: detect-private-key
         exclude: ^helmfile\.d/upstream/|^tests/integration/kyverno/genkeys/
       - id: end-of-file-fixer
-        exclude: ^helmfile\.d/upstream/|^tests/.*/.*\.out$|^pipeline/config/safespring/defaults/
+        exclude: ^helmfile\.d/upstream/|^tests/.*/.*\.out$|^pipeline/config/elastx/defaults/
       - id: mixed-line-ending
         exclude: ^helmfile\.d/upstream/
       - id: trailing-whitespace

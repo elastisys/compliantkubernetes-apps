@@ -31,6 +31,7 @@ else
   #   -H "X-GitHub-Api-Version: 2025-10-29" \
   #   https://api.github.com/orgs/packages/container/compliantkubernetes-apps-pipeline/versions |
   #   jq '.[] | select(.metadata.container.tags | any(. == "'"${GITHUB_SHA}"'")).id')
+
   echo "$GITHUB_SHA"
 
   VERSION_ID=$(curl -s \

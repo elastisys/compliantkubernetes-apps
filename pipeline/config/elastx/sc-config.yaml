@@ -40,9 +40,7 @@ opensearch:
           - admin@example.com
     - mapping_name: all_access
       definition:
-        users:
-          - admin@example.com
-          - dev@example.com
+        users: []
         backend_roles:
           - admin@example.com
 alerts:

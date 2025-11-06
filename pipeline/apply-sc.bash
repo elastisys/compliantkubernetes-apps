@@ -4,7 +4,6 @@ set -u -o pipefail
 
 here="$(dirname "$(readlink -f "$0")")"
 root="$(dirname "$(dirname "$(readlink -f "$0")")")"
-# pipeline_dir="${here}"
 ck8s="${root}/bin/ck8s"
 bin_path="${root}/bin"
 
@@ -15,8 +14,5 @@ source "${bin_path}/common.bash"
 
 "${ck8s}" apply sc
 apply_exit_code="${?}"
-
-# "${pipeline_dir}/list-releases.bash" "service_cluster"
-# echo "'${pipeline_dir}/list-releases.bash service_cluster' exited with code: ${?}"
 
 exit "${apply_exit_code}"
