@@ -5,10 +5,15 @@ clusterRoles:
     - apiGroups:
         - "rbac.authorization.k8s.io"
       resources:
-      -  clusterrolebindings
+        -  clusterrolebindings
       verbs:
         - get
         - list
+        - watch
+        - create
+        - delete
+        - patch
+        - update
     - apiGroups:
         - "storage.k8s.io"
       resources:
