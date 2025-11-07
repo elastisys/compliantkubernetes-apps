@@ -1,22 +1,22 @@
 name: End-to-end
 
-# on:
-#   schedule:
-#     - cron: "0 4 * * *"
+on:
+  schedule:
+    - cron: "0 4 * * *"
 
 # TODO: Use workflow dispatch for testing manually. Should only enable schedule run when merging the PR
-on:
-  workflow_dispatch:
-    inputs:
-      environment:
-        description: "Environment to run tests against"
-        type: environment
-        required: true
-        default: test
-      alerts:
-        description: "Send Slack alerts"
-        type: boolean
-        default: false
+# on:
+#   workflow_dispatch:
+#     inputs:
+#       environment:
+#         description: "Environment to run tests against"
+#         type: environment
+#         required: true
+#         default: test
+#       alerts:
+#         description: "Send Slack alerts"
+#         type: boolean
+#         default: false
 
 jobs:
   check-for-updates:
@@ -616,11 +616,11 @@ jobs:
           GITHUB_ACTOR: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  # Alert run condition github.event.inputs.alerts == 'true' should be changed to always() when PR is ready to merge
+  # TODO: Alert run with condition github.event.inputs.alerts == 'true' should be changed to always() when PR is ready to merge
   alert:
     needs: [clean-apps-image]
     runs-on: ubuntu-latest
-    if: github.event.inputs.alerts == 'true' && github.ref == 'refs/heads/main'
+    # if: github.event.inputs.alerts == 'true' && github.ref == 'refs/heads/main'
     steps:
       - id: get-sha
         run: |
