@@ -117,7 +117,7 @@ repos:
     hooks:
       - id: codespell
         name: check spelling
-        exclude: ^helmfile\.d/charts/hnc/config-and-crds/crds/|^helmfile\.d/upstream/|tests/package-lock.json
+        exclude: ^helmfile\.d/charts/hnc/config-and-crds/crds/|^helmfile\.d/upstream/|tests/package-lock.json|^pipeline/config/elastx/defaults/
         args:
           - -I
           - .codespellignore

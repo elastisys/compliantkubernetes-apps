@@ -153,7 +153,7 @@ jobs:
           repository: HaoruiPeng/compliantkubernetes-apps
           ref: main
           path: apps
-          fetch-depth: 0 # Fetches all tags
+          fetch-depth: 0
 
       - name: Generate and insert public SSH key
         run: |
@@ -220,7 +220,6 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_DNS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_DNS_SECRET_ACCESS_KEY }}
-          # See https://github.com/aws/aws-cli/issues/5262
           AWS_EC2_METADATA_DISABLED: true
         with:
           args: route53 change-resource-record-sets --hosted-zone-id Z1001117397DAU71G3RN2 --change-batch file://apps/pipeline/config/elastx/dns/${{ matrix.cluster }}-api.json
@@ -664,5 +663,5 @@ jobs:
               }]
             }
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }} # required
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
         if: always()
