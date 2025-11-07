@@ -12,8 +12,9 @@ if [ ! -d "${log_dir}" ]; then
 fi
 
 test_dir="${root}/tests"
+CK8S_CONFIG_PATH="${root}/pipeline/config/elastx"
 
-mapfile -t dirs < <(find end-to-end -mindepth 1 -maxdepth 1 -type d ! -name '.*' -printf '%f\n')
+mapfile -t dirs < <(find "${test_dir}/end-to-end" -mindepth 1 -maxdepth 1 -type d ! -name '.*' -printf '%f\n')
 
 for dir in "${dirs[@]}"; do
   log_file="${log_dir}/end-to-end-${dir}.log"
