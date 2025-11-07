@@ -11,13 +11,13 @@ if [ ! -d "${log_dir}" ]; then
   mkdir -p "${log_dir}"
 fi
 
-cd "${root}/tests" || exit
+test_dir="${root}/tests"
 
 mapfile -t dirs < <(find end-to-end -mindepth 1 -maxdepth 1 -type d ! -name '.*' -printf '%f\n')
 
 for dir in "${dirs[@]}"; do
   log_file="${log_dir}/end-to-end-${dir}.log"
-  if ! bats -r end-to-end/"${dir}" 2>&1 | tee "${log_file}"; then
+  if ! bats -r "${test_dir}/end-to-end/${dir}" 2>&1 | tee "${log_file}"; then
     echo "Test for ${dir} failed. See ${log_file} for details."
   else
     rm "${log_file}"
