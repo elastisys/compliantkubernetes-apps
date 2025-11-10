@@ -1,0 +1,59 @@
+etcd_deployment_type: kubeadm
+cloud_provider: external
+external_cloud_provider: openstack
+calico_mtu: 1480
+external_openstack_cloud_controller_extra_args:
+  # Must be different for every cluster in the same openstack project
+  cluster-name: pipeline-elastx-wc
+cinder_csi_enabled: true
+cinder_topology: true
+persistent_volumes_enabled: true
+expand_persistent_volumes: true
+openstack_blockstorage_ignore_volume_az: true
+storage_classes:
+  - name: cinder-csi
+    is_default: true
+    parameters:
+      allowVolumeExpansion: true
+      type: v2-1k
+  - name: cinder-csi-faster
+    parameters:
+      allowVolumeExpansion: true
+      type: 8k-IOPS
+  - name: cinder-csi-fastest
+    parameters:
+      allowVolumeExpansion: true
+      type: 16k-IOPS
+
+supplementary_addresses_in_ssl_keys:
+  - kube.pipeline-elastx.dev-ck8s.com
+kubeconfig_localhost_ansible_host: true
+
+external_openstack_enable_ingress_hostname: true
+external_openstack_cloud_controller_bind_address: 0.0.0.0
+
+cinder_topology_zones:
+  - sto1
+  - sto2
+  - sto3
+cinder_tolerations:
+  - key: elastisys.io/node-type
+    operator: Exists
+    effect: NoSchedule
+
+external_openstack_lbaas_subnet_id: <cluster-subnet-uuid>
+external_openstack_lbaas_floating_network_id: 600b8501-78cb-4155-9c9f-23dfcba88828
+external_openstack_lbaas_method: ROUND_ROBIN
+external_openstack_lbaas_provider: amphora
+external_openstack_lbaas_use_octavia: true
+external_openstack_lbaas_create_monitor: true
+external_openstack_lbaas_monitor_delay: 1m
+external_openstack_lbaas_monitor_timeout: 30s
+external_openstack_lbaas_monitor_max_retries: "3"
+external_openstack_network_public_networks:
+  - elx-public1
+
+ntp_filter_interface: true
+ntp_interfaces:
+  - ignore wildcard
+  - listen ens3

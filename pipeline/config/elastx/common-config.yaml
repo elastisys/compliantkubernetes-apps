@@ -1,0 +1,86 @@
+# Changes made here will override the default values for both the service and workload cluster.
+# See the default configuration under "defaults/" to see available and suggested options.
+global:
+  baseDomain: pipeline-elastx.dev-ck8s.com
+  opsDomain: ops.pipeline-elastx.dev-ck8s.com
+issuers:
+  letsencrypt:
+    prod:
+      email: letsencrypt@elastisys.com
+    staging:
+      email: letsencrypt@elastisys.com
+clusterAdmin:
+  users:
+    - admin@example.com
+  groups: []
+opa:
+  imageRegistry:
+    URL:
+      - harbor.pipeline-elastx.dev-ck8s.com
+      - quay.io/jetstack/cert-manager-acmesolver
+  networkPolicies:
+    enabled: false
+kured:
+  tolerations:
+    - key: node-role.kubernetes.io/master
+      operator: Exists
+      effect: NoSchedule
+    - key: node-role.kubernetes.io/control-plane
+      operator: Exists
+      effect: NoSchedule
+    - key: elastisys.io/node-type
+      operator: Exists
+      effect: NoSchedule
+  notification:
+    slack:
+      enabled: false
+      channel: kured-notification
+networkPolicies:
+  global:
+    trivy:
+      ips:
+        - 0.0.0.0/0
+    objectStorage:
+      ips:
+        - 0.0.0.0/0
+      ports:
+        - 443
+    scIngress:
+      ips:
+        - 0.0.0.0/0
+    wcIngress:
+      ips:
+        - 0.0.0.0/0
+  coredns:
+    externalDns:
+      ips:
+        - 0.0.0.0/0
+  kured:
+    notificationSlack:
+      ips:
+        - 0.0.0.0/0
+  falco:
+    plugins:
+      ips:
+        - 0.0.0.0/0
+  alertmanager:
+    alertReceivers:
+      ips:
+        - 0.0.0.0/0
+trivy:
+  nodeCollector:
+    tolerations:
+      - key: elastisys.io/node-type
+        operator: Exists
+        effect: NoSchedule
+      - key: node-role.kubernetes.io/control-plane
+        operator: Exists
+        effect: NoSchedule
+ingressNginx:
+  controller:
+    config:
+      useProxyProtocol: false
+    service:
+      annotations:
+        service.beta.kubernetes.io/openstack-internal-load-balancer: "true"
+        loadbalancer.openstack.org/proxy-protocol: "false"

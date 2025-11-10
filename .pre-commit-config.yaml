@@ -43,10 +43,9 @@ repos:
       - id: detect-private-key
         exclude: ^helmfile\.d/upstream/|^tests/integration/kyverno/genkeys/
       - id: end-of-file-fixer
-        exclude: ^helmfile\.d/upstream/|^tests/.*/.*\.out$
+        exclude: ^helmfile\.d/upstream/|^tests/.*/.*\.out$|^pipeline/config/elastx/defaults/
       - id: mixed-line-ending
         exclude: ^helmfile\.d/upstream/
-      - id: no-commit-to-branch
       - id: trailing-whitespace
         exclude: ^helmfile\.d/upstream/|^tests/.*/.*\.out$
 
@@ -118,7 +117,7 @@ repos:
     hooks:
       - id: codespell
         name: check spelling
-        exclude: ^helmfile\.d/charts/hnc/config-and-crds/crds/|^helmfile\.d/upstream/|tests/package-lock.json
+        exclude: ^helmfile\.d/charts/hnc/config-and-crds/crds/|^helmfile\.d/upstream/|tests/package-lock.json|^pipeline/config/elastx/defaults/
         args:
           - -I
           - .codespellignore

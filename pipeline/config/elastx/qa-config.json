@@ -1,0 +1,57 @@
+{
+  "kubeloginClientSecret": "somesecretstring",
+  "adminGroup": "admin@example.com",
+  "dex": {
+    "gcp": {
+      "clientID": "set-me",
+      "clientSecret": "set-me"
+    }
+  },
+  "dnsProvider": {
+    "domain": "dev-ck8s.com",
+    "aws": {
+      "hostedZone": "Z1001117397DAU71G3RN2",
+      "secrets": {
+        "accessKey": "set-me",
+        "secretKey": "set-me"
+      }
+    }
+  },
+  "objectStorage": {
+    "config": {
+      "s3": {
+        "region": "us-east-1",
+        "regionEndpoint": "https://swift.elastx.cloud"
+      }
+    },
+    "secrets": {
+      "s3": {
+        "accessKey": "set-me",
+        "secretKey": "set-me"
+      }
+    }
+  },
+  "wcSubnets": {
+    "apiServer": [
+      "0.0.0.0/0"
+    ],
+    "nodes": [
+      "0.0.0.0/0"
+    ],
+    "ingress": [
+      "0.0.0.0/0"
+    ]
+  },
+  "scSubnets": {
+    "apiServer": [
+      "0.0.0.0/0"
+    ],
+    "nodes": [
+      "0.0.0.0/0"
+    ],
+    "ingress": [
+      "0.0.0.0/0"
+    ]
+  },
+  "networkPlugin": "calico"
+}

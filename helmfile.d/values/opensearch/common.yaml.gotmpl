@@ -153,7 +153,7 @@ securityContext:
       - ALL
 
 networkPolicy:
-  create: true
+  create: {{ dig "opensearch" "enabled" "true" .Values.networkPolicies }}
 
 {{- if .Values.opensearch.snapshot.enabled }}
 keystore:

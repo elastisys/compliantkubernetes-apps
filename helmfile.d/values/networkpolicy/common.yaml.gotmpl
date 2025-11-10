@@ -92,7 +92,7 @@ certManager:
     ips: {{- toYaml .Values.networkPolicies.certManager.letsencrypt.ips | nindent 6 }}
 
 gatekeeper:
-  enabled: true
+  enabled: {{ dig "gatekeeper" "enabled" "true" .Values.networkPolicies }}
 
 rookCeph:
   enabled: {{ .Values.networkPolicies.rookCeph.enabled }}

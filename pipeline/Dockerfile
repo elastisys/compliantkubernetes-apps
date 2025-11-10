@@ -1,68 +1,152 @@
-FROM ubuntu:rolling
-LABEL org.opencontainers.image.source https://github.com/elastisys/compliantkubernetes-apps
+FROM ubuntu:24.04 AS node-deps
+
+LABEL org.opencontainers.image.source=https://github.com/elastisys/compliantkubernetes-apps
+
+RUN apt-get update && apt-get install -y npm && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /welkin-test
+COPY ./tests/package.json ./tests/package-lock.json ./
+RUN npm install --global --omit dev
+
+
+FROM ubuntu:24.04
 
 ARG DEBIAN_FRONTEND=noninteractive
-ARG TZ=Etc/UTC
+ARG TZ="Etc/UTC"
+ENV LANGUAGE="en"
+ENV LANG="en_US.utf8"
 
 RUN apt-get update && \
-    apt-get install -y apache2-utils bats curl dnsutils gettext-base git gpg iputils-ping jq net-tools pwgen s3cmd ssh unzip wget && \
+    apt-get install -y apache2-utils bats curl dnsutils gettext-base git gpg iputils-ping jq net-tools pwgen s3cmd ssh unzip wget locales make nodejs parallel python3-venv && \
     apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/* && \
+    localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
+
+ENV NODE_PATH="/usr/local/lib/node_modules"
+
+#Gomplate
+ARG GOMPLATE_VERSION="4.3.1"
+RUN curl -LOs "https://github.com/hairyhenderson/gomplate/releases/download/v${GOMPLATE_VERSION}/gomplate_linux-amd64" && \
+    install -Tm 755 gomplate_linux-amd64 /usr/local/bin/gomplate && \
+    rm gomplate_linux-amd64
 
 # Kubectl
-ENV KUBECTL_VERSION "v1.28.6"
-RUN wget --progress=dot:giga "https://storage.googleapis.com/kubernetes-release/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl" && \
+ARG KUBECTL_VERSION="1.32.8"
+RUN curl -LOs "https://dl.k8s.io/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl" && \
     install -Tm 755 kubectl /usr/local/bin/kubectl && \
     rm kubectl
 
 # Kubeconform
-ENV KUBECONFORM_VERSION "v0.6.1"
-RUN wget --progress=dot:giga "https://github.com/yannh/kubeconform/releases/download/${KUBECONFORM_VERSION}/kubeconform-linux-amd64.tar.gz" && \
+ARG KUBECONFORM_VERSION="0.6.7"
+RUN curl -LOs "https://github.com/yannh/kubeconform/releases/download/v${KUBECONFORM_VERSION}/kubeconform-linux-amd64.tar.gz" && \
     tar -zxvf kubeconform-linux-amd64.tar.gz kubeconform && \
     install -Tm 755 kubeconform /usr/local/bin/kubeconform && \
-    rm kubeconform
+    rm kubeconform-linux-amd64.tar.gz kubeconform
 
 # sops
-# NOTE: This needs to be installed before the helm-secrets plugin.
-ENV SOPS_VERSION="3.9.4"
-RUN wget --progress=dot:giga "https://github.com/getsops/sops/releases/download/v${SOPS_VERSION}/sops-v${SOPS_VERSION}.linux.amd64" && \
+ARG SOPS_VERSION="3.10.1"
+RUN curl -LOs "https://github.com/getsops/sops/releases/download/v${SOPS_VERSION}/sops-v${SOPS_VERSION}.linux.amd64" && \
     install -Tm 755 "sops-v${SOPS_VERSION}.linux.amd64" /usr/local/bin/sops && \
     rm "sops-v${SOPS_VERSION}.linux.amd64"
 
 # Helm
-ENV HELM_VERSION "v3.13.3"
-RUN wget --progress=dot:giga "https://get.helm.sh/helm-${HELM_VERSION}-linux-amd64.tar.gz" && \
-    tar -zxvf "helm-${HELM_VERSION}-linux-amd64.tar.gz" && \
+ARG HELM_VERSION="3.18.4"
+ENV HELM_DATA_HOME="/usr/local/share/helm"
+RUN curl -LOs "https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz" && \
+    tar -zxvf "helm-v${HELM_VERSION}-linux-amd64.tar.gz" linux-amd64/helm && \
     install -Tm 755 linux-amd64/helm /usr/local/bin/helm && \
-    rm -rf linux-amd64 "helm-${HELM_VERSION}-linux-amd64.tar.gz"
-# We need to use this variable to override the default data path for helm
-# TODO Change when this is closed https://github.com/helm/helm/issues/7919
-# Should come with v3.3.0, see https://github.com/helm/helm/pull/7983
-ENV XDG_DATA_HOME=/root/.config
-RUN helm plugin install https://github.com/databus23/helm-diff --version v3.9.4
-RUN helm plugin install https://github.com/jkroepke/helm-secrets --version v4.5.1
+    rm -rf linux-amd64 "helm-v${HELM_VERSION}-linux-amd64.tar.gz"
+
+ARG HELM_DIFF_VERSION="3.10.0"
+RUN helm plugin install https://github.com/databus23/helm-diff --version "v${HELM_DIFF_VERSION}" > /dev/null
+
+ARG HELM_SECRETS_VERSION="4.6.5"
+RUN helm plugin install https://github.com/jkroepke/helm-secrets --version "v${HELM_SECRETS_VERSION}" > /dev/null
 
 # Helmfile
-ENV HELMFILE_VERSION "0.162.0"
-RUN wget --progress=dot:giga "https://github.com/helmfile/helmfile/releases/download/v${HELMFILE_VERSION}/helmfile_${HELMFILE_VERSION}_linux_amd64.tar.gz" && \
+ARG HELMFILE_VERSION="0.171.0"
+RUN curl -LOs "https://github.com/helmfile/helmfile/releases/download/v${HELMFILE_VERSION}/helmfile_${HELMFILE_VERSION}_linux_amd64.tar.gz" && \
     tar -zxvf "helmfile_${HELMFILE_VERSION}_linux_amd64.tar.gz" helmfile && \
     install -Tm 755 helmfile /usr/local/bin/helmfile && \
     rm helmfile "helmfile_${HELMFILE_VERSION}_linux_amd64.tar.gz"
 
+ARG KUBELOGIN_VERSION="1.32.3"
+RUN curl -LOs "https://github.com/int128/kubelogin/releases/download/v${KUBELOGIN_VERSION}/kubelogin_linux_amd64.zip" && \
+    unzip kubelogin_linux_amd64.zip && \
+    install -Tm 755 kubelogin /usr/local/bin/kubectl-oidc_login && \
+    rm kubelogin kubelogin_linux_amd64.zip LICENSE README.md
+
 # yq
-ENV YQ_VERSION "v4.42.1"
-RUN wget --progress=dot:giga "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_amd64" && \
+ARG YQ_VERSION="4.45.1"
+RUN curl -LOs "https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}/yq_linux_amd64" && \
     install -Tm 755 yq_linux_amd64 /usr/local/bin/yq && \
     rm yq_linux_amd64
 
 # yajsv
-ENV YAJSV_VERSION "v1.4.1"
-RUN wget --progress=dot:giga https://github.com/neilpa/yajsv/releases/download/${YAJSV_VERSION}/yajsv.linux.amd64 && \
+ARG YAJSV_VERSION="1.4.1"
+RUN curl -LOs "https://github.com/neilpa/yajsv/releases/download/v${YAJSV_VERSION}/yajsv.linux.amd64" && \
     install -Tm 755 yajsv.linux.amd64 /usr/local/bin/yajsv && \
     rm yajsv.linux.amd64
 
 # opa
-ENV OPA_VERSION "v0.57.1"
-RUN wget --progress=dot:giga "https://github.com/open-policy-agent/opa/releases/download/${OPA_VERSION}/opa_linux_amd64" && \
+ARG OPA_VERSION="0.57.1"
+RUN curl -LOs "https://github.com/open-policy-agent/opa/releases/download/v${OPA_VERSION}/opa_linux_amd64" && \
     install -Tm 755 opa_linux_amd64 /usr/local/bin/opa && \
     rm opa_linux_amd64
+
+ARG BATS_CORE_VERSION="1.11.1"
+RUN git clone --depth 1 https://github.com/bats-core/bats-core.git --branch "v${BATS_CORE_VERSION}" /tmp/bats-core && ./tmp/bats-core/install.sh /usr/local && rm -rf /tmp/bats-core
+
+# Currently all from main as most do not have current releases
+RUN git clone --depth 1 https://github.com/bats-core/bats-assert.git /usr/local/lib/bats/assert
+RUN git clone --depth 1 https://github.com/bats-core/bats-detik.git /usr/local/lib/bats/detik
+RUN git clone --depth 1 https://github.com/bats-core/bats-file.git /usr/local/lib/bats/file
+RUN git clone --depth 1 https://github.com/grayhemp/bats-mock.git /usr/local/lib/bats/mock
+RUN git clone --depth 1 https://github.com/bats-core/bats-support.git /usr/local/lib/bats/support
+
+ENV DOCS_PATH="/usr/local/share/docs"
+RUN git clone --depth 1 --recurse-submodules --shallow-submodules https://github.com/elastisys/welkin.git "${DOCS_PATH}" && \
+    chmod -R a+w "${DOCS_PATH}" && \
+    python3 -m venv /opt/docs-venv && \
+    /opt/docs-venv/bin/python -m pip install --upgrade pip && \
+    cd "${DOCS_PATH}" && \
+    /opt/docs-venv/bin/pip install --no-cache-dir -r requirements.txt
+
+ENV PATH="/opt/docs-venv/bin:${PATH}:/usr/local/lib/node_modules/.bin"
+COPY --from=node-deps /usr/local/lib/node_modules/welkin-test/node_modules /usr/local/lib/node_modules
+
+ENV DIST="noble"
+
+RUN mkdir -p /etc/apt/keyrings && \
+    curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor | tee /etc/apt/keyrings/microsoft.gpg > /dev/null && \
+    chmod go+r /etc/apt/keyrings/microsoft.gpg && \
+    echo "Types: deb \n\
+URIs: https://packages.microsoft.com/repos/azure-cli/ \n\
+Suites: ${DIST} \n\
+Components: main \n\
+Architectures: $(dpkg --print-architecture) \n\
+Signed-by: /etc/apt/keyrings/microsoft.gpg" | tee /etc/apt/sources.list.d/azure-cli.sources
+
+ARG AZ_VERSION=2.63.0
+RUN apt-get update && \
+    apt-get install -y azure-cli=${AZ_VERSION}-1~${DIST} buildah docker.io libasound2t64 libatk1.0-0 libatk-bridge2.0-0 libcanberra-gtk-module \
+    libcanberra-gtk3-module libcups2 libgbm-dev libgbm1 libglib2.0-0 libgtk2.0-0 libgtk2.0-0t64 libgtk-3-0 \
+    libgtk-3-0t64 libnotify-dev libnss3 libxss1 libxtst6 podman-remote skopeo socat xauth xvfb zstd && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* && \
+    ln -s /usr/bin/podman-remote /usr/bin/podman
+
+ARG KIND_VERSION="0.27.0"
+RUN curl -LOs "https://github.com/kubernetes-sigs/kind/releases/download/v${KIND_VERSION}/kind-linux-amd64" && \
+    install -Tm 755 kind-linux-amd64 /usr/local/bin/kind && \
+    rm kind-linux-amd64
+
+ARG VELERO_VERSION="1.13.0"
+RUN curl -LOs "https://github.com/vmware-tanzu/velero/releases/download/v${VELERO_VERSION}/velero-v${VELERO_VERSION}-linux-amd64.tar.gz" && \
+    tar -zxvf "velero-v${VELERO_VERSION}-linux-amd64.tar.gz" "velero-v${VELERO_VERSION}-linux-amd64" && \
+    install -Tm 755 "velero-v${VELERO_VERSION}-linux-amd64/velero" /usr/local/bin/velero && \
+    rm -r "velero-v${VELERO_VERSION}-linux-amd64.tar.gz" "velero-v${VELERO_VERSION}-linux-amd64"
+
+ENV PATH="$PATH:/usr/local/lib/node_modules/.bin"
+ENV CYPRESS_CACHE_FOLDER=/usr/local/lib/cypress
+RUN cypress install && cypress verify
