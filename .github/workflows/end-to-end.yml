@@ -6,17 +6,17 @@ on:
 
 # TODO: Use workflow dispatch for testing manually. Should only enable schedule run when merging the PR
 # on:
-#   workflow_dispatch:
-#     inputs:
-#       environment:
-#         description: "Environment to run tests against"
-#         type: environment
-#         required: true
-#         default: test
-#       alerts:
-#         description: "Send Slack alerts"
-#         type: boolean
-#         default: false
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Environment to run tests against"
+        type: environment
+        required: true
+        default: test
+      alerts:
+        description: "Send Slack alerts"
+        type: boolean
+        default: false
 
 jobs:
   check-for-updates:
@@ -439,7 +439,7 @@ jobs:
         with:
           condition-type: "artifact"
           artifact-name: apps-installed
-          timeout-minutes: 40
+          timeout-minutes: 45
 
       - name: Update Ingress DNS records
         run: |
