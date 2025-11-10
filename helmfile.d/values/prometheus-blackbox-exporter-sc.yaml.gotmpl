@@ -64,10 +64,9 @@ config:
         preferred_ip_protocol: "ip4"
         tls_config:
           insecure_skip_verify: {{ not .Values.global.verifyTls }}
-    {{- if or (eq .Values.harbor.database.type "external") (eq .Values.harbor.redis.type "external") }}
     tcp_connect:
       prober: tcp
-    {{- end }}
+
 service:
   ipDualStack:
     enabled: true
