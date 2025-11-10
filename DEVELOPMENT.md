@@ -302,7 +302,7 @@ These are the general steps to do when replacing old Helm chart(s) with a Module
 
 ### Testing Modules
 
-Modules should be tested just as components have been tested previously in the [end-to-end tests](tests/end-to-end).
+Modules should be tested just as components have been tested previously in the [tests](tests/).
 
 #### Testing Chart to Module migration
 
