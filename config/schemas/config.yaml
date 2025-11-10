@@ -4427,6 +4427,16 @@ properties:
                 type: string
           webhook:
             $ref: '#/properties/alerts/properties/runbookUrls/$defs/noUpstreamRunbook'
+      disabled:
+        type: object
+        title: Disabled alerts
+        description: Alerts that can be disabled
+        properties:
+          CPUThrottlingHigh:
+            title: CPUThrottlingHigh disabled
+            description: Configure whether or not CPUThrottlingHigh alert should be disabled
+            type: boolean
+            default: true
   grafana:
     title: Grafana Config
     description: |-
