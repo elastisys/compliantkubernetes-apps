@@ -8165,9 +8165,6 @@ properties:
         description: Configure the Tekton Controller
         type: object
         properties:
-          replicas:
-            title: Number of controller replicas
-            type: integer
           resources:
             $ref: '#/$defs/kubernetesResourceRequirements'
       webhook:
@@ -8175,9 +8172,6 @@ properties:
         description: Configure the Tekton Webhook
         type: object
         properties:
-          replicas:
-            title: Number of webhook replicas
-            type: integer
           resources:
             $ref: '#/$defs/kubernetesResourceRequirements'
       remoteResolvers:
@@ -8185,9 +8179,6 @@ properties:
         description: Configure the Tekton Remote Resolver
         type: object
         properties:
-          replicas:
-            title: Number of remote resolver replicas
-            type: integer
           resources:
             $ref: '#/$defs/kubernetesResourceRequirements'
       customConfigDefaults:

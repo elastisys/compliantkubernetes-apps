@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:82b3e71c-544c-4701-938b-68a8a410f653",
+  "serialNumber": "urn:uuid:259239db-283a-4537-af05-8099daa75411",
   "version": 1,
   "metadata": {
-    "timestamp": "2025-11-06T07:38:38Z",
+    "timestamp": "2025-11-10T12:57:48Z",
     "lifecycles": [
       {
         "phase": "build"
@@ -2509,14 +2509,14 @@
       }
     },
     {
-      "bom-ref": "pkg:helm/tekton-pipelines@0.1.0",
+      "bom-ref": "pkg:helm/tekton-monitoring@0.1.0",
       "type": "library",
       "supplier": {
         "name": "Elastisys"
       },
-      "name": "tekton-pipelines",
+      "name": "tekton-monitoring",
       "version": "0.1.0",
-      "description": "A Helm chart for Tekton pipelines",
+      "description": "A Helm chart for monitoring the Tekton pipelines controller",
       "licenses": [
         {
           "license": {
@@ -2524,7 +2524,7 @@
           }
         }
       ],
-      "purl": "pkg:helm/tekton-pipelines@0.1.0",
+      "purl": "pkg:helm/tekton-monitoring@0.1.0",
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -2534,7 +2534,38 @@
       "evidence": {
         "occurrences": [
           {
-            "location": "helmfile.d/charts/tekton-pipelines"
+            "location": "helmfile.d/charts/tekton-monitoring"
+          }
+        ]
+      }
+    },
+    {
+      "bom-ref": "pkg:helm/tekton-pipeline@1.1.0",
+      "type": "library",
+      "supplier": {
+        "name": "The Tekton project"
+      },
+      "name": "tekton-pipeline",
+      "version": "1.1.0",
+      "description": "A Helm chart for Tekton Pipelines",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "purl": "pkg:helm/tekton-pipeline@1.1.0",
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "Not evaluated"
+        }
+      ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/tekton/tekton-pipeline"
           }
         ]
       }
@@ -4229,6 +4260,17 @@
       "purl": "pkg:oci/tektoncd/github.com/tektoncd/pipeline/cmd/webhook@v0.45.0?repository_url=ghcr.io"
     },
     {
+      "bom-ref": "pkg:oci/tektoncd/pipeline/controller-10a3e32792f33651396d02b6855a6e36@v1.1.0?repository_url=ghcr.io\u0026digest=sha256:72ba947187317aee83b8b6ba510b17375bede4ce062e366cd0162515e0f7d5f2",
+      "type": "container",
+      "supplier": {
+        "name": "tektoncd"
+      },
+      "name": "ghcr.io/tektoncd/pipeline/controller-10a3e32792f33651396d02b6855a6e36",
+      "version": "v1.1.0",
+      "cpe": "cpe:2.3:a:tektoncd:controller-10a3e32792f33651396d02b6855a6e36:1.1.0:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/tektoncd/pipeline/controller-10a3e32792f33651396d02b6855a6e36@v1.1.0?repository_url=ghcr.io\u0026digest=sha256:72ba947187317aee83b8b6ba510b17375bede4ce062e366cd0162515e0f7d5f2"
+    },
+    {
       "bom-ref": "pkg:oci/thanos/thanos@v0.39.2",
       "type": "container",
       "supplier": {
@@ -4377,7 +4419,8 @@
         "pkg:helm/prometheus-windows-exporter@0.12.2",
         "pkg:helm/rclone@0.1.0",
         "pkg:helm/s3-exporter@0.1.0",
-        "pkg:helm/tekton-pipelines@0.1.0",
+        "pkg:helm/tekton-monitoring@0.1.0",
+        "pkg:helm/tekton-pipeline@1.1.0",
         "pkg:helm/thanos-ingress-secret@0.1.0",
         "pkg:helm/thanos-ruler@0.1.0",
         "pkg:helm/thanos@15.13.1",
@@ -5073,11 +5116,23 @@
       ]
     },
     {
-      "ref": "pkg:helm/tekton-pipelines@0.1.0",
+      "ref": "pkg:helm/tekton-monitoring@0.1.0",
       "dependsOn": [
-        "pkg:oci/tektoncd/github.com/tektoncd/pipeline/cmd/controller@v0.45.0?repository_url=ghcr.io",
+        "pkg:oci/ingress-nginx/kube-webhook-certgen@v1.5.2?repository_url=registry.k8s.io",
+        "pkg:oci/kiwigrid/k8s-sidecar@1.30.3?repository_url=quay.io",
+        "pkg:oci/prometheus-operator/prometheus-config-reloader@v0.85.0?repository_url=quay.io",
+        "pkg:oci/prometheus-operator/prometheus-operator@v0.85.0?repository_url=quay.io",
+        "pkg:oci/prometheus/alertmanager@v0.28.1?repository_url=quay.io",
         "pkg:oci/tektoncd/github.com/tektoncd/pipeline/cmd/resolvers@v0.45.0?repository_url=ghcr.io",
         "pkg:oci/tektoncd/github.com/tektoncd/pipeline/cmd/webhook@v0.45.0?repository_url=ghcr.io"
+      ]
+    },
+    {
+      "ref": "pkg:helm/tekton-pipeline@1.1.0",
+      "dependsOn": [
+        "pkg:oci/tektoncd/github.com/tektoncd/pipeline/cmd/resolvers@v0.45.0?repository_url=ghcr.io",
+        "pkg:oci/tektoncd/github.com/tektoncd/pipeline/cmd/webhook@v0.45.0?repository_url=ghcr.io",
+        "pkg:oci/tektoncd/pipeline/controller-10a3e32792f33651396d02b6855a6e36@v1.1.0?repository_url=ghcr.io\u0026digest=sha256:72ba947187317aee83b8b6ba510b17375bede4ce062e366cd0162515e0f7d5f2"
       ]
     },
     {
@@ -5660,6 +5715,10 @@
     },
     {
       "ref": "pkg:oci/tektoncd/github.com/tektoncd/pipeline/cmd/webhook@v0.45.0?repository_url=ghcr.io",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:oci/tektoncd/pipeline/controller-10a3e32792f33651396d02b6855a6e36@v1.1.0?repository_url=ghcr.io\u0026digest=sha256:72ba947187317aee83b8b6ba510b17375bede4ce062e366cd0162515e0f7d5f2",
       "dependsOn": []
     },
     {
