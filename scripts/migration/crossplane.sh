@@ -3,9 +3,9 @@
 set -euo pipefail
 shopt -s inherit_errexit
 
-module_acceptance() {
+module_maintenance_test() {
   if [[ "${#}" -lt 2 ]] || [[ ! "${1}" =~ ^(sc|wc)$ ]]; then
-    log_fatal "usage: module_acceptance <sc|wc> <module_selector> [<helm-post-renderer-kustomization-dir>]"
+    log_fatal "usage: module_maintenance_test <sc|wc> <module_selector> [<helm-post-renderer-kustomization-dir>]"
   fi
 
   local helmfile_list_result
@@ -33,7 +33,7 @@ module_acceptance() {
   old_release_name="${new_release_name#"module-"}"
   namespace="$(jq -r '.[0].namespace' <<<"${helmfile_list_result}")"
 
-  log_info "Running ${new_release_name} acceptance test by comparing it with existing Helm Release ${old_release_name} in cluster ${1}"
+  log_info "Running ${new_release_name} maintenance test by comparing it with existing Helm Release ${old_release_name} in cluster ${1}"
 
   crossplane_release="$(_crossplane_render "${1}" "${new_release_name}" | yq 'select(.kind == "Release")')"
 
@@ -82,7 +82,7 @@ module_acceptance() {
     log_fatal "DO NOT UPGRADE"
   fi
 
-  log_info "${new_release_name} acceptance test for cluster ${1} succeeded!"
+  log_info "${new_release_name} maintenance test for cluster ${1} succeeded!"
 }
 
 _crossplane_render() {
