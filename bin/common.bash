@@ -156,6 +156,7 @@ check_tools() {
   check_minor "$(echo "${req}" | jq --raw-output '.["helm-secrets"].version')" "$(helm plugin list | grep secrets)" "helm secrets plugin"
   check_minor "$(echo "${req}" | jq --raw-output '.["getsops/sops/v3"].version')" "$(sops --version)" "sops"
   check_minor "$(echo "${req}" | jq --raw-output '.["s3cmd"].version')" "$(s3cmd --version)" "s3cmd"
+  check_minor "$(echo "${req}" | jq --raw-output '.["crossplane"].version')" "$(crossplane version --client)" "crossplane"
 
   if [[ "${warn}" != 0 ]]; then
     if [[ -t 1 ]]; then
