@@ -66,6 +66,24 @@ config:
           insecure_skip_verify: {{ not .Values.global.verifyTls }}
     tcp_connect:
       prober: tcp
+    rabbitmq_amqp:
+      prober: tcp
+      timeout: 10s
+      tcp:
+        tls: false
+        query_response:
+          - send: "AMQP\x00\x00\x09\x01"
+          - expect: "AMQP"
+    rabbitmq_amqps:
+      prober: tcp
+      timeout: 10s
+      tcp:
+        tls: true
+        tls_config:
+          insecure_skip_verify: {{ not .Values.global.verifyTls }}
+        query_response:
+          - send: "AMQP\x00\x00\x09\x01"
+          - expect: "AMQP"
 
 service:
   ipDualStack:
