@@ -68,6 +68,8 @@ global:
   ipFamilies:
     - "IPv4"
 
+  mountCustomRootCert: false
+
 clusterApi:
   ## Set to true if kubernetes is installed with cluster-api
   enabled: set-me

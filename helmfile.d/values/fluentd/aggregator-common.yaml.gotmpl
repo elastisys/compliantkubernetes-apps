@@ -67,6 +67,22 @@ aggregator:
 
   extraEnvVarsSecret: {{ .Release.Name }}-storage-credentials
 
+  {{- if .Values.global.mountCustomRootCert }}
+  extraEnvVars:
+  - name: AWS_CA_BUNDLE
+    value: /etc/ssl/certs/ca.crt
+
+  extraVolumes:
+  - configMap:
+      defaultMode: 420
+      name: root-cert
+    name: root-certs-volume
+
+  extraVolumeMounts:
+  - mountPath: /etc/ssl/certs
+    name: root-certs-volume
+  {{- end }}
+
   networkPolicy:
     enabled: false
 
