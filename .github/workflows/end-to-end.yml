@@ -4,8 +4,7 @@ on:
   schedule:
     - cron: "0 4 * * *"
 
-# TODO: Use workflow dispatch for testing manually. Should only enable schedule run when merging the PR
-# on:
+# TODO: Use workflow dispatch for testing manually. Can be removed before merging the PR
   workflow_dispatch:
     inputs:
       environment:
@@ -498,7 +497,6 @@ jobs:
 
       - name: Run end-to-end tests
         continue-on-error: true
-        # if: steps.wait-wc.outcome == 'success'
         id: e2e-test
         run: ./apps/pipeline/test/end-to-end.bash
 
@@ -616,11 +614,12 @@ jobs:
           GITHUB_ACTOR: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  # TODO: Alert run with condition github.event.inputs.alerts == 'true' should be changed to always() when PR is ready to merge
+  # TODO: alert job condition should be changed to always() before PR is merged
   alert:
     needs: [clean-apps-image]
     runs-on: ubuntu-latest
-    # if: github.event.inputs.alerts == 'true' && github.ref == 'refs/heads/main'
+    if: github.event.inputs.alerts == 'true' && github.ref == 'refs/heads/main' && github.workflow.on == 'workflow_dispatch'
+    environment: test
     steps:
       - id: get-sha
         run: |
