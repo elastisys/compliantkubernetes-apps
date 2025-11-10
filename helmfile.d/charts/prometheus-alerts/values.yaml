@@ -151,6 +151,9 @@ defaultRules:
     # alertLabels:
     #   key: value
 
+  disabled:
+    CPUThrottlingHigh: false
+
 capacityManagementAlertsPredictUsage: false
 capacityManagementAlertsNodeGroupCpuLimit24h: 75
 capacityManagementAlertsNodeGroupMemoryLimit24h: 75
