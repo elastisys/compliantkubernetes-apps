@@ -12,6 +12,16 @@ spec:
     - Ingress
     - Egress
   ingress:
+    {{- if eq (dig "ck8sCloudProvider" "" .Values.global ) "azure" }}
+    - from:
+      - ipBlock:
+          cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 443
+        - protocol: TCP
+          port: 80
+    {{- end }}
     {{- if or .Values.global.wcNodes.ips .Values.global.wcIngress.ips }}
     - from:
       {{- if not (or .Values.global.externalLoadBalancer .Values.global.ingressUsingHostNetwork) }}
