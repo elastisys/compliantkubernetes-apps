@@ -65,10 +65,4 @@ policies:
           peers:
             - podSelectorLabels:
                 app: crossplane
-        {{- range $provider, $_ := $providers }}
-        - name: ingress-rule-prov-{{ $provider }}
-          peers:
-            - podSelectorLabels:
-                pkg.crossplane.io/provider: provider-{{ $provider }}
-        {{- end }}
     {{- end }}
