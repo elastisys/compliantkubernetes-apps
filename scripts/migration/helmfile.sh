@@ -43,7 +43,7 @@ helmfile_apply() {
 
   if [[ "${CK8S_DRY_RUN_INSTALL}" == "true" ]]; then
     log_info "Dry-running on ${*}"
-    helmfile_diff "${prefix}" "${@}"
+    helmfile_diff "${prefix}" "${@}" || true
     return
   fi
 
