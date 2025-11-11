@@ -8,13 +8,7 @@ controller:
   deployment:
     {{- with .Values.images | dig "tekton" "controller" "" }}
     {{- with merge (include "container_uri.parse" . | fromJson) $global }}
-    image:
-      {{- with include "gen.reg-rep-img" . }}
-      repository: {{ . }}
-      {{- end }}
-      {{- if or .tag .digest }}
-      tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
-      {{- end }}
+    image: {{ include "gen.reg-rep-img" . }}:{{- if or .tag .digest }}{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}{{- end }}
     {{- end }}
     {{- end }}
 

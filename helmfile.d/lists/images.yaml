@@ -93,9 +93,7 @@ images:
   rclone:
     image: ghcr.io/elastisys/rclone-sync:1.70.3
   tekton:
-    controller: ghcr.io/tektoncd/github.com/tektoncd/pipeline/cmd/controller:v0.45.0
-    remoteResolvers: ghcr.io/tektoncd/github.com/tektoncd/pipeline/cmd/resolvers:v0.45.0
-    webhook: ghcr.io/tektoncd/github.com/tektoncd/pipeline/cmd/webhook:v0.45.0
+    controller: ghcr.io/tektoncd/pipeline/controller-10a3e32792f33651396d02b6855a6e36:v1.1.0@sha256:72ba947187317aee83b8b6ba510b17375bede4ce062e366cd0162515e0f7d5f2
   thanos:
     image: ghcr.io/elastisys/bitnami/thanos:0.37.2-debian-12-r8
   velero:
