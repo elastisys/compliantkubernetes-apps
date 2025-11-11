@@ -108,6 +108,8 @@ externalURL: https://{{ .Values.harbor.subdomain }}.{{ .Values.global.baseDomain
 
 harborAdminPassword: {{ .Values.harbor.password }}
 
+caBundleSecretName: root-cert
+
 clair:
   enabled: false
 
