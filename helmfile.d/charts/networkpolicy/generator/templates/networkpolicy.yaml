@@ -10,9 +10,13 @@ metadata:
   namespace: {{ $namespace }}
 spec:
   podSelector:
+    {{- with $policy.podSelectorExpressions }}
+    matchExpressions: {{- toYaml . | nindent 6 }}
+    {{- end }}
     {{- with $policy.podSelectorLabels }}
     matchLabels: {{- toYaml . | nindent 6 }}
-    {{- else }} {} {{- end }}
+    {{- end }}
+    {{- if not (or $policy.podSelectorLabels $policy.podSelectorExpressions) }} {} {{- end }}
   policyTypes:
     {{- if hasKey $policy "egress" }}
     - Egress
