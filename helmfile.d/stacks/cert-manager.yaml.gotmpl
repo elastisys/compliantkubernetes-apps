@@ -19,6 +19,24 @@ templates:
       - values/networkpolicies/common/common.yaml.gotmpl
       - values/networkpolicies/common/cert-manager.yaml.gotmpl
 
+  cert-manager-resolvers-networkpolicy:
+    inherit:
+      - template: cert-manager
+      - template: networkpolicies
+    installed: {{ .Values | get "networkPolicies.certManager.enabled" false }}
+    name: networkpolicy-cert-manager-resolvers
+    labels:
+      netpol: cert-manager
+    needs:
+      - kube-system/admin-namespaces
+      - kube-system/dev-namespaces
+    {{- if .Values | get "ck8sWorkloadCluster.enabled" false }}
+      - kube-system/user-rbac
+    {{- end }}
+    values:
+      - values/networkpolicies/common/common.yaml.gotmpl
+      - values/networkpolicies/common/cert-manager-resolvers.yaml.gotmpl
+
   cert-manager-controller:
     disableValidation: true
     disableValidationOnInstall: true
@@ -30,6 +48,7 @@ templates:
     needs:
       {{- if .Values | get "networkPolicies.certManager.enabled" false }}
       - cert-manager/networkpolicy
+      - cert-manager/networkpolicy-cert-manager-resolvers
       {{- end }}
       - monitoring/kube-prometheus-stack # creates servicemonitors
     values:
