@@ -1,0 +1,50 @@
+policies:
+  gatekeeper-system:
+    all-deny:
+      podSelectorLabels: {}
+      egress: {}
+      ingress: {}
+
+    controller-manager:
+      podSelectorLabels:
+        control-plane: controller-manager
+      ingress:
+        - rule: ingress-rule-prometheus
+          ports:
+            - tcp: 8888
+        - rule: ingress-rule-blackbox
+          ports:
+            - tcp: 8443
+        - rule: ingress-rule-apiserver
+          ports:
+            - tcp: 8443
+      egress:
+        - rule: egress-rule-apiserver
+
+    audit-controller:
+      podSelectorLabels:
+        control-plane: audit-controller
+      ingress:
+        - rule: ingress-rule-prometheus
+          ports:
+            - tcp: 8888
+      egress:
+        - rule: egress-rule-apiserver
+
+    templates-wait:
+      podSelectorLabels:
+        job-name: gatekeeper-templates-wait
+      egress:
+        - rule: egress-rule-apiserver
+
+    update-crds-hook:
+      podSelectorLabels:
+        job-name: gatekeeper-update-crds-hook
+      egress:
+        - rule: egress-rule-apiserver
+
+    update-namespace-label:
+      podSelectorLabels:
+        job-name: gatekeeper-update-namespace-label
+      egress:
+        - rule: egress-rule-apiserver
