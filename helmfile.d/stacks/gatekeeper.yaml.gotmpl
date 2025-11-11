@@ -7,13 +7,25 @@ templates:
     labels:
       app: gatekeeper
 
+  gatekeeper-networkpolicy:
+    inherit:
+      - template: gatekeeper
+      - template: networkpolicies
+    labels:
+      netpol: gatekeeper
+    needs:
+      - kube-system/admin-namespaces
+    values:
+      - values/networkpolicies/common/common.yaml.gotmpl
+      - values/networkpolicies/common/gatekeeper.yaml.gotmpl
+
   gatekeeper-controller:
     inherit:
       - template: gatekeeper
       - template: gatekeeper-chart
     name: gatekeeper
     needs:
-      - kube-system/common-np
+      - gatekeeper-system/networkpolicy
     values:
       - values/gatekeeper/gatekeeper.yaml.gotmpl
     wait: true
