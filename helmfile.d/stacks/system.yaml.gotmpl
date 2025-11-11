@@ -86,3 +86,17 @@ templates:
       psp: rook-ceph
     values:
       - values/podsecuritypolicies/common/rook-ceph.yaml.gotmpl
+
+  coredns-networkpolicy:
+    inherit:
+      - template: system
+      - template: networkpolicies
+    name: networkpolicy-coredns
+    installed: {{ .Values | get "networkPolicies.coredns.enabled" false }}
+    labels:
+      netpol: coredns
+    needs:
+      - kube-system/admin-namespaces
+    values:
+      - values/networkpolicies/common/common.yaml.gotmpl
+      - values/networkpolicies/common/coredns.yaml.gotmpl
