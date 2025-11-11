@@ -5,6 +5,9 @@ policies:
       egress: {}
       ingress: {}
 
+    {{- $functions := .Values.images.crossplane.functions }}
+    {{- $providers := .Values.images.crossplane.providers }}
+
     crossplane:
       podSelectorLabels:
         app.kubernetes.io/name: crossplane
@@ -15,11 +18,11 @@ policies:
         {{- if and (.Values | get "networkPolicies.crossplane.packageRegistry.ips" list) (.Values | get "networkPolicies.crossplane.packageRegistry.ports" list) }}
         - rule: egress-rule-package-registry
         {{- end }}
-        {{- range $function, $image := .Values.images.crossplane.functions }}
-        - name: egress-rule-{{ $function }}
+        {{- range $function, $_ := $functions }}
+        - name: egress-rule-fn-{{ $function }}
           peers:
             - podSelectorLabels:
-                pkg.crossplane.io/functions: {{ $function }}
+                pkg.crossplane.io/function: function-{{ $function }}
         {{- end }}
 
     crossplane-rbac-manager:
@@ -35,7 +38,7 @@ policies:
       egress:
         - rule: egress-rule-apiserver
 
-    {{- range $provider, $image := .Values.images.crossplane.providers }}
+    {{- range $provider, $_ := $providers }}
     provider-{{ $provider }}:
       podSelectorLabels:
         pkg.crossplane.io/provider: provider-{{ $provider }}
@@ -43,5 +46,23 @@ policies:
         - rule: egress-rule-apiserver
         {{- if eq $provider "helm" }}
         - rule: egress-rule-package-registry
+        - rule: egress-rule-dns
         {{- end }}
+        {{- range $function, $_ := $functions }}
+        - name: egress-rule-fn-{{ $function }}
+          peers:
+            - podSelectorLabels:
+                pkg.crossplane.io/function: function-{{ $function }}
+        {{- end }}
+    {{- end }}
+
+    {{- range $function, $_ := $functions }}
+    function-{{ $function }}:
+      podSelectorLabels:
+        pkg.crossplane.io/function: function-{{ $function }}
+      ingress:
+        - name: ingress-crossplane
+          peers:
+            - podSelectorLabels:
+                app: crossplane
     {{- end }}

@@ -60,6 +60,7 @@ spec:
           type: RuntimeDefault
       restartPolicy: Never
       serviceAccountName: crossplane-provider-waiter
+      terminationGracePeriodSeconds: 1
       containers:
         - name: waiter
           image: {{ .Values.kubectlImage.repository }}:{{ .Values.kubectlImage.tag }}
