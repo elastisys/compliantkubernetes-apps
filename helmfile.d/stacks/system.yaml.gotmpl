@@ -4,53 +4,6 @@ templates:
     condition: ck8sAnyCluster.enabled
     namespace: kube-system
 
-  networkpolicies-common:
-    inherit: [ template: system ]
-    installed: {{ .Values | get "ck8sAnyCluster.enabled" false }}
-    chart: charts/networkpolicy/common
-    version: 0.2.0
-    name: common-np
-    labels:
-      policy: netpol
-      netpol: common
-    needs:
-      - kube-system/admin-namespaces # Make this only for SC?
-    {{- if .Values | get "ck8sWorkloadCluster.enabled" false }}
-      - kube-system/user-rbac # creates networkpolicies for its namespaces
-    {{- end }}
-    values:
-    - values/networkpolicy/common.yaml.gotmpl
-
-  networkpolicies-service:
-    condition: ck8sManagementCluster.enabled
-    inherit: [ template: system ]
-    installed: {{ .Values | get "ck8sManagementCluster.enabled" false }}
-    chart: charts/networkpolicy/service-cluster
-    version: 0.2.0
-    name: service-cluster-np
-    labels:
-      policy: netpol
-      netpol: service
-    needs:
-      - kube-system/admin-namespaces
-    values:
-      - values/networkpolicy/service-cluster.yaml.gotmpl
-
-  networkpolicies-workload:
-    condition: ck8sWorkloadCluster.enabled
-    inherit: [ template: system ]
-    installed: {{ .Values | get "ck8sWorkloadCluster.enabled" false }}
-    chart: charts/networkpolicy/workload-cluster
-    version: 0.2.0
-    name: workload-cluster-np
-    labels:
-      policy: netpol
-      netpol: workload
-    needs:
-      - kube-system/admin-namespaces
-    values:
-      - values/networkpolicy/workload-cluster.yaml.gotmpl
-
   node-local-dns:
     disableValidationOnInstall: true
     inherit: [ template: system ]

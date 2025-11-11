@@ -44,11 +44,6 @@ templates:
       - falco/networkpolicy
       {{- end }}
       - falco/podsecuritypolicy
-      {{- if .Values | get "ck8sManagementCluster.enabled" false }}
-      - kube-system/service-cluster-np
-      {{- else if .Values | get "ck8sWorkloadCluster.enabled" false }}
-      - kube-system/workload-cluster-np
-      {{- end }}
     values:
       - values/falco/falco-common.yaml.gotmpl
       {{- if .Values | get "ck8sManagementCluster.enabled" false }}
