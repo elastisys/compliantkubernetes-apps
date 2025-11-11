@@ -54,56 +54,6 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 
 ## Automatic method
 
-> [!caution]
-> v0.49.0 has a known issue with a migration missing for maintaining the old configuration for the Ingress Controller using UpCloud as provider.
->
-> The default configuration changed from using HostPorts on the Pods to NodePorts on the Service.
-> This changes the used port numbers, so unless you reconfigure your load balancer to use the new NodePorts, ingress traffic will not be able to enter your environment.
->
-> For the SC:
->
-> ```bash
-> host_port="$(yq ea "explode(.) | .ingressNginx.controller.useHostPort | select(. != null) | {\"wrapper\": .} as \$item ireduce ({}; . * \$item) | .wrapper | ... comments=\"\"" \
->   "${CK8S_CONFIG_PATH}/defaults/common-config.yaml" \
->   "${CK8S_CONFIG_PATH}/defaults/sc-config.yaml" \
->   "${CK8S_CONFIG_PATH}/common-config.yaml" \
->   "${CK8S_CONFIG_PATH}/sc-config.yaml")"
-> if [[ "${host_port}" == "true" ]]; then
->   yq -i '.ingressNginx.controller.useHostPort = true' "${CK8S_CONFIG_PATH}/sc-config.yaml"
-> fi
->
-> service_enabled="$(yq ea "explode(.) | .ingressNginx.controller.service.enabled | select(. != null) | {\"wrapper\": .} as \$item ireduce ({}; . * \$item) | .wrapper | ... comments=\"\"" \
->   "${CK8S_CONFIG_PATH}/defaults/common-config.yaml" \
->   "${CK8S_CONFIG_PATH}/defaults/sc-config.yaml" \
->   "${CK8S_CONFIG_PATH}/common-config.yaml" \
->   "${CK8S_CONFIG_PATH}/sc-config.yaml")"
-> if [[ "${service_enabled}" == "false" ]]; then
->   yq -i '.ingressNginx.controller.service.enabled = false' "${CK8S_CONFIG_PATH}/sc-config.yaml"
-> fi
-> ```
->
-> For the WC:
->
-> ```bash
-> host_port="$(yq ea "explode(.) | .ingressNginx.controller.useHostPort | select(. != null) | {\"wrapper\": .} as \$item ireduce ({}; . * \$item) | .wrapper | ... comments=\"\"" \
->   "${CK8S_CONFIG_PATH}/defaults/common-config.yaml" \
->   "${CK8S_CONFIG_PATH}/defaults/wc-config.yaml" \
->   "${CK8S_CONFIG_PATH}/common-config.yaml" \
->   "${CK8S_CONFIG_PATH}/wc-config.yaml")"
-> if [[ "${host_port}" == "true" ]]; then
->   yq -i '.ingressNginx.controller.useHostPort = true' "${CK8S_CONFIG_PATH}/wc-config.yaml"
-> fi
->
-> service_enabled="$(yq ea "explode(.) | .ingressNginx.controller.service.enabled | select(. != null) | {\"wrapper\": .} as \$item ireduce ({}; . * \$item) | .wrapper | ... comments=\"\"" \
->   "${CK8S_CONFIG_PATH}/defaults/common-config.yaml" \
->   "${CK8S_CONFIG_PATH}/defaults/wc-config.yaml" \
->   "${CK8S_CONFIG_PATH}/common-config.yaml" \
->   "${CK8S_CONFIG_PATH}/wc-config.yaml")"
-> if [[ "${service_enabled}" == "false" ]]; then
->   yq -i '.ingressNginx.controller.service.enabled = false' "${CK8S_CONFIG_PATH}/wc-config.yaml"
-> fi
-> ```
-
 1. Pull the latest changes and switch to the correct branch:
 
     ```bash
@@ -145,56 +95,6 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 ### Prepare upgrade - _non-disruptive_
 
 > _Done before maintenance window._
-
-> [!caution]
-> v0.49.0 has a known issue with a migration missing for maintaining the old configuration for the Ingress Controller using UpCloud as provider.
->
-> The default configuration changed from using HostPorts on the Pods to NodePorts on the Service.
-> This changes the used port numbers, so unless you reconfigure your load balancer to use the new NodePorts, ingress traffic will not be able to enter your environment.
->
-> For the SC:
->
-> ```bash
-> host_port="$(yq ea "explode(.) | .ingressNginx.controller.useHostPort | select(. != null) | {\"wrapper\": .} as \$item ireduce ({}; . * \$item) | .wrapper | ... comments=\"\"" \
->   "${CK8S_CONFIG_PATH}/defaults/common-config.yaml" \
->   "${CK8S_CONFIG_PATH}/defaults/sc-config.yaml" \
->   "${CK8S_CONFIG_PATH}/common-config.yaml" \
->   "${CK8S_CONFIG_PATH}/sc-config.yaml")"
-> if [[ "${host_port}" == "true" ]]; then
->   yq -i '.ingressNginx.controller.useHostPort = true' "${CK8S_CONFIG_PATH}/sc-config.yaml"
-> fi
->
-> service_enabled="$(yq ea "explode(.) | .ingressNginx.controller.service.enabled | select(. != null) | {\"wrapper\": .} as \$item ireduce ({}; . * \$item) | .wrapper | ... comments=\"\"" \
->   "${CK8S_CONFIG_PATH}/defaults/common-config.yaml" \
->   "${CK8S_CONFIG_PATH}/defaults/sc-config.yaml" \
->   "${CK8S_CONFIG_PATH}/common-config.yaml" \
->   "${CK8S_CONFIG_PATH}/sc-config.yaml")"
-> if [[ "${service_enabled}" == "false" ]]; then
->   yq -i '.ingressNginx.controller.service.enabled = false' "${CK8S_CONFIG_PATH}/sc-config.yaml"
-> fi
-> ```
->
-> For the WC:
->
-> ```bash
-> host_port="$(yq ea "explode(.) | .ingressNginx.controller.useHostPort | select(. != null) | {\"wrapper\": .} as \$item ireduce ({}; . * \$item) | .wrapper | ... comments=\"\"" \
->   "${CK8S_CONFIG_PATH}/defaults/common-config.yaml" \
->   "${CK8S_CONFIG_PATH}/defaults/wc-config.yaml" \
->   "${CK8S_CONFIG_PATH}/common-config.yaml" \
->   "${CK8S_CONFIG_PATH}/wc-config.yaml")"
-> if [[ "${host_port}" == "true" ]]; then
->   yq -i '.ingressNginx.controller.useHostPort = true' "${CK8S_CONFIG_PATH}/wc-config.yaml"
-> fi
->
-> service_enabled="$(yq ea "explode(.) | .ingressNginx.controller.service.enabled | select(. != null) | {\"wrapper\": .} as \$item ireduce ({}; . * \$item) | .wrapper | ... comments=\"\"" \
->   "${CK8S_CONFIG_PATH}/defaults/common-config.yaml" \
->   "${CK8S_CONFIG_PATH}/defaults/wc-config.yaml" \
->   "${CK8S_CONFIG_PATH}/common-config.yaml" \
->   "${CK8S_CONFIG_PATH}/wc-config.yaml")"
-> if [[ "${service_enabled}" == "false" ]]; then
->   yq -i '.ingressNginx.controller.service.enabled = false' "${CK8S_CONFIG_PATH}/wc-config.yaml"
-> fi
-> ```
 
 1. Pull the latest changes and switch to the correct branch:
 
