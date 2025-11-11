@@ -1,0 +1,78 @@
+{{- define "old-style.rule.gen" }}{{ if and .ips .ports }}
+{{- $peers := list }}{{ range .ips }}{{ $peers = dict "cidr" . | append $peers }}{{ end }}
+{{- $ports := list }}{{ range .ports }}{{ $ports = dict "tcp" . | append $ports }}{{ end }}
+{{- dict "peers" $peers "ports" $ports | toYaml | nindent 10 | trim -}}
+{{- end }}{{ end -}}
+
+policies:
+  ingress-nginx:
+    all-deny:
+      podSelectorLabels: {}
+      egress: {}
+      ingress: {}
+
+    default-backend:
+      podSelectorLabels:
+        app.kubernetes.io/component: default-backend
+      ingress:
+        - rule: ingress-rule-ingress
+          ports:
+            - tcp: 8080
+
+    webhook:
+      podSelectorLabels:
+        app.kubernetes.io/component: admission-webhook
+      egress:
+        - rule: egress-rule-dns
+        - rule: egress-rule-apiserver
+
+    controller:
+      podSelectorLabels:
+        app.kubernetes.io/component: controller
+      ingress:
+        - rule: ingress-rule-ingress-controller
+          ports:
+            - tcp: 80
+            - tcp: 443
+        - rule: ingress-rule-apiserver
+          ports:
+            - tcp: 8443
+        - rule: ingress-rule-blackbox
+          ports:
+            - tcp: 80
+            - tcp: 443
+            - tcp: 8443
+        - rule: ingress-rule-prometheus
+          ports:
+            - tcp: 10254
+      egress:
+        - rule: egress-rule-dns
+        - rule: egress-rule-apiserver
+        - rule: egress-rule-ingress
+          ports:
+            - tcp: 80
+            - tcp: 443
+        - rule: egress-rule-namespaces
+          peers:
+            - namespaceSelectorLabels: {}
+        - name: egress-rule-kube-system-api
+          peers:
+            - podSelectorLabels:
+                component: kube-apiserver
+            - namespaceSelectorLabels:
+                kubernetes.io/metadata.name: kube-system
+          ports:
+            - tcp: 3000
+        - name: egress-rule-default-backend
+          peers:
+            - podSelectorLabels:
+                app.kubernetes.io/component: default-backend
+          ports:
+            - tcp: 8080
+        - name: egress-rule-cert-manager
+          peers:
+            - namespaceSelectorLabels: {}
+            - podSelectorLabels:
+                acme.cert-manager.io/http01-solver: "true"
+          ports:
+            - tcp: 8089

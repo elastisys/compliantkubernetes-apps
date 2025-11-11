@@ -1,0 +1,124 @@
+{{- define "old-style.rule.gen" }}{{ if and .ips .ports }}
+{{- $peers := list }}{{ range .ips }}{{ $peers = dict "cidr" . | append $peers }}{{ end }}
+{{- $ports := list }}{{ range .ports }}{{ $ports = dict "tcp" . | append $ports }}{{ end }}
+{{- dict "peers" $peers "ports" $ports | toYaml | nindent 10 | trim -}}
+{{- end }}{{ end -}}
+
+policies:
+  ingress-nginx:
+    all-deny:
+      podSelectorLabels: {}
+      egress: {}
+      ingress: {}
+
+    default-backend:
+      podSelectorLabels:
+        app.kubernetes.io/component: default-backend
+      ingress:
+        - rule: ingress-rule-ingress
+          ports:
+            - tcp: 8080
+
+    webhook:
+      podSelectorLabels:
+        app.kubernetes.io/component: admission-webhook
+      egress:
+        - rule: egress-rule-dns
+        - rule: egress-rule-apiserver
+
+    controller:
+      podSelectorLabels:
+        app.kubernetes.io/component: controller
+      ingress:
+        - rule: ingress-rule-ingress-controller
+          ports:
+            - tcp: 80
+            - tcp: 443
+        - rule: ingress-rule-apiserver
+          ports:
+            - tcp: 8443
+        - rule: ingress-rule-blackbox
+          ports:
+            - tcp: 80
+            - tcp: 443
+            - tcp: 8443
+        - rule: ingress-rule-prometheus
+          ports:
+            - tcp: 10254
+      egress:
+        - rule: egress-rule-dns
+        - rule: egress-rule-apiserver
+        - rule: egress-rule-ingress
+          ports:
+            - tcp: 80
+            - tcp: 443
+        - name: egress-rule-grafana
+          peers:
+            - namespaceSelectorLabels:
+                kubernetes.io/metadata.name: monitoring
+              podSelectorLabels:
+                app.kubernetes.io/name: grafana
+          ports:
+            - tcp: 3000
+        - name: egress-rule-opensearch-dashboards
+          peers:
+            - namespaceSelectorLabels:
+                kubernetes.io/metadata.name: opensearch-system
+              podSelectorLabels:
+                app.kubernetes.io/instance: opensearch-dashboards
+          ports:
+            - tcp: 5601
+        - name: egress-rule-opensearch
+          peers:
+            - namespaceSelectorLabels:
+                kubernetes.io/metadata.name: opensearch-system
+              podSelectorLabels:
+                {{- if .Values.opensearch.clientNode.dedicatedPods }}
+                app.kubernetes.io/component: opensearch-client
+                {{- else }}
+                app.kubernetes.io/component: opensearch-master
+                {{- end }}
+          ports:
+            - tcp: 9200
+        - name: egress-rule-harbor
+          peers:
+            - namespaceSelectorLabels:
+                kubernetes.io/metadata.name: harbor
+              podSelectorLabels:
+                component: core
+            - namespaceSelectorLabels:
+                kubernetes.io/metadata.name: harbor
+              podSelectorLabels:
+                component: portal
+          ports:
+            - tcp: 8080
+        - name: egress-rule-dex
+          peers:
+            - namespaceSelectorLabels:
+                kubernetes.io/metadata.name: dex
+              podSelectorLabels:
+                app.kubernetes.io/name: dex
+          ports:
+            - tcp: 5556
+        - name: egress-rule-thanos
+          peers:
+            - namespaceSelectorLabels:
+                kubernetes.io/metadata.name: thanos
+              podSelectorLabels:
+                app.kubernetes.io/component: receive-distributor
+          ports:
+            - tcp: 10902 # HTTP API
+            - tcp: 19291 # Remote Write
+        - name: egress-rule-default-backend
+          peers:
+            - podSelectorLabels:
+                app.kubernetes.io/component: default-backend
+          ports:
+            - tcp: 8080
+        - name: egress-rule-cert-manager
+          peers:
+            - namespaceSelectorLabels: {}
+            - podSelectorLabels:
+                acme.cert-manager.io/http01-solver: "true"
+          ports:
+            - tcp: 8089

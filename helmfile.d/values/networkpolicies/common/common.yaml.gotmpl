@@ -118,6 +118,18 @@ rules:
           app.kubernetes.io/name: ingress-nginx
       {{- end }}
 
+  ingress-rule-ingress-controller:
+    peers:
+      {{- if not (or $netpol.global.externalLoadBalancer $netpol.global.ingressUsingHostNetwork) }}
+      {{- range $nodes.ips }}
+      - cidr: {{ .}}
+      {{- end }}
+      {{- else }}
+      {{- range $ingress.ips }}
+      - cidr: {{ . }}
+      {{- end }}
+      {{- end }}
+
   ingress-rule-blackbox:
     peers:
       - namespaceSelectorLabels:
