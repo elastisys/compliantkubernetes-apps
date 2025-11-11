@@ -100,3 +100,86 @@ templates:
     values:
       - values/networkpolicies/common/common.yaml.gotmpl
       - values/networkpolicies/common/coredns.yaml.gotmpl
+
+  dns-autoscaler-networkpolicy:
+    inherit:
+      - template: system
+      - template: networkpolicies
+    name: networkpolicy-dns-autoscaler
+    installed: {{ .Values | get "networkPolicies.dnsAutoscaler.enabled" false }}
+    labels:
+      netpol: dns-autoscaler
+    needs:
+      - kube-system/admin-namespaces
+    values:
+      - values/networkpolicies/common/common.yaml.gotmpl
+      - values/networkpolicies/common/dns-autoscaler.yaml.gotmpl
+
+  metrics-server-networkpolicy:
+    inherit:
+      - template: system
+      - template: networkpolicies
+    name: networkpolicy-metrics-server
+    installed: {{ .Values | get "networkPolicies.kubeSystem.enabled" false }}
+    labels:
+      netpol: metrics-server
+    needs:
+      - kube-system/admin-namespaces
+    values:
+      - values/networkpolicies/common/common.yaml.gotmpl
+      - values/networkpolicies/common/metrics-server.yaml.gotmpl
+
+  cinder-csi-networkpolicy:
+    inherit:
+      - template: system
+      - template: networkpolicies
+    name: networkpolicy-cinder-csi
+    installed: {{ and (.Values | get "networkPolicies.kubeSystem.enabled" false) (.Values | get "networkPolicies.kubeSystem.openstack.enabled" false) }}
+    labels:
+      netpol: cinder-csi
+    needs:
+      - kube-system/admin-namespaces
+    values:
+      - values/networkpolicies/common/common.yaml.gotmpl
+      - values/networkpolicies/common/cinder-csi.yaml.gotmpl
+
+  upcloud-csi-networkpolicy:
+    inherit:
+      - template: system
+      - template: networkpolicies
+    name: networkpolicy-upcloud-csi
+    installed: {{ and (.Values | get "networkPolicies.kubeSystem.enabled" false) (.Values | get "networkPolicies.kubeSystem.upcloud.enabled" false) }}
+    labels:
+      netpol: upcloud-csi
+    needs:
+      - kube-system/admin-namespaces
+    values:
+      - values/networkpolicies/common/common.yaml.gotmpl
+      - values/networkpolicies/common/upcloud-csi.yaml.gotmpl
+
+  snapshot-controller-networkpolicy:
+    inherit:
+      - template: system
+      - template: networkpolicies
+    name: networkpolicy-snapshot-controller
+    installed: {{ .Values | get "networkPolicies.kubeSystem.enabled" false }}
+    labels:
+      netpol: snapshot-controller
+    needs:
+      - kube-system/admin-namespaces
+    values:
+      - values/networkpolicies/common/common.yaml.gotmpl
+      - values/networkpolicies/common/snapshot-controller.yaml.gotmpl
+
+  additional-networkpolicy:
+    inherit:
+      - template: system
+      - template: networkpolicies
+    name: networkpolicy-additional
+    installed: {{ .Values | get "networkPolicies.additional" "" | ne "" }}
+    labels:
+      netpol: additional
+    needs:
+      - kube-system/admin-namespaces
+    values:
+      - values/networkpolicies/common/additional.yaml.gotmpl
