@@ -1317,6 +1317,30 @@ allOf:
                   ports:
                     title: NetworkPolicies Kyverno Image Registry Ports
                     $ref: '#/$defs/portlist'
+- if:
+    properties:
+      crossplane:
+        properties:
+          enabled:
+            type: boolean
+            const: true
+      networkPolicies:
+        properties:
+          crossplane:
+            properties:
+              enabled:
+                type: boolean
+                const: true
+  then:
+    properties:
+      networkPolicies:
+        properties:
+          crossplane:
+            properties:
+              packageRegistry:
+                properties:
+                  ips:
+                    $ref: '#/$defs/iplist'
 properties:
   global:
     title: Global options
@@ -7955,8 +7979,7 @@ properties:
             type: object
             additionalProperties: false
             properties:
-              ips:
-                $ref: '#/$defs/iplist'
+              ips: true
               ports:
                 $ref: '#/$defs/portlist'
                 default:
