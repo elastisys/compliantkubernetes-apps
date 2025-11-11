@@ -153,7 +153,8 @@ releases:
   - inherit: [ template: rclone-restore ]
   - inherit: [ template: rclone-sync ]
 
-  - inherit: [ template: dex ]
+  - inherit: [ template: dex-networkpolicy ]
+  - inherit: [ template: dex-main ]
 
   - inherit: [ template: grafana-admin ]
   - inherit: [ template: grafana-dev ]

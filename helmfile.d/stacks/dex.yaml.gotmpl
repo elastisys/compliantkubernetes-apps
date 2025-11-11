@@ -1,17 +1,36 @@
 ---
 templates:
   dex:
-    disableValidationOnInstall: true
     condition: ck8sManagementCluster.enabled
-    inherit: [ template: dex-chart ]
-    installed: {{ .Values | get "ck8sManagementCluster.enabled" false }}
     namespace: dex
-    name: dex
     labels:
       app: dex
+
+  dex-main:
+    disableValidationOnInstall: true
+    inherit:
+     - template: dex
+     - template: dex-chart
+    installed: {{ .Values | get "ck8sManagementCluster.enabled" false }}
+    name: dex
     needs:
-      - kube-system/service-cluster-np
+      {{- if .Values | get "networkPolicies.dex.enabled" false }}
+      - dex/networkpolicy
+      {{- end }}
       - monitoring/kube-prometheus-stack # creates servicemonitors
     values:
       - values/dex.yaml.gotmpl
     wait: true
+
+  dex-networkpolicy:
+    inherit:
+      - template: dex
+      - template: networkpolicies
+    installed: {{ and (.Values | get "ck8sManagementCluster.enabled" false) (.Values | get "networkPolicies.dex.enabled" false) }}
+    labels:
+      netpol: dex
+    needs:
+      - kube-system/admin-namespaces
+    values:
+      - values/networkpolicies/common/common.yaml.gotmpl
+      - values/networkpolicies/service/dex.yaml.gotmpl
