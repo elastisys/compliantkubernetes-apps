@@ -15,8 +15,9 @@ kubectlImage:
 {{- end }}
 {{- end }}
 
+{{- with .Values.images | dig "crossplane" "configurations" dict }}
 configurations:
-{{- range $configuration, $image := .Values.images.crossplane.configurations }}
+{{- range $configuration, $image := . }}
   {{ $configuration }}:
     {{- $image = merge (include "container_uri.parse" $image | fromJson) $imagesGlobal }}
     {{- with $image }}
@@ -28,6 +29,7 @@ configurations:
       tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
       {{- end }}
     {{- end }}
+{{- end }}
 {{- end }}
 
 functions:
