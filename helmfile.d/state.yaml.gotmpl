@@ -60,6 +60,7 @@ releases:
   - inherit: [ template: kube-state-metrics-extra-resources ]
   - inherit: [ template: metrics-server ]
 
+  - inherit: [ template: cert-manager-resolvers-networkpolicy ]
   - inherit: [ template: cert-manager-networkpolicy ]
   - inherit: [ template: cert-manager-controller ]
   - inherit: [ template: cert-manager-issuers ]
