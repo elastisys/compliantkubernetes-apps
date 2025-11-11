@@ -33,3 +33,12 @@ policies:
       egress:
         - rule: egress-rule-dns
         - rule: egress-rule-apiserver
+
+    velero-maintenance-job:
+      podSelectorExpressions:
+        - key: velero.io/repo-name
+          operator: Exists
+      egress:
+        - rule: egress-rule-dns
+        - rule: egress-rule-apiserver
+        - rule: egress-rule-object-storage
