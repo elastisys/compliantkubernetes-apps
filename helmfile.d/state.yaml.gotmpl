@@ -52,12 +52,19 @@ releases:
   - inherit: [ template: networkpolicies-common ]
   - inherit: [ template: networkpolicies-service ]
   - inherit: [ template: networkpolicies-workload ]
+  - inherit: [ template: additional-networkpolicy]
+  - inherit: [ template: dns-autoscaler-networkpolicy ]
+  - inherit: [ template: snapshot-controller-networkpolicy ]
+
+  - inherit: [ template: cinder-csi-networkpolicy ]
+  - inherit: [ template: upcloud-csi-networkpolicy ]
 
   - inherit: [ template: monitoring-networkpolicy ]
   - inherit: [ template: monitoring-podsecuritypolicy ]
 
   - inherit: [ template: kube-prometheus-stack ]
   - inherit: [ template: kube-state-metrics-extra-resources ]
+  - inherit: [ template: metrics-server-networkpolicy ]
   - inherit: [ template: metrics-server ]
 
   - inherit: [ template: cert-manager-networkpolicy ]
