@@ -1921,68 +1921,6 @@
       }
     },
     {
-      "bom-ref": "pkg:helm/networkpolicy-service@0.2.0",
-      "type": "library",
-      "supplier": {
-        "name": "Elastisys"
-      },
-      "name": "networkpolicy-service",
-      "version": "0.2.0",
-      "description": "This chart will contain the Network Policies common for both service cluster and workload cluster(s).",
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
-      "purl": "pkg:helm/networkpolicy-service@0.2.0",
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "Not evaluated"
-        }
-      ],
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/charts/networkpolicy/common"
-          }
-        ]
-      }
-    },
-    {
-      "bom-ref": "pkg:helm/networkpolicy-workload@0.2.0",
-      "type": "library",
-      "supplier": {
-        "name": "Elastisys"
-      },
-      "name": "networkpolicy-workload",
-      "version": "0.2.0",
-      "description": "This chart will contain the Network Policies for workload cluster.",
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
-      "purl": "pkg:helm/networkpolicy-workload@0.2.0",
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "Not evaluated"
-        }
-      ],
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/charts/networkpolicy/workload-cluster"
-          }
-        ]
-      }
-    },
-    {
       "bom-ref": "pkg:helm/node-feature-discovery@0.16.6",
       "type": "library",
       "supplier": {
@@ -4397,8 +4335,6 @@
         "pkg:helm/minio@5.0.14",
         "pkg:helm/namespaces@0.1.1",
         "pkg:helm/networkpolicy-generator@0.1.0",
-        "pkg:helm/networkpolicy-service@0.2.0",
-        "pkg:helm/networkpolicy-workload@0.2.0",
         "pkg:helm/node-feature-discovery@0.16.6",
         "pkg:helm/node-local-dns@0.1.1",
         "pkg:helm/opensearch-configurer@0.1.0",
@@ -4965,14 +4901,6 @@
     },
     {
       "ref": "pkg:helm/networkpolicy-generator@0.1.0",
-      "dependsOn": []
-    },
-    {
-      "ref": "pkg:helm/networkpolicy-service@0.2.0",
-      "dependsOn": []
-    },
-    {
-      "ref": "pkg:helm/networkpolicy-workload@0.2.0",
       "dependsOn": []
     },
     {
