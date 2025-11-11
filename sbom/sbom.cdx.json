@@ -1,10 +1,17 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
+<<<<<<< HEAD
   "serialNumber": "urn:uuid:82b3e71c-544c-4701-938b-68a8a410f653",
   "version": 1,
   "metadata": {
     "timestamp": "2025-11-06T07:38:38Z",
+=======
+  "serialNumber": "urn:uuid:870e55ea-37b8-4076-99a1-df6a7c54510a",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2025-11-11T12:53:03Z",
+>>>>>>> a04cd07a (apps: removed old network policy chart)
     "lifecycles": [
       {
         "phase": "build"
@@ -1885,68 +1892,6 @@
         "occurrences": [
           {
             "location": "helmfile.d/charts/networkpolicy/generator"
-          }
-        ]
-      }
-    },
-    {
-      "bom-ref": "pkg:helm/networkpolicy-service@0.2.0",
-      "type": "library",
-      "supplier": {
-        "name": "Elastisys"
-      },
-      "name": "networkpolicy-service",
-      "version": "0.2.0",
-      "description": "This chart will contain the Network Policies common for both service cluster and workload cluster(s).",
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
-      "purl": "pkg:helm/networkpolicy-service@0.2.0",
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "Not evaluated"
-        }
-      ],
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/charts/networkpolicy/common"
-          }
-        ]
-      }
-    },
-    {
-      "bom-ref": "pkg:helm/networkpolicy-workload@0.2.0",
-      "type": "library",
-      "supplier": {
-        "name": "Elastisys"
-      },
-      "name": "networkpolicy-workload",
-      "version": "0.2.0",
-      "description": "This chart will contain the Network Policies for workload cluster.",
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
-      "purl": "pkg:helm/networkpolicy-workload@0.2.0",
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "Not evaluated"
-        }
-      ],
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/charts/networkpolicy/workload-cluster"
           }
         ]
       }
@@ -4357,8 +4302,6 @@
         "pkg:helm/minio@5.0.14",
         "pkg:helm/namespaces@0.1.1",
         "pkg:helm/networkpolicy-generator@0.1.0",
-        "pkg:helm/networkpolicy-service@0.2.0",
-        "pkg:helm/networkpolicy-workload@0.2.0",
         "pkg:helm/node-feature-discovery@0.16.6",
         "pkg:helm/node-local-dns@0.1.1",
         "pkg:helm/opensearch-configurer@0.1.0",
@@ -4917,14 +4860,6 @@
     },
     {
       "ref": "pkg:helm/networkpolicy-generator@0.1.0",
-      "dependsOn": []
-    },
-    {
-      "ref": "pkg:helm/networkpolicy-service@0.2.0",
-      "dependsOn": []
-    },
-    {
-      "ref": "pkg:helm/networkpolicy-workload@0.2.0",
       "dependsOn": []
     },
     {
