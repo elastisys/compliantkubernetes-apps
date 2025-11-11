@@ -6,6 +6,19 @@ templates:
     labels:
       app: opensearch
 
+  opensearch-networkpolicy:
+    inherit:
+      - template: opensearch
+      - template: networkpolicies
+    installed: {{ and (.Values | get "ck8sManagementCluster.enabled" false) (.Values | get "networkPolicies.opensearch.enabled" false) }}
+    labels:
+      netpol: opensearch
+    needs:
+      - kube-system/admin-namespaces
+    values:
+      - values/networkpolicies/common/common.yaml.gotmpl
+      - values/networkpolicies/service/opensearch.yaml.gotmpl
+
   opensearch-secrets:
     disableValidationOnInstall: true # creates cert-manager/certificates
     inherit: [ template: opensearch ]
@@ -39,7 +52,9 @@ templates:
       {{- if .Values | get "opensearch.sso.enabled" false }}
       - dex/dex
       {{- end }}
-      - kube-system/service-cluster-np
+      {{- if .Values | get "networkPolicies.opensearch.enabled" false }}
+      - opensearch-system/networkpolicy
+      {{- end }}
       - opensearch-system/opensearch-secrets
       - opensearch-system/podsecuritypolicy
     values:
@@ -54,7 +69,9 @@ templates:
     installed: {{ and (.Values | get "opensearch.enabled" false) (.Values | get "opensearch.clientNode.dedicatedPods" false) }}
     name: opensearch-client
     needs:
-      - kube-system/service-cluster-np
+      {{- if .Values | get "networkPolicies.opensearch.enabled" false }}
+      - opensearch-system/networkpolicy
+      {{- end }}
       - opensearch-system/opensearch-master
       - opensearch-system/podsecuritypolicy
     values:
@@ -69,7 +86,9 @@ templates:
     installed: {{ and (.Values | get "opensearch.enabled" false) (.Values | get "opensearch.dataNode.dedicatedPods" false) }}
     name: opensearch-data
     needs:
-      - kube-system/service-cluster-np
+      {{- if .Values | get "networkPolicies.opensearch.enabled" false }}
+      - opensearch-system/networkpolicy
+      {{- end }}
       - opensearch-system/opensearch-master
       - opensearch-system/podsecuritypolicy
     values:
@@ -87,7 +106,9 @@ templates:
       {{- if .Values | get "opensearch.sso.enabled" false }}
       - dex/dex
       {{- end }}
-      - kube-system/service-cluster-np
+      {{- if .Values | get "networkPolicies.opensearch.enabled" false }}
+      - opensearch-system/networkpolicy
+      {{- end }}
       - opensearch-system/opensearch-master
       - opensearch-system/podsecuritypolicy
     values:
