@@ -12,7 +12,11 @@ spec:
   podSelector:
     {{- with $policy.podSelectorLabels }}
     matchLabels: {{- toYaml . | nindent 6 }}
-    {{- else }} {} {{- end }}
+    {{- end }}
+    {{- with $policy.podSelectorExpressions }}
+    matchExpressions: {{- toYaml . | nindent 6 }}
+    {{- end }}
+    {{- if not (or $policy.podSelectorLabels $policy.podSelectorExpressions) }} {} {{- end }}
   policyTypes:
     {{- if hasKey $policy "egress" }}
     - Egress
