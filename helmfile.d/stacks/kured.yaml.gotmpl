@@ -6,6 +6,19 @@ templates:
     labels:
       app: kured
 
+  kured-networkpolicy:
+    inherit:
+      - template: kured
+      - template: networkpolicies
+    installed: {{ and (.Values | get "kured.enabled" false) (.Values | get "networkPolicies.kured.enabled" false) }}
+    labels:
+      netpol: kured
+    needs:
+      - kube-system/admin-namespaces
+    values:
+      - values/networkpolicies/common/common.yaml.gotmpl
+      - values/networkpolicies/common/kured.yaml.gotmpl
+
   kured-podsecuritypolicy:
     inherit:
       - template: kured
@@ -35,7 +48,9 @@ templates:
       - template: kured-chart
     name: kured
     needs:
-      - kube-system/common-np
+      {{- if .Values | get "networkPolicies.kured.enabled" false }}
+      - kured/networkpolicy
+      {{- end }}
       - monitoring/kube-prometheus-stack # creates servicemonitors
     values:
       - values/kured.yaml.gotmpl
