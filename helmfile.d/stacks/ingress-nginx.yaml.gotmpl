@@ -35,10 +35,8 @@ templates:
     name: ingress-nginx
     needs:
       - ingress-nginx/podsecuritypolicy
-      {{- if .Values | get "ck8sManagementCluster.enabled" false }}
-      - kube-system/service-cluster-np
-      {{- else if .Values | get "ck8sWorkloadCluster.enabled" false }}
-      - kube-system/workload-cluster-np
+      {{- if .Values | get "networkPolicies.ingressNginx.enabled" false }}
+      - ingress-nginx/networkpolicy
       {{- end }}
       {{- if .Values | get "ingressNginx.controller.chroot" false }}
       - kube-system/file-copier
@@ -49,18 +47,24 @@ templates:
     wait: true
 
   ingress-nginx-networkpolicy:
-    condition: ck8sWorkloadCluster.enabled
     inherit:
       - template: ingress-nginx
       - template: networkpolicies
-    installed: {{ .Values | get "wcProbeIngress.enabled" false }}
+    installed: {{ .Values | get "networkPolicies.ingressNginx.enabled" false }}
     labels:
       netpol: ingress-nginx
     needs:
       - kube-system/admin-namespaces
     values:
       - values/networkpolicies/common/common.yaml.gotmpl
+      {{- if .Values | get "ck8sManagementCluster.enabled" false }}
+      - values/networkpolicies/service/ingress-nginx.yaml.gotmpl
+      {{- else if .Values | get "ck8sWorkloadCluster.enabled" false }}
+      - values/networkpolicies/workload/ingress-nginx.yaml.gotmpl
+      {{- if .Values | get "wcProbeIngress.enabled" false }}
       - values/networkpolicies/workload/ingress-nginx-probe.yaml.gotmpl
+      {{- end }}
+      {{- end }}
 
   ingress-nginx-probe-ingress:
     condition: ck8sWorkloadCluster.enabled
