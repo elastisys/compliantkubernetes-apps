@@ -1,0 +1,19 @@
+{{- define "old-style.rule.gen" }}{{ if and .ips .ports }}
+{{- $peers := list }}{{ range .ips }}{{ $peers = dict "cidr" . | append $peers }}{{ end }}
+{{- $ports := list }}{{ range .ports }}{{ $ports = dict "tcp" . | append $ports }}{{ end }}
+{{- dict "peers" $peers "ports" $ports | toYaml | nindent 10 | trim -}}
+{{- end }}{{ end -}}
+
+policies:
+  kube-system:
+    upcloud-csi:
+      podSelectorLabels:
+        app: csi-upcloud-controller
+      ingress: {}
+      egress:
+        - rule: egress-rule-dns
+        - rule: egress-rule-apiserver
+        {{- with .Values.networkPolicies.kubeSystem.upcloud  }}
+        - name: egress-rule-upcloud
+          {{ template "old-style.rule.gen" . }}
+        {{- end }}

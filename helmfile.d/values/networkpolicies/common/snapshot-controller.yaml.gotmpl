@@ -1,0 +1,9 @@
+policies:
+  kube-system:
+    snapshot-controller:
+      podSelectorLabels:
+        app: snapshot-controller
+      ingress: {}
+      egress:
+        - rule: egress-rule-dns
+        - rule: egress-rule-apiserver
