@@ -18,9 +18,9 @@ spec:
       labels:
         {{- include "s3-exporter.selectorLabels" . | nindent 8 }}
     spec:
+      {{- if .Values.volumes }}
       volumes:
-      {{- with .Values.volumes }}
-        {{- toYaml . | nindent 8 }}
+        {{- toYaml .Values.volumes | nindent 8 }}
       {{- end }}
       automountServiceAccountToken: false
       {{- with .Values.imagePullSecrets }}
@@ -49,9 +49,9 @@ spec:
             httpGet:
               path: /
               port: http
+          {{- if .Values.volumeMounts }}
           volumeMounts:
-          {{- with .Values.volumeMounts }}
-            {{- toYaml . | nindent 12 }}
+            {{- toYaml .Values.volumeMounts | nindent 12 }}
           {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
