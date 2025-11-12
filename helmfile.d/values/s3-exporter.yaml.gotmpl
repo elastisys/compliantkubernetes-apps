@@ -32,6 +32,17 @@ image:
 {{- end }}
 {{- end }}
 
+{{- if .Values.global.mountCustomRootCert }}
+volumes:
+- name: root-certs-volume
+  configMap:
+    defaultMode: 420
+    name: root-certs
+volumeMounts:
+- mountPath: /etc/ssl/certs
+  name: root-certs-volume
+{{- end }}
+
 service:
   ipFamilyPolicy: {{ .Values.global.ipFamilyPolicy }}
   ipFamilies: {{ toYaml .Values.global.ipFamilies | nindent 6 }}
