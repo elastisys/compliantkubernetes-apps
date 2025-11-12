@@ -197,3 +197,39 @@ image:
   {{- end }}
 {{- end }}
 {{- end }}
+
+{{- if .Values.global.mountCustomRootCert }}
+extraInitContainers:
+- name: custom-root-cert
+  {{- with .Values.images | dig "opensearch" "image" "" }}
+  {{- with merge (include "container_uri.parse" . | fromJson) $global }}
+  image: "{{- include "gen.container_uri" . }}"
+  {{- end }}
+  {{- end }}
+  command:
+  - /bin/bash
+  - -c
+  - |
+    cp /usr/share/opensearch/jdk/lib/security/cacerts /opt/custom-truststore/truststore/new-cacerts
+    chmod +w /opt/custom-truststore/truststore/new-cacerts
+    keytool -importcert -trustcacerts -alias "custom-ca" -file /opt/custom-certs/ca.crt -keystore /opt/custom-truststore/truststore/new-cacerts -storepass {{ .Values.opensearch.trustStorePassword }} -noprompt
+  volumeMounts:
+  - mountPath: /opt/custom-certs
+    name: root-certs-volume
+  - mountPath: /opt/custom-truststore/truststore
+    name: custom-truststore
+
+extraVolumes:
+- configMap:
+    defaultMode: 420
+    name: root-cert
+  name: root-certs-volume
+- emptyDir: {}
+  name: custom-truststore
+
+extraVolumeMounts:
+- mountPath: /opt/custom-truststore/custom
+  name: root-certs-volume
+- mountPath: /opt/custom-truststore/truststore
+  name: custom-truststore
+{{- end }}
