@@ -148,6 +148,7 @@ object_storage.delete() {
 object_storage.is_compacted() {
   local bucket="${1}"
   local prefix="${2}"
+  local cutoff="${3}"
 
   local object_storage_type
   object_storage_type="$(yq.get sc '.objectStorage.type')"
@@ -155,7 +156,7 @@ object_storage.is_compacted() {
   "s3")
     # For some reason it doesn't like the single quotes for the awk input, likely because of the escaped pipes.
     # shellcheck disable=SC2016
-    run bats_pipe ck8s s3cmd ls --recursive "s3://${bucket}/${prefix}" \| awk '{print $4}' \| sed "s|s3://${bucket}/||" \| sed 's|\(.*\)/.*|\1|' \| sort \| uniq -d
+    run bats_pipe ck8s s3cmd ls --recursive "s3://${bucket}/${prefix}" \| awk -v cutoff="${cutoff}" '$1" "$2 < cutoff' \| awk '{print $4}' \| sed "s|s3://${bucket}/||" \| sed 's|\(.*\)/.*|\1|' \| sort \| uniq -d
     assert_success
     refute_output
     ;;
