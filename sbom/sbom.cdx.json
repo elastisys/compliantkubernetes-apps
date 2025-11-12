@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:72227cea-41d7-4fa4-9ee8-01b8a35baed7",
+  "serialNumber": "urn:uuid:fd9f0887-d3a9-48b5-98cb-7f4793225941",
   "version": 1,
   "metadata": {
-    "timestamp": "2025-11-12T10:03:19Z",
+    "timestamp": "2025-11-12T10:15:25Z",
     "lifecycles": [
       {
         "phase": "build"
@@ -37,6 +37,13 @@
       "type": "application",
       "name": "compliantkubernetes-apps",
       "version": "latest",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
       "purl": "pkg:generic/compliantkubernetes-apps@latest",
       "properties": [
         {
