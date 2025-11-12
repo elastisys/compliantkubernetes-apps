@@ -394,19 +394,7 @@
       "image_property": "tekton.controller",
       "helmfile_selector": "app=tekton",
       "container_name": "tekton-pipelines-controller",
-      "template_file": "sc/tekton-pipelines/templates/controller/deployment.yaml"
-    },
-    {
-      "image_property": "tekton.remoteResolvers",
-      "helmfile_selector": "app=tekton",
-      "container_name": "controller",
-      "template_file": "sc/tekton-pipelines/templates/remote-resolvers/deployment.yaml"
-    },
-    {
-      "image_property": "tekton.webhook",
-      "helmfile_selector": "app=tekton",
-      "container_name": "webhook",
-      "template_file": "sc/tekton-pipelines/templates/webhook/deployment.yaml"
+      "template_file": "sc/tekton-pipeline/templates/tekton-pipelines-controller-deploy.yaml"
     },
     {
       "image_property": "thanos.image",
