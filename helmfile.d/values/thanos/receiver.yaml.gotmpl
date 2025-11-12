@@ -20,6 +20,18 @@ compactor:
     - --deduplication.replica-label=prometheus_replica
   {{- end }}
 
+  {{- if .Values.global.mountCustomRootCert }}
+  extraVolumes:
+  - name: root-certs-volume
+    configMap:
+      defaultMode: 420
+      name: root-cert
+  
+  extraVolumeMounts:
+  - mountPath: /etc/ssl/certs
+    name: root-certs-volume
+  {{- end }}
+
   resources: {{- toYaml .Values.thanos.compactor.resources | nindent 4 }}
 
   persistence:
@@ -33,6 +45,19 @@ compactor:
       type: RuntimeDefault
 
 storegateway:
+
+  {{- if .Values.global.mountCustomRootCert }}
+  extraVolumes:
+  - name: root-certs-volume
+    configMap:
+      defaultMode: 420
+      name: root-cert
+  
+  extraVolumeMounts:
+  - mountPath: /etc/ssl/certs
+    name: root-certs-volume
+  {{- end }}
+
   enabled: true
   persistence:
     size: {{ .Values.thanos.storegateway.persistence.size }}
@@ -46,6 +71,19 @@ storegateway:
       type: RuntimeDefault
 
 bucketweb:
+
+  {{- if .Values.global.mountCustomRootCert }}
+  extraVolumes:
+  - name: root-certs-volume
+    configMap:
+      defaultMode: 420
+      name: root-cert
+  
+  extraVolumeMounts:
+  - mountPath: /etc/ssl/certs
+    name: root-certs-volume
+  {{- end }}
+
   enabled: true
   resources: {{- toYaml .Values.thanos.bucketweb.resources | nindent 4 }}
 
@@ -57,6 +95,19 @@ bucketweb:
       type: RuntimeDefault
 
 receive:
+
+  {{- if .Values.global.mountCustomRootCert }}
+  extraVolumes:
+  - name: root-certs-volume
+    configMap:
+      defaultMode: 420
+      name: root-cert
+  
+  extraVolumeMounts:
+  - mountPath: /etc/ssl/certs
+    name: root-certs-volume
+  {{- end }}
+
   enabled: true
 
   mode: {{ .Values.thanos.receiver.mode }}
@@ -105,6 +156,19 @@ receive:
       type: RuntimeDefault
 
 receiveDistributor:
+
+  {{- if .Values.global.mountCustomRootCert }}
+  extraVolumes:
+  - name: root-certs-volume
+    configMap:
+      defaultMode: 420
+      name: root-cert
+  
+  extraVolumeMounts:
+  - mountPath: /etc/ssl/certs
+    name: root-certs-volume
+  {{- end }}
+
   enabled: true
   serviceAccount:
     create: false
@@ -137,6 +201,19 @@ receiveDistributor:
     {{- end }}
 
 ruler:
+
+  {{- if .Values.global.mountCustomRootCert }}
+  extraVolumes:
+  - name: root-certs-volume
+    configMap:
+      defaultMode: 420
+      name: root-cert
+  
+  extraVolumeMounts:
+  - mountPath: /etc/ssl/certs
+    name: root-certs-volume
+  {{- end }}
+
   enabled: {{ .Values.thanos.ruler.enabled }}
 
   resources: {{- toYaml .Values.thanos.ruler.resources | nindent 4 }}
@@ -214,6 +291,19 @@ ruler:
         name: ruler-config
 
 metrics:
+
+  {{- if .Values.global.mountCustomRootCert }}
+  extraVolumes:
+  - name: root-certs-volume
+    configMap:
+      defaultMode: 420
+      name: root-cert
+  
+  extraVolumeMounts:
+  - mountPath: /etc/ssl/certs
+    name: root-certs-volume
+  {{- end }}
+
   enabled: {{ .Values.thanos.metrics.enabled }}
   serviceMonitor:
     enabled: {{ .Values.thanos.metrics.serviceMonitor.enabled }}
