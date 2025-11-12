@@ -12,7 +12,7 @@ skipped=(
 )
 declare -a skipped_sc
 skipped_sc=(
-  app=tekton
+  "app!=tekton"
 )
 declare -a skipped_wc
 skipped_wc=(
