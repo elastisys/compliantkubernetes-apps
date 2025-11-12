@@ -37,7 +37,7 @@ volumes:
 - name: root-certs-volume
   configMap:
     defaultMode: 420
-    name: root-certs
+    name: root-cert
 volumeMounts:
 - mountPath: /etc/ssl/certs
   name: root-certs-volume
