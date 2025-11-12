@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:2ffa9046-b27e-4737-85df-e851a944355d",
+  "serialNumber": "urn:uuid:dee53793-5504-411f-a0a9-8dbf29ede326",
   "version": 1,
   "metadata": {
-    "timestamp": "2025-11-11T08:17:18Z",
+    "timestamp": "2025-11-18T14:47:46Z",
     "lifecycles": [
       {
         "phase": "build"
@@ -1735,13 +1735,13 @@
       }
     },
     {
-      "bom-ref": "pkg:helm/metrics-server@3.12.1",
+      "bom-ref": "pkg:helm/metrics-server@3.13.0",
       "type": "library",
       "supplier": {
         "name": "kubernetes-sigs"
       },
       "name": "metrics-server",
-      "version": "3.12.1",
+      "version": "3.13.0",
       "description": "Metrics Server is a scalable, efficient source of container resource metrics for Kubernetes built-in autoscaling pipelines.",
       "licenses": [
         {
@@ -1750,7 +1750,7 @@
           }
         }
       ],
-      "purl": "pkg:helm/metrics-server@3.12.1",
+      "purl": "pkg:helm/metrics-server@3.13.0",
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -2863,15 +2863,15 @@
       "purl": "pkg:oci/aquasecurity/node-collector@0.3.1"
     },
     {
-      "bom-ref": "pkg:oci/autoscaling/addon-resizer@1.8.20?repository_url=registry.k8s.io",
+      "bom-ref": "pkg:oci/autoscaling/addon-resizer@1.8.23?repository_url=registry.k8s.io",
       "type": "container",
       "supplier": {
         "name": "autoscaling"
       },
       "name": "registry.k8s.io/autoscaling/addon-resizer",
-      "version": "1.8.20",
-      "cpe": "cpe:2.3:a:kubernetes:addon-resizer:1.8.20:*:*:*:*:*:*:*",
-      "purl": "pkg:oci/autoscaling/addon-resizer@1.8.20?repository_url=registry.k8s.io"
+      "version": "1.8.23",
+      "cpe": "cpe:2.3:a:kubernetes:addon-resizer:1.8.23:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/autoscaling/addon-resizer@1.8.23?repository_url=registry.k8s.io"
     },
     {
       "bom-ref": "pkg:oci/bats/bats@v1.4.1",
@@ -3908,15 +3908,15 @@
       "purl": "pkg:oci/library/busybox@1.36?repository_url=docker.io"
     },
     {
-      "bom-ref": "pkg:oci/metrics-server/metrics-server@v0.7.1?repository_url=registry.k8s.io",
+      "bom-ref": "pkg:oci/metrics-server/metrics-server@v0.8.0?repository_url=registry.k8s.io",
       "type": "container",
       "supplier": {
         "name": "metrics-server"
       },
       "name": "registry.k8s.io/metrics-server/metrics-server",
-      "version": "v0.7.1",
-      "cpe": "cpe:2.3:a:kubernetes:metrics-server:0.7.1:*:*:*:*:*:*:*",
-      "purl": "pkg:oci/metrics-server/metrics-server@v0.7.1?repository_url=registry.k8s.io"
+      "version": "v0.8.0",
+      "cpe": "cpe:2.3:a:kubernetes:metrics-server:0.8.0:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/metrics-server/metrics-server@v0.8.0?repository_url=registry.k8s.io"
     },
     {
       "bom-ref": "pkg:oci/minio/mc@RELEASE.2023-09-29T16-41-22Z?repository_url=quay.io",
@@ -4361,7 +4361,7 @@
         "pkg:helm/kyverno@3.3.6",
         "pkg:helm/letsencrypt@0.1.0",
         "pkg:helm/log-manager@0.1.0",
-        "pkg:helm/metrics-server@3.12.1",
+        "pkg:helm/metrics-server@3.13.0",
         "pkg:helm/minio@15.0.5",
         "pkg:helm/minio@5.0.14",
         "pkg:helm/namespaces@0.1.1",
@@ -4897,11 +4897,11 @@
       ]
     },
     {
-      "ref": "pkg:helm/metrics-server@3.12.1",
+      "ref": "pkg:helm/metrics-server@3.13.0",
       "dependsOn": [
-        "pkg:oci/autoscaling/addon-resizer@1.8.20?repository_url=registry.k8s.io",
+        "pkg:oci/autoscaling/addon-resizer@1.8.23?repository_url=registry.k8s.io",
         "pkg:oci/crossplane-contrib/provider-kubernetes@v1.0.0?repository_url=xpkg.crossplane.io",
-        "pkg:oci/metrics-server/metrics-server@v0.7.1?repository_url=registry.k8s.io"
+        "pkg:oci/metrics-server/metrics-server@v0.8.0?repository_url=registry.k8s.io"
       ]
     },
     {
@@ -5173,7 +5173,7 @@
       "dependsOn": []
     },
     {
-      "ref": "pkg:oci/autoscaling/addon-resizer@1.8.20?repository_url=registry.k8s.io",
+      "ref": "pkg:oci/autoscaling/addon-resizer@1.8.23?repository_url=registry.k8s.io",
       "dependsOn": []
     },
     {
@@ -5553,7 +5553,7 @@
       "dependsOn": []
     },
     {
-      "ref": "pkg:oci/metrics-server/metrics-server@v0.7.1?repository_url=registry.k8s.io",
+      "ref": "pkg:oci/metrics-server/metrics-server@v0.8.0?repository_url=registry.k8s.io",
       "dependsOn": []
     },
     {
