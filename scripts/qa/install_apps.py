@@ -50,7 +50,7 @@ def configure_apps(
     """Configure apps"""
 
     # Configure network plugin
-    if (network_plugin := args.config["networkPlugin"]) is not None:
+    if (network_plugin := args.config.get("networkPlugin")) is not None:
         common_config.set("networkPlugin.type", network_plugin, merge=False)
 
     # Configure platform administrators
@@ -351,6 +351,9 @@ def install_dex(args: Args) -> None:
 
 def open_network_policies(config: Config) -> None:
     """Open network policies"""
+    if config.get("networkPlugin") is None:
+        return
+
     for cluster in ["sc", "wc"]:
         allow_all_policy = (
             f"{TESTS_DIR}/common/network-policies/{config['networkPlugin']}-allow-all.yaml"
@@ -360,6 +363,9 @@ def open_network_policies(config: Config) -> None:
 
 def close_network_policies(config: Config) -> None:
     """Close network policies"""
+    if config.get("networkPlugin") is None:
+        return
+
     for cluster in ["sc", "wc"]:
         allow_all_policy = (
             f"{TESTS_DIR}/common/network-policies/{config['networkPlugin']}-allow-all.yaml"

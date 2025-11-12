@@ -85,7 +85,8 @@ should serve as a good guideline of what's possible (but necessarily _required_)
     "ingress": [
       "set-me"
     ]
-  }
+  },
+  "networkPlugin": "set-me"
 }
 ```
 
@@ -193,7 +194,8 @@ load balancer won't be included.
   "wcSubnets": {
     "apiServer": ["172.16.36.0/24"],
     "nodes": ["172.16.36.0/24"]
-  }
+  },
+  "networkPlugin": "calico"
 }
 ```
 
@@ -241,7 +243,8 @@ Find the public hostnames for your SC/WC on the [Load Balancers page](https://hu
         "secretKey": "redacted"
       }
     }
-  }
+  },
+  "networkPlugin": "calico"
 }
 ```
 
@@ -291,7 +294,8 @@ We're going with very permissive subnets for Brewer, but you can totally close t
   "wcSubnets": {
     "nodes": [ "0.0.0.0/0" ],
     "apiServer": [ "0.0.0.0/0" ]
-  }
+  },
+  "networkPlugin": "calico"
 }
 ```
 
