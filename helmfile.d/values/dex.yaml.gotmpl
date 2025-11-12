@@ -27,6 +27,17 @@ volumes:
       secretName: {{ .Values.dex.google.SASecretName }}
 {{- end }}
 
+{{- if .Values.global.mountCustomRootCert }}
+volumes:
+- name: root-certs-volume
+  configMap:
+    defaultMode: 420
+    name: root-cert
+volumeMounts:
+- mountPath: /etc/ssl/certs
+  name: root-certs-volume
+{{- end }}
+
 config:
   oauth2:
     skipApprovalScreen: true
