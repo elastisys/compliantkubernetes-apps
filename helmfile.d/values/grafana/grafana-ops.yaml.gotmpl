@@ -114,7 +114,6 @@ grafana.ini:
     oauth_allow_insecure_email_lookup: true
   auth.generic_oauth:
     name: dex
-    email_attribute_path: "sub"
     enabled: {{ .Values.grafana.ops.oidc.enabled }}
     use_pkce: true
     client_id: grafana-ops
@@ -123,6 +122,7 @@ grafana.ini:
     auth_url: https://{{ .Values.dex.subdomain }}.{{ .Values.global.baseDomain }}{{ $trailingDot }}/auth
     token_url: http://dex.dex.svc.cluster.local{{ $trailingDot }}:5556/token
     api_url: http://dex.dex.svc.cluster.local{{ $trailingDot }}:5556/api
+    allowed_domains: {{ join " " .Values.grafana.ops.oidc.allowedDomains }}
     allow_sign_up: true
     skip_org_role_sync: {{ .Values.grafana.ops.oidc.skipRoleSync }}
     tls_skip_verify_insecure: {{ not .Values.global.verifyTls }}
