@@ -80,7 +80,7 @@ images:
     blackboxExporter: quay.io/prometheus/blackbox-exporter:v0.27.0
     grafanaLabelEnforcer: quay.io/prometheuscommunity/prom-label-proxy:v0.11.0
     s3Exporter: ghcr.io/elastisys/s3-exporter:0.5.0
-    metricsServer: registry.k8s.io/metrics-server/metrics-server:v0.7.1
+    metricsServer: registry.k8s.io/metrics-server/metrics-server:v0.8.0
     trivyOperator: mirror.gcr.io/aquasec/trivy-operator:0.29.0
   nodeLocalDns:
     image: registry.k8s.io/dns/k8s-dns-node-cache:1.25.0
