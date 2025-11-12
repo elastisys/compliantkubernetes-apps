@@ -121,9 +121,7 @@ _get_cronjob_env() {
 
 _get_latest_job_start_time() {
   kubectl -n "${NAMESPACE}" get jobs -o json |
-    jq -r "[.items[] | select(.metadata.ownerReferences[]?.name==\"${CRONJOB_NAME}\")] | sort_by(.status.startTime) | .[-1].status.startTime" |
-    cut -c1-16 |
-    tr 'T' ' '
+    jq -r "[.items[] | select(.metadata.ownerReferences[]?.name==\"${CRONJOB_NAME}\")] | sort_by(.status.startTime) | .[-1].status.startTime"
 }
 {{ end }}
 

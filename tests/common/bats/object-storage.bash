@@ -154,14 +154,18 @@ object_storage.is_compacted() {
   object_storage_type="$(yq.get sc '.objectStorage.type')"
   case "${object_storage_type}" in
   "s3")
+    # "yyyy-mm-ddThh:mm:ssZ" -> "yyyy-mm-dd hh:mm"
+    local -r s3_cutoff="$(echo "${cutoff}" | cut -c1-16 | tr 'T' ' ')"
     # For some reason it doesn't like the single quotes for the awk input, likely because of the escaped pipes.
     # shellcheck disable=SC2016
-    run bats_pipe ck8s s3cmd ls --recursive "s3://${bucket}/${prefix}" \| awk -v cutoff="${cutoff}" '$1" "$2 < cutoff' \| awk '{print $4}' \| sed "s|s3://${bucket}/||" \| sed 's|\(.*\)/.*|\1|' \| sort \| uniq -d
+    run bats_pipe ck8s s3cmd ls --recursive "s3://${bucket}/${prefix}" \| awk -v cutoff="${s3_cutoff}" '$1" "$2 < cutoff' \| awk '{print $4}' \| sed "s|s3://${bucket}/||" \| sed 's|\(.*\)/.*|\1|' \| sort \| uniq -d
     assert_success
     refute_output
     ;;
   "azure")
-    run bats_pipe az storage blob list --container-name "${bucket}" --prefix "${prefix}" --query '[].name' \| jq -r '.[]' \| sed 's|\(.*\)/.*|\1|' \| sort \| uniq -d
+    # It thinks we intend to expand $cutoff in the jq expression, but we're passing it as an arg.
+    # shellcheck disable=SC2016
+    run bats_pipe az storage blob list --container-name "${bucket}" --prefix "${prefix}" \| jq -r --arg cutoff "${cutoff}" '.[] | select(.properties.createdOn < $cutoff) | .name' \| sed 's|\(.*\)/.*|\1|' \| sort \| uniq -d
     assert_success
     refute_output
     ;;
