@@ -47,6 +47,8 @@ templates:
     name: metrics-server
     labels:
       app: metrics-server
+    needs:
+      - cert-manager/cert-manager # creates certificates and issuers
     values:
       - values/metrics-server.yaml.gotmpl
 

@@ -11,6 +11,12 @@ defaultArgs:
 args:
   - "--kubelet-insecure-tls"
 
+apiService:
+  insecureSkipTLSVerify: false
+
+tls:
+  type: cert-manager
+
 # keeping the container port from the old chart
 containerPort: 8443
 
