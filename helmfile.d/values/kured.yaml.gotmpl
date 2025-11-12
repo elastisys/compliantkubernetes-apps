@@ -54,6 +54,9 @@ slack:
 hostNetwork: false
 
 containerSecurityContext:
+  # This is needed to allow kured to send a signal to trigger a node reboot
+  appArmorProfile:
+    type: Unconfined
   runAsUser: 0
   runAsGroup: 0
   privileged: false
@@ -64,7 +67,3 @@ containerSecurityContext:
     - CAP_KILL
     drop:
     - '*'
-
-podAnnotations:
-  # This is needed to allow kured to send a signal to trigger a node reboot
-  container.apparmor.security.beta.kubernetes.io/kured: unconfined
