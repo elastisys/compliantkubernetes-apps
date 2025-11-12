@@ -47,7 +47,7 @@ else
 fi
 
 # Resolve repository root relative to this script
-REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+REPO_ROOT="$(readlink --canonicalize "$(dirname "${BASH_SOURCE[0]}")/..")"
 
 # Paths relative to repository root (use absolute for reliability)
 SBOM_OUTPUT="${REPO_ROOT}/sbom/sbom.cdx.json"
