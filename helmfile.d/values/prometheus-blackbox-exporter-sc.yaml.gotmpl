@@ -72,7 +72,10 @@ config:
       tcp:
         tls: false
         query_response:
-          - send: "AMQP\x00\x00\x09\x01"
+          - send: "HELO\r"
+          - send: "\r"
+          - send: "\r"
+          - send: "\r"
           - expect: "AMQP"
     rabbitmq_amqps:
       prober: tcp
@@ -82,7 +85,23 @@ config:
         tls_config:
           insecure_skip_verify: {{ not .Values.global.verifyTls }}
         query_response:
-          - send: "AMQP\x00\x00\x09\x01"
+          - send: "HELO\r"
+          - send: "\r"
+          - send: "\r"
+          - send: "\r"
+          - expect: "AMQP"
+    rabbitmq_amqps_insecure:
+      prober: tcp
+      timeout: 10s
+      tcp:
+        tls: true
+        tls_config:
+          insecure_skip_verify: true
+        query_response:
+          - send: "HELO\r"
+          - send: "\r"
+          - send: "\r"
+          - send: "\r"
           - expect: "AMQP"
 
 service:
