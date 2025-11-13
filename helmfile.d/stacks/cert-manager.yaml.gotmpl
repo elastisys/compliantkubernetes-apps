@@ -29,8 +29,8 @@ templates:
       netpol: cert-manager
     needs:
       - kube-system/admin-namespaces
-      - kube-system/dev-namespaces
     {{- if .Values | get "ck8sWorkloadCluster.enabled" false }}
+      - kube-system/dev-namespaces
       - kube-system/user-rbac
     {{- end }}
     values:
