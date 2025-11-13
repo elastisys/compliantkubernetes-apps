@@ -65,6 +65,17 @@ instances:
   {{- end }}
   {{- end }}
 
+{{- if .Values.global.mountCustomRootCert }}
+extraVolumes:
+- name: root-certs-volume
+  configMap:
+    defaultMode: 420
+    name: root-cert
+extraVolumeMounts:
+- mountPath: /etc/ssl/certs
+  name: root-certs-volume
+{{- end }}
+
 storageClassName: {{ .Values.storageClasses.default }}
 
 compaction:

@@ -61,6 +61,9 @@ spec:
               resources: {{- toYaml . | nindent 16 }}
               {{- end }}
               volumeMounts:
+                {{- if .Values.extraVolumeMounts }}
+                {{- toYaml .Values.extraVolumeMounts | nindent 16 }}
+                {{- end }}
                 {{- if $.Values.s3.enabled }}
                 - name: s3cfg
                   mountPath: /configs
@@ -70,6 +73,9 @@ spec:
                   mountPath: /scripts
                   readOnly: true
           volumes:
+            {{- if .Values.extraVolumes }}
+            {{- toYaml .Values.extraVolumes | nindent 12 }}
+            {{- end }}
             {{- if $.Values.s3.enabled }}
             - name: s3cfg
               secret:

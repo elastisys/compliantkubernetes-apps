@@ -21,6 +21,9 @@ azure:
   azureCopyBufferGB: 0.3
   azureCopyConcurrency: 8
 
+extraVolumes: []
+
+extraVolumeMounts: []
 
 instances:
   - bucket: set-me
