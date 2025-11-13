@@ -27,6 +27,13 @@ templates:
       - values/kube-prometheus-stack-sc.yaml.gotmpl
       {{- else if .Values | get "ck8sWorkloadCluster.enabled" false }}
       - values/kube-prometheus-stack-wc.yaml.gotmpl
+    hooks:
+      - events: [ presync ]
+        showlogs: true
+        command: hooks/create-from-manifest.sh
+        args:
+          - "{{ .Environment.Name }}"
+          - alertmanager/dev-secret.yaml
       {{- end }}
     wait: true
     timeout: 600
