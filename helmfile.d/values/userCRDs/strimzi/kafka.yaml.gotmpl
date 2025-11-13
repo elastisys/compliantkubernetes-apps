@@ -1,5 +1,13 @@
 {{- if .Values.user.kafka.enabled }}
 clusterRoles:
+  strimzi-kafka-broker:
+    rules:
+    - apiGroups:
+        - ""
+      resources:
+        - nodes
+      verbs:
+        - get
   strimzi-cluster-operator-global:
     rules:
     - apiGroups:
@@ -172,6 +180,15 @@ clusterRoles:
         - patch
         - update
 clusterRoleBindings:
+  strimzi-cluster-operator-kafka-broker-delegation:
+    subjects:
+    - kind: ServiceAccount
+      name: strimzi-cluster-operator
+      namespace: kafka
+    roleRef:
+      kind: ClusterRole
+      name: strimzi-kafka-broker
+      apiGroup: rbac.authorization.k8s.io
   strimzi-cluster-operator:
     roleRef:
       name: strimzi-cluster-operator-global
