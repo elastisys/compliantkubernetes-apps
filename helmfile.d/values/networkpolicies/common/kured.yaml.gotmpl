@@ -1,0 +1,27 @@
+{{- define "old-style.rule.gen" }}{{ if and .ips .ports }}
+{{- $peers := list }}{{ range .ips }}{{ $peers = dict "cidr" . | append $peers }}{{ end }}
+{{- $ports := list }}{{ range .ports }}{{ $ports = dict "tcp" . | append $ports }}{{ end }}
+{{- dict "peers" $peers "ports" $ports | toYaml | nindent 10 | trim -}}
+{{- end }}{{ end -}}
+
+policies:
+  kured:
+    all-deny:
+      podSelectorLabels: {}
+      egress: {}
+      ingress: {}
+
+    kured:
+      podSelectorLabels:
+        app.kubernetes.io/name: kured
+      ingress:
+        - rule: ingress-rule-prometheus
+          ports:
+            - tcp: 8080
+      egress:
+        - rule: egress-rule-dns
+        - rule: egress-rule-apiserver
+        {{- if .Values.kured.notification.slack.enabled }}
+        - name:
+          {{ template "old-style.rule.gen" .Values.networkPolicies.kured.notificationSlack }}
+        {{- end }}

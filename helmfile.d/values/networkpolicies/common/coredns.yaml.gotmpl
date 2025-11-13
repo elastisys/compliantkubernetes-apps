@@ -1,0 +1,40 @@
+policies:
+  kube-system:
+    coredns:
+      podSelectorLabels:
+        k8s-app: kube-dns
+      ingress:
+        - name: ingress-rule-dns
+          ports:
+            - tcp: 53
+            - udp: 53
+        - name: ingress-rule-kube-dns
+          peers:
+            - podSelectorLabels:
+                k8s-app: kube-dns
+        - rule: ingress-rule-prometheus
+          ports:
+            - tcp: 9153
+      egress:
+        - rule: egress-rule-dns
+        - rule: egress-rule-apiserver
+        - rule: egress-rule-nodes
+          ports:
+            - tcp: 53
+            - udp: 53
+        - name: egress-rule-service-ip
+          peers:
+            {{- range .Values.networkPolicies.coredns.serviceIp.ips }}
+            - cidr: {{ . }}
+            {{- end }}
+          ports:
+            - tcp: 53
+            - udp: 53
+        - name: egress-rule-external-dns
+          peers:
+            {{- range .Values.networkPolicies.coredns.externalDns.ips }}
+            - cidr: {{ . }}
+            {{- end }}
+          ports:
+            - tcp: 53
+            - udp: 53
