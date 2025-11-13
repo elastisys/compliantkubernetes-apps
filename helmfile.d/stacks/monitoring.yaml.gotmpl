@@ -40,6 +40,7 @@ templates:
       - values/podsecuritypolicies/common/monitoring.yaml.gotmpl
 
   metrics-server:
+    disableValidationOnInstall: true
     condition: ck8sAnyCluster.enabled
     inherit: [ template: metrics-server-chart ]
     installed: {{ .Values | get "metricsServer.enabled" false }}
@@ -47,6 +48,8 @@ templates:
     name: metrics-server
     labels:
       app: metrics-server
+    needs:
+      - cert-manager/cert-manager # creates certificates and issuers
     values:
       - values/metrics-server.yaml.gotmpl
 
