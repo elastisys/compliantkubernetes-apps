@@ -120,7 +120,11 @@ rules:
 
   ingress-rule-ingress-controller:
     peers:
-      {{- if not (or $netpol.global.externalLoadBalancer $netpol.global.ingressUsingHostNetwork) }}
+      {{- if (eq (dig "ck8sCloudProvider" "" .Values.global) "azure") }}
+      {{- range concat $ingress.ips $nodes.ips }}
+      - cidr: {{ . }}
+      {{- end }}
+      {{- else if not (or $netpol.global.externalLoadBalancer $netpol.global.ingressUsingHostNetwork) }}
       {{- range $nodes.ips }}
       - cidr: {{ .}}
       {{- end }}
