@@ -4,51 +4,25 @@
 }}
 
 controller:
-  replicas: {{ .Values.tektonPipelines.controller.replicas }}
   resources: {{- toYaml .Values.tektonPipelines.controller.resources | nindent 4 }}
-  {{- with .Values.images | dig "tekton" "controller" "" }}
-  {{- with merge (include "container_uri.parse" . | fromJson) $global }}
-  image:
-    {{- with include "gen.reg-rep-img" . }}
-    repository: {{ . }}
+  deployment:
+    {{- with .Values.images | dig "tekton" "controller" "" }}
+    {{- with merge (include "container_uri.parse" . | fromJson) $global }}
+    image: {{ include "gen.reg-rep-img" . }}{{- if or .tag .digest }}:{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}{{- end }}
     {{- end }}
-    {{- if or .tag .digest }}
-    tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
     {{- end }}
-  {{- end }}
-  {{- end }}
 
 webhook:
-  replicas: {{ .Values.tektonPipelines.webhook.replicas }}
   resources: {{- toYaml .Values.tektonPipelines.webhook.resources | nindent 4 }}
-  {{- with .Values.images | dig "tekton" "webhook" "" }}
-  {{- with merge (include "container_uri.parse" . | fromJson) $global }}
-  image:
-    {{- with include "gen.reg-rep-img" . }}
-    repository: {{ . }}
-    {{- end }}
-    {{- if or .tag .digest }}
-    tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
-    {{- end }}
-  {{- end }}
-  {{- end }}
+
 
 remoteResolvers:
-  replicas: {{ .Values.tektonPipelines.remoteResolvers.replicas }}
   resources: {{- toYaml .Values.tektonPipelines.remoteResolvers.resources | nindent 4 }}
-  {{- with .Values.images | dig "tekton" "remoteResolvers" "" }}
-  {{- with merge (include "container_uri.parse" . | fromJson) $global }}
-  image:
-    {{- with include "gen.reg-rep-img" . }}
-    repository: {{ . }}
-    {{- end }}
-    {{- if or .tag .digest }}
-    tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
-    {{- end }}
-  {{- end }}
-  {{- end }}
 
 alerts:
   evaluateThanos: {{ .Values.thanos.enabled }}
 
-customConfigDefaults: {{- toYaml .Values.tektonPipelines.customConfigDefaults | nindent 2 }}
+configDefaults: {{- toYaml .Values.tektonPipelines.customConfigDefaults | nindent 2 }}
+
+namespace:
+  create: false

@@ -1417,8 +1417,6 @@ tektonPipelines:
   enabled: false
 
   controller:
-    replicas: 1
-
     resources:
       limits:
         cpu: 20m
@@ -1428,8 +1426,6 @@ tektonPipelines:
         memory: 64Mi
 
   webhook:
-    replicas: 1
-
     resources:
       limits:
         cpu: 20m
@@ -1439,8 +1435,6 @@ tektonPipelines:
         memory: 64Mi
 
   remoteResolvers:
-    replicas: 1
-
     resources:
       requests:
         cpu: 10m

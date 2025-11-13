@@ -38,6 +38,19 @@ policies:
       egress:
         - rule: egress-rule-apiserver
 
+    events-controller:
+      podSelectorLabels:
+        app: tekton-events-controller
+      ingress:
+        - rule: ingress-rule-prometheus
+          ports:
+            - tcp: 9090
+        - rule: ingress-rule-apiserver
+          ports:
+            - tcp: 8443
+      egress:
+        - rule: egress-rule-apiserver
+
     {{ if .Values.networkPolicies.tektonPipelines.pipeline }}
     {{ toYaml .Values.networkPolicies.tektonPipelines.pipeline | nindent 4 }}
     {{- end }}

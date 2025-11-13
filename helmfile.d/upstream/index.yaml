@@ -37,6 +37,8 @@ repositories:
 
   nvidia: https://helm.ngc.nvidia.com/nvidia
 
+  tekton: https://cdfoundation.github.io/tekton-helm-chart
+
 charts:
   aquasecurity/trivy-operator: 0.31.0
 
@@ -78,3 +80,5 @@ charts:
   vmware-tanzu/velero: 10.0.11
 
   nvidia/gpu-operator: v24.9.2
+
+  tekton/tekton-pipeline: 1.1.0
