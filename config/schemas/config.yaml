@@ -8737,6 +8737,10 @@ properties:
         type: object
         patternProperties:
           "^[a-z-]+$":
+            debugEnabled:
+              title: Enable debug logging for the provider
+              default: false
+              type: boolean
             resources:
               $ref: '#/$defs/kubernetesResourceRequirements'
         additionalProperties: false

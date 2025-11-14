@@ -129,6 +129,7 @@ crossplane:
             memory: 128Mi
   providers:
     helm:
+      debugEnabled: false
       resources:
         requests:
           cpu: 150m
@@ -137,6 +138,7 @@ crossplane:
           cpu: 300m
           memory: 512Mi
     kubernetes:
+      debugEnabled: false
       resources:
         requests:
           cpu: 25m

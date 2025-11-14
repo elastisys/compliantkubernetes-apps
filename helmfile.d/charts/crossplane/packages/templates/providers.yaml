@@ -39,13 +39,16 @@ spec:
               type: RuntimeDefault
           containers:
             - name: package-runtime
+              {{- if $values.debugEnabled }}
+              args:
+                - --debug
+              {{- end }}
               securityContext:
                 allowPrivilegeEscalation: false
                 capabilities:
                   drop:
                     - ALL
 ---
-
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
