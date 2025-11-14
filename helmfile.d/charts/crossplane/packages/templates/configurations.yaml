@@ -1,0 +1,11 @@
+{{- range $name, $values := .Values.configurations }}
+---
+apiVersion: pkg.crossplane.io/v1
+kind: Configuration
+metadata:
+  name: {{ $name }}
+spec:
+  package: {{ $values.image.repository }}:{{ $values.image.tag }}
+  # Setting this to true to make us handle all dependency management instead of Crossplane.
+  skipDependencyResolution: true
+{{- end }}

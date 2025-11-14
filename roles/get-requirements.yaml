@@ -5,8 +5,10 @@
     install_path: "{{ lookup('env', 'CK8S_INSTALL_PATH', default='/usr/local/bin') }}"
     install_user: "{{ lookup('env','USER') }}"
     apache2_utils_version: "{{ requirements['apache2-utils'].version }}"
+    crossplane_version: "{{ requirements['crossplane'].version }}"
     curl_version: "{{ requirements['curl'].version }}"
     dnsutils_version: "{{ requirements['dnsutils'].version }}"
+    gzip_version: "{{ requirements['gzip'].version }}"
     helm_version: "{{ requirements['helm.sh/helm/v3'].version | regex_replace('^v', '') }}"
     helmdiff_version: "{{ requirements['github.com/databus23/helm-diff/v3'].version | regex_replace('^v', '') }}"
     helmfile_version: "{{ requirements['github.com/helmfile/helmfile'].version | regex_replace('^v', '') }}"
@@ -27,7 +29,13 @@
       - dnsutils={{ dnsutils_version }}
       - apache2-utils={{ apache2_utils_version }}
       - pwgen={{ pwgen_version }}
+      - gzip={{ gzip_version }}
     get_url_list:
+      - command: crossplane
+        version: "{{ crossplane_version }}"
+        url: https://releases.crossplane.io/stable/{{ crossplane_version }}/bin/linux_amd64/crank
+        dest: "{{ install_path }}/crossplane"
+        version_flag: "version --client"
       - command: jq
         version: "{{ jq_version }}"
         url: https://github.com/stedolan/jq/releases/download/jq-{{ jq_version }}/jq-linux64

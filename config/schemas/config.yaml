@@ -8468,6 +8468,14 @@ properties:
             patternProperties:
               "^[a-z-]+$":
                 $ref: '#/$defs/containerImage'
+          configurations:
+            title: Crossplane Configuration images configuration
+            description: Crossplane Configuration images configuration
+            type: object
+            additionalProperties: false
+            patternProperties:
+              "^[a-z-]+$":
+                $ref: '#/$defs/containerImage'
       dex:
         title: Dex stack image configuration
         description: Dex stack image configuration
