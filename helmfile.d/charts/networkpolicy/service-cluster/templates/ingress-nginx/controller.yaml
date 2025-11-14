@@ -24,7 +24,7 @@ spec:
     {{- end }}
     {{- if or  .Values.global.scNodes.ips .Values.global.scIngress.ips }}
     - from:
-      {{- if not (or .Values.global.externalLoadBalancer .Values.global.ingressUsingHostNetwork) }}
+      {{- if .Values.global.ingressUsingHostNetwork }}
         {{- if .Values.global.scNodes.ips }}
         {{- range $IP := .Values.global.scNodes.ips }}
         - ipBlock:
