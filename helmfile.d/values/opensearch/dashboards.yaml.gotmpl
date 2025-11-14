@@ -28,6 +28,9 @@ config:
         client_secret: {{ .Values.opensearch.clientSecret }}
         base_redirect_url: https://{{ .Values.opensearch.dashboards.subdomain }}.{{ .Values.global.baseDomain }}
         logout_url: https://{{ .Values.opensearch.dashboards.subdomain }}.{{ .Values.global.baseDomain }}
+        {{- if .Values.global.mountCustomRootCert }}
+        root_ca: "/opt/custom-truststore/custom/ca.crt"
+        {{- end }}
       {{ end }}
       multitenancy:
         enabled: false
@@ -98,4 +101,20 @@ image:
   tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
   {{- end }}
 {{- end }}
+{{- end }}
+
+{{- if .Values.global.mountCustomRootCert }}
+extraVolumes:
+- configMap:
+    defaultMode: 420
+    name: root-cert
+  name: root-certs-volume
+- emptyDir: {}
+  name: custom-truststore
+
+extraVolumeMounts:
+- mountPath: /opt/custom-truststore/custom
+  name: root-certs-volume
+- mountPath: /opt/custom-truststore/truststore
+  name: custom-truststore
 {{- end }}
