@@ -64,10 +64,46 @@ config:
         preferred_ip_protocol: "ip4"
         tls_config:
           insecure_skip_verify: {{ not .Values.global.verifyTls }}
-    {{- if or (eq .Values.harbor.database.type "external") (eq .Values.harbor.redis.type "external") }}
     tcp_connect:
       prober: tcp
-    {{- end }}
+    rabbitmq_amqp:
+      prober: tcp
+      timeout: 10s
+      tcp:
+        tls: false
+        query_response:
+          - send: "HELO\r"
+          - send: "\r"
+          - send: "\r"
+          - send: "\r"
+          - expect: "AMQP"
+    rabbitmq_amqps:
+      prober: tcp
+      timeout: 10s
+      tcp:
+        tls: true
+        tls_config:
+          insecure_skip_verify: {{ not .Values.global.verifyTls }}
+        query_response:
+          - send: "HELO\r"
+          - send: "\r"
+          - send: "\r"
+          - send: "\r"
+          - expect: "AMQP"
+    rabbitmq_amqps_insecure:
+      prober: tcp
+      timeout: 10s
+      tcp:
+        tls: true
+        tls_config:
+          insecure_skip_verify: true
+        query_response:
+          - send: "HELO\r"
+          - send: "\r"
+          - send: "\r"
+          - send: "\r"
+          - expect: "AMQP"
+
 service:
   ipDualStack:
     enabled: true
