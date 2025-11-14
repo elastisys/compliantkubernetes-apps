@@ -49,6 +49,9 @@ validatingWebhookCustomRules:
       - nodes/proxy
       - hierarchyconfiguration
       - poddisruptionbudgets
+    {{- range .Values.gatekeeper.additionalValidationResources }}
+      - {{ . }}
+    {{- end }}
   - apiGroups:
       - '*'
     apiVersions:
@@ -63,6 +66,18 @@ validatingWebhookCustomRules:
       - clusters
       - openstackclusters
       - secrets
+  {{- if .Values.gatekeeper.additionalValidationDeleteResources }}
+  - apiGroups:
+      - '*'
+    apiVersions:
+      - '*'
+    operations:
+      - DELETE
+    resources:
+    {{- range .Values.gatekeeper.additionalValidationDeleteResources }}
+      - {{ . }}
+    {{- end }}
+  {{- end }}
 mutatingWebhookCustomRules:
   - apiGroups:
       - '*'
@@ -104,6 +119,11 @@ mutatingWebhookCustomRules:
       - nodes/proxy
       - hierarchyconfiguration
       - appprojects
+    {{- range .Values.gatekeeper.additionalMutationResources }}
+      - {{ . }}
+    {{- end }}
+
+
 
 auditMatchKindOnly: true
 
