@@ -90,7 +90,7 @@ setup() {
   object_storage.has_none "${BUCKET}" "${TEST_DATA_PREFIX}"
 }
 
-@test "sc-logs - log-manager retention job runs fine when no logs needs to be deleted" {
+@test "sc-logs - log-manager retention job runs fine when no logs need to be deleted" {
   test_run_cronjob "${CRONJOB_NAME}" 120
 }
 
