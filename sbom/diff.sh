@@ -10,7 +10,7 @@ set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 
 WRAPPER="${REPO_ROOT}/scripts/run-from-container.sh"
-IMAGE="ghcr.io/elastisys/sbom-generator:latest"
+IMAGE="ghcr.io/elastisys/sbom-generator:0.2"
 CONFIG="${REPO_ROOT}/sbom/sbom.config.yaml"
 COMMITTED_SBOM="${REPO_ROOT}/sbom/sbom.cdx.json"
 

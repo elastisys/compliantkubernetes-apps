@@ -5,6 +5,7 @@ create_test_namespace() {
 }
 
 wait_test_namespace() {
+  kubectl wait --for jsonpath='{.status.status}'=Ok subnamespaceanchors.hnc.x-k8s.io velero-test -n production
   kubectl wait --for jsonpath='{.status.phase}'=Active namespace/velero-test
 }
 

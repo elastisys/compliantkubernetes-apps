@@ -35,6 +35,8 @@ global:
           port: {{ . }}
         {{- end }}
 
+  ck8sCloudProvider: {{ .Values.global.ck8sCloudProvider }}
+
 monitoring:
   enabled: {{ .Values.networkPolicies.monitoring.enabled }}
   grafana:

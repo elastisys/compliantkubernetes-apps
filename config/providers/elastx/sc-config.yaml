@@ -2,6 +2,11 @@ harbor:
   persistence:
     type: objectStorage
     disableRedirect: true
+  alerts:
+    HarborP99LatencyHigherThan55Seconds:
+      enabled: false
+    HarborP50LatencyHigherThan10Seconds:
+      enabled: false
 objectStorage:
   swift:
     authVersion: 0

@@ -32,6 +32,8 @@ global:
         - protocol: TCP
           port: 443
 
+  ck8sCloudProvider: {{ .Values.global.ck8sCloudProvider }}
+
 monitoring:
   enabled: {{ .Values.networkPolicies.monitoring.enabled }}
 

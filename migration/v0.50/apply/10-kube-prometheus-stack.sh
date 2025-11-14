@@ -16,6 +16,11 @@ run() {
     fi
 
     for cluster in "${clusters[@]}"; do
+
+      if [[ "${cluster}" == "wc" ]]; then
+        kubectl_do "${cluster}" annotate secret -n alertmanager alertmanager-kube-prometheus-stack-alertmanager helm.sh/resource-policy=keep
+      fi
+
       current_version=$(helm_do "${cluster}" get metadata -n monitoring kube-prometheus-stack -ojson | jq -r '.version')
 
       log_info "Upgrading kube-prometheus-stack on ${cluster}: ${current_version} -> ${chart_version}"

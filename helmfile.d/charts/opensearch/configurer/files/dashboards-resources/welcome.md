@@ -4,12 +4,18 @@
 
 Here you can find the most relevant features and changes for the last couple of releases of Welkin
 
-- Added support for Cilium. **[v0.48]**
-- Upgraded Harbor to v2.13.1. **[v0.48]**
-- Upgraded Falco chart to v6.0.2. **[v0.48]**
-- Grafana was upgraded to the new major version 12. **[v0.48]**
-- Added an image signature verification Kyverno policy. This can be enabled by your Platform Administrator. **[v0.48]**
-- Added options to configure session time in OpenSearch. This can be configured by your Platform Administration. **[v0.47]**
+- Added self-managed Jaeger Operator support. See [Jaeger docs](https://elastisys.io/welkin/user-guide/self-managed-services/jaeger/) for more information. **[v.0.50]**
+- Upgrade prometheus-blackbox-exporter chart to v11.3.1. **[v.0.50]**
+- Added a new dashboard to Grafana to filter by namespace and see r/w throughput and IOPS for pods with persistent volumes.
+  - Named Read and Write - Namespace (Pods with PVCs). **[v.0.50]**
+- Upgrade kube-prometheus-stack chart to v77.11.1. **[v.0.50]**
+- Upgrade ingress-nginx chart to v4.13.3 and app version to v1.13.3. **[v.0.50]**
+- Upgraded gatekeeper to v3.20.1. **[v.0.50]**
+- Added a Fluentd metric and alert which catches rejections due to mapping conflicts in OpenSearch. **[v.0.49]**
+- Upgraded OpenSearch to v2.19.3. **[v.0.49]**
+- Make namespace label in metric refer to resource, not exporter. **[v.0.49]**
+- Added logging for failing DNS requests. **[v.0.49]**
+- OpenSearch namespace is now PSS restricted. **[v.0.49]**
 
 ## Public docs
 

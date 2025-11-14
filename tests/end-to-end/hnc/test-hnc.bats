@@ -20,6 +20,11 @@ teardown_file() {
   delete_static_wc_kubeconfig
 }
 
+wait_test_namespace() {
+  kubectl wait --for jsonpath='{.status.status}'=Ok subnamespaceanchors.hnc.x-k8s.io "${NAMESPACE}"-tests-end-to-end -n "${NAMESPACE}"
+  kubectl wait --for jsonpath='{.status.phase}'=Active namespace/"${NAMESPACE}"-tests-end-to-end -n "${NAMESPACE}"
+}
+
 @test "hnc dev can create subnamespace" {
   run kubectl auth whoami
   assert_output --partial "dev@example.com"
@@ -30,6 +35,8 @@ metadata:
   name: "${NAMESPACE}-tests-end-to-end"
   namespace: "${NAMESPACE}"
 EOF
+
+  wait_test_namespace
 
   assert_success
 }
