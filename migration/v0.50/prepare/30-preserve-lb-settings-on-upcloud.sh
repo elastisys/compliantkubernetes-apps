@@ -26,13 +26,11 @@ lift_option() {
 if [[ "${CK8S_CLUSTER}" =~ ^(sc|both)$ ]]; then
   lift_option sc .ingressNginx.controller.service.enabled false
   lift_option sc .ingressNginx.controller.useHostPort true
-  log_info "Setting '.networkPolicies.global.ingressUsingHostNetwork' to 'true'"
-  yq_add sc .networkPolicies.global.ingressUsingHostNetwork true
+  lift_option sc .networkPolicies.global.ingressUsingHostNetwork true
 fi
 
 if [[ "${CK8S_CLUSTER}" =~ ^(wc|both)$ ]]; then
   lift_option wc .ingressNginx.controller.service.enabled false
   lift_option wc .ingressNginx.controller.useHostPort true
-  log_info "Setting '.networkPolicies.global.ingressUsingHostNetwork' to 'true'"
-  yq_add wc .networkPolicies.global.ingressUsingHostNetwork true
+  lift_option wc .networkPolicies.global.ingressUsingHostNetwork true
 fi
