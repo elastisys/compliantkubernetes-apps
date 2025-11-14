@@ -12,11 +12,7 @@ roles:
 
 replicas: {{ .Values.opensearch.masterNode.count }}
 
-{{- if .Values.global.mountCustomRootCert }}
-opensearchJavaOpts: "{{ .Values.opensearch.masterNode.javaOpts }} -Djavax.net.ssl.trustStore=/opt/custom-truststore/new-cacerts -Djavax.net.ssl.trustStorePassword={{ .Values.opensearch.trustStorePassword }}"
-{{- else }}
 opensearchJavaOpts: {{ .Values.opensearch.masterNode.javaOpts }}
-{{- end }}
 
 resources: {{- toYaml .Values.opensearch.masterNode.resources | nindent 2 }}
 

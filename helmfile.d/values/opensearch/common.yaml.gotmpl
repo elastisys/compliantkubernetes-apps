@@ -210,13 +210,13 @@ extraInitContainers:
   - /bin/bash
   - -c
   - |
-    cp /usr/share/opensearch/jdk/lib/security/cacerts /opt/custom-truststore/truststore/new-cacerts
-    chmod +w /opt/custom-truststore/truststore/new-cacerts
-    keytool -importcert -trustcacerts -alias "custom-ca" -file /opt/custom-certs/ca.crt -keystore /opt/custom-truststore/truststore/new-cacerts -storepass {{ .Values.opensearch.trustStorePassword }} -noprompt
+    cp /usr/share/opensearch/jdk/lib/security/cacerts /opt/truststore/cacerts
+    chmod +w /opt/truststore/cacerts
+    keytool -importcert -trustcacerts -alias "custom-ca" -file /opt/certs/ca.crt -keystore /opt/truststore/cacerts -storepass changeit -noprompt
   volumeMounts:
-  - mountPath: /opt/custom-certs
+  - mountPath: /opt/certs/
     name: root-certs-volume
-  - mountPath: /opt/custom-truststore/truststore
+  - mountPath: /opt/truststore
     name: custom-truststore
 
 extraVolumes:
@@ -228,8 +228,10 @@ extraVolumes:
   name: custom-truststore
 
 extraVolumeMounts:
-- mountPath: /opt/custom-truststore/custom
+- mountPath: /opt/certs
   name: root-certs-volume
-- mountPath: /opt/custom-truststore/truststore
-  name: custom-truststore
+- name: custom-truststore
+  mountPath: /usr/share/opensearch/jdk/lib/security/cacerts
+  subPath: cacerts
+  readOnly: true
 {{- end }}
