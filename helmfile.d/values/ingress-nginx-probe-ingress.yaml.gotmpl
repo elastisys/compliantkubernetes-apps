@@ -1,5 +1,10 @@
 ingress:
   host: {{ .Values.ingressNginx.subDomain }}.{{ .Values.global.baseDomain }}
+  {{ if .Values.ingressNginx.wildcardFix }}
+  tlshost: '"*.{{ .Values.global.baseDomain }}"'
+  {{ else }}
+  tlshost: {{ .Values.ingressNginx.subDomain }}.{{ .Values.global.baseDomain }}
+  {{ end }}
   annotations:
     cert-manager.io/cluster-issuer: {{ .Values.global.issuer }}
   {{ if and .Values.externalTrafficPolicy.local .Values.externalTrafficPolicy.whitelistRange.global }}

@@ -7,4 +7,5 @@ service:
 ingress:
   className: nginx
   host: ingress.example.com
+  tlshost: ingress.example.com
   annotations: {}

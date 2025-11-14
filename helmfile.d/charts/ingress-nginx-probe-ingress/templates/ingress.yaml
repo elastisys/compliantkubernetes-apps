@@ -13,7 +13,7 @@ spec:
   ingressClassName: {{ .Values.ingress.className }}
   tls:
     - hosts:
-        - {{ .Values.ingress.host }}
+        - {{ .Values.ingress.tlshost }}
       secretName: "{{ $fullName }}-tls"
   rules:
     - host: {{ .Values.ingress.host }}
