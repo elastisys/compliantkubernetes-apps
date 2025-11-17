@@ -497,10 +497,14 @@ validate_sops_config() {
     yq -i '.secret = "value"' "${tmp_secret}"
 
     # this will fail if e.g. not all gpg public keys are imported to keyring
-    sops --config "${sops_config}" --in-place --encrypt "${tmp_secret}"
+    if ! sops --config "${sops_config}" --in-place --encrypt "${tmp_secret}"; then
+      log_fatal "Failed to encrypt file using fingerprints in ${sops_config}. If you are using GPG fingerprints, ensure they are in your keyring"
+    fi
 
     # test decrypt to ensure a matching private key is available
-    sops --in-place --decrypt "${tmp_secret}"
+    if ! sops --in-place --decrypt "${tmp_secret}"; then
+      log_fatal "Failed to decrypt file. Ensure your private key has a matching public key in ${sops_config}"
+    fi
   fi
 }
 
