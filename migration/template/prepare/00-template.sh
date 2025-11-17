@@ -6,7 +6,7 @@ ROOT="$(readlink -f "${HERE}/../../../")"
 # shellcheck source=scripts/migration/lib.sh
 source "${ROOT}/scripts/migration/lib.sh"
 
-: "${CK8S_DRY_RUN_INSTALL:=false}"
+: "${CK8S_DRY_RUN_INSTALL:=true}"
 
 # functions currently available in the library:
 #   - logging:
