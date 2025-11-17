@@ -1254,6 +1254,28 @@ allOf:
                       ips:
                         $ref: '#/$defs/iplist'
 - if:
+    properties:
+      networkPolicies:
+        properties:
+          ingressNginx:
+            properties:
+              ingressOverride:
+                properties:
+                  enabled:
+                    type: boolean
+                    const: true
+  then:
+    properties:
+      networkPolicies:
+        properties:
+          ingressNginx:
+            properties:
+              ingressOverride:
+                properties:
+                  ips:
+                    title: Network Policies Ingress Override IPs
+                    $ref: '#/$defs/iplist'
+- if:
     allOf:
       - properties:
           harbor:
@@ -7333,6 +7355,20 @@ properties:
             title: Network Policies Ingress NGINX Enabled
             type: boolean
             default: true
+          ingressOverride:
+            title: Network Policies Ingress Override
+            description: |-
+              Configure override to the ingress rules for Ingress NGINX.
+
+              Required when cluster ingress uses direct routing.
+            type: object
+            additionalProperties: false
+            properties:
+              enabled:
+                title: Network Policies Ingress Override Enabled
+                type: boolean
+                default: false
+              ips: true
       certManager:
         title: Network Policies cert-manager
         description: Configure cert-manager network policy rules.

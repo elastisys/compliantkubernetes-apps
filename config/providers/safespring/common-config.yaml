@@ -8,6 +8,9 @@ networkPolicies:
   global:
     externalLoadBalancer: true
     ingressUsingHostNetwork: true
+  ingressNginx:
+    ingressOverride:
+      enabled: false
   kubeSystem:
     openstack:
       enabled: true
