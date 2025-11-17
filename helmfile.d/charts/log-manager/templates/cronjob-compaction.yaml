@@ -30,6 +30,9 @@ spec:
               image: {{ $.Values.image.repository }}:{{ default $.Chart.AppVersion $.Values.image.tag }}
               command: [/scripts/compaction.sh]
               env:
+                {{- if $.Values.extraEnv }}
+                {{- toYaml $.Values.extraEnv | nindent 16 }}
+                {{- end }}
                 {{- if $.Values.s3.enabled }}
                 - name: S3_CONFIG
                   value: /configs/s3cfg.ini

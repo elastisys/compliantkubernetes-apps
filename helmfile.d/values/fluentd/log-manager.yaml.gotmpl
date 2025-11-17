@@ -74,6 +74,9 @@ extraVolumes:
 extraVolumeMounts:
 - mountPath: /etc/ssl/certs
   name: root-certs-volume
+extraEnv:
+- name: SSL_CERT_FILE
+  value: /etc/ssl/certs/ca.crt
 {{- end }}
 
 storageClassName: {{ .Values.storageClasses.default }}
