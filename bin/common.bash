@@ -491,7 +491,7 @@ validate_sops_config() {
   sops --decrypt "${secrets["secrets_file"]}" >/dev/null
 
   if [[ "${skip_test_encrypt}" == "false" ]]; then
-    tmp_secret=$(mktemp --suffix=-secret) tmp_secret=$(mktemp --suffix=-secret)
+    tmp_secret=$(mktemp --suffix=-secret)
     append_trap "rm ${tmp_secret}" EXIT
 
     yq -i '.secret = "value"' "${tmp_secret}"
