@@ -16,6 +16,9 @@ networkPolicies:
     ingressUsingHostNetwork: true
   rookCeph:
     enabled: true
+  ingressNginx:
+    ingressOverride:
+      enabled: false
 opa:
   rejectLoadBalancerService:
     enabled: true

@@ -123,6 +123,10 @@ s3Exporter:
 
 ingressNginx:
   enabled: true
+  ingressOverride:
+    enabled: false
+    ips:
+      - set-me-if-enabled
 
 dex:
   enabled: true

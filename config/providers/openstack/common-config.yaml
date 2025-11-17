@@ -15,6 +15,9 @@ networkPolicies:
   global:
     externalLoadBalancer: false
     ingressUsingHostNetwork: false
+  ingressNginx:
+    ingressOverride:
+      enabled: false
 objectStorage:
   type: s3
   s3:

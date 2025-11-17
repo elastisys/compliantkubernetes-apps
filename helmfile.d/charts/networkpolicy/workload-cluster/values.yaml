@@ -73,6 +73,10 @@ monitoring:
 
 ingressNginx:
   enabled: true
+  ingressOverride:
+    enabled : false
+    ips:
+      - set-me-if-enabled
 
 alertmanager:
   enabled: true

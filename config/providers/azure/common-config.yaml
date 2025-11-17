@@ -20,10 +20,9 @@ networkPolicies:
   global:
     externalLoadBalancer: false
     ingressUsingHostNetwork: false
-    scIngress:
-      ips:
-        - 0.0.0.0/0
-    wcIngress:
+  ingressNginx:
+    ingressOverride:
+      enabled: true
       ips:
         - 0.0.0.0/0
 opa:
