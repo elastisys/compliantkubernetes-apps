@@ -17,21 +17,6 @@ usage() {
   exit 1
 }
 
-gatekeeper_cleanup() {
-  local kubeconfig="$1" ns="${2:-gatekeeper-system}" rel="${3:-gatekeeper-templates}"
-
-  with_kubeconfig "${kubeconfig}" bash -cu '
-    echo "Running Gatekeeper Cleanup Resources"
-
-    kubectl -n '"${ns}"' delete job '"${rel}"'-wait --ignore-not-found
-    kubectl -n '"${ns}"' delete configmap '"${rel}"'-wait --ignore-not-found
-    kubectl -n '"${ns}"' delete serviceaccount '"${rel}"' --ignore-not-found
-    kubectl -n '"${ns}"' delete serviceaccount '"${rel}"'-hook --ignore-not-found
-    kubectl delete clusterrole '"${rel}"'-wait --ignore-not-found
-    kubectl delete clusterrolebinding '"${rel}"'-wait --ignore-not-found
-  '
-}
-
 # Run arbitrary kubecolor commands as cluster admin.
 ops_kubecolor() {
   case "${1}" in
@@ -63,13 +48,6 @@ ops_helm() {
   esac
   shift
   with_kubeconfig "${kubeconfig}" helm "${@}"
-  # Detect uninstall gatekeeper-templates
-  if [[ "$1" =~ ^(delete|uninstall)$ ]]; then
-    local rel="$2"
-    if [[ "$rel" == "gatekeeper-templates" || "$rel" == gatekeeper* ]]; then
-      gatekeeper_cleanup "${kubeconfig}" "gatekeeper-system" "${rel:-gatekeeper-templates}"
-    fi
-  fi
 }
 
 # Run arbitrary Helmfile commands as cluster admin.
@@ -94,14 +72,9 @@ ops_helmfile() {
   esac
 
   shift
+
   with_kubeconfig "${kubeconfig}" \
     helmfile -f "${here}/../helmfile.d/" -e ${cluster} "${@}"
-
-  if [[ "$1" =~ ^(delete|destroy)$ ]]; then
-    if printf '%q ' "$@" | grep -Eq -- '-l[[:space:]]*(app|component)=gatekeeper|name=gatekeeper-templates'; then
-      gatekeeper_cleanup "${kubeconfig}" "gatekeeper-system" "gatekeeper-templates"
-    fi
-  fi
 }
 
 # Run arbitrary Velero commands as cluster admin.
