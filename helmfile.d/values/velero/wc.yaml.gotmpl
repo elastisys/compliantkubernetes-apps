@@ -67,6 +67,9 @@ configuration:
       prefix: {{ .Values.velero.storagePrefix }}
       {{- if eq .Values.objectStorage.type "s3" }}
       provider: aws
+      {{- if and .Values.global.mountCustomRootCert .Values.velero.caCert.enabled }}
+      caCert: {{ .Values.velero.caCert.key }}
+      {{- end }}
       config:
         region: {{ include "componentObjectStorage" (list "velero" "region" .) }}
         s3ForcePathStyle: {{ include "componentObjectStorage" (list "velero" "forcePathStyle" .) }}
@@ -222,16 +225,29 @@ configMaps:
       secCtxRunAsUser: "1000"
       secCtxRunAsGroup: "1000"
 
-{{- if eq .Values.velero.uploaderType "kopia" }}
+{{- if or .Values.global.mountCustomRootCert (eq .Values.velero.uploaderType "kopia") }}
 extraVolumes:
-  - name: udmrepo
-    emptyDir: {}
-  - name: cache
-    emptyDir: {}
-
+{{- if .Values.global.mountCustomRootCert }}
+- name: root-certs-volume
+  configMap:
+    defaultMode: 420
+    name: root-cert
+{{- end }}
+{{- if eq .Values.velero.uploaderType "kopia" }}
+- name: udmrepo
+  emptyDir: {}
+- name: cache
+  emptyDir: {}
+{{- end }}
 extraVolumeMounts:
-  - name: udmrepo
-    mountPath: /udmrepo
-  - name: cache
-    mountPath: /.cache
+{{- if .Values.global.mountCustomRootCert }}
+- mountPath: /etc/ssl/certs
+  name: root-certs-volume
+{{- end }}
+{{- if eq .Values.velero.uploaderType "kopia" }}
+- name: udmrepo
+  mountPath: /udmrepo
+- name: cache
+  mountPath: /.cache
+{{- end }}
 {{- end }}
