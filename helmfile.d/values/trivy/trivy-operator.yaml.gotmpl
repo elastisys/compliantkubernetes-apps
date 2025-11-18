@@ -33,6 +33,33 @@ trivy:
   timeout: {{- toYaml .Values.trivy.scanner.timeout | nindent 4 }}
   {{- end }}
 
+{{- if .Values.global.mountCustomRootCert }}
+volumes:
+- name: root-certs-volume
+  configMap:
+    defaultMode: 420
+    name: root-cert
+- name: cache-policies
+  emptyDir: {}
+volumeMounts:
+- mountPath: /etc/ssl/certs
+  name: root-certs-volume
+- mountPath: /tmp
+  name: cache-policies
+  readOnly: false
+
+trivyOperator:
+  scanJobCustomVolumes:
+  - name: root-certs-volume
+    configMap:
+      defaultMode: 420
+      name: root-cert
+  scanJobCustomVolumesMount:
+  - mountPath: /etc/ssl/certs/custom-ca.crt
+    subPath: ca.crt
+    name: root-certs-volume
+{{- end }}
+
 operator:
 
   # configAuditScannerEnabled the flag to enable configuration audit scanner
