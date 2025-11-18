@@ -449,3 +449,14 @@ groups:
     labels:
       severity: critical
       group: Thanos
+  - alert: ThanosBlocksMetaSyncsStalled
+    annotations:
+      description: The counter thanos_blocks_meta_syncs_total for storegateway pod {{`{{$labels.pod}}`}} has not increased in the last 30 minutes.
+      runbook_url: {{ .Values.runbookUrls.thanos.ThanosBlocksMetaSyncsStalled }}
+      summary: Thanos blocks meta syncs have stalled.
+    expr: |
+      increase(thanos_blocks_meta_syncs_total{container="storegateway"}[30m]) == 0
+    for: 5m
+    labels:
+      severity: warning
+      group: Thanos
