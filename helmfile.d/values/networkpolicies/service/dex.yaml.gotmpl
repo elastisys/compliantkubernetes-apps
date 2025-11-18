@@ -1,0 +1,51 @@
+{{- define "old-style.rule.gen" }}{{ if and .ips .ports }}
+{{- $peers := list }}{{ range .ips }}{{ $peers = dict "cidr" . | append $peers }}{{ end }}
+{{- $ports := list }}{{ range .ports }}{{ $ports = dict "tcp" . | append $ports }}{{ end }}
+{{- dict "peers" $peers "ports" $ports | toYaml | nindent 10 | trim -}}
+{{- end }}{{ end -}}
+
+policies:
+  dex:
+    all-deny:
+      podSelectorLabels: {}
+      egress: {}
+      ingress: {}
+
+    dex:
+      podSelectorLabels:
+        app.kubernetes.io/name: dex
+      ingress:
+        - rule: ingress-rule-ingress
+          ports:
+            - tcp: 5556
+        - rule: ingress-rule-prometheus
+          ports:
+            - tcp: 5558
+        - name: ingress-rule-grafana
+          peers:
+          peers:
+            - namespaceSelectorLabels:
+                kubernetes.io/metadata.name: monitoring
+              podSelectorLabels:
+                app.kubernetes.io/name: grafana
+          ports:
+            - tcp: 5556
+        - name: ingress-rule-opensearch
+          peers:
+            - namespaceSelectorLabels:
+                kubernetes.io/metadata.name: opensearch-system
+              podSelectorLabels:
+                app.kubernetes.io/instance: opensearch-master
+            - namespaceSelectorLabels:
+                kubernetes.io/metadata.name: opensearch-system
+              podSelectorLabels:
+                app.kubernetes.io/instance: opensearch-dashboards
+          ports:
+            - tcp: 5556
+      egress:
+        - rule: egress-rule-dns
+        - rule: egress-rule-apiserver
+        {{- with .Values.networkPolicies.dex.connectors }}
+        - name: egress-rule-connectors
+          {{ template "old-style.rule.gen" . }}
+        {{- end }}
