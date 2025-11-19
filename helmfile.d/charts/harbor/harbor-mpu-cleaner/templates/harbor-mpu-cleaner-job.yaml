@@ -30,6 +30,9 @@ spec:
                 capabilities:
                   drop: ["ALL"]
               env:
+                {{- if .Values.extraEnv }}
+                {{- toYaml .Values.extraEnv | nindent 16 }}
+                {{- end }}
                 - name: AWS_ACCESS_KEY_ID
                   valueFrom:
                     secretKeyRef:
@@ -46,9 +49,15 @@ spec:
                       name: {{ .Release.Name }}-secret
                       key: aws-endpoint-url
               volumeMounts:
+                {{- if .Values.extraVolumeMounts }}
+                {{- toYaml .Values.extraVolumeMounts | nindent 16 }}
+                {{- end }}
                 - name: scripts
                   mountPath: /scripts
           volumes:
+          {{- if .Values.extraVolumes }}
+          {{- toYaml .Values.extraVolumes | nindent 10 }}
+          {{- end }}
           - name: scripts
             configMap:
               name: {{ .Release.Name }}-cm

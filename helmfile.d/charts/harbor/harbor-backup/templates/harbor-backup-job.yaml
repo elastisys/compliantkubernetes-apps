@@ -23,6 +23,9 @@ spec:
               image: "{{ .Values.image.repository }}{{- with .Values.image.tag }}:{{ . }}{{ end }}"
               command: ['/bin/bash', '/scripts/harbor-backup.sh']
               env:
+                {{- if .Values.extraEnv }}
+                {{- toYaml .Values.extraEnv | nindent 16 }}
+                {{- end }}
               {{- if .Values.s3.enabled }}
                 - name: S3_BACKUP
                   value: "true"
@@ -76,6 +79,9 @@ spec:
                 - name: DAYS_TO_RETAIN
                   value: "{{ .Values.retentionDays }}"
               volumeMounts:
+                {{- if .Values.extraVolumeMounts }}
+                {{- toYaml .Values.extraVolumeMounts | nindent 16 }}
+                {{- end }}
                 - name: scripts
                   mountPath: /scripts
                 - name: backup
@@ -85,6 +91,9 @@ spec:
                   mountPath: /etc/gcs
                 {{- end }}
           volumes:
+          {{- if .Values.extraVolumes }}
+          {{- toYaml .Values.extraVolumes | nindent 10 }}
+          {{- end }}
           - name: scripts
             configMap:
               name: {{ .Release.Name }}-cm

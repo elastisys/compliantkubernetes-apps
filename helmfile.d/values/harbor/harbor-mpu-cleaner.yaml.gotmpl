@@ -26,3 +26,19 @@ image:
   {{- end }}
 {{- end }}
 {{- end }}
+
+{{- if .Values.global.mountCustomRootCert }}
+extraVolumes:
+- name: root-certs-volume
+  configMap:
+    defaultMode: 420
+    name: root-cert
+
+extraVolumeMounts:
+- mountPath: /etc/ssl/certs
+  name: root-certs-volume
+
+extraEnv:
+- name: AWS_CA_BUNDLE
+  value: /etc/ssl/certs/ca.crt
+{{- end }}
