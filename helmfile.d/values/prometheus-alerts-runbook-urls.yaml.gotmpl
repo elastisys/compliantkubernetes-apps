@@ -284,6 +284,7 @@ runbookUrls:
     {{- dict "name" "ThanosQueryIsDown" "header" "thanos-component-absent" "config" .thanos | include "tpl.thanos" }}
     {{- dict "name" "ThanosReceiveIsDown" "header" "thanos-component-absent" "config" .thanos | include "tpl.thanos" }}
     {{- dict "name" "ThanosStoreIsDown" "header" "thanos-component-absent" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosBlocksMetaSyncsStalled" "header" "thanos-store" "config" .thanos | include "tpl.missing-runbook" }}
   webhook:
     {{- dict "name" "WebhookFailing" "config" .webhook | include "tpl.missing-runbook" }}
 {{- end }}
