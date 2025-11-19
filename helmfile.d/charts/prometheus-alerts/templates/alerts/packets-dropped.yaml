@@ -1,4 +1,4 @@
-{{- if and .Values.defaultRules.create .Values.defaultRules.rules.networkpolicies }}
+{{- if and .Values.defaultRules.create .Values.defaultRules.rules.networkpolicies (eq .Values.networkType "calico") }}
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
