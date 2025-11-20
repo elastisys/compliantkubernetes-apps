@@ -21,6 +21,8 @@ osDataNodeCount: {{ .Values.opensearch.masterNode.count }}
 osIndexAlerts: {{ toYaml .Values.opensearch.promIndexAlerts | nindent 2 }}
 osMaxShardsPerNode: {{ .Values.opensearch.maxShardsPerNode }}
 
+networkType: {{ .Values.networkPlugin.type }}
+
 defaultRules:
   create: true
   alertLabels:

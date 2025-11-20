@@ -1,0 +1,76 @@
+{{- if and .Values.defaultRules.create .Values.defaultRules.rules.networkpolicies (eq .Values.networkType "cilium") }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ printf "%s-%s" (include "prometheus-alerts.fullname" .) "packets-dropped-cilium" | trunc 63 | trimSuffix "-" }}
+  labels:
+    app: {{ template "prometheus-alerts.name" . }}
+    {{- include "prometheus-alerts.labels" . | nindent 4 }}
+    {{- if .Values.defaultRules.alertLabels }}
+    {{- toYaml .Values.defaultRules.alertLabels | nindent 4 }}
+    {{- end }}
+  {{- if .Values.defaultRules.annotations }}
+  annotations:
+    {{- toYaml .Values.defaultRules.annotations | nindent 4 }}
+  {{- end }}
+spec:
+  groups:
+  - name: packets-dropped-cilium
+    rules:
+    - alert: FrequentIngressPacketsDropped
+      annotations:
+        description: Dropping ingress traffic from {{ "{{ $labels.source_namespace }}" }}/{{ "{{ $labels.source_pod }}" }} to {{ "{{ $labels.destination_namespace }}" }}/{{ "{{ $labels.destination_pod }}" }}
+        summary: Dropping ingress traffic {{ "{{ $labels.source_namespace }}" }}/{{ "{{ $labels.source_pod }}" }} to {{ "{{ $labels.destination_namespace }}" }}/{{ "{{ $labels.destination_pod }}" }}
+        runbook_url: {{ .Values.runbookUrls.packetsDropped.FrequentIngressPacketsDropped }}
+      expr: |
+        increase(hubble_drop_total{traffic_direction="ingress",reason="POLICY_DENIED"}[15m]) > 0
+      for: 5m
+      labels:
+        severity: warning
+        group: PacketsDropped
+{{- if .Values.defaultRules.additionalRuleLabels }}
+{{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
+{{- end }}
+    - alert: ScarceIngressPacketsDropped
+      annotations:
+        description: Dropping ingress traffic from {{ "{{ $labels.source_namespace }}" }}/{{ "{{ $labels.source_pod }}" }} to {{ "{{ $labels.destination_namespace }}" }}/{{ "{{ $labels.destination_pod }}" }}
+        summary: Dropping ingress traffic from {{ "{{ $labels.source_namespace }}" }}/{{ "{{ $labels.source_pod }}" }} to {{ "{{ $labels.destination_namespace }}" }}/{{ "{{ $labels.destination_pod }}" }}
+        runbook_url: {{ .Values.runbookUrls.packetsDropped.ScarceIngressPacketsDropped }}
+      expr: |
+        increase(hubble_drop_total{traffic_direction="ingress",reason="POLICY_DENIED"}[3h]) > 20
+      for: 6h
+      labels:
+        severity: info
+        group: PacketsDropped
+{{- if .Values.defaultRules.additionalRuleLabels }}
+{{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
+{{- end }}
+    - alert: FrequentEgressPacketsDropped
+      annotations:
+        description: Dropping egress traffic from {{ "{{ $labels.source_namespace }}" }}/{{ "{{ $labels.source_pod }}" }} to {{ "{{ $labels.destination_namespace }}" }}/{{ "{{ $labels.destination_pod }}" }}
+        summary: Dropping egress traffic {{ "{{ $labels.source_namespace }}" }}/{{ "{{ $labels.source_pod }}" }} to {{ "{{ $labels.destination_namespace }}" }}/{{ "{{ $labels.destination_pod }}" }}
+        runbook_url: {{ .Values.runbookUrls.packetsDropped.FrequentEgressPacketsDropped }}
+      expr: |
+        increase(hubble_drop_total{traffic_direction="egress",reason="POLICY_DENIED"}[15m]) > 0
+      for: 5m
+      labels:
+        severity: warning
+        group: PacketsDropped
+{{- if .Values.defaultRules.additionalRuleLabels }}
+{{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
+{{- end }}
+    - alert: ScarceEgressPacketsDropped
+      annotations:
+        description: Dropping egress traffic from {{ "{{ $labels.source_namespace }}" }}/{{ "{{ $labels.source_pod }}" }} to {{ "{{ $labels.destination_namespace }}" }}/{{ "{{ $labels.destination_pod }}" }}
+        summary: Dropping egress traffic {{ "{{ $labels.source_namespace }}" }}/{{ "{{ $labels.source_pod }}" }} to {{ "{{ $labels.destination_namespace }}" }}/{{ "{{ $labels.destination_pod }}" }}
+        runbook_url: {{ .Values.runbookUrls.packetsDropped.ScarceEgressPacketsDropped }}
+      expr: |
+        increase(hubble_drop_total{traffic_direction="egress",reason="POLICY_DENIED"}[3h]) > 20
+      for: 6h
+      labels:
+        severity: info
+        group: PacketsDropped
+{{- if .Values.defaultRules.additionalRuleLabels }}
+{{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
+{{- end }}
+{{- end }}

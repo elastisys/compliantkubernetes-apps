@@ -10,6 +10,8 @@ prometheusJob: kube-prometheus-stack-prometheus
 operatorJob: kube-prometheus-stack-operator
 prometheusNamespace: monitoring
 
+networkType: calico
+
 s3BucketAlerts:
   size:
     enabled: false
