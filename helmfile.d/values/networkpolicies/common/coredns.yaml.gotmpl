@@ -38,3 +38,18 @@ policies:
           ports:
             - tcp: 53
             - udp: 53
+
+    {{- if .Values | get "networkPolicies.dnsAutoscaler.enabled" false }}
+    dns-autoscaler:
+      podSelectorLabels:
+        k8s-app: dns-autoscaler
+      ingress:
+        - rule: ingress-rule-apiserver
+          ports:
+            - tcp: 8080
+        - rule: egress-rule-nodes
+          ports:
+            - tcp: 8080
+      egress:
+        - rule: egress-rule-apiserver
+    {{- end }}
