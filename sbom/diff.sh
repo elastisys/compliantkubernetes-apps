@@ -30,7 +30,9 @@ export TMPDIR="${XDG_CACHE_HOME}"
 echo "[sbom] Running diff against ${COMMITTED_SBOM} ..."
 extra_env=()
 if [[ -n "${CK8S_GITHUB_TOKEN:-}" ]]; then
-  extra_env+=(--env CK8S_GITHUB_TOKEN)
+  extra_env+=(--env "GITHUB_TOKEN=${CK8S_GITHUB_TOKEN}")
+elif [[ -n "${GITHUB_TOKEN:-}" ]]; then
+  extra_env+=(--env GITHUB_TOKEN)
 fi
 set +e
 "${WRAPPER}" --env XDG_CACHE_HOME="${XDG_CACHE_HOME}" --env TMPDIR="${TMPDIR}" "${extra_env[@]}" \
