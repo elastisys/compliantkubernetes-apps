@@ -79,6 +79,7 @@ clusterApi:
 
 crossplane:
   enabled: false
+  debugEnabled: false
   resources:
     requests:
       cpu: 150m
@@ -96,6 +97,7 @@ crossplane:
         memory: 128Mi
   functions:
     auto-ready:
+      debugEnabled: false
       resources:
         requests:
           cpu: 10m
@@ -104,6 +106,7 @@ crossplane:
           cpu: 20m
           memory: 128Mi
     capability:
+      debugEnabled: false
       resources:
         requests:
           cpu: 10m
@@ -112,6 +115,7 @@ crossplane:
           cpu: 20m
           memory: 128Mi
     go-templating:
+      debugEnabled: false
       resources:
         requests:
           cpu: 25m
@@ -120,13 +124,14 @@ crossplane:
           cpu: 50m
           memory: 128Mi
     patch-and-transform:
-        resources:
-          requests:
-            cpu: 25m
-            memory: 64Mi
-          limits:
-            cpu: 50m
-            memory: 128Mi
+      debugEnabled: false
+      resources:
+        requests:
+          cpu: 25m
+          memory: 64Mi
+        limits:
+          cpu: 50m
+          memory: 128Mi
   providers:
     helm:
       debugEnabled: false

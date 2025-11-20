@@ -32,6 +32,7 @@ configurations:
 {{- end }}
 {{- end }}
 
+{{ $functionValues := .Values.crossplane.functions }}
 functions:
 {{- range $function, $image := .Values.images.crossplane.functions }}
   {{ $function }}:
@@ -45,10 +46,11 @@ functions:
       tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
       {{- end }}
     {{- end }}
-    {{- $.Values | dig "crossplane" "functions" $function "resources" | toYaml | nindent 4 }}
+    resources: {{ dig $function "resources" dict $functionValues | toYaml | nindent 6 }}
+    debugEnabled: {{ dig $function "debugEnabled" false $functionValues | toYaml | nindent 6 }}
 {{- end }}
 
-{{ $providerConfig := .Values.crossplane.providers }}
+{{ $providerValues := .Values.crossplane.providers }}
 providers:
 {{- range $provider, $image := .Values.images.crossplane.providers }}
   {{ $provider }}:
@@ -62,6 +64,6 @@ providers:
       tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
       {{- end }}
     {{- end }}
-    resources: {{ dig $provider "resources" dict $providerConfig | toYaml | nindent 6 }}
-    debugEnabled: {{ dig $provider "debugEnabled" false $providerConfig | toYaml | nindent 6 }}
+    resources: {{ dig $provider "resources" dict $providerValues | toYaml | nindent 6 }}
+    debugEnabled: {{ dig $provider "debugEnabled" false $providerValues | toYaml | nindent 6 }}
 {{- end }}
