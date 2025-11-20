@@ -71,7 +71,9 @@ echo "Generating SBOM to ${SBOM_OUTPUT} ..."
 # Forward optional GitHub token to avoid rate limits
 extra_env=()
 if [[ -n "${CK8S_GITHUB_TOKEN:-}" ]]; then
-  extra_env+=(--env CK8S_GITHUB_TOKEN)
+  extra_env+=(--env "GITHUB_TOKEN=${CK8S_GITHUB_TOKEN}")
+elif [[ -n "${GITHUB_TOKEN:-}" ]]; then
+  extra_env+=(--env GITHUB_TOKEN)
 fi
 "${WRAPPER}" --env XDG_CACHE_HOME="${XDG_CACHE_HOME}" "${extra_env[@]}" \
   "${IMAGE}" "${forward_args[@]}" generate \
