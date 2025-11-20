@@ -101,20 +101,6 @@ templates:
       - values/networkpolicies/common/common.yaml.gotmpl
       - values/networkpolicies/common/coredns.yaml.gotmpl
 
-  dns-autoscaler-networkpolicy:
-    inherit:
-      - template: system
-      - template: networkpolicies
-    name: networkpolicy-dns-autoscaler
-    installed: {{ .Values | get "networkPolicies.dnsAutoscaler.enabled" false }}
-    labels:
-      netpol: dns-autoscaler
-    needs:
-      - kube-system/admin-namespaces
-    values:
-      - values/networkpolicies/common/common.yaml.gotmpl
-      - values/networkpolicies/common/dns-autoscaler.yaml.gotmpl
-
   metrics-server-networkpolicy:
     inherit:
       - template: system
