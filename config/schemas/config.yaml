@@ -8779,6 +8779,10 @@ properties:
         title: Enable Crossplane
         default: false
         type: boolean
+      debugEnabled:
+        title: Enable debug logging for Crossplane
+        default: false
+        type: boolean
       resources:
         $ref: '#/$defs/kubernetesResourceRequirements'
       rbacManager:
@@ -8808,6 +8812,10 @@ properties:
           "^[a-z-]+$":
             resources:
               $ref: '#/$defs/kubernetesResourceRequirements'
+            debugEnabled:
+              title: Enable debug logging for the function
+              default: false
+              type: boolean
         additionalProperties: false
 additionalProperties:
   title: Additional Properties

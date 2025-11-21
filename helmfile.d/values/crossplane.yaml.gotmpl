@@ -31,6 +31,11 @@ image:
 {{- end }}
 {{- end }}
 
+{{ if eq (index .Values.crossplane "debugEnabled") true }}
+args:
+  - --debug
+{{ end }}
+
 resourcesCrossplane:
   {{- toYaml .Values.crossplane.resources | nindent 2 }}
 
