@@ -140,6 +140,9 @@ schedules:
       includedNamespaces:
         - monitoring
       excludedResources:
+        - certificaterequests.cert-manager.io
+        - challenges.acme.cert-manager.io
+        - orders.acme.cert-manager.io
         - clustercompliancereports.aquasecurity.github.io
         - clusterconfigauditreports.aquasecurity.github.io
         - clusterinfraassessmentreports.aquasecurity.github.io
