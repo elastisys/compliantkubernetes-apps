@@ -23,6 +23,12 @@ Cypress.Commands.add('harborStaticDexLogin', (ingress) => {
 
   cy.dexStaticLogin()
 
+  // Wait for redirect to complete and land on either onboarding or dashboard
+  cy.get('body', { timeout: 20000 }).should(($body) => {
+    const text = $body.text()
+    expect(text).to.match(/Projects|SAVE/)
+  })
+
   cy.url().then((url) => {
     if (url.includes('oidc-onboard')) {
       cy.contains('label', 'Username').siblings().get('input').as('userInput').clear()
