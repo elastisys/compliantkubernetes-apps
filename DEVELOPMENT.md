@@ -13,7 +13,7 @@ This requires that `kind` is installed and that either `podman` or `docker` is a
 ### Terminology
 
 - `apps-flavor` - one of `prod`, `dev` or `air-gapped` is a global switch for configuring the clusters and deployed applications in different ways. The recommended value when working with local clusters is `dev`.
-- `local-cluster-profile` - a reference to a preconfigured `Cluster` config passed to `kind` when creating or updating local clusters. We use profiles to differentiate between single-/multi-node clusters and/or to enable special features such as container image caching. Use `./scripts/local-clusters.sh list profiles` to see a list of built-in profiles.
+- `local-cluster-profile` - a reference to a preconfigured `Cluster` config passed to `kind` when creating or updating local clusters. We use profiles to differentiate between single-/multi-node clusters and/or to enable special features such as container image caching. Use `./scripts/local-cluster.sh list profiles` to see a list of built-in profiles.
 - `domain` - a local domain name. This can be arbitrary, but using a real domain (or subdomain) for which we have authority allows for setting up DNS based challenges for certificates issued by `cert-manager`.
 
 ### Setup

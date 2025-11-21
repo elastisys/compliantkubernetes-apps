@@ -519,6 +519,30 @@ setup_node_local_dns() {
   fi
 }
 
+setup_sc_s3_sharable() {
+  log.info "Setting up s3 as sharable"
+  local domain CK8S_CLUSTER CK8S_DRY_RUN_INSTALL
+  domain="$(yq ".global.baseDomain" <"${CK8S_CONFIG_PATH}/common-config.yaml")"
+  # shellcheck source=scripts/migration/lib.sh
+  source "${ROOT}/scripts/migration/lib.sh"
+  CK8S_CLUSTER=both
+  CK8S_DRY_RUN_INSTALL=false
+
+  yq_add common '.objectStorage.s3.regionEndpoint' "\"http://minio.${domain}\""
+  yq_add common '.ingressNginx.controller.useHostPort' 'true'
+  yq_add common '.networkPolicies.global.objectStorage.ports[0]' '80'
+  yq_add common '.networkPolicies.ingressNginx.ingressOverride.enabled' 'false'
+
+  log.info "Installing Ingress in SC"
+  helmfile_do sc apply -lapp=ingress-nginx --include-transitive-needs --output simple
+  log.info "Upgrading Minio Chart with Ingress"
+  helm_do sc upgrade -n minio-system minio "${ROOT}/helmfile.d/upstream/minio/minio" \
+    --reuse-values \
+    --set ingress.enabled=true \
+    --set ingress.ingressClassName=nginx \
+    --set ingress.hosts[0]=minio."${domain}"
+}
+
 delete() {
   local cluster
   cluster="${1:-}"
@@ -560,6 +584,9 @@ main() {
     case "${subcommand}" in
     node-local-dns)
       setup_node_local_dns
+      ;;
+    sharable-s3)
+      setup_sc_s3_sharable
       ;;
     *)
       log.usage
