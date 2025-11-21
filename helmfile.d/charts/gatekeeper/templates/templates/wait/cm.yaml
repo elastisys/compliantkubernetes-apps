@@ -8,7 +8,7 @@ metadata:
     {{- include "gatekeeper-templates.labels" . | nindent 4 }}
   annotations:
     helm.sh/hook: post-install,post-upgrade
-    helm.sh/hook-delete-policy: hook-succeeded
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
 data:
   wait.sh: |-
     {{- .Files.Get "files/wait.sh" | nindent 4 }}
