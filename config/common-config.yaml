@@ -220,6 +220,9 @@ alerts:
     thanos: {}
     webhook: {}
 
+  disabled:
+    CPUThrottlingHigh: true
+
 ## Falco configuration.
 falco:
   ## Falco alerting configuration.
