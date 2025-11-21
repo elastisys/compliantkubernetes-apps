@@ -31,7 +31,7 @@ Cypress.Commands.add('harborStaticDexLogin', (ingress) => {
 
   cy.url().then((url) => {
     if (url.includes('oidc-onboard')) {
-      cy.contains('label', 'Username').siblings().get('input').as('userInput').clear()
+      cy.contains('label', 'Username').parent().find('input').as('userInput').clear()
       cy.get('@userInput').type('dex-static-user')
 
       cy.contains('SAVE').click()
