@@ -488,7 +488,9 @@ validate_sops_config() {
   skip_test_encrypt="${1:-false}"
 
   # should be able to decrypt $CK8S_CONFIG_PATH/secrets.yaml with some private key
-  sops --decrypt "${secrets["secrets_file"]}" >/dev/null
+  if ! sops --decrypt "${secrets["secrets_file"]}" >/dev/null; then
+    log_fatal "Failed to decrypt ${secrets["secrets_file"]}. Ensure you have a private key that has a matching public key in ${sops_config}"
+  fi
 
   if [[ "${skip_test_encrypt}" == "false" ]]; then
     tmp_secret=$(mktemp --suffix=-secret)
