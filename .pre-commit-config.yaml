@@ -127,6 +127,7 @@ repos:
     rev: v0.18.1
     hooks:
       - id: markdownlint-cli2
+        language_version: 22.21.1
         name: lint markdown files
         exclude: ^changelog/|^docs/sbom.md$|^helmfile\.d/charts/opensearch/configurer/files/|^helmfile\.d/upstream/|^images/elasticsearch-curator/
         args:
