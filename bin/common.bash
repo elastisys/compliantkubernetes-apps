@@ -416,6 +416,7 @@ validate_config() {
   schema_validate() {
     merged_config="${1}"
     schema_file="${2}"
+    verbose="${3:-}"
 
     schema_validation_result="$(mktemp --suffix='.txt')"
     append_trap "rm ${schema_validation_result}" EXIT
@@ -423,7 +424,7 @@ validate_config() {
     if ! yajsv -s "${schema_file}" "${merged_config}" >"${schema_validation_result}"; then
       log_warning "Failed schema validation:"
       sed -r 's/^.*_(..-config\.yaml): fail: (.*)/\1: \2/; / failed validation$/q' <"${schema_validation_result}"
-      if [[ "${3:-}" == "-v" ]]; then
+      if [[ "${verbose}" == "true" ]]; then
         grep -oP '(?<=fail: )[^:]+' "${schema_validation_result}" | sort -u |
           while read -r jpath; do
             if [[ $jpath != "(root)" ]]; then
@@ -485,34 +486,63 @@ validate_sops_config() {
     exit 1
   fi
 
-  # Compares the keyring with the sops config to see if the config has anything the keyring does not have.
-  keyring=$(gpg --with-colons --list-keys | awk -F: '/^pub:.*/ { getline; print $10 }')
-  creation_pgp=$(yq '[.creation_rules[].pgp // "" | split(",") | .[]] | unique | .[]' "${sops_config}")
-  # Pass keyring fingerprints twice to ensure other keys will not be flagged
-  fingerprints=$(tr ' ' '\n' <<<"${keyring} ${keyring} ${creation_pgp}" | sort | uniq -u)
+  skip_test_encrypt="${1:-false}"
 
-  # Find rules ending with trailing comma
-  comma_search=$(yq '.creation_rules[] | select(.pgp == "*,")' "${sops_config}")
+  # should be able to decrypt $CK8S_CONFIG_PATH/secrets.yaml with some private key
+  if ! sops --decrypt "${secrets["secrets_file"]}" >/dev/null; then
+    log_fatal "Failed to decrypt ${secrets["secrets_file"]}. Ensure you have a private key that has a matching public key in ${sops_config}"
+  fi
 
-  if [ -n "${fingerprints// /}" ] || [ "${comma_search: -1}" == "," ]; then
-    log_error "ERROR: SOPS config contains no or invalid PGP keys."
-    log_error "SOPS config: ${sops_config}:"
-    yq 'split(" ") | {"missing or invalid fingerprints": .}' <<<"${fingerprints}" | cat
-    log_error "Fingerprints must be uppercase and separated by commas."
-    log_error "Recreate or edit the SOPS config to fix the issue"
-    exit 1
+  if [[ "${skip_test_encrypt}" == "false" ]]; then
+    tmp_secret=$(mktemp --suffix=-secret)
+    append_trap "rm ${tmp_secret}" EXIT
+
+    yq -i '.secret = "value"' "${tmp_secret}"
+
+    # this will fail if e.g. not all gpg public keys are imported to keyring
+    if ! sops --config "${sops_config}" --in-place --encrypt "${tmp_secret}"; then
+      log_fatal "Failed to encrypt file using fingerprints in ${sops_config}. If you are using GPG fingerprints, ensure they are in your keyring"
+    fi
+
+    # test decrypt to ensure a matching private key is available
+    if ! sops --in-place --decrypt "${tmp_secret}"; then
+      log_fatal "Failed to decrypt file. Ensure your private key has a matching public key in ${sops_config}"
+    fi
   fi
 }
 
 # Load and validate all configuration options from the config path.
-# Usage: config_load <sc|wc> [--skip-validation|-v]
+# Usage: config_load <sc|wc> [--skip-validation] [-v] [--skip-test-encrypt]
 config_load() {
-  load_config "$1"
+  cluster="${1}"
+  load_config "${cluster}"
+  shift
 
-  if [[ "${CK8S_SKIP_VALIDATION}" == "false" ]] && [[ "--skip-validation" != "${2:-''}" ]]; then
-    validate_version "$1"
-    validate_config "$1" "${2:-''}"
-    validate_sops_config
+  skip_validation=false
+  skip_test_encrypt=false
+  verbose=false
+  while [ "${#}" -gt 0 ]; do
+    case "${1}" in
+    --skip-validation)
+      skip_validation=true
+      ;;
+    --skip-test-encrypt)
+      skip_test_encrypt=true
+      ;;
+    -v)
+      verbose=true
+      ;;
+    *)
+      log_error "Usage: config_load <sc|wc> [--skip-validation] [-v] [--skip-test-encrypt]"
+      ;;
+    esac
+    shift
+  done
+
+  if [[ "${CK8S_SKIP_VALIDATION}" == "false" ]] && [[ "${skip_validation}" == "false" ]]; then
+    validate_version "${cluster}"
+    validate_config "${cluster}" "${verbose}"
+    validate_sops_config "${skip_test_encrypt}"
   fi
 }
 
