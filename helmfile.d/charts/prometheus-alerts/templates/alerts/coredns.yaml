@@ -34,7 +34,7 @@ spec:
         runbook_url: {{ $.Values.runbookUrls.coreDns.CorednsLatencyHigh }}
         summary: {{ . | title }} is experiencing high 99th percentile latency.
       expr: |
-        histogram_quantile(0.99, sum(rate(coredns_dns_request_duration_seconds_bucket{job="{{ . }}"}[5m])) without (instance,pod)) > 4
+        histogram_quantile(0.99, sum(rate(coredns_dns_request_duration_seconds_bucket{job="{{ . }}"}[5m])) without (instance,pod)) > 0.1
       for: 10m
       labels:
         severity: medium
@@ -71,7 +71,7 @@ spec:
         runbook_url: {{ $.Values.runbookUrls.coreDns.CorednsForwardLatencyHigh }}
         summary: {{ . | title }} is experiencing high latency forwarding requests.
       expr: |
-        histogram_quantile(0.99, sum(rate(coredns_forward_request_duration_seconds_bucket{job="{{ . }}"}[5m])) without (pod, instance, rcode)) > 4
+        histogram_quantile(0.99, sum(rate(coredns_forward_request_duration_seconds_bucket{job="{{ . }}"}[5m])) without (pod, instance, rcode)) > 0.1
       for: 10m
       labels:
         severity: medium
