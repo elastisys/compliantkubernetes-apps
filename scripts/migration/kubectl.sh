@@ -11,7 +11,7 @@ kubectl_do() {
     log_fatal "Second argument must be a kubectl operation, not an option"
   fi
 
-  if [[ "${CK8S_DRY_RUN_INSTALL}" == "true" ]]; then
+  if [[ "${CK8S_DRY_RUN_INSTALL:-"true"}" == "true" ]]; then
     local command="${2}"
     # List of common commands that generally DO NOT support --dry-run=server
     case "${command}" in
