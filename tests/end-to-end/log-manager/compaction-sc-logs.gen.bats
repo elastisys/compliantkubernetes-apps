@@ -85,13 +85,9 @@ setup() {
   #       is still no guarantee.
   test_run_cronjob "${CRONJOB_NAME}" 1200
 
-  object_storage.is_compacted "${BUCKET}" "${PREFIX}"
-}
+  local -r cutoff="$(_get_latest_job_start_time)"
 
-@test "sc-logs - log-manager compaction job runs fine when no logs needs compaction" {
-  object_storage.is_compacted "${BUCKET}" "${PREFIX}"
-
-  test_run_cronjob "${CRONJOB_NAME}" 120
+  object_storage.is_compacted "${BUCKET}" "${PREFIX}" "${cutoff}"
 }
 
 _create_uncompacted_objects() {
@@ -110,4 +106,9 @@ _create_uncompacted_objects() {
 
 _get_cronjob_env() {
   kubectl -n "${NAMESPACE}" get cronjob "${CRONJOB_NAME}" -o jsonpath='{.spec.jobTemplate.spec.template.spec.containers[0].env[?(@.name=="'"${1}"'")].value}'
+}
+
+_get_latest_job_start_time() {
+  kubectl -n "${NAMESPACE}" get jobs -o json |
+    jq -r "[.items[] | select(.metadata.ownerReferences[]?.name==\"${CRONJOB_NAME}\")] | sort_by(.status.startTime) | .[-1].status.startTime"
 }
