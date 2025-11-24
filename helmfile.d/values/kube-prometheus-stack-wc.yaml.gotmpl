@@ -41,6 +41,10 @@ alertmanager:
     route:
       group_by: {{ toYaml .Values.prometheus.alertmanagerSpec.groupBy | nindent 8 }}
   alertmanagerSpec:
+    automountServiceAccountToken: false
+    useExistingSecret: true
+    secrets:
+     - alertmanager-kube-prometheus-stack-alertmanager
     replicas: {{ .Values.prometheus.alertmanagerSpec.replicas }}
     retention: {{ .Values.prometheus.retention.alertmanager }}
     resources: {{- toYaml .Values.prometheus.alertmanagerSpec.resources | nindent 6 }}
