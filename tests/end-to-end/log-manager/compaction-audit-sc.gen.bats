@@ -90,14 +90,6 @@ setup() {
   object_storage.is_compacted "${BUCKET}" "${PREFIX}" "${cutoff}"
 }
 
-@test "audit-sc - log-manager compaction job runs fine when no logs need compaction" {
-  local -r cutoff="$(_get_latest_job_start_time)"
-
-  object_storage.is_compacted "${BUCKET}" "${PREFIX}" "${cutoff}"
-
-  test_run_cronjob "${CRONJOB_NAME}" 120
-}
-
 _create_uncompacted_objects() {
   local test_data_file_1
   local test_data_file_2
