@@ -1,0 +1,3 @@
+{{- if .Values.additional }}
+  {{- .Values.additional }}
+{{- end }}
