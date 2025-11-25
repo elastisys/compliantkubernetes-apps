@@ -25,7 +25,7 @@ rejectPodWithoutController:
 restrictPodDisruptionBudgets:
     enable: {{ .Values.opa.restrictPodDisruptionBudgets.enabled }}
     enforcementAction: {{ .Values.opa.restrictPodDisruptionBudgets.enforcement }}
-{{- if eq .Environment.Name "workload_cluster" }}
+{{- if .Values.ck8sWorkloadCluster.enabled }}
 allowUserCRDs:
     enable: {{ .Values.gatekeeper.allowUserCRDs.enabled }}
     enforcementAction: {{ .Values.gatekeeper.allowUserCRDs.enforcement }}

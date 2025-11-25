@@ -32,7 +32,7 @@ constraints:
         runAsUser:
           rule: RunAsAny
 
-    {{- if eq .Environment.Name "service_cluster" }}
+    {{- if .Values.ck8sManagementCluster.enabled }}
     log-manager:
       podSelectorLabels:
         app.kubernetes.io/instance: log-manager
@@ -46,7 +46,7 @@ constraints:
 
 
 
-  {{- if eq .Environment.Name "workload_cluster" }}
+  {{- if .Values.ck8sWorkloadCluster.enabled }}
   fluentd:
     forwarder-user:
       podSelectorLabels:

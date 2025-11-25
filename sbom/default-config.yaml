@@ -1,0 +1,1810 @@
+# Default config for SBOM generation - enables all charts to render with dummy values
+global:
+  ck8sVersion: any
+  ck8sCloudProvider: baremetal
+  ck8sEnvironmentName: sbom
+  ck8sFlavor: prod
+  ck8sK8sInstaller: kubespray
+  baseDomain: sbom.example.com
+  opsDomain: ops.sbom.example.com
+  clusterName: sbom-cluster
+  clustersMonitoring:
+    - sbom-wc
+  scDomain: ""
+  scOpsDomain: ""
+  issuer: letsencrypt-staging
+  verifyTls: true
+  clusterDns: 10.96.0.10
+  containerRuntime: containerd
+  enforceIPFamilyPolicy: false
+  enforceIPFamilies: false
+  ipFamilyPolicy: "SingleStack"
+  ipFamilies:
+    - "IPv4"
+
+objectStorage:
+  type: s3
+  s3:
+    region: us-east-1
+    regionEndpoint: https://s3.example.com
+    forcePathStyle: true
+    accessKey: dummy-access-key
+    secretKey: dummy-secret-key
+  buckets:
+    harbor: sbom-harbor
+    opensearch: sbom-opensearch
+    scFluentd: sbom-sc-logs
+    audit: sbom-audit
+    velero: sbom-velero
+    thanos: sbom-thanos
+  restore:
+    enabled: false
+    dryrun: false
+    destinations: {}
+    sources: {}
+    decrypt: {}
+    timestamp: ""
+    addTargetsFromSync: false
+    targets: []
+  sync:
+    activeDeadlineSeconds: 14400
+    enabled: false
+    dryrun: false
+    destinationType: s3
+    syncDefaultBuckets: false
+    defaultSchedule: "0 5 * * *"
+    buckets: []
+    encrypt:
+      enabled: false
+      directoryNames: false
+      fileNames: false
+    resources:
+      requests:
+        cpu: 100m
+        memory: 100Mi
+      limits:
+        cpu: 300m
+        memory: 500Mi
+
+clusterAdmin:
+  users:
+    - admin@example.com
+  groups:
+    - cluster-admins
+
+opa:
+  validatingWebhookTimeoutSeconds: 30
+  mutatingWebhookTimeoutSeconds: 30
+  auditChunkSize: 500
+  auditFromCache: true
+  auditIntervalSeconds: 60
+  constraintViolationsLimit: 20
+  controllerManager:
+    affinity: {}
+    nodeSelector: {}
+    tolerations: []
+    topologySpreadConstraints: []
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+  audit:
+    affinity: {}
+    nodeSelector: {}
+    tolerations: []
+    writeToRAMDisk: false
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
+      limits:
+        cpu: 100m
+        memory: 128Mi
+  rejectLoadBalancerService:
+    enabled: false
+    enforcement: deny
+  rejectLocalStorageEmptyDir:
+    enabled: false
+    enforcement: deny
+  rejectPodWithoutController:
+    enabled: false
+    enforcement: deny
+  restrictPodDisruptionBudgets:
+    enabled: false
+    enforcement: deny
+  preventAccidentalDeletion:
+    enabled: false
+    enforcement: deny
+  disallowedTags:
+    enabled: false
+    enforcement: deny
+    tags:
+      - latest
+  resourceRequests:
+    enabled: false
+    enforcement: deny
+  networkPolicies:
+    enabled: true
+    enforcement: deny
+  minimumDeploymentReplicas:
+    enabled: false
+    enforcement: deny
+  mutations:
+    jobTTL:
+      enabled: false
+      ttlSeconds: 300
+    ndots:
+      enabled: false
+      ndotAmount: 5
+      labelSelector:
+        matchLabels: {}
+  imageRegistry:
+    enabled: true
+    enforcement: deny
+    URL:
+      - harbor.example.com
+      - quay.io/jetstack/cert-manager-acmesolver
+      - registry.k8s.io
+      - docker.io
+      - ghcr.io
+
+networkPolicies:
+  enableAlerting: true
+  defaultDeny: false
+  allowedNameSpaces: []
+  additionalEgressPolicies: []
+  additionalIngressPolicies: []
+  additional: ""
+  global:
+    objectStorage:
+      ips:
+        - 10.0.0.0/8
+      ports:
+        - 443
+    scIngress:
+      ips:
+        - 10.0.0.0/8
+    wcIngress:
+      ips:
+        - 10.0.0.0/8
+    scApiserver:
+      ips:
+        - 10.0.0.0/8
+      port: 6443
+    scNodes:
+      ips:
+        - 10.0.0.0/8
+    wcApiserver:
+      ips:
+        - 10.0.0.0/8
+      port: 6443
+    wcNodes:
+      ips:
+        - 10.0.0.0/8
+    trivy:
+      ips:
+        - 0.0.0.0/0
+      port: 443
+    externalLoadBalancer: false
+    ingressUsingHostNetwork: false
+    objectStorageSwift:
+      ips:
+        - 10.0.0.0/8
+      ports:
+        - 5000
+  alertmanager:
+    enabled: true
+    alertReceivers:
+      ips:
+        - 0.0.0.0/0
+      ports:
+        - 443
+  kubeSystem:
+    enabled: true
+    openstack:
+      enabled: true
+      ips:
+        - 10.0.0.0/8
+      ports:
+        - 5000
+        - 8774
+        - 8776
+  monitoring:
+    enabled: true
+    grafana:
+      externalDashboardProvider:
+        ips:
+          - 0.0.0.0/0
+        ports:
+          - 443
+      externalDataSources:
+        enabled: false
+        ips:
+          - 0.0.0.0/0
+        ports:
+          - 443
+  prometheus:
+    internalAccess:
+      enabled: false
+      namespaces: []
+  s3Exporter:
+    enabled: true
+  crossplane:
+    enabled: true
+    packageRegistry:
+      ips:
+        - 0.0.0.0/0
+      ports:
+        - 443
+  kyverno:
+    enabled: true
+    imageRegistry:
+      ips:
+        - 0.0.0.0/0
+      ports:
+        - 443
+  kured:
+    enabled: true
+    notificationSlack:
+      ips:
+        - 0.0.0.0/0
+      ports:
+        - 443
+  velero:
+    enabled: true
+  certManager:
+    enabled: true
+    letsencrypt:
+      ips:
+        - 0.0.0.0/0
+    http01:
+      ips: []
+    dns01:
+      ips: []
+    namespaces:
+      - dex
+      - harbor
+      - monitoring
+      - opensearch-system
+      - thanos
+  ingressNginx:
+    enabled: true
+    ingressOverride:
+      enabled: false
+      ips:
+        - 10.0.0.0/8
+  falco:
+    enabled: true
+    plugins:
+      ips:
+        - 0.0.0.0/0
+      ports:
+        - 443
+  externalDns:
+    enabled: true
+    ips:
+      - 0.0.0.0/0
+    ports:
+      - 443
+  gatekeeper:
+    enabled: true
+  rookCeph:
+    enabled: true
+  coredns:
+    enabled: true
+    externalDns:
+      ips:
+        - 8.8.8.8
+    serviceIp:
+      ips:
+        - 10.96.0.10
+  dnsAutoscaler:
+    enabled: true
+  harbor:
+    enabled: true
+    registries:
+      ips:
+        - 0.0.0.0/0
+      ports:
+        - 443
+    jobservice:
+      ips:
+        - 0.0.0.0/0
+      ports:
+        - 443
+    database:
+      internalIngress:
+        peers: []
+        ports: []
+      externalEgress:
+        peers: []
+        ports: []
+    redis:
+      externalEgress:
+        peers: []
+        ports: []
+    trivy:
+      ips:
+        - 0.0.0.0/0
+      ports:
+        - 443
+  tektonPipelines:
+    enabled: true
+    pipeline: {}
+  thanos:
+    enabled: true
+  opensearch:
+    enabled: true
+    plugins:
+      ips:
+        - 0.0.0.0/0
+      ports:
+        - 443
+  fluentd:
+    enabled: true
+    extraOutput:
+      ips: []
+      ports: []
+  rclone:
+    enabled: true
+    sync:
+      objectStorage:
+        ips:
+          - 10.0.0.0/8
+        ports:
+          - 443
+      objectStorageSwift:
+        ips:
+          - 10.0.0.0/8
+        ports:
+          - 5000
+      secondaryUrl:
+        ips:
+          - 10.0.0.0/8
+        ports:
+          - 443
+  dex:
+    enabled: true
+    connectors:
+      ips:
+        - 0.0.0.0/0
+      ports:
+        - 443
+
+# Welcoming dashboard config
+welcomingDashboard:
+  extraTextGrafana: ""
+  extraTextOpensearch: ""
+  extraVersions: []
+
+# Grafana label enforcer
+grafanaLabelEnforcer:
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 100m
+      memory: 128Mi
+
+# Grafana config
+grafana:
+  password: dummy-password
+  clientSecret: dummy-secret
+  opsClientSecret: dummy-secret
+  ops:
+    subdomain: grafana
+    envRenderSecret: {}
+    viewersCanEdit: false
+    dataproxy:
+      timeout: 30
+    contentSecurityPolicy: {}
+    plugins: []
+    additionalDatasources: []
+    trailingDots: false
+    additionalConfigValues: ""
+    sidecar:
+      resources:
+        requests:
+          cpu: 50m
+          memory: 50Mi
+        limits:
+          cpu: 100m
+          memory: 100Mi
+    oidc:
+      enabled: true
+      jwtEnabled: false
+      scopes:
+        - openid
+        - email
+        - profile
+        - groups
+      skipRoleSync: false
+      userGroups:
+        grafanaAdmin: admin
+        grafanaEditor: editor
+        grafanaViewer: viewer
+      allowedDomains:
+        - example.com
+    resources: {}
+    tolerations: []
+    affinity: {}
+    nodeSelector: {}
+  user:
+    subdomain: grafana-user
+    envRenderSecret: {}
+    oidc:
+      jwtEnabled: false
+      allowedDomains:
+        - example.com
+
+# Harbor config
+harbor:
+  enabled: true
+  subdomain: harbor
+  alerts:
+    HarborP99LatencyHigherThan55Seconds:
+      enabled: true
+    HarborP50LatencyHigherThan10Seconds:
+      enabled: true
+    HarborErrorRateHigh:
+      enabled: true
+  nodeSelector: {}
+  tolerations: []
+  portal:
+    replicas: 1
+    affinity: {}
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
+      limits:
+        cpu: 100m
+        memory: 128Mi
+  core:
+    replicas: 1
+    affinity: {}
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+  password: dummy-password
+  clientSecret: dummy-secret
+  coreSecret: dummy-secret
+  jobserviceSecret: dummy-secret
+  jobservice:
+    replicas: 1
+    affinity: {}
+    jobLoggers:
+      - file
+      - database
+      - stdout
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
+      limits:
+        cpu: 100m
+        memory: 128Mi
+    jobLog:
+      persistentVolumeClaim:
+        size: 1Gi
+  registrySecret: dummy-secret
+  registryPassword: dummy-password
+  registryPasswordHtpasswd: dummy-htpasswd
+  xsrf: abcdefghijklmnopqrstuvwxyz123456
+  registry:
+    replicas: 1
+    affinity: {}
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
+      limits:
+        cpu: 100m
+        memory: 128Mi
+    controller:
+      resources:
+        requests:
+          cpu: 50m
+          memory: 64Mi
+        limits:
+          cpu: 100m
+          memory: 128Mi
+    persistentVolumeClaim:
+      size: 10Gi
+  trivy:
+    replicas: 1
+    affinity: {}
+    extraEnvVars: []
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
+      limits:
+        cpu: 100m
+        memory: 128Mi
+    persistentVolumeClaim:
+      size: 5Gi
+  gc:
+    enabled: false
+    forceConfigure: false
+    schedule: "0 0 * * *"
+  redis:
+    type: internal
+    internal:
+      affinity: {}
+      resources:
+        requests:
+          cpu: 50m
+          memory: 64Mi
+        limits:
+          cpu: 100m
+          memory: 128Mi
+      persistentVolumeClaim:
+        size: 1Gi
+  database:
+    type: internal
+    internal:
+      affinity: {}
+      resources:
+        requests:
+          cpu: 50m
+          memory: 64Mi
+        limits:
+          cpu: 100m
+          memory: 128Mi
+      persistentVolumeClaim:
+        size: 5Gi
+  ingress:
+    defaultAnnotations: {}
+    additionalAnnotations: {}
+  oidc:
+    adminGroupName: harbor-admins
+    groupClaimName: groups
+    scope: openid,email,profile,groups
+  internal:
+    databasePassword: dummy-password
+  s3:
+    multipartcopythresholdsize: 536870912
+    multipartcopychunksize: 67108864
+    multipartcopymaxconcurrency: 10
+  exporter:
+    replicas: 1
+    affinity: {}
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
+      limits:
+        cpu: 100m
+        memory: 128Mi
+  persistence:
+    type: objectStorage
+    disableRedirect: false
+
+# OpenSearch config
+opensearch:
+  enabled: true
+  subdomain: opensearch
+  clusterName: opensearch-cluster
+  maxShardsPerNode: 1000
+  maxClauseCount: 8192
+  ingress:
+    maxbodysize: 8m
+  dataNode:
+    dedicatedPods: false
+    count: 3
+  clientNode:
+    dedicatedPods: false
+    count: 3
+  ism:
+    overwritePolicies: false
+    defaultPolicies: true
+    additionalPolicies: []
+    authlog:
+      rolloverSizeMB: 1024
+      rolloverAgeDays: 30
+    kubeaudit:
+      rolloverSizeMB: 1024
+      rolloverAgeDays: 30
+    kubernetes:
+      rolloverSizeMB: 1024
+      rolloverAgeDays: 30
+    other:
+      rolloverSizeMB: 1024
+      rolloverAgeDays: 30
+  defaultTemplates: true
+  additionalTemplates: []
+  overwriteTemplates: false
+  masterNode:
+    count: 3
+    javaOpts: "-Xms512m -Xmx512m"
+    storageSize: 8Gi
+    storageClass: ""
+    affinity: {}
+    nodeSelector: {}
+    tolerations: []
+    resources:
+      requests:
+        cpu: 200m
+        memory: 512Mi
+      limits:
+        cpu: 500m
+        memory: 1Gi
+  createIndices: true
+  indexPerNamespace: false
+  promIndexAlerts: []
+  sso:
+    enabled: false
+  snapshot:
+    enabled: false
+    repository: snapshots
+    min: 7
+    max: 14
+    backupSchedule: "0 0 * * *"
+    retentionSchedule: "0 1 * * *"
+    retentionAge: 30
+  securityadmin:
+    activeDeadlineSeconds: 300
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
+      limits:
+        cpu: 100m
+        memory: 128Mi
+  dashboards:
+    subdomain: opensearch
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+    contentSecurityPolicy:
+      - "default-src 'self'"
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+  exporter:
+    tolerations: []
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
+      limits:
+        cpu: 100m
+        memory: 128Mi
+    serviceMonitor:
+      scrapeTimeout: 30s
+      interval: 60s
+  extraUsers: []
+  extraRoles: []
+  dashboardsPassword: dummy-password
+  dashboardsHash: $2y$12$dummyhashvalueforsbomdummy
+  clientSecret: dummy-secret
+  dashboardsCookieEncKey: dummy-cookie-key-32chars
+  adminHash: $2y$12$dummyhashvalueforsbomdummy
+  fluentdPassword: dummy-password
+  configurerPassword: dummy-password
+  configurerHash: $2y$12$dummyhashvalueforsbomdummy
+  curatorPassword: dummy-password
+  snapshotterPassword: dummy-password
+  metricsExporterPassword: dummy-password
+  extraRoleMappings:
+    - mapping_name: kibana_user
+      definition:
+        users:
+          - admin@example.com
+    - mapping_name: kubernetes_log_reader
+      definition:
+        users:
+          - admin@example.com
+    - mapping_name: all_access
+      definition:
+        users:
+          - admin@example.com
+    - mapping_name: alerting_ack_alerts
+      definition:
+        users:
+          - admin@example.com
+    - mapping_name: alerting_read_access
+      definition:
+        users:
+          - admin@example.com
+    - mapping_name: alerting_full_access
+      definition:
+        users:
+          - admin@example.com
+
+# Issuers
+issuers:
+  letsencrypt:
+    enabled: true
+    prod:
+      email: admin@example.com
+      solvers: []
+    staging:
+      email: admin@example.com
+      solvers: []
+  extraIssuers: []
+  secrets: {}
+
+# Additional config for SBOM generation
+dex:
+  subdomain: dex
+  replicaCount: 1
+  contentSecurityPolicy: {}
+  connectors: []
+  kubeloginClientSecret: dummy-secret
+  additionalKubeloginRedirects: []
+  additionalStaticClients: []
+  enableStaticLogin: false
+  google:
+    groupSupport: false
+  expiry:
+    deviceRequests: 5m
+    signingKeys: 6h
+    idTokens: 24h
+    idToken: 24h
+    refreshTokens:
+      reuseInterval: 3s
+      validIfNotUsedFor: 168h
+      absoluteLifetime: 720h
+  serviceMonitor:
+    enabled: true
+  resources:
+    limits:
+      cpu: 100m
+      memory: 50Mi
+    requests:
+      cpu: 5m
+      memory: 25Mi
+  tolerations: []
+  topologySpreadConstraints: []
+  nodeSelector: {}
+  affinity: {}
+
+user:
+  grafanaPassword: dummy-password
+  namespaces: []
+  adminUsers: []
+  adminGroups: []
+  constraints: {}
+  serviceAccounts: []
+  createNamespaces: true
+  sealedSecrets:
+    enabled: false
+  mongodb:
+    enabled: false
+  fluxv2:
+    enabled: false
+  kafka:
+    enabled: false
+  jaeger:
+    enabled: false
+  extraRoles: {}
+  extraRoleBindings: {}
+  extraClusterRoles: {}
+  extraClusterRoleBindings: {}
+
+kubeapiMetricsPassword: dummy-password
+kubeapiMetricsPasswordHtpasswd: dummy-htpasswd
+
+externalTrafficPolicy:
+  local: false
+  whitelistRange:
+    global: 0.0.0.0/0
+    kubeapiMetrics: 0.0.0.0/0
+    userGrafana: 0.0.0.0/0
+    opsGrafana: 0.0.0.0/0
+    thanosReceiver: 0.0.0.0/0
+    harbor: 0.0.0.0/0
+    opensearch: 0.0.0.0/0
+    opensearchDashboards: 0.0.0.0/0
+    dex: 0.0.0.0/0
+
+fluentd:
+  enabled: true
+  audit:
+    enabled: false
+  scLogs:
+    enabled: false
+  logManager:
+    tolerations: []
+    nodeSelector: {}
+    affinity: {}
+    compaction:
+      volume: 10Gi
+      resources:
+        requests:
+          cpu: 100m
+          memory: 128Mi
+        limits:
+          cpu: 500m
+          memory: 512Mi
+    retention:
+      resources:
+        requests:
+          cpu: 100m
+          memory: 128Mi
+        limits:
+          cpu: 500m
+          memory: 512Mi
+  forwarder:
+    tolerations: []
+    nodeSelector: {}
+    affinity: {}
+    requestTimeout: 30s
+    buffer:
+      chunkLimitSize: 8m
+      totalLimitSize: 1g
+    livenessThresholdSeconds: 300
+    stuckThresholdSeconds: 900
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+  user:
+    tolerations: []
+    nodeSelector: {}
+    affinity: {}
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+
+ingressNginx:
+  subDomain: ingress
+  defaultBackend:
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+    topologySpreadConstraints: []
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
+      limits:
+        cpu: 100m
+        memory: 128Mi
+  controller:
+    useHostPort: false
+    extraArgs: {}
+    extraEnvs: []
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+    chroot: false
+    additionalConfig: {}
+    allowSnippetAnnotations: false
+    enableAnnotationValidations: true
+    enablepublishService: true
+    config:
+      annotationsRiskLevel: High
+      useProxyProtocol: false
+
+rookCeph:
+  monitoring:
+    enabled: true
+  gatekeeperPsp:
+    enabled: false
+
+hnc:
+  enabled: true
+  includedNamespacesRegex: ".*"
+  excludedNamespaces: []
+  ha: false
+  unpropagatedAnnotations: []
+  managedNamespaceAnnotations: []
+  managedNamespaceLabels: []
+  manager:
+    resources:
+      requests:
+        cpu: 100m
+        memory: 300Mi
+      limits:
+        cpu: 200m
+        memory: 500Mi
+  webhook:
+    resources:
+      requests:
+        cpu: 50m
+        memory: 100Mi
+      limits:
+        cpu: 100m
+        memory: 200Mi
+  serviceMonitor:
+    relabelings: []
+  additionalAllowPropagateResources: []
+  webhookMatchConditions: false
+
+gatekeeper:
+  allowUserCRDs:
+    enabled: true
+    enforcement: deny
+    adminConfUser: kubernetes-admin
+    extraServiceAccounts: []
+    extraCRDs: []
+  additionalValidationResources: []
+  additionalValidationDeleteResources: []
+  additionalMutationResources: []
+
+prometheus:
+  replicas: 1
+  nodeSelector: {}
+  affinity: {}
+  tolerations: []
+  resources:
+    requests:
+      cpu: 200m
+      memory: 512Mi
+    limits:
+      cpu: 500m
+      memory: 1Gi
+  retention:
+    alertmanager: 120h
+    age: 15d
+    size: 50GB
+  topologySpreadConstraints: []
+  diskAlerts:
+    enabled: true
+  storage:
+    enabled: true
+    size: 50Gi
+  s3BucketAlerts:
+    exclude: []
+    buckets: []
+    size:
+      enabled: false
+      percent: 80
+      sizeQuotaGB: 100
+    totalSize:
+      enabled: false
+      percent: 80
+      sizeQuotaGB: 500
+    objects:
+      enabled: false
+      percent: 80
+      count: 1000000
+  autoscaledNodeGroupAlerts:
+    enabled: false
+    groupLabel: ""
+    groupLabelValues: []
+  capacityManagementAlerts:
+    enabled: false
+    persistentVolume:
+      enabled: false
+      limit: 80
+    disklimit: 80
+    predictUsage: false
+    usagelimit: 80
+    requestLimit:
+      cpu: 80
+      memory: 80
+    nodeGroupRequestsExcludePattern: ""
+    nodeGroupCpuLimit24h: 80
+    nodeGroupMemoryLimit24h: 80
+    nodeGroupCpuLimit1h: 80
+    nodeGroupMemoryLimit1h: 80
+    nodeCpuLimit1h: 80
+    nodeMemoryLimit1h: 80
+  webhookAlerts:
+    enabled: false
+  alertmanagerSpec:
+    replicas: 1
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
+      limits:
+        cpu: 100m
+        memory: 128Mi
+    storage:
+      volumeClaimTemplate:
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 1Gi
+    topologySpreadConstraints: []
+    affinity: {}
+    groupBy:
+      - alertname
+      - namespace
+  devAlertmanager:
+    enabled: true
+    namespace: monitoring
+
+alerts:
+  alertTo: slack
+  runbookUrls:
+    alertmanager: {}
+    backupStatus: {}
+    blackbox: {}
+    certManager: {}
+    clusterApi: {}
+    clusterAutoscaler: {}
+    clusterCapacityManagement: {}
+    configReloaders: {}
+    coreDns: {}
+    dailyChecks: {}
+    diskPerf: {}
+    falco: {}
+    fluentd: {}
+    general: {}
+    harbor: {}
+    hnc: {}
+    kubeStateMetrics: {}
+    kubernetesApps: {}
+    kubernetesResources: {}
+    kubernetesStorage: {}
+    kubernetesSystem: {}
+    kured: {}
+    missingMetrics: {}
+    nodeExporter: {}
+    nodeNetwork: {}
+    opensearch: {}
+    openstack: {}
+    packetsDropped: {}
+    prometheusOperator: {}
+    prometheus: {}
+    thanos: {}
+    webhook: {}
+  customRoutes: []
+  customReceivers: []
+  slack:
+    channel: "#alerts"
+    apiUrl: ""
+    customTemplate: ""
+  opsGenieHeartbeat:
+    enabled: false
+  opsGenie:
+    apiKey: dummy-api-key
+
+thanos:
+  enabled: true
+  objectStorage:
+    type: s3
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+  bucketweb:
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
+      limits:
+        cpu: 100m
+        memory: 128Mi
+  query:
+    enabled: true
+    replicaCount: 2
+    topologySpreadConstraints: []
+    affinity: {}
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+  queryFrontend:
+    resources:
+      requests:
+        cpu: 50m
+        memory: 128Mi
+      limits:
+        cpu: 200m
+        memory: 256Mi
+  receiveDistributor:
+    replicationFactor: 1
+    replicaCount: 1
+    extraFlags: []
+    receiveMaxConcurrency: 10
+    receiveHashringsAlgorithm: hashmod
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
+      limits:
+        cpu: 100m
+        memory: 128Mi
+  storegateway:
+    persistence:
+      size: 10Gi
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+  ruler:
+    enabled: true
+    replicaCount: 1
+    topologySpreadConstraints: []
+    affinity: {}
+    configReloader:
+      resources:
+        requests:
+          cpu: 10m
+          memory: 16Mi
+        limits:
+          cpu: 50m
+          memory: 32Mi
+    persistence:
+      enabled: true
+      size: 5Gi
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
+      limits:
+        cpu: 100m
+        memory: 128Mi
+  compactor:
+    retentionResolutionRaw: 30d
+    retentionResolution5m: 120d
+    retentionResolution1h: 365d
+    verticalCompaction: false
+    deduplication: "receiverReplicas"
+    persistence:
+      size: 10Gi
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+  receiver:
+    enabled: true
+    mode: receive
+    subdomain: thanos-receiver
+    replicaCount: 1
+    affinity: {}
+    topologySpreadConstraints: []
+    tsdbRetention: 15d
+    persistence:
+      enabled: true
+      size: 10Gi
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+    basic_auth:
+      username: thanos-user
+      password: dummy-password
+      passwordHash: $2y$12$dummyhashvalueforsbomdummy
+
+# Crossplane configuration - enable to render crossplane charts
+crossplane:
+  enabled: true
+  debugEnabled: false
+  resources:
+    requests:
+      cpu: 150m
+      memory: 400Mi
+    limits:
+      cpu: 200m
+      memory: 512Mi
+  rbacManager:
+    resources:
+      requests:
+        cpu: 5m
+        memory: 32Mi
+      limits:
+        cpu: 20m
+        memory: 128Mi
+  functions:
+    auto-ready:
+      debugEnabled: false
+      resources:
+        requests:
+          cpu: 10m
+          memory: 64Mi
+        limits:
+          cpu: 20m
+          memory: 128Mi
+    capability:
+      debugEnabled: false
+      resources:
+        requests:
+          cpu: 10m
+          memory: 64Mi
+        limits:
+          cpu: 20m
+          memory: 128Mi
+    go-templating:
+      debugEnabled: false
+      resources:
+        requests:
+          cpu: 25m
+          memory: 64Mi
+        limits:
+          cpu: 50m
+          memory: 128Mi
+    patch-and-transform:
+      debugEnabled: false
+      resources:
+        requests:
+          cpu: 25m
+          memory: 64Mi
+        limits:
+          cpu: 50m
+          memory: 128Mi
+  providers:
+    helm:
+      debugEnabled: false
+      resources:
+        requests:
+          cpu: 150m
+          memory: 256Mi
+        limits:
+          cpu: 300m
+          memory: 512Mi
+    kubernetes:
+      debugEnabled: false
+      resources:
+        requests:
+          cpu: 25m
+          memory: 128Mi
+        limits:
+          cpu: 50m
+          memory: 256Mi
+
+# GPU configuration - enable to render GPU operator charts
+gpu:
+  enabled: true
+  operator:
+    resources:
+      requests:
+        cpu: 50m
+        memory: 128Mi
+      limits:
+        cpu: 100m
+        memory: 256Mi
+    tolerations: []
+    affinity: {}
+  driver:
+    version: "570.124.06"
+    env:
+      - name: NVIDIA_VISIBLE_DEVICES
+        value: all
+  nodeFeatureDiscovery:
+    worker:
+      resources:
+        requests:
+          cpu: 10m
+          memory: 64Mi
+        limits:
+          cpu: 50m
+          memory: 128Mi
+      tolerations:
+        - key: elastisys.io/node-type
+          operator: Equal
+          value: gpu
+          effect: NoSchedule
+      affinity: {}
+    controlPlane:
+      resources:
+        requests:
+          cpu: 10m
+          memory: 64Mi
+        limits:
+          cpu: 50m
+          memory: 128Mi
+      tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+          operator: Equal
+          value: ""
+      affinity: {}
+  daemonsets:
+    tolerations:
+      - key: elastisys.io/node-type
+        operator: Equal
+        value: gpu
+        effect: NoSchedule
+  mig:
+    strategy: single
+  devicePlugin:
+    config: {}
+  extraMetrics: false
+
+# Kyverno configuration - enable to render kyverno charts
+kyverno:
+  enabled: true
+  resources:
+    limits:
+      cpu: 200m
+      memory: 384Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  nodeSelector: {}
+  podAffinity: {}
+  nodeAffinity: {}
+  topologySpreadConstraints: []
+  tolerations: []
+  policies:
+    verifyImageSignature:
+      enabled: false
+      type: Cosign
+      ignoreRekorTlog: false
+      attestor: ""
+
+# Cluster API configuration
+clusterApi:
+  enabled: true
+  monitoring:
+    enabled: true
+  clusters:
+    - sc
+    - wc
+
+# Tekton Pipelines configuration
+tektonPipelines:
+  enabled: true
+  controller:
+    resources:
+      limits:
+        cpu: 20m
+        memory: 128Mi
+      requests:
+        cpu: 10m
+        memory: 64Mi
+  webhook:
+    resources:
+      limits:
+        cpu: 20m
+        memory: 128Mi
+      requests:
+        cpu: 10m
+        memory: 64Mi
+  remoteResolvers:
+    resources:
+      requests:
+        cpu: 10m
+        memory: 64Mi
+      limits:
+        cpu: 20m
+        memory: 128Mi
+  customConfigDefaults: {}
+
+# External DNS configuration
+externalDns:
+  enabled: true
+  provider: aws
+  txtOwnerId: sbom-cluster
+  sources:
+    crd: false
+    ingress: true
+    service: true
+  domains: []
+  logLevel: info
+  txtPrefix: ""
+  extraArgs: []
+  resources:
+    limits:
+      cpu: 100m
+      memory: 100Mi
+    requests:
+      cpu: 50m
+      memory: 50Mi
+  affinity: {}
+  topologySpreadConstraints: []
+  tolerations: []
+  namespaced: false
+  endpoints: []
+  awsRoute53:
+    accessKey: dummy-access-key
+    secretKey: dummy-secret-key
+
+# Kured configuration
+kured:
+  enabled: true
+  configuration:
+    lockReleaseDelay: 5m
+  metrics:
+    enabled: true
+    interval: 60s
+    labels: {}
+  extraArgs: []
+  extraEnvVars: {}
+  notification:
+    slack:
+      enabled: false
+      channel: ""
+  tolerations:
+    - key: node-role.kubernetes.io/master
+      operator: Exists
+      effect: NoSchedule
+    - key: node-role.kubernetes.io/control-plane
+      operator: Exists
+      effect: NoSchedule
+  resources:
+    requests:
+      cpu: 15m
+      memory: 15Mi
+    limits:
+      cpu: 100m
+      memory: 100Mi
+  affinity: {}
+  nodeSelector: {}
+  dsAnnotations: {}
+
+# S3 Exporter configuration
+s3Exporter:
+  enabled: true
+  interval: 60m
+  scrapeTimeout: 10m
+  resources:
+    limits: {}
+    requests:
+      cpu: 50m
+      memory: 20Mi
+  tolerations: []
+  affinity: {}
+  nodeSelector: {}
+
+# OpenStack monitoring
+openstackMonitoring:
+  enabled: true
+
+# KubeVIP monitoring
+kubeVIPMonitoring:
+  enabled: true
+
+# Storage classes
+storageClasses:
+  default: rook-ceph-block
+
+# Trivy additional config
+trivy:
+  enabled: true
+  excludeNamespaces: ""
+  clusterComplianceEnabled: true
+  configAuditScannerEnabled: true
+  exposedSecretScannerEnabled: true
+  infraAssessmentScannerEnabled: true
+  rbacAssessmentScannerEnabled: true
+  vulnerabilityScannerEnabled: true
+  sbomGenerationEnabled: false
+  vulnerabilityScanner:
+    scannerReportTTL: "720h"
+    scanOnlyCurrentRevisions: true
+  scanJobs:
+    concurrentLimit: 1
+    retryDelay: 1m
+    timeout: 5m
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 1000Mi
+  serviceMonitor:
+    enabled: true
+    interval: 5m
+  tolerations: []
+  affinity: {}
+  nodeCollector:
+    tolerations:
+      - key: node-role.kubernetes.io/control-plane
+        operator: Exists
+        effect: NoSchedule
+  scanner:
+    resources: {}
+    timeout: 5m0s
+    offlineScanEnabled: false
+    dbRegistry: ""
+    dbRepository: ""
+    dbRepositoryInsecure: false
+    javaDbRegistry: ""
+    javaDbRepository: ""
+    imagePullSecret:
+      name: ""
+    registry:
+      mirror: {}
+
+# Velero configuration
+velero:
+  enabled: true
+  tolerations: []
+  nodeSelector: {}
+  uploaderType: kopia
+  useVolumeSnapshots: true
+  schedule: "0 0 * * *"
+  retentionPeriod: 720h0m0s
+  storagePrefix: workload-cluster
+  restoreResourcePriorities: []
+  resources:
+    limits:
+      cpu: 500m
+      memory: 500Mi
+    requests:
+      cpu: 50m
+      memory: 100Mi
+  nodeAgent:
+    tolerations: []
+    resources:
+      limits:
+        cpu: 500m
+        memory: 500Mi
+      requests:
+        cpu: 50m
+        memory: 100Mi
+  excludedNamespaces:
+    - calico-apiserver
+    - calico-system
+    - cert-manager
+    - crossplane-system
+    - falco
+    - fluentd
+    - fluentd-system
+    - gatekeeper-system
+    - gpu-operator
+    - hnc-system
+    - ingress-nginx
+    - kube-node-lease
+    - kube-public
+    - kube-system
+    - kured
+    - kyverno
+    - monitoring
+    - openstack-system
+    - rook-ceph
+    - velero
+  excludedExtraNamespaces: []
+
+# Falco configuration
+falco:
+  enabled: true
+  alerts:
+    enabled: true
+    type: alertmanager
+    priority: notice
+    hostPort: http://alertmanager-operated.alertmanager:9093
+  rulesFiles:
+    default:
+      enabled: true
+      version: 4.0.0
+    incubating:
+      enabled: false
+      version: 5.0.1
+    sandbox:
+      enabled: false
+      version: 5.0.1
+  artifact:
+    install:
+      enabled: true
+  tty: true
+  driver:
+    kind: modern_ebpf
+    ebpf:
+      hostNetwork: false
+    module:
+      repoURL: ""
+  useContainerEngine: true
+  customIndexes: []
+  customRules: {}
+  resources:
+    limits:
+      cpu: 200m
+      memory: 500Mi
+    requests:
+      cpu: 100m
+      memory: 150Mi
+  tolerations:
+    - key: node-role.kubernetes.io/master
+      operator: Exists
+      effect: NoSchedule
+    - key: node-role.kubernetes.io/control-plane
+      operator: Exists
+      effect: NoSchedule
+  affinity: {}
+  nodeSelector: {}
+  falcoSidekick:
+    resources:
+      limits:
+        cpu: 20m
+        memory: 250Mi
+      requests:
+        cpu: 10m
+        memory: 25Mi
+    tolerations: []
+    affinity: {}
+    nodeSelector: {}
+
+# Certmanager configuration
+certmanager:
+  resources:
+    requests:
+      cpu: 25m
+      memory: 100Mi
+    limits:
+      cpu: 250m
+      memory: 250Mi
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  extraArgs: []
+  webhook:
+    resources:
+      requests:
+        cpu: 25m
+        memory: 25Mi
+      limits:
+        cpu: 250m
+        memory: 100Mi
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+  cainjector:
+    resources:
+      requests:
+        cpu: 25m
+        memory: 100Mi
+      limits:
+        cpu: 250m
+        memory: 250Mi
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+    extraArgs: []
+
+# Metrics server configuration
+metricsServer:
+  enabled: true
+  resources:
+    requests:
+      cpu: 10m
+      memory: 25Mi
+    limits:
+      cpu: 100m
+      memory: 100Mi
+  tolerations: []
+  affinity: {}
+
+# Node local DNS
+nodeLocalDns:
+  customConfig: ""
+  hostZone:
+    extraConfig: ""
+  resources:
+    limits:
+      cpu: 100m
+      memory: 200Mi
+    requests:
+      cpu: 25m
+      memory: 40Mi
+
+# Network plugin configuration
+networkPlugin:
+  type: calico
+  calico:
+    calicoAccountant:
+      enabled: true
+      backend: nftables
+      tolerations:
+        - key: node-role.kubernetes.io/master
+          operator: Exists
+          effect: NoSchedule
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+          effect: NoSchedule
+      resources:
+        limits:
+          cpu: 100m
+          memory: 128Mi
+        requests:
+          cpu: 50m
+          memory: 64Mi
+    calicoFelixMetrics:
+      enabled: true
+
+# WC Probe Ingress
+wcProbeIngress:
+  enabled: true
+
+# Prometheus blackbox exporter targets
+prometheusBlackboxExporter:
+  hostAliases: []
+  resources:
+    requests:
+      cpu: 10m
+      memory: 25Mi
+    limits:
+      cpu: 20m
+      memory: 50Mi
+  tolerations: []
+  affinity: {}
+  targets:
+    rook: true
+    nginx: true
+    prometheus: true
+    gatekeeper: true
+    falco: true
+    sc: true
+    wc: true
+    fluentd: true
+    thanosQuery: true
+    thanosReceiver: true
+  customKubeapiTargets: []
+
+# Prometheus operator
+prometheusOperator:
+  resources:
+    requests:
+      cpu: 50m
+      memory: 100Mi
+    limits:
+      cpu: 100m
+      memory: 200Mi
+  prometheusConfigReloader:
+    resources:
+      requests:
+        cpu: 50m
+        memory: 50Mi
+      limits:
+        cpu: 50m
+        memory: 50Mi
+
+# Prometheus node exporter
+prometheusNodeExporter:
+  scrapeTimeout: ""
+  resources:
+    requests:
+      cpu: 25m
+      memory: 50Mi
+    limits:
+      cpu: 50m
+      memory: 100Mi
+
+# Kube state metrics
+kubeStateMetrics:
+  resources:
+    requests:
+      cpu: 15m
+      memory: 50Mi
+    limits:
+      cpu: 30m
+      memory: 300Mi
+
+# Images global configuration
+images:
+  global:
+    registry:
+      enabled: false
+    repository:
+      enabled: false
+

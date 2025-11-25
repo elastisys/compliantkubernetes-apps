@@ -5,7 +5,7 @@ policies:
       egress: {}
       ingress: {}
 
-    {{- if eq .Environment.Name "service_cluster" }}
+    {{- if .Values.ck8sManagementCluster.enabled }}
     cert-manager-http01-solver:
       podSelectorLabels:
         acme.cert-manager.io/http01-solver: "true"
@@ -22,7 +22,7 @@ policies:
         - rule: egress-rule-dns
         - rule: egress-rule-apiserver
         - rule: egress-rule-nodes
-        {{- if eq .Environment.Name "workload_cluster" }}
+        {{- if .Values.ck8sWorkloadCluster.enabled }}
         - rule: egress-rule-sc-ingress
         {{- end }}
         - name: egress-rule-metrics-collection
@@ -32,7 +32,7 @@ policies:
         - rule: ingress-rule-apiserver
           ports:
             - tcp: 9090
-        {{- if eq .Environment.Name "workload_cluster" }}
+        {{- if .Values.ck8sWorkloadCluster.enabled }}
         {{- if and .Values.networkPolicies.prometheus.internalAccess.enabled .Values.networkPolicies.prometheus.internalAccess.namespaces }}
         - name: ingress-rule-internal-prometheus
           peers:
@@ -53,7 +53,7 @@ policies:
           peers:
             - podSelectorLabels:
                 app.kubernetes.io/name: prometheus
-            {{- if eq .Environment.Name "service_cluster" }}
+            {{- if .Values.ck8sManagementCluster.enabled }}
             - podSelectorLabels:
                 app.kubernetes.io/name: grafana
             {{- end }}
@@ -92,9 +92,9 @@ policies:
         - rule: egress-rule-dns
         - rule: egress-rule-nodes
         - rule: egress-rule-ingress
-        {{- if eq .Environment.Name "service_cluster" }}
+        {{- if .Values.ck8sManagementCluster.enabled }}
         - rule: egress-rule-wc-ingress
-        {{- else if eq .Environment.Name "workload_cluster" }}
+        {{- else if .Values.ck8sWorkloadCluster.enabled }}
         - rule: egress-rule-sc-ingress
         {{- end }}
         - name: egress-rule-probe
@@ -124,7 +124,7 @@ policies:
             - tcp: 8080
             - tcp: 8081
 
-    {{- if eq .Environment.Name "service_cluster" }}
+    {{- if .Values.ck8sManagementCluster.enabled }}
     {{- if eq .Values.objectStorage.type "s3" | and .Values.s3Exporter.enabled .Values.networkPolicies.s3Exporter.enabled }}
     s3-exporter:
       podSelectorLabels:

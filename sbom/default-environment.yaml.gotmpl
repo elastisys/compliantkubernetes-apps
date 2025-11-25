@@ -1,0 +1,33 @@
+helmDefaults:
+  createNamespace: false
+  skipDeps: true
+  timeout: 1800
+
+environments:
+  {{- if .Environment.Name | eq "default" }}
+  default:
+    values:
+      - ck8sManagementCluster: { enabled: true }
+      - ck8sWorkloadCluster: { enabled: true }
+      - ck8sLocalCluster: { enabled: true }
+      - ck8sAnyCluster: { enabled: true }
+      - lists/images.yaml
+  {{- end }}
+
+templates:
+  networkpolicies:
+    chart: charts/networkpolicy/generator
+    version: 0.1.0
+    name: networkpolicy
+    labels:
+      policy: netpol
+
+  podsecuritypolicies:
+    disableValidationOnInstall: true
+    chart: charts/gatekeeper/podsecuritypolicies
+    version: 0.1.0
+    name: podsecuritypolicy
+    labels:
+      policy: psp
+    needs:
+      - gatekeeper-system/gatekeeper-templates # creates gatekeeper/constraints and gatekeeper/mutations

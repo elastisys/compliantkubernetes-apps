@@ -1,4 +1,4 @@
-{{- if eq .Environment.Name "workload_cluster" }}
+{{- if .Values.ck8sWorkloadCluster.enabled }}
 userCRDs:
   enabled: {{ .Values.gatekeeper.allowUserCRDs.enabled }}
   admin:

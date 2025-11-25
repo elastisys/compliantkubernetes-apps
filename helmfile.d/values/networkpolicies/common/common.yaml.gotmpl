@@ -4,13 +4,13 @@
 {{- $ingress := dict }}
 {{- $nodes := dict }}
 
-{{- if eq .Environment.Name "service_cluster" }}
+{{- if .Values.ck8sManagementCluster.enabled }}
 
 {{- $apiserver = .Values.networkPolicies.global.scApiserver }}
 {{- $ingress = .Values.networkPolicies.global.scIngress }}
 {{- $nodes = .Values.networkPolicies.global.scNodes }}
 
-{{- else if eq .Environment.Name "workload_cluster" }}
+{{- else if .Values.ck8sWorkloadCluster.enabled }}
 
 {{- $apiserver = .Values.networkPolicies.global.wcApiserver }}
 {{- $ingress = .Values.networkPolicies.global.wcIngress }}

@@ -3,6 +3,9 @@
 # Repository root
 repository_path: "."
 output_path: "./sbom/sbom.cdx.json"
+ck8s_config_path: "./sbom"
+default_config_path: "./sbom/default-config.yaml"
+environments_path: "./sbom"
 
 # Metadata
 supplier: "Elastisys"

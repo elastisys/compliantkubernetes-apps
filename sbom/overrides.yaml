@@ -7,40 +7,14 @@
 #   licenses:
 #     - license:
 #         id: "Apache-2.0"
-helmfile.d/upstream/prometheus-community/kube-prometheus-stack/charts/crds:
-  licenses:
-    - license:
-        id: "Apache-2.0"
-  evaluation: "Not evaluated"
-
-helmfile.d/upstream/kyverno/kyverno/charts/crds:
-  licenses:
-    - license:
-        id: "Apache-2.0"
-  evaluation: "Not evaluated"
-
-helmfile.d/upstream/kyverno/kyverno/charts/grafana:
-  licenses:
-    - license:
-        id: "Apache-2.0"
-  evaluation: "Not evaluated"
-
 helmfile.d/upstream/opensearch-project/opensearch-dashboards:
   licenses:
     - license:
         id: "Apache-2.0"
   evaluation: "Not evaluated"
 
-helmfile.d/charts/fluentd/forwarder:
-  licenses:
-    - license:
-        id: "GPL-3.0"
-
 helmfile.d/upstream/crossplane-stable/crossplane:
   licenses:
     - license:
         id: "Apache-2.0"
-  evaluation: "Not evaluated"
-
-helmfile.d/upstream/jetstack/cert-manager:
   evaluation: "Not evaluated"
