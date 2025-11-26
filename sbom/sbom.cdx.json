@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:f758c64e-8ffc-44b8-b49d-148618aee7bb",
+  "serialNumber": "urn:uuid:e616e0e1-b9b8-4748-9547-1f41924cf6c1",
   "version": 1,
   "metadata": {
-    "timestamp": "2025-11-26T13:38:16Z",
+    "timestamp": "2025-11-26T13:45:58Z",
     "lifecycles": [
       {
         "phase": "build"
@@ -4269,26 +4269,15 @@
       "purl": "pkg:oci/tektoncd/pipeline/controller-10a3e32792f33651396d02b6855a6e36@v1.1.0?repository_url=ghcr.io\u0026digest=sha256:72ba947187317aee83b8b6ba510b17375bede4ce062e366cd0162515e0f7d5f2"
     },
     {
-      "bom-ref": "pkg:oci/thanos/thanos@v0.39.2",
-      "type": "container",
-      "supplier": {
-        "name": "thanos"
-      },
-      "name": "thanos/thanos",
-      "version": "v0.39.2",
-      "cpe": "cpe:2.3:a:thanos:thanos:0.39.2:*:*:*:*:*:*:*",
-      "purl": "pkg:oci/thanos/thanos@v0.39.2"
-    },
-    {
-      "bom-ref": "pkg:oci/thanos/thanos@v0.40.1?repository_url=quay.io",
+      "bom-ref": "pkg:oci/thanos/thanos@v0.39.2?repository_url=quay.io",
       "type": "container",
       "supplier": {
         "name": "thanos"
       },
       "name": "quay.io/thanos/thanos",
-      "version": "v0.40.1",
-      "cpe": "cpe:2.3:a:thanos:thanos:0.40.1:*:*:*:*:*:*:*",
-      "purl": "pkg:oci/thanos/thanos@v0.40.1?repository_url=quay.io"
+      "version": "v0.39.2",
+      "cpe": "cpe:2.3:a:thanos:thanos:0.39.2:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/thanos/thanos@v0.39.2?repository_url=quay.io"
     },
     {
       "bom-ref": "pkg:oci/velero/velero-plugin-for-aws@v1.9.0?repository_url=docker.io",
@@ -4491,13 +4480,13 @@
     {
       "ref": "pkg:helm/common@2.31.3",
       "dependsOn": [
-        "pkg:oci/thanos/thanos@v0.40.1?repository_url=quay.io"
+        "pkg:oci/thanos/thanos@v0.39.2?repository_url=quay.io"
       ]
     },
     {
       "ref": "pkg:helm/common@2.31.4",
       "dependsOn": [
-        "pkg:oci/thanos/thanos@v0.40.1?repository_url=quay.io"
+        "pkg:oci/thanos/thanos@v0.39.2?repository_url=quay.io"
       ]
     },
     {
@@ -4877,7 +4866,7 @@
         "pkg:oci/prometheus/alertmanager@v0.28.1?repository_url=quay.io",
         "pkg:oci/prometheus/node-exporter@v0.85.0",
         "pkg:oci/prometheus/prometheus@v3.6.0?repository_url=quay.io",
-        "pkg:oci/thanos/thanos@v0.39.2"
+        "pkg:oci/thanos/thanos@v0.39.2?repository_url=quay.io"
       ]
     },
     {
@@ -4960,7 +4949,7 @@
         "pkg:oci/bitnami/minio-object-browser@2.0.2-debian-12-r2",
         "pkg:oci/bitnami/minio@2025.7.23-debian-12-r2",
         "pkg:oci/bitnami/os-shell@12-debian-12-r50",
-        "pkg:oci/thanos/thanos@v0.40.1?repository_url=quay.io"
+        "pkg:oci/thanos/thanos@v0.39.2?repository_url=quay.io"
       ]
     },
     {
@@ -5150,13 +5139,13 @@
     {
       "ref": "pkg:helm/thanos-ingress-secret@0.1.0",
       "dependsOn": [
-        "pkg:oci/thanos/thanos@v0.40.1?repository_url=quay.io"
+        "pkg:oci/thanos/thanos@v0.39.2?repository_url=quay.io"
       ]
     },
     {
       "ref": "pkg:helm/thanos-ruler@0.1.0",
       "dependsOn": [
-        "pkg:oci/thanos/thanos@v0.40.1?repository_url=quay.io"
+        "pkg:oci/thanos/thanos@v0.39.2?repository_url=quay.io"
       ]
     },
     {
@@ -5169,7 +5158,7 @@
         "pkg:oci/bitnami/minio@2025.7.23-debian-12-r2",
         "pkg:oci/bitnami/os-shell@12-debian-12-r50",
         "pkg:oci/bitnami/thanos@0.39.2-debian-12-r2",
-        "pkg:oci/thanos/thanos@v0.40.1?repository_url=quay.io"
+        "pkg:oci/thanos/thanos@v0.39.2?repository_url=quay.io"
       ]
     },
     {
@@ -5723,11 +5712,7 @@
       "dependsOn": []
     },
     {
-      "ref": "pkg:oci/thanos/thanos@v0.39.2",
-      "dependsOn": []
-    },
-    {
-      "ref": "pkg:oci/thanos/thanos@v0.40.1?repository_url=quay.io",
+      "ref": "pkg:oci/thanos/thanos@v0.39.2?repository_url=quay.io",
       "dependsOn": []
     },
     {
