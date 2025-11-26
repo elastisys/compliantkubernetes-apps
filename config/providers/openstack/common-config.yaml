@@ -15,6 +15,7 @@ networkPolicies:
   global:
     externalLoadBalancer: false
     ingressUsingHostNetwork: false
+    ingressMode: InternalProxy
 objectStorage:
   type: s3
   s3:

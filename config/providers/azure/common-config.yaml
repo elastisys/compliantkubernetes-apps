@@ -20,12 +20,9 @@ networkPolicies:
   global:
     externalLoadBalancer: false
     ingressUsingHostNetwork: false
-    scIngress:
-      ips:
-        - 0.0.0.0/0
-    wcIngress:
-      ips:
-        - 0.0.0.0/0
+    ingressMode: DirectRouting
+    ingressDirectRoutingAllowlistPeers:
+       - cidr: 0.0.0.0/0
 opa:
   rejectLoadBalancerService:
     enabled: false

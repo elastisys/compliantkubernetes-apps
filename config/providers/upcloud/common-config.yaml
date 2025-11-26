@@ -4,6 +4,7 @@ networkPolicies:
   global:
     externalLoadBalancer: true
     ingressUsingHostNetwork: false
+    ingressMode: ExternalProxy
   kubeSystem:
     upcloud:
       enabled: true
