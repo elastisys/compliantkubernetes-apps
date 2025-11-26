@@ -118,6 +118,29 @@ rules:
           app.kubernetes.io/name: ingress-nginx
       {{- end }}
 
+  ingress-rule-ingress-controller:
+    peers:
+      {{- if or (eq $netpol.global.ingressMode "HostNetwork") (and $netpol.global.externalLoadBalancer $netpol.global.ingressUsingHostNetwork) -}}
+      {{- range $nodes.ips }}
+      - cidr: {{ . }}
+      {{- end }}
+      {{- else if eq $netpol.global.ingressMode "InternalProxy" -}}
+      {{- range $nodes.ips }}
+      - cidr: {{ . }}
+      {{- end }}
+      {{- else if eq $netpol.global.ingressMode "ExternalProxy" -}}
+      {{- range $ingress.ips }}
+      - cidr: {{ . }}
+      {{- end }}
+      {{- else if eq $netpol.global.ingressMode "DirectRouting" -}}
+      {{- range $nodes.ips }}
+      - cidr: {{ . }}
+      {{- end }}
+      {{- with $netpol.global.ingressDirectRoutingAllowlistPeers }}
+      {{- . | toYaml | nindent 6 }}
+      {{- end }}
+      {{- end }}
+
   ingress-rule-blackbox:
     peers:
       - namespaceSelectorLabels:
