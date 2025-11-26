@@ -95,7 +95,7 @@ images:
   tekton:
     controller: ghcr.io/tektoncd/pipeline/controller-10a3e32792f33651396d02b6855a6e36:v1.1.0@sha256:72ba947187317aee83b8b6ba510b17375bede4ce062e366cd0162515e0f7d5f2
   thanos:
-    image: ghcr.io/elastisys/bitnami/thanos:0.37.2-debian-12-r8
+    image: quay.io/thanos/thanos:v0.39.2
   velero:
     image: docker.io/velero/velero:v1.16.1
     pluginAws: docker.io/velero/velero-plugin-for-aws:v1.9.0
