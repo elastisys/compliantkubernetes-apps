@@ -27,7 +27,9 @@ run() {
         log_warn "'service-cluster-np' Helm release not found. Skipping deletion."
       fi
 
+      helmfile_upgrade sc policy=netpol
     fi
+
     if [[ "${CK8S_CLUSTER}" =~ ^(wc|both)$ ]]; then
       log_info "operation on workload cluster"
 
@@ -46,6 +48,8 @@ run() {
       else
         log_warn "'workload-cluster-np' Helm release not found. Skipping deletion."
       fi
+
+      helmfile_upgrade wc policy=netpol
     fi
     ;;
   rollback)
