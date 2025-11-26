@@ -42,7 +42,8 @@ volumes:
 - name: cache-policies
   emptyDir: {}
 volumeMounts:
-- mountPath: /etc/ssl/certs
+- mountPath: /etc/ssl/certs/custom-ca.crt
+  subPath: ca.crt
   name: root-certs-volume
 - mountPath: /tmp
   name: cache-policies
