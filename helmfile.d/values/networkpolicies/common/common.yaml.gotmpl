@@ -120,17 +120,24 @@ rules:
 
   ingress-rule-ingress-controller:
     peers:
-      {{- if (eq (dig "ck8sCloudProvider" "" .Values.global) "azure") }}
-      {{- range concat $ingress.ips $nodes.ips }}
+      {{- if or (eq $netpol.global.ingressMode "HostNetwork") (and $netpol.global.externalLoadBalancer $netpol.global.ingressUsingHostNetwork) -}}
+      {{- range $nodes.ips }}
       - cidr: {{ . }}
       {{- end }}
-      {{- else if not (or $netpol.global.externalLoadBalancer $netpol.global.ingressUsingHostNetwork) }}
+      {{- else if eq $netpol.global.ingressMode "InternalProxy" -}}
       {{- range $nodes.ips }}
-      - cidr: {{ .}}
+      - cidr: {{ . }}
       {{- end }}
-      {{- else }}
+      {{- else if eq $netpol.global.ingressMode "ExternalProxy" -}}
       {{- range $ingress.ips }}
       - cidr: {{ . }}
+      {{- end }}
+      {{- else if eq $netpol.global.ingressMode "DirectRouting" -}}
+      {{- range $nodes.ips }}
+      - cidr: {{ . }}
+      {{- end }}
+      {{- with $netpol.global.ingressDirectRoutingAllowlistPeers }}
+      {{- . | toYaml | nindent 6 }}
       {{- end }}
       {{- end }}
 

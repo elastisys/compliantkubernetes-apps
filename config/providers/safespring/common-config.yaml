@@ -8,9 +8,9 @@ networkPolicies:
   global:
     externalLoadBalancer: true
     ingressUsingHostNetwork: true
-  ingressNginx:
-    ingressOverride:
-      enabled: false
+    ingressMode: DirectRouting
+    ingressDirectRoutingAllowlistPeers:
+       - cidr: 0.0.0.0/0
   kubeSystem:
     openstack:
       enabled: true

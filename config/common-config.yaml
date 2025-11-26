@@ -1240,6 +1240,8 @@ networkPolicies:
     # only true if loadbalancer is not controlled by a kubernetes cloud controller
     externalLoadBalancer: set-me
     ingressUsingHostNetwork: set-me
+    ingressMode: set-me
+    ingressDirectRoutingAllowlistPeers: []
     trivy:
       ips:
         - set-me-if-(.trivy.enabled)

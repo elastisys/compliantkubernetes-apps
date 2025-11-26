@@ -7227,6 +7227,21 @@ properties:
             description: |-
               When enabled create Network Policy rules for ingress via host network.
             type: boolean
+          ingressMode:
+            title: Network Policies Ingress Mode
+            description: |-
+              The Ingress Controller Mode determines the CIDR's used in the ingress rules to the ingress controller.
+            type: string
+            enum:
+              - HostNetwork
+              - InternalProxy
+              - ExternalProxy
+              - DirectRouting
+          ingressDirectRoutingAllowlistPeers:
+            title: DirectRouting Mode ingress allow list
+            description: |-
+              Allow list CIDRs for ingress traffic to the ingress controller if the DirectRouting ingressMode is enabled.
+            type: array
           objectStorage:
             title: Network Policies ObjectStorage
             description: |-
