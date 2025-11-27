@@ -284,16 +284,22 @@ resolve() {
 }
 
 config() {
-  local name flavor domain ops_prefix self_signed="false"
+  local name flavor domain ops_prefix self_signed="false" share_object_storage="false"
   name="${1:-}"
   flavor="${2:-}"
   domain="${3:-}"
   if [[ "${4:-}" != "--self-signed" ]]; then
     ops_prefix="${4:-"ops"}"
   fi
-  if [[ "${4:-}" == "--self-signed" ]] || [[ "${5:-}" == "--self-signed" ]]; then
-    self_signed="true"
-  fi
+
+  for arg in "${@:4}"; do
+    if [[ "$arg" == "--self-signed" ]]; then
+      self_signed="true"
+    fi
+    if [[ "$arg" == "--share-object-storage" ]]; then
+      share_object_storage="true"
+    fi
+  done
 
   export name
   export domain
@@ -357,12 +363,26 @@ config() {
   fi
 
   "${ROOT}/bin/ck8s" init both
+
+  if [[ "${share_object_storage}" == "true" ]]; then
+    log.info "Configuring shared object storage endpoint for Minio"
+    yq -Pi ".objectStorage.s3.regionEndpoint = \"http://minio.${domain}:30080\"" "${CK8S_CONFIG_PATH}/common-config.yaml"
+    yq -Pi '.networkPolicies.global.objectStorage.ports[0] = 30080' "${CK8S_CONFIG_PATH}/common-config.yaml"
+    yq -Pi '.networkPolicies.global.objectStorage.ports[1] = 80' "${CK8S_CONFIG_PATH}/common-config.yaml"
+    yq -Pi '.networkPolicies.ingressNginx.ingressOverride.enabled = false' "${CK8S_CONFIG_PATH}/common-config.yaml"
+  fi
 }
 
 create() {
-  local cluster config affix
+  local cluster config affix share_object_storage=false
   cluster="${1:-}"
   config="${2:-}"
+
+  for arg in "${@:3}"; do
+    if [[ "$arg" == "--share-object-storage" ]]; then
+      share_object_storage="true"
+    fi
+  done
 
   if [[ -z "${cluster}" ]]; then
     log.usage
@@ -463,6 +483,18 @@ create() {
     helmfile -e local_cluster -f "${ROOT}/helmfile.d" -lapp=minio apply --output simple
   fi
 
+  if [[ "${share_object_storage}" == "true" ]]; then
+    log.info "Installing ingress-nginx in service cluster for shared object storage"
+    "${ROOT}/bin/ck8s" ops helmfile sc -lapp=ingress-nginx apply --include-transitive-needs --output simple
+    log.info "Enabling Ingress in Minio"
+    domain="$(yq ".global.baseDomain" <"${CK8S_CONFIG_PATH}/common-config.yaml")"
+    "${ROOT}/bin/ck8s" ops helm sc upgrade -n minio-system minio "${ROOT}/helmfile.d/upstream/minio/minio" \
+      --reuse-values \
+      --set ingress.enabled=true \
+      --set ingress.ingressClassName=nginx \
+      --set ingress.hosts[0]=minio."${domain}"
+  fi
+
   index.state "${cluster}" "ready"
   log.info "cluster ${cluster} is ready"
 }
@@ -519,30 +551,6 @@ setup_node_local_dns() {
   fi
 }
 
-setup_sc_s3_sharable() {
-  log.info "Setting up s3 as sharable"
-  local domain CK8S_CLUSTER CK8S_DRY_RUN_INSTALL
-  domain="$(yq ".global.baseDomain" <"${CK8S_CONFIG_PATH}/common-config.yaml")"
-  # shellcheck source=scripts/migration/lib.sh
-  source "${ROOT}/scripts/migration/lib.sh"
-  CK8S_CLUSTER=both
-  CK8S_DRY_RUN_INSTALL=false
-
-  yq_add common '.objectStorage.s3.regionEndpoint' "\"http://minio.${domain}\""
-  yq_add common '.ingressNginx.controller.useHostPort' 'true'
-  yq_add common '.networkPolicies.global.objectStorage.ports[0]' '80'
-  yq_add common '.networkPolicies.ingressNginx.ingressOverride.enabled' 'false'
-
-  log.info "Installing Ingress in SC"
-  helmfile_do sc apply -lapp=ingress-nginx --include-transitive-needs --output simple
-  log.info "Upgrading Minio Chart with Ingress"
-  helm_do sc upgrade -n minio-system minio "${ROOT}/helmfile.d/upstream/minio/minio" \
-    --reuse-values \
-    --set ingress.enabled=true \
-    --set ingress.ingressClassName=nginx \
-    --set ingress.hosts[0]=minio."${domain}"
-}
-
 delete() {
   local cluster
   cluster="${1:-}"
@@ -584,9 +592,6 @@ main() {
     case "${subcommand}" in
     node-local-dns)
       setup_node_local_dns
-      ;;
-    sharable-s3)
-      setup_sc_s3_sharable
       ;;
     *)
       log.usage
