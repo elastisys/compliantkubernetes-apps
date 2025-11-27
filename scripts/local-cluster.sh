@@ -363,7 +363,7 @@ config() {
   fi
 
   "${ROOT}/bin/ck8s" init both
-
+  log.info "Adding Shared object storage configs"
   if [[ "${share_object_storage}" == "true" ]]; then
     log.info "Configuring shared object storage endpoint for Minio"
     yq -Pi ".objectStorage.s3.regionEndpoint = \"http://minio.${domain}:30080\"" "${CK8S_CONFIG_PATH}/common-config.yaml"
