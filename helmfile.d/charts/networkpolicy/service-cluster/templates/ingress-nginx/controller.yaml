@@ -189,4 +189,13 @@ spec:
               acme.cert-manager.io/http01-solver: "true"
       ports:
         - port: 8089
+    - to:
+       - namespaceSelector:
+           matchLabels:
+             kubernetes.io/metadata.name: minio-system
+         podSelector:
+           matchLabels:
+             app: minio
+      ports:
+        - port: 9000
 {{- end }}
