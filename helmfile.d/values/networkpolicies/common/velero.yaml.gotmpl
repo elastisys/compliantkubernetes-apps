@@ -33,3 +33,11 @@ policies:
       egress:
         - rule: egress-rule-dns
         - rule: egress-rule-apiserver
+
+    velero-data-mover:
+      podSelectorLabels:
+        velero.io/exposer-pod-group: snapshot-exposer
+      egress:
+        - rule: egress-rule-dns
+        - rule: egress-rule-apiserver
+        - rule: egress-rule-object-storage
