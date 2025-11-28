@@ -21,6 +21,7 @@ spec:
     volumes:
       - configMap
       - downwardAPI
+      - hostPath
       - emptyDir
       - persistentVolumeClaim
       - projected
