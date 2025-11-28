@@ -91,7 +91,7 @@ images:
     curatorCronjob: ghcr.io/elastisys/bitnami/elasticsearch-curator:5.8.4-debian-10-r235
     exporter: quay.io/prometheuscommunity/elasticsearch-exporter:v1.7.0
   rclone:
-    image: ghcr.io/elastisys/rclone-sync:1.70.3
+    image: ghcr.io/elastisys/rclone-sync:1.72.0
   tekton:
     controller: ghcr.io/tektoncd/pipeline/controller-10a3e32792f33651396d02b6855a6e36:v1.1.0@sha256:72ba947187317aee83b8b6ba510b17375bede4ce062e366cd0162515e0f7d5f2
   thanos:
