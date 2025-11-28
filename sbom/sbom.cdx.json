@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:dee53793-5504-411f-a0a9-8dbf29ede326",
+  "serialNumber": "urn:uuid:b57a8c32-510d-4a08-849f-5c786f5c0372",
   "version": 1,
   "metadata": {
-    "timestamp": "2025-11-18T14:47:46Z",
+    "timestamp": "2025-11-28T14:39:31Z",
     "lifecycles": [
       {
         "phase": "build"
@@ -3270,15 +3270,15 @@
       "purl": "pkg:oci/elastisys/rclone-sync@1.63.0?repository_url=ghcr.io"
     },
     {
-      "bom-ref": "pkg:oci/elastisys/rclone-sync@1.70.3?repository_url=ghcr.io",
+      "bom-ref": "pkg:oci/elastisys/rclone-sync@1.72.0?repository_url=ghcr.io",
       "type": "container",
       "supplier": {
         "name": "elastisys"
       },
       "name": "ghcr.io/elastisys/rclone-sync",
-      "version": "1.70.3",
-      "cpe": "cpe:2.3:a:elastisys:rclone-sync:1.70.3:*:*:*:*:*:*:*",
-      "purl": "pkg:oci/elastisys/rclone-sync@1.70.3?repository_url=ghcr.io"
+      "version": "1.72.0",
+      "cpe": "cpe:2.3:a:elastisys:rclone-sync:1.72.0:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/elastisys/rclone-sync@1.72.0?repository_url=ghcr.io"
     },
     {
       "bom-ref": "pkg:oci/elastisys/s3-exporter@0.5.0?repository_url=ghcr.io",
@@ -5071,7 +5071,7 @@
       "ref": "pkg:helm/rclone@0.1.0",
       "dependsOn": [
         "pkg:oci/elastisys/rclone-sync@1.63.0?repository_url=ghcr.io",
-        "pkg:oci/elastisys/rclone-sync@1.70.3?repository_url=ghcr.io"
+        "pkg:oci/elastisys/rclone-sync@1.72.0?repository_url=ghcr.io"
       ]
     },
     {
@@ -5321,7 +5321,7 @@
       "dependsOn": []
     },
     {
-      "ref": "pkg:oci/elastisys/rclone-sync@1.70.3?repository_url=ghcr.io",
+      "ref": "pkg:oci/elastisys/rclone-sync@1.72.0?repository_url=ghcr.io",
       "dependsOn": []
     },
     {
