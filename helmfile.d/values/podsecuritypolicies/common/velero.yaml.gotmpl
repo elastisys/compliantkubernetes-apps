@@ -9,6 +9,7 @@ constraints:
           - emptyDir
           - projected
           - secret
+          - configMap
         allowedHostPaths:
           - pathPrefix: /var/lib/kubelet/pods
             readOnly: false
@@ -25,16 +26,42 @@ constraints:
       allow:
         runAsUser:
           rule: MustRunAsNonRoot
+        volumes:
+          - hostPath
+          - emptyDir
+          - projected
+          - secret
+          - persistentVolumeClaim
+          - configMap
+          - downwardAPI
+        allowedHostPaths:
+          - pathPrefix: /var/lib/kubelet/pods
+            readOnly: false
+          - pathPrefix: /var/lib/kubelet/plugins
+            readOnly: false
       mutation:
-        runAsUser: 1000
+        runAsUser: 1002
     data-upload:
       podSelectorLabels:
         velero.io/exposer-pod-group: snapshot-exposer
       allow:
         runAsUser:
           rule: MustRunAsNonRoot
+        volumes:
+          - hostPath
+          - emptyDir
+          - projected
+          - secret
+          - persistentVolumeClaim
+          - configMap
+          - downwardAPI
+        allowedHostPaths:
+          - pathPrefix: /var/lib/kubelet/pods
+            readOnly: false
+          - pathPrefix: /var/lib/kubelet/plugins
+            readOnly: false
       mutation:
-        runAsUser: 1000
+        runAsUser: 1002
     repo-maintenance:
       podSelectorExpressions:
         - key: velero.io/repo-name

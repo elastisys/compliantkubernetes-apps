@@ -134,6 +134,7 @@ schedules:
     template:
       storageLocation: default
       snapshotMoveData: {{ .Values.velero.useVolumeSnapshots }}
+      snapshotVolumes: {{ .Values.velero.useVolumeSnapshots }}
       excludedNamespaces:
         {{- with .Values.velero.excludedNamespaces }}
         {{- toYaml . | nindent 8 }}
