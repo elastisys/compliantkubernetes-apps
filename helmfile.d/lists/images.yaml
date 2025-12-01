@@ -80,7 +80,7 @@ images:
     curatorCronjob: ghcr.io/elastisys/bitnami/elasticsearch-curator:5.8.4-debian-10-r235
     exporter: quay.io/prometheuscommunity/elasticsearch-exporter:v1.7.0
   rclone:
-    image: ghcr.io/elastisys/rclone-sync:1.70.3
+    image: ghcr.io/elastisys/rclone-sync:1.72.0
   tekton:
     controller: ghcr.io/tektoncd/github.com/tektoncd/pipeline/cmd/controller:v0.45.0
     remoteResolvers: ghcr.io/tektoncd/github.com/tektoncd/pipeline/cmd/resolvers:v0.45.0
