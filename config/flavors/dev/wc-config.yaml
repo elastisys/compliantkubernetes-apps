@@ -1,9 +1,18 @@
 hnc:
   webhook:
     replicaCount: 1
+    resources:
+      requests:
+        cpu: 20m
+        memory: 64Mi
+      limits:
+        cpu: 100m
+        memory: 128Mi
 user:
   namespaces:
     - set-me
     - demo1
     - demo2
     - demo3
+fluentd:
+  enabled: false

@@ -7,9 +7,77 @@ harbor:
     enabled: false
   persistence:
     type: filesystem
+  core:
+    resources:
+      requests:
+        cpu: 10m
+        memory: 128Mi
+      limits:
+        cpu: 200m
+        memory: 256Mi
+  database:
+    internal:
+      resources:
+        requests:
+          cpu: 10m
+          memory: 64Mi
+        limits:
+          cpu: 200m
+          memory: 256Mi
+  exporter:
+    resources:
+      requests:
+        cpu: 5m
+        memory: 16Mi
+      limits:
+        cpu: 20m
+        memory: 32Mi
+  jobservice:
+     resources:
+       requests:
+        cpu: 10m
+        memory: 64Mi
+       limits:
+        cpu: 100m
+        memory: 128Mi
+  registry:
+     resources:
+      requests:
+        cpu: 10m
+        memory: 64Mi
+      limits:
+        cpu: 100m
+        memory: 128Mi
+     controller:
+       resources:
+         requests:
+          cpu: 10m
+          memory: 64Mi
+         limits:
+          cpu: 100m
+          memory: 128Mi
+  portal:
+    resources:
+      requests:
+        cpu: 10m
+        memory: 32Mi
+      limits:
+        cpu: 100m
+        memory: 64Mi
+  trivy:
+    persistentVolumeClaim:
+      size: 2Gi
+    resources:
+      requests:
+        cpu: 50m
+        memory: 128Mi
+      limits:
+        cpu: 300m
+        memory: 256Mi
 
 opensearch:
   masterNode:
+    count: 1
     storageSize: 20Gi
     javaOpts: -Xms1536m -Xmx1536m
     resources:
@@ -50,3 +118,86 @@ prometheus:
 
 fluentd:
   enabled: false
+
+thanos:
+ query:
+   topologySpreadConstraints: []
+   resources:
+      requests:
+        cpu: 10m
+        memory: 64Mi
+      limits:
+        cpu: 200m
+        memory: 256Mi
+
+ queryFrontend:
+    resources:
+      requests:
+        cpu: 10m
+        memory: 32Mi
+      limits:
+        cpu: 100m
+        memory: 128Mi
+
+ ruler:
+  replicaCount: 1
+  topologySpreadConstraints: []
+  resources:
+      requests:
+        cpu: 10m
+        memory: 64Mi
+      limits:
+        cpu: 200m
+        memory: 128Mi
+
+ receiveDistributor:
+    replicaCount: 1
+    replicationFactor: 1
+    resources:
+      requests:
+        cpu: 20m
+        memory: 64Mi
+      limits:
+        cpu: 200m
+        memory: 256Mi
+
+ receiver:
+   mode: standalone
+   replicaCount: 1
+   replicationFactor: 1
+   topologySpreadConstraints: []
+   resources:
+      requests:
+        cpu: 50m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+   persistence:
+     size: 5Gi
+
+ compactor:
+   retentionResolutionRaw: 2d
+   retentionResolution5m: 2d
+   retentionResolution1h: 0s
+   persistence:
+      enabled: true
+      size: 5Gi
+   resources:
+      requests:
+        cpu: 50m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 256Mi
+
+ storegateway:
+    persistence:
+      size: 1Gi
+    resources:
+      requests:
+        cpu: 10m
+        memory: 64Mi
+      limits:
+        cpu: 200m
+        memory: 256Mi

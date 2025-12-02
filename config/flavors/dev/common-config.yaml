@@ -1,11 +1,31 @@
 global:
+  issuer: self-signed
   verifyTls: false
+issuers:
+  extraIssuers:
+    - apiVersion: cert-manager.io/v1
+      kind: ClusterIssuer
+      metadata:
+        name: self-signed
+      spec:
+        selfSigned: {}
+  letsencrypt:
+    enabled: false
 
 prometheus:
+  alertmanagerSpec:
+    replicas: 1
   storage:
     size: 2Gi
   retention:
     size: 1GiB
+  resources:
+    requests:
+      cpu: 50m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
 
 velero:
   enabled: false
@@ -29,3 +49,60 @@ networkPolicies:
       ports:
         - 443
         - 80
+
+certmanager:
+  resources:
+    requests:
+      cpu: 10m
+      memory: 64Mi
+    limits:
+      cpu: 100m
+      memory: 128Mi
+  webhook:
+    resources:
+      requests:
+        cpu: 10m
+        memory: 32Mi
+      limits:
+        cpu: 50m
+        memory: 64Mi
+  cainjector:
+    resources:
+      requests:
+        cpu: 10m
+        memory: 64Mi
+      limits:
+        cpu: 100m
+        memory: 128Mi
+ingressNginx:
+  controller:
+    resources:
+      requests:
+        cpu: 50m
+        memory: 128Mi
+      limits:
+        cpu: 200m
+        memory: 250Mi
+opa:
+  controllerManager:
+    resources:
+      requests:
+        cpu: 50m
+        memory: 128Mi
+      limits:
+        cpu: 200m
+        memory: 256Mi
+  audit:
+    resources:
+      requests:
+        cpu: 50m
+        memory: 128Mi
+      limits:
+        cpu: 200m
+        memory: 256Mi
+
+falco:
+  enabled: false
+
+trivy:
+  enabled: false
