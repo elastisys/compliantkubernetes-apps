@@ -10,7 +10,17 @@ tolerations:  {{- toYaml .Values.opensearch.curator.tolerations | nindent 2 }}
 nodeSelector: {{- toYaml .Values.opensearch.curator.nodeSelector | nindent 2 }}
 resources:    {{- toYaml .Values.opensearch.curator.resources | nindent 2 }}
 
-retention: {{ toYaml .Values.opensearch.curator.retention | nindent 2 }}
+retention:
+  {{- if .Values.opensearch.indexPerNamespace }}
+  - pattern: ^[^.].*
+    sizeGB: {{ .Values.opensearch.curator.defaultSizeGB | default 5000 }}
+    ageDays: {{ .Values.opensearch.curator.defaultAgeDays | default 30 }}
+  {{- end }}
+  {{- range .Values.opensearch.curator.retention }}
+  - pattern: {{ .pattern }}
+    sizeGB: {{ .sizeGB }}
+    ageDays: {{ .ageDays }}
+  {{- end }}
 
 {{- $global := dict
   "registry" (ternary (dig "uri" "" .Values.images.global.registry) "" .Values.images.global.registry.enabled)
