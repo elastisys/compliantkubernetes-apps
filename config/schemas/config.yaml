@@ -6485,6 +6485,16 @@ properties:
             title: OpenSearch Curator Enabled
             type: boolean
             default: true
+          indexPerNamespaceDefaultSizeGB:
+            title: OpenSearch Curator Index-Per-Namespace Default Size GB
+            description: Default size threshold in GB for automatically generated index-per-namespace patterns.
+            type: number
+            default: 5000
+          indexPerNamespaceDefaultAgeDays:
+            title: OpenSearch Curator Index-Per-Namespace Default Age Days
+            description: Default age threshold in days for automatically generated index-per-namespace patterns.
+            type: number
+            default: 30
           retention:
             title: OpenSearch Curator Retention
             description: Configures the retention of indices in OpenSearch.
