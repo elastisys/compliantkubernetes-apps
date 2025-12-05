@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:b57a8c32-510d-4a08-849f-5c786f5c0372",
+  "serialNumber": "urn:uuid:7351f4eb-6085-450a-b87d-e333a4659fe3",
   "version": 1,
   "metadata": {
-    "timestamp": "2025-11-28T14:39:31Z",
+    "timestamp": "2025-12-01T10:59:51Z",
     "lifecycles": [
       {
         "phase": "build"
@@ -315,13 +315,13 @@
       }
     },
     {
-      "bom-ref": "pkg:helm/common@2.30.0",
+      "bom-ref": "pkg:helm/common@2.31.3",
       "type": "library",
       "supplier": {
         "name": "Broadcom, Inc. All Rights Reserved."
       },
       "name": "common",
-      "version": "2.30.0",
+      "version": "2.31.3",
       "description": "A Library Helm Chart for grouping common logic between bitnami charts. This chart is not deployable by itself.",
       "licenses": [
         {
@@ -330,7 +330,38 @@
           }
         }
       ],
-      "purl": "pkg:helm/common@2.30.0",
+      "purl": "pkg:helm/common@2.31.3",
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "Not evaluated"
+        }
+      ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/bitnami/thanos/charts/minio/charts/common"
+          }
+        ]
+      }
+    },
+    {
+      "bom-ref": "pkg:helm/common@2.31.4",
+      "type": "library",
+      "supplier": {
+        "name": "Broadcom, Inc. All Rights Reserved."
+      },
+      "name": "common",
+      "version": "2.31.4",
+      "description": "A Library Helm Chart for grouping common logic between bitnami charts. This chart is not deployable by itself.",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "purl": "pkg:helm/common@2.31.4",
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -1766,13 +1797,13 @@
       }
     },
     {
-      "bom-ref": "pkg:helm/minio@15.0.5",
+      "bom-ref": "pkg:helm/minio@17.0.19",
       "type": "library",
       "supplier": {
         "name": "Broadcom, Inc. All Rights Reserved."
       },
       "name": "minio",
-      "version": "15.0.5",
+      "version": "17.0.19",
       "description": "MinIO(R) is an object storage server, compatible with Amazon S3 cloud storage service, mainly used for storing unstructured data (such as photos, videos, log files, etc.).",
       "licenses": [
         {
@@ -1781,7 +1812,7 @@
           }
         }
       ],
-      "purl": "pkg:helm/minio@15.0.5",
+      "purl": "pkg:helm/minio@17.0.19",
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -2633,13 +2664,13 @@
       }
     },
     {
-      "bom-ref": "pkg:helm/thanos@15.13.1",
+      "bom-ref": "pkg:helm/thanos@17.3.1",
       "type": "library",
       "supplier": {
         "name": "Broadcom, Inc. All Rights Reserved."
       },
       "name": "thanos",
-      "version": "15.13.1",
+      "version": "17.3.1",
       "description": "Thanos is a highly available metrics system that can be added on top of existing Prometheus deployments, providing a global query view across all Prometheus installations.",
       "licenses": [
         {
@@ -2648,7 +2679,7 @@
           }
         }
       ],
-      "purl": "pkg:helm/thanos@15.13.1",
+      "purl": "pkg:helm/thanos@17.3.1",
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -2929,48 +2960,59 @@
       "purl": "pkg:oci/bitnami/kubectl@1.30.2"
     },
     {
-      "bom-ref": "pkg:oci/bitnami/minio-client@2025.2.21-debian-12-r0",
+      "bom-ref": "pkg:oci/bitnami/minio-client@2025.7.21-debian-12-r1",
       "type": "container",
       "supplier": {
         "name": "bitnami"
       },
       "name": "bitnami/minio-client",
-      "version": "2025.2.21-debian-12-r0",
-      "cpe": "cpe:2.3:a:bitnami:minio-client:2025.2.21:*:*:*:*:*:*:*",
-      "purl": "pkg:oci/bitnami/minio-client@2025.2.21-debian-12-r0"
+      "version": "2025.7.21-debian-12-r1",
+      "cpe": "cpe:2.3:a:bitnami:minio-client:2025.7.21:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/bitnami/minio-client@2025.7.21-debian-12-r1"
     },
     {
-      "bom-ref": "pkg:oci/bitnami/minio@2025.2.28-debian-12-r0",
+      "bom-ref": "pkg:oci/bitnami/minio-object-browser@2.0.2-debian-12-r2",
+      "type": "container",
+      "supplier": {
+        "name": "bitnami"
+      },
+      "name": "bitnami/minio-object-browser",
+      "version": "2.0.2-debian-12-r2",
+      "cpe": "cpe:2.3:a:bitnami:minio-object-browser:2.0.2:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/bitnami/minio-object-browser@2.0.2-debian-12-r2"
+    },
+    {
+      "bom-ref": "pkg:oci/bitnami/minio@2025.7.23-debian-12-r2",
       "type": "container",
       "supplier": {
         "name": "bitnami"
       },
       "name": "bitnami/minio",
-      "version": "2025.2.28-debian-12-r0",
-      "cpe": "cpe:2.3:a:bitnami:minio:2025.2.28:*:*:*:*:*:*:*",
-      "purl": "pkg:oci/bitnami/minio@2025.2.28-debian-12-r0"
+      "version": "2025.7.23-debian-12-r2",
+      "cpe": "cpe:2.3:a:bitnami:minio:2025.7.23:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/bitnami/minio@2025.7.23-debian-12-r2"
     },
     {
-      "bom-ref": "pkg:oci/bitnami/os-shell@12-debian-12-r39",
+      "bom-ref": "pkg:oci/bitnami/os-shell@12-debian-12-r50",
       "type": "container",
       "supplier": {
         "name": "bitnami"
       },
       "name": "bitnami/os-shell",
-      "version": "12-debian-12-r39",
+      "version": "12-debian-12-r50",
       "cpe": "cpe:2.3:a:bitnami:os-shell:12:*:*:*:*:*:*:*",
-      "purl": "pkg:oci/bitnami/os-shell@12-debian-12-r39"
+      "purl": "pkg:oci/bitnami/os-shell@12-debian-12-r50"
     },
     {
-      "bom-ref": "pkg:oci/bitnami/thanos@0.37.2-debian-12-r8",
+      "bom-ref": "pkg:oci/bitnami/thanos@0.39.2-debian-12-r2",
       "type": "container",
       "supplier": {
         "name": "bitnami"
       },
       "name": "bitnami/thanos",
-      "version": "0.37.2-debian-12-r8",
-      "cpe": "cpe:2.3:a:bitnami:thanos:0.37.2:*:*:*:*:*:*:*",
-      "purl": "pkg:oci/bitnami/thanos@0.37.2-debian-12-r8"
+      "version": "0.39.2-debian-12-r2",
+      "cpe": "cpe:2.3:a:bitnami:thanos:0.39.2:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/bitnami/thanos@0.39.2-debian-12-r2"
     },
     {
       "bom-ref": "pkg:oci/brancz/kube-rbac-proxy@v0.19.1",
@@ -3158,17 +3200,6 @@
       "version": "1.32.4",
       "cpe": "cpe:2.3:a:elastisys:kubectl:1.32.4:*:*:*:*:*:*:*",
       "purl": "pkg:oci/elastisys/bitnami/kubectl@1.32.4?repository_url=ghcr.io"
-    },
-    {
-      "bom-ref": "pkg:oci/elastisys/bitnami/thanos@0.37.2-debian-12-r8?repository_url=ghcr.io",
-      "type": "container",
-      "supplier": {
-        "name": "elastisys"
-      },
-      "name": "ghcr.io/elastisys/bitnami/thanos",
-      "version": "0.37.2-debian-12-r8",
-      "cpe": "cpe:2.3:a:elastisys:thanos:0.37.2:*:*:*:*:*:*:*",
-      "purl": "pkg:oci/elastisys/bitnami/thanos@0.37.2-debian-12-r8?repository_url=ghcr.io"
     },
     {
       "bom-ref": "pkg:oci/elastisys/calico-accountant@0.1.6-ck8s3?repository_url=ghcr.io",
@@ -4238,15 +4269,15 @@
       "purl": "pkg:oci/tektoncd/pipeline/controller-10a3e32792f33651396d02b6855a6e36@v1.1.0?repository_url=ghcr.io\u0026digest=sha256:72ba947187317aee83b8b6ba510b17375bede4ce062e366cd0162515e0f7d5f2"
     },
     {
-      "bom-ref": "pkg:oci/thanos/thanos@v0.39.2",
+      "bom-ref": "pkg:oci/thanos/thanos@v0.39.2?repository_url=quay.io",
       "type": "container",
       "supplier": {
         "name": "thanos"
       },
-      "name": "thanos/thanos",
+      "name": "quay.io/thanos/thanos",
       "version": "v0.39.2",
       "cpe": "cpe:2.3:a:thanos:thanos:0.39.2:*:*:*:*:*:*:*",
-      "purl": "pkg:oci/thanos/thanos@v0.39.2"
+      "purl": "pkg:oci/thanos/thanos@v0.39.2?repository_url=quay.io"
     },
     {
       "bom-ref": "pkg:oci/velero/velero-plugin-for-aws@v1.9.0?repository_url=docker.io",
@@ -4315,7 +4346,7 @@
         "pkg:helm/cert-manager@v1.18.3",
         "pkg:helm/cilium-default-deny@0.1.0",
         "pkg:helm/cluster-admin-rbac@0.1.0",
-        "pkg:helm/common@2.30.0",
+        "pkg:helm/common@2.31.4",
         "pkg:helm/crds@0.0.0",
         "pkg:helm/crds@3.3.6",
         "pkg:helm/crossplane-packages@0.1.0",
@@ -4362,7 +4393,7 @@
         "pkg:helm/letsencrypt@0.1.0",
         "pkg:helm/log-manager@0.1.0",
         "pkg:helm/metrics-server@3.13.0",
-        "pkg:helm/minio@15.0.5",
+        "pkg:helm/minio@17.0.19",
         "pkg:helm/minio@5.0.14",
         "pkg:helm/namespaces@0.1.1",
         "pkg:helm/networkpolicy-generator@0.1.0",
@@ -4390,7 +4421,7 @@
         "pkg:helm/tekton-pipeline@1.1.0",
         "pkg:helm/thanos-ingress-secret@0.1.0",
         "pkg:helm/thanos-ruler@0.1.0",
-        "pkg:helm/thanos@15.13.1",
+        "pkg:helm/thanos@17.3.1",
         "pkg:helm/tigera-operator@v3.26.4",
         "pkg:helm/trivy-operator@0.31.0",
         "pkg:helm/user-crds@0.1.0",
@@ -4447,9 +4478,15 @@
       ]
     },
     {
-      "ref": "pkg:helm/common@2.30.0",
+      "ref": "pkg:helm/common@2.31.3",
       "dependsOn": [
-        "pkg:oci/elastisys/bitnami/thanos@0.37.2-debian-12-r8?repository_url=ghcr.io"
+        "pkg:oci/thanos/thanos@v0.39.2?repository_url=quay.io"
+      ]
+    },
+    {
+      "ref": "pkg:helm/common@2.31.4",
+      "dependsOn": [
+        "pkg:oci/thanos/thanos@v0.39.2?repository_url=quay.io"
       ]
     },
     {
@@ -4829,7 +4866,7 @@
         "pkg:oci/prometheus/alertmanager@v0.28.1?repository_url=quay.io",
         "pkg:oci/prometheus/node-exporter@v0.85.0",
         "pkg:oci/prometheus/prometheus@v3.6.0?repository_url=quay.io",
-        "pkg:oci/thanos/thanos@v0.39.2"
+        "pkg:oci/thanos/thanos@v0.39.2?repository_url=quay.io"
       ]
     },
     {
@@ -4905,13 +4942,14 @@
       ]
     },
     {
-      "ref": "pkg:helm/minio@15.0.5",
+      "ref": "pkg:helm/minio@17.0.19",
       "dependsOn": [
-        "pkg:helm/common@2.30.0",
-        "pkg:oci/bitnami/minio-client@2025.2.21-debian-12-r0",
-        "pkg:oci/bitnami/minio@2025.2.28-debian-12-r0",
-        "pkg:oci/bitnami/os-shell@12-debian-12-r39",
-        "pkg:oci/elastisys/bitnami/thanos@0.37.2-debian-12-r8?repository_url=ghcr.io"
+        "pkg:helm/common@2.31.3",
+        "pkg:oci/bitnami/minio-client@2025.7.21-debian-12-r1",
+        "pkg:oci/bitnami/minio-object-browser@2.0.2-debian-12-r2",
+        "pkg:oci/bitnami/minio@2025.7.23-debian-12-r2",
+        "pkg:oci/bitnami/os-shell@12-debian-12-r50",
+        "pkg:oci/thanos/thanos@v0.39.2?repository_url=quay.io"
       ]
     },
     {
@@ -5101,25 +5139,26 @@
     {
       "ref": "pkg:helm/thanos-ingress-secret@0.1.0",
       "dependsOn": [
-        "pkg:oci/elastisys/bitnami/thanos@0.37.2-debian-12-r8?repository_url=ghcr.io"
+        "pkg:oci/thanos/thanos@v0.39.2?repository_url=quay.io"
       ]
     },
     {
       "ref": "pkg:helm/thanos-ruler@0.1.0",
       "dependsOn": [
-        "pkg:oci/elastisys/bitnami/thanos@0.37.2-debian-12-r8?repository_url=ghcr.io"
+        "pkg:oci/thanos/thanos@v0.39.2?repository_url=quay.io"
       ]
     },
     {
-      "ref": "pkg:helm/thanos@15.13.1",
+      "ref": "pkg:helm/thanos@17.3.1",
       "dependsOn": [
-        "pkg:helm/common@2.30.0",
-        "pkg:helm/minio@15.0.5",
-        "pkg:oci/bitnami/minio-client@2025.2.21-debian-12-r0",
-        "pkg:oci/bitnami/minio@2025.2.28-debian-12-r0",
-        "pkg:oci/bitnami/os-shell@12-debian-12-r39",
-        "pkg:oci/bitnami/thanos@0.37.2-debian-12-r8",
-        "pkg:oci/elastisys/bitnami/thanos@0.37.2-debian-12-r8?repository_url=ghcr.io"
+        "pkg:helm/common@2.31.4",
+        "pkg:helm/minio@17.0.19",
+        "pkg:oci/bitnami/minio-client@2025.7.21-debian-12-r1",
+        "pkg:oci/bitnami/minio-object-browser@2.0.2-debian-12-r2",
+        "pkg:oci/bitnami/minio@2025.7.23-debian-12-r2",
+        "pkg:oci/bitnami/os-shell@12-debian-12-r50",
+        "pkg:oci/bitnami/thanos@0.39.2-debian-12-r2",
+        "pkg:oci/thanos/thanos@v0.39.2?repository_url=quay.io"
       ]
     },
     {
@@ -5197,19 +5236,23 @@
       "dependsOn": []
     },
     {
-      "ref": "pkg:oci/bitnami/minio-client@2025.2.21-debian-12-r0",
+      "ref": "pkg:oci/bitnami/minio-client@2025.7.21-debian-12-r1",
       "dependsOn": []
     },
     {
-      "ref": "pkg:oci/bitnami/minio@2025.2.28-debian-12-r0",
+      "ref": "pkg:oci/bitnami/minio-object-browser@2.0.2-debian-12-r2",
       "dependsOn": []
     },
     {
-      "ref": "pkg:oci/bitnami/os-shell@12-debian-12-r39",
+      "ref": "pkg:oci/bitnami/minio@2025.7.23-debian-12-r2",
       "dependsOn": []
     },
     {
-      "ref": "pkg:oci/bitnami/thanos@0.37.2-debian-12-r8",
+      "ref": "pkg:oci/bitnami/os-shell@12-debian-12-r50",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:oci/bitnami/thanos@0.39.2-debian-12-r2",
       "dependsOn": []
     },
     {
@@ -5278,10 +5321,6 @@
     },
     {
       "ref": "pkg:oci/elastisys/bitnami/kubectl@1.32.4?repository_url=ghcr.io",
-      "dependsOn": []
-    },
-    {
-      "ref": "pkg:oci/elastisys/bitnami/thanos@0.37.2-debian-12-r8?repository_url=ghcr.io",
       "dependsOn": []
     },
     {
@@ -5673,7 +5712,7 @@
       "dependsOn": []
     },
     {
-      "ref": "pkg:oci/thanos/thanos@v0.39.2",
+      "ref": "pkg:oci/thanos/thanos@v0.39.2?repository_url=quay.io",
       "dependsOn": []
     },
     {

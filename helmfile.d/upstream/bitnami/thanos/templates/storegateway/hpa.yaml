@@ -15,6 +15,10 @@ metadata:
   annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
   {{- end }}
 spec:
+  {{- if .Values.storegateway.autoscaling.behavior }}
+  behavior:
+    {{- toYaml .Values.storegateway.autoscaling.behavior | nindent 4 }}
+  {{- end }}
   scaleTargetRef:
     apiVersion: {{ include "common.capabilities.statefulset.apiVersion" . }}
     kind: StatefulSet
@@ -26,24 +30,16 @@ spec:
     - type: Resource
       resource:
         name: memory
-        {{- if semverCompare "<1.23-0" (include "common.capabilities.kubeVersion" .) }}
-        targetAverageUtilization: {{ .Values.storegateway.autoscaling.targetMemory }}
-        {{- else }}
         target:
           type: Utilization
           averageUtilization: {{ .Values.storegateway.autoscaling.targetMemory }}
-        {{- end }}
     {{- end }}
     {{- if .Values.storegateway.autoscaling.targetCPU }}
     - type: Resource
       resource:
         name: cpu
-        {{- if semverCompare "<1.23-0" (include "common.capabilities.kubeVersion" .) }}
-        targetAverageUtilization: {{ .Values.storegateway.autoscaling.targetCPU }}
-        {{- else }}
         target:
           type: Utilization
           averageUtilization: {{ .Values.storegateway.autoscaling.targetCPU }}
-        {{- end }}
     {{- end }}
 {{- end }}
