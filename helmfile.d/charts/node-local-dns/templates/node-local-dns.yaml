@@ -108,7 +108,7 @@ data:
       {{- . | nindent 6 }}
       {{- end }}
       log . {combined} {
-        class denial error
+        class error
       }
       cache 30
       reload
