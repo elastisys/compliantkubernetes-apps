@@ -1,0 +1,15 @@
+networkPolicies:
+  global:
+    externalLoadBalancer: false
+    ingressUsingHostNetwork: false
+  ingressNginx:
+    ingressOverride:
+      enabled: true
+      ips:
+        - 0.0.0.0/0
+ingressNginx:
+  controller:
+    service:
+      enabled: true
+      type: LoadBalancer
+    useHostPort: false
