@@ -76,6 +76,7 @@ harbor:
         memory: 256Mi
 
 opensearch:
+  enabled: false
   masterNode:
     count: 1
     storageSize: 20Gi
