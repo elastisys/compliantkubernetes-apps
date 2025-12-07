@@ -165,7 +165,6 @@ thanos:
  receiver:
    mode: standalone
    replicaCount: 1
-   replicationFactor: 1
    topologySpreadConstraints: []
    resources:
       requests:
