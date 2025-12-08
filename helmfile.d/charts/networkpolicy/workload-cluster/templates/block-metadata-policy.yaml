@@ -1,0 +1,6 @@
+{{ if .Values.global.blockMetadata }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: my-name-is-mud
+{{ end }}

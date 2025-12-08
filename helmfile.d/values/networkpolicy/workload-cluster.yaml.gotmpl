@@ -1,4 +1,5 @@
 global:
+  blockMetadata: {{ and (eq .Values.networkPlugin.type "calico") (eq .Values.global.ck8sK8sInstaller "capi") }}
   wcApiserver:
     ips: {{- toYaml .Values.networkPolicies.global.wcApiserver.ips | nindent 6 }}
     port: {{- toYaml .Values.networkPolicies.global.wcApiserver.port | nindent 6 }}
