@@ -162,6 +162,22 @@ with_kubeconfig() {
   export DETIK_CLIENT_NAME="kubectl"
 }
 
+# sets up a temporary GPG home and key for local testing
+# usage: with_temporary_gpg
+with_temporary_gpg() {
+  if ! command -v setup-local-gpg &>/dev/null; then
+    log.fatal "setup-local-gpg script not found in path"
+  fi
+
+  eval "$(setup-local-gpg)"
+
+  if [[ -z "${CK8S_PGP_FP:-}" ]]; then
+    fail "Failed to generate temporary GPG key"
+  fi
+
+  log.trace "Temporary GPG initialized. Fingerprint: $CK8S_PGP_FP"
+}
+
 # sets the kubeconfig to use
 # usage: with_static_wc_kubeconfig <dev|...?>
 with_static_wc_kubeconfig() {
