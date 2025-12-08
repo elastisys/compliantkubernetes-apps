@@ -42,13 +42,15 @@ templates:
   metrics-server:
     disableValidationOnInstall: true
     condition: ck8sAnyCluster.enabled
-    inherit: [ template: metrics-server-chart ]
     installed: {{ .Values | get "metricsServer.enabled" false }}
+    chart: charts/modules/metrics-server
+    version: 0.1.0
     namespace: kube-system
-    name: metrics-server
+    name: module-metrics-server
     labels:
       app: metrics-server
     needs:
+      - crossplane-system/crossplane-packages
       - cert-manager/cert-manager # creates certificates and issuers
     values:
       - values/metrics-server.yaml.gotmpl

@@ -25,7 +25,6 @@ spec:
       selector: {}
       template:
         spec:
-          resources: {{ toYaml $values.resources | nindent 12 }}
           securityContext:
             runAsNonRoot: true
             seccompProfile:
@@ -42,4 +41,5 @@ spec:
                   drop:
                     - ALL
                 runAsUser: 65532
+              resources: {{ toYaml $values.resources | nindent 16 }}
 {{- end }}

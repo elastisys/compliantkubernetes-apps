@@ -1,0 +1,49 @@
+apiVersion: module.elastisys.com/v1alpha1
+kind: MetricsServer
+metadata:
+  name: metrics-server
+spec:
+  providerConfigs:
+    helm:
+      local:
+        kind: ProviderConfig
+        name: metrics-server-local
+    kubernetes:
+      local:
+        kind: ProviderConfig
+        name: metrics-server-local
+  rbac:
+    create: {{ .Values.rbac.create }}
+  defaultArgs: {{ .Values.defaultArgs | toYaml | nindent 4 }}
+  args: {{ .Values.args | toYaml | nindent 4 }}
+  tls:
+    type: {{ .Values.tls.type }}
+  containerPort: {{ .Values.containerPort }}
+  livenessProbe:
+    periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+  resources: {{ .Values.resources | toYaml | nindent 4 }}
+  tolerations: {{ .Values.tolerations | toYaml | nindent 4 }}
+  affinity: {{ .Values.affinity | toYaml | nindent 4 }}
+  apiService:
+    insecureSkipTLSVerify: {{ .Values.apiService.insecureSkipTLSVerify }}
+  {{- if or .Values.containerImage.registry .Values.containerImage.repository .Values.containerImage.image .Values.containerImage.tag .Values.containerImage.digest }}
+  containerImage:
+    {{- with .Values.containerImage.registry }}
+    registry: {{ . }}
+    {{- end }}
+    {{- with .Values.containerImage.repository }}
+    repository: {{ . }}
+    {{- end }}
+    {{- with .Values.containerImage.image }}
+    image: {{ . }}
+    {{- end }}
+    {{- with .Values.containerImage.tag }}
+    tag: {{ . }}
+    {{- end }}
+    {{- with .Values.containerImage.digest }}
+    digest: {{ . }}
+    {{- end }}
+  {{- end }}
+  crossplane:
+    compositionRef:
+      name: metrics-server

@@ -37,12 +37,21 @@ affinity: {{- toYaml .Values.metricsServer.affinity | nindent 2 }}
 
 {{- with .Values.images | dig "monitoring" "metricsServer" "" }}
 {{- with merge (include "container_uri.parse" . | fromJson) $global }}
-image:
-  {{- with include "gen.reg-rep-img" . }}
+containerImage:
+  {{- with .registry }}
+  registry: {{ . }}
+  {{- end }}
+  {{- with .repository }}
   repository: {{ . }}
   {{- end }}
-  {{- if or .tag .digest }}
-  tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
+  {{- with .image }}
+  image: {{ . }}
+  {{- end }}
+  {{- with .tag }}
+  tag: {{ . }}
+  {{- end }}
+  {{- with .digest }}
+  digest: {{ . }}
   {{- end }}
 {{- end }}
 {{- end }}

@@ -1,0 +1,42 @@
+# metrics-server module values
+
+rbac:
+  create: true
+
+defaultArgs:
+  - --cert-dir=/tmp
+  - --kubelet-preferred-address-types=InternalIP
+  - --kubelet-use-node-status-port
+  - --metric-resolution=30s
+
+args:
+  - "--kubelet-insecure-tls"
+
+apiService:
+  insecureSkipTLSVerify: false
+
+tls:
+  type: cert-manager
+
+containerPort: 8443
+
+livenessProbe:
+  periodSeconds: 20
+
+resources:
+  requests:
+    cpu: 10m
+    memory: 25Mi
+  limits:
+    cpu: 100m
+    memory: 100Mi
+
+tolerations: []
+affinity: {}
+
+containerImage:
+  registry: ""
+  repository: ""
+  image: ""
+  tag: ""
+  digest: ""
