@@ -66,7 +66,7 @@ spec:
         summary: Index {{`{{ $labels.index }}`}} is using {{`{{ $value }}`}} percent of max field limit
         runbook_url: {{ .Values.runbookUrls.opensearch.OpenSearchFieldLimit }}
     - alert: OpenSearchFieldLimit
-      expr: (sum(max_over_time(elasticsearch_indices_mappings_stats_fields{namespace="opensearch-system"}[5m])) by (index) / sum(max_over_time(elasticsearch_indices_settings_total_fields{namespace="opensearch-system"}[5m])) by (index)) * 100 > 95
+      expr: (sum(max_over_time(elasticsearch_indices_mappings_stats_fields{namespace="opensearch-system",index!~"top_queries.*"}[5m])) by (index) / sum(max_over_time(elasticsearch_indices_settings_total_fields{namespace="opensearch-system",index!~"top_queries.*}[5m])) by (index)) * 100 > 95
       for: 15m
       labels:
         severity: critical
