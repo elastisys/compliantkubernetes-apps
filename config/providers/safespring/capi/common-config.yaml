@@ -1,41 +1,8 @@
-openstackMonitoring:
-  enabled: true
-kubeVIPMonitoring:
-  enabled: true
-storageClasses:
-  default: cinder-csi
 networkPolicies:
   global:
     externalLoadBalancer: false
-    ingressUsingHostNetwork: true
-  ingressNginx:
-    ingressOverride:
-      enabled: false
-  kubeSystem:
-    openstack:
-      enabled: true
-      ips:
-        - 185.189.29.233/32
-      ports:
-        - 5000
-        - 8774
-        - 8776
-objectStorage:
-  type: s3
-  s3:
-    region: sto1
-    regionEndpoint: https://s3.sto1.safedc.net
-    forcePathStyle: true
 ingressNginx:
   controller:
-    config:
-      useProxyProtocol: false
-    useHostPort: true
     service:
       enabled: true
-      allocateLoadBalancerNodePorts: true
-      annotations: {}
       type: LoadBalancer
-opa:
-  rejectLoadBalancerService:
-    enabled: true

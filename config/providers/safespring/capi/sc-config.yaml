@@ -1,9 +1,0 @@
-harbor:
-  persistence:
-    type: objectStorage
-    disableRedirect: true
-prometheus:
-  s3BucketAlerts:
-    objects:
-      enabled: true
-      count: 1000000
