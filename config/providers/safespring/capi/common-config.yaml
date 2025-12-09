@@ -6,7 +6,7 @@ storageClasses:
   default: cinder-csi
 networkPolicies:
   global:
-    externalLoadBalancer: true
+    externalLoadBalancer: false
     ingressUsingHostNetwork: true
   ingressNginx:
     ingressOverride:
@@ -32,10 +32,10 @@ ingressNginx:
       useProxyProtocol: false
     useHostPort: true
     service:
-      enabled: false
+      enabled: true
       allocateLoadBalancerNodePorts: true
       annotations: {}
-      type: NodePort
+      type: LoadBalancer
 opa:
   rejectLoadBalancerService:
     enabled: true
