@@ -36,7 +36,7 @@ log.usage() {
   log.fatal "$0 usage:
   - cache <create|delete>                                                    - manages local cache for local clusters
   - resolve <create|delete> <domain>                                         - manages local resolve for local clusters
-  - config <name> <flavor> <domain> [ops-prefix] [--self-signed]             - configures a local cluster
+  - config <name> <flavor> <domain> [ops-prefix]                             - configures a local cluster
   - create <name> <profile-name|profile-path> [--skip-calico] [--skip-minio] - creates a local cluster
   - delete <name>                                                            - deletes a local cluster
   - list clusters                                                            - lists available clusters
