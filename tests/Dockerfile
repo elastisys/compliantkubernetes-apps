@@ -49,7 +49,7 @@ RUN curl -LOs "https://github.com/helmfile/helmfile/releases/download/v${HELMFIL
     install -Tm 755 helmfile /usr/local/bin/helmfile && \
     rm helmfile "helmfile_${HELMFILE_VERSION}_linux_amd64.tar.gz"
 
-ARG KUBECTL_VERSION="1.32.8"
+ARG KUBECTL_VERSION="1.33.6"
 RUN curl -LOs "https://dl.k8s.io/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl" && \
     install -Tm 755 kubectl /usr/local/bin/kubectl && \
     rm kubectl
