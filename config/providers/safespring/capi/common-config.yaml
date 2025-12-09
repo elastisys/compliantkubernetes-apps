@@ -6,3 +6,4 @@ ingressNginx:
     service:
       enabled: true
       type: LoadBalancer
+    useHostPort: false
