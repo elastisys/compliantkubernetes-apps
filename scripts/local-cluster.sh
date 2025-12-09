@@ -281,8 +281,8 @@ resolve() {
 
 config() {
   local name flavor domain ops_prefix
-  name="${1:-}"
-  flavor="${2:-}"
+  name="${1:-welkin-quick-start}"
+  flavor="${2:-dev}"
   domain="${3:-welkin.test}"
   ops_prefix="${4:-"ops"}"
 
