@@ -71,6 +71,11 @@ RUN curl -LOs "https://github.com/open-policy-agent/opa/releases/download/v${OPA
     install -Tm 755 opa_linux_amd64 /usr/local/bin/opa && \
     rm opa_linux_amd64
 
+ARG PROMETHEUS_VERSION="3.6.0"
+RUN curl -fsSL "https://github.com/prometheus/prometheus/releases/download/v${PROMETHEUS_VERSION}/prometheus-${PROMETHEUS_VERSION}.linux-amd64.tar.gz" | \
+    tar -zxvf - "prometheus-${PROMETHEUS_VERSION}.linux-amd64/promtool" --strip-components=1 && \
+    mv promtool /usr/local/bin/
+
 ARG SOPS_VERSION="3.10.1"
 RUN curl -LOs "https://github.com/getsops/sops/releases/download/v${SOPS_VERSION}/sops-v${SOPS_VERSION}.linux.amd64" && \
     install -Tm 755 "sops-v${SOPS_VERSION}.linux.amd64" /usr/local/bin/sops && \
