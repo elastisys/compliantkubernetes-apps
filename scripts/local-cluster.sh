@@ -36,8 +36,8 @@ log.usage() {
   log.fatal "$0 usage:
   - cache <create|delete>                                                    - manages local cache for local clusters
   - resolve <create|delete> <domain>                                         - manages local resolve for local clusters
-  - config <name> <flavor> <domain> [ops-prefix]                             - configures a local cluster
-  - create <name> <profile-name|profile-path> [--skip-calico] [--skip-minio] - creates a local cluster
+  - config [name] [flavor] [domain] [ops-prefix]                             - configures a local cluster
+  - create <name> [profile-name|profile-path] [--skip-calico] [--skip-minio] - creates a local cluster
   - delete <name>                                                            - deletes a local cluster
   - list clusters                                                            - lists available clusters
   - list profiles                                                            - lists available profiles
@@ -442,6 +442,9 @@ create() {
 
     helmfile -e local_cluster -f "${ROOT}/helmfile.d" -lapp=minio apply --output simple
   fi
+
+  log.info "applying welkin configuration for ${affix}"
+  "${ROOT}/bin/ck8s" apply "${affix}"
 
   index.state "${cluster}" "ready"
   log.info "cluster ${cluster} is ready"

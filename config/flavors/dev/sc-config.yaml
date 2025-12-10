@@ -163,8 +163,8 @@ thanos:
         memory: 256Mi
 
  receiver:
-   mode: standalone
    replicaCount: 1
+   tsdbRetention: 2d
    topologySpreadConstraints: []
    resources:
       requests:
@@ -178,7 +178,7 @@ thanos:
 
  compactor:
    retentionResolutionRaw: 2d
-   retentionResolution5m: 2d
+   retentionResolution5m: 0s
    retentionResolution1h: 0s
    persistence:
       enabled: true
