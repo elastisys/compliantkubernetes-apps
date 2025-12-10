@@ -296,16 +296,31 @@ config() {
   export flavor
   export ops_prefix
 
+  local config_path_was_unset=false
+  local pgp_key_was_unset=false
+
   if [[ -z "${name}" ]] || [[ -z "${flavor}" ]] || [[ -z "${domain}" ]]; then
     log.usage
   fi
 
   if [[ -z "${CK8S_CONFIG_PATH:-}" ]]; then
-    log.fatal "CK8S_CONFIG_PATH is unset"
+    config_path_was_unset=true
+    export CK8S_CONFIG_PATH="${HOME}/welkin-quick-start"
+    mkdir -p "${CK8S_CONFIG_PATH}"
+    log.info "CK8S_CONFIG_PATH is unset. Using default: ${CK8S_CONFIG_PATH}"
   fi
 
   if [[ -z "${CK8S_PGP_FP:-}" ]]; then
-    log.fatal "CK8S_PGP_FP is unset"
+    pgp_key_was_unset=true
+    if [[ -x "${ROOT}/bin/setup-local-gpg" ]]; then
+      eval "$("${ROOT}/bin/setup-local-gpg")"
+      log.info "CK8S_PGP_FP is unset. Using temp gpgkey: ${CK8S_PGP_FP}"
+      log.info "Using temp GNUPGHOME: ${GNUPGHOME}"
+    fi
+
+    if [[ -z "${CK8S_PGP_FP:-}" ]]; then
+      log.fatal "CK8S_PGP_FP is unset and automatic generation failed."
+    fi
   fi
 
   if ! [[ -d "${CK8S_CONFIG_PATH}" ]]; then
@@ -353,6 +368,18 @@ config() {
   fi
 
   "${ROOT}/bin/ck8s" init both
+
+  if [[ "${config_path_was_unset}" == "true" ]] || [[ "${pgp_key_was_unset}" == "true" ]]; then
+    log.info "Run these commands to configure your current shell session before creating cluster"
+    if [[ "${config_path_was_unset}" == "true" ]]; then
+      log.info "export CK8S_CONFIG_PATH='${CK8S_CONFIG_PATH}'"
+    fi
+
+    if [[ "${pgp_key_was_unset}" == "true" ]]; then
+      log.info "export CK8S_PGP_FP='${CK8S_PGP_FP}'"
+      log.info "export GNUPGHOME='${GNUPGHOME}'"
+    fi
+  fi
 }
 
 create() {

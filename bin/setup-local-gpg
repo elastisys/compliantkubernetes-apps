@@ -23,4 +23,3 @@ FINGERPRINT=$(gpg --list-secret-keys --keyid-format LONG | grep sec | awk '{prin
 
 echo "export GNUPGHOME='$GNUPGHOME'"
 echo "export CK8S_PGP_FP='$FINGERPRINT'"
-echo "export SOPS_PGP_FP='$FINGERPRINT'"
