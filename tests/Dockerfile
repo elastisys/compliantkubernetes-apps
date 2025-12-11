@@ -88,6 +88,7 @@ RUN curl -LOs "https://github.com/neilpa/yajsv/releases/download/v${YAJSV_VERSIO
 
 ARG YQ_VERSION="4.45.1"
 RUN curl -LOs "https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}/yq_linux_amd64" && \
+    echo "654d2943ca1d3be2024089eb4f270f4070f491a0610481d128509b2834870049  yq_linux_amd64" | sha256sum -c - && \
     install -Tm 755 yq_linux_amd64 /usr/local/bin/yq && \
     rm yq_linux_amd64
 
