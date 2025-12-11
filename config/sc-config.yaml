@@ -1009,6 +1009,11 @@ opensearch:
   # Config for https://www.elastic.co/guide/en/elasticsearch/client/curator/5.8/about.html
   curator:
     enabled: true
+    # Defaults used for automatic index-per-namespace patterns in the curator values:
+    #   - "^[^.].*"    (non-system indices)
+    #   - ".orphaned*" (orphaned indices from removed namespaces)
+    indexPerNamespaceDefaultSizeGB: 5000
+    indexPerNamespaceDefaultAgeDays: 30
     retention:
       - pattern: other-*
         sizeGB: 5000
