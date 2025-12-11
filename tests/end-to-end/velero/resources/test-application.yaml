@@ -15,6 +15,7 @@ metadata:
   name: velero-test
   namespace: velero-test
 spec:
+  terminationGracePeriodSeconds: 1
   containers:
   - image: ${image}
     args:
