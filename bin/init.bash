@@ -139,6 +139,9 @@ generate_default_config() {
   if [[ -f "${config_template_path}/providers/${CK8S_CLOUD_PROVIDER}/${config_name}" ]]; then
     files+=("${config_template_path}/providers/${CK8S_CLOUD_PROVIDER}/${config_name}")
   fi
+  if [[ -f "${config_template_path}/providers/${CK8S_CLOUD_PROVIDER}/${CK8S_K8S_INSTALLER}/${config_name}" ]]; then
+    files+=("${config_template_path}/providers/${CK8S_CLOUD_PROVIDER}/${CK8S_K8S_INSTALLER}/${config_name}")
+  fi
 
   yq_merge "${files[@]}" | envsubst >"${new_config}"
 
