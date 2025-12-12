@@ -83,6 +83,7 @@ RUN curl -LOs "https://github.com/getsops/sops/releases/download/v${SOPS_VERSION
 
 ARG YAJSV_VERSION="1.4.1"
 RUN curl -LOs "https://github.com/neilpa/yajsv/releases/download/v${YAJSV_VERSION}/yajsv.linux.amd64" && \
+    echo "4bd6d2b1d6292ab1f7ba63db83c182a603a790d431429cf71f05cb0fcc677def  yajsv.linux.amd64" | sha256sum -c - && \
     install -Tm 755 yajsv.linux.amd64 /usr/local/bin/yajsv && \
     rm yajsv.linux.amd64
 
