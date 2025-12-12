@@ -15,6 +15,8 @@ userCRDs:
         name: "velero-server-upgrade-crds"
       - namespace: "crossplane-system"
         name: "crossplane"
+      - namespace: "tigera-operator"
+        name: "tigera-operator"
       {{- if .Values.gatekeeper.allowUserCRDs.extraServiceAccounts }}
       {{- toYaml .Values.gatekeeper.allowUserCRDs.extraServiceAccounts | nindent 6 }}
       {{- end }}
