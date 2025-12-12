@@ -36,8 +36,8 @@ log.usage() {
   log.fatal "$0 usage:
   - cache <create|delete>                                                    - manages local cache for local clusters
   - resolve <create|delete> <domain>                                         - manages local resolve for local clusters
-  - config <name> <flavor> <domain> [ops-prefix] [--self-signed]             - configures a local cluster
-  - create <name> <profile-name|profile-path> [--skip-calico] [--skip-minio] - creates a local cluster
+  - config [name] [flavor] [domain] [ops-prefix]                             - configures a local cluster
+  - create <name> [profile-name|profile-path] [--skip-calico] [--skip-minio] - creates a local cluster
   - delete <name>                                                            - deletes a local cluster
   - list clusters                                                            - lists available clusters
   - list profiles                                                            - lists available profiles
@@ -280,16 +280,11 @@ resolve() {
 }
 
 config() {
-  local name flavor domain ops_prefix self_signed="false"
-  name="${1:-}"
-  flavor="${2:-}"
-  domain="${3:-}"
-  if [[ "${4:-}" != "--self-signed" ]]; then
-    ops_prefix="${4:-"ops"}"
-  fi
-  if [[ "${4:-}" == "--self-signed" ]] || [[ "${5:-}" == "--self-signed" ]]; then
-    self_signed="true"
-  fi
+  local name flavor domain ops_prefix
+  name="${1:-welkin-quick-start}"
+  flavor="${2:-dev}"
+  domain="${3:-welkin.test}"
+  ops_prefix="${4:-"ops"}"
 
   export name
   export domain
@@ -333,12 +328,6 @@ config() {
   yq -Pi 'with(select(. == null); . = {}) | . *= (load(env(HERE) + "/local-clusters/configs/sc-config.yaml") | (.. | select(tag == "!!str")) |= envsubst)' "${CK8S_CONFIG_PATH}/sc-config.yaml"
   yq -Pi 'with(select(. == null); . = {}) | . *= (load(env(HERE) + "/local-clusters/configs/wc-config.yaml") | (.. | select(tag == "!!str")) |= envsubst)' "${CK8S_CONFIG_PATH}/wc-config.yaml"
 
-  if [[ "${self_signed}" == "true" ]]; then
-    log.info "Configuring local environment with self-signed certificates"
-    yq -Pi 'with(select(. == null); . = {}) | . *= (load(env(HERE) + "/local-clusters/configs/partial/common-self-signed.yaml") | (.. | select(tag == "!!str")) |= envsubst)' "${CK8S_CONFIG_PATH}/common-config.yaml"
-
-  fi
-
   if ! [[ -f "${CK8S_CONFIG_PATH}/defaults/common-config.yaml" ]]; then
     mkdir -p "${CK8S_CONFIG_PATH}/defaults"
     touch "${CK8S_CONFIG_PATH}/defaults/common-config.yaml"
@@ -358,7 +347,7 @@ config() {
 create() {
   local cluster config affix
   cluster="${1:-}"
-  config="${2:-}"
+  config="${2:-single-node}"
 
   if [[ -z "${cluster}" ]]; then
     log.usage
@@ -453,6 +442,9 @@ create() {
 
     helmfile -e local_cluster -f "${ROOT}/helmfile.d" -lapp=minio apply --output simple
   fi
+
+  log.info "applying welkin configuration for ${affix}"
+  "${ROOT}/bin/ck8s" apply "${affix}"
 
   index.state "${cluster}" "ready"
   log.info "cluster ${cluster} is ready"
