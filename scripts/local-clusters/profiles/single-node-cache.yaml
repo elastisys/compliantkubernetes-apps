@@ -49,11 +49,11 @@ nodes:
         hostPath: ${ROOT}/scripts/local-clusters/registries
         readOnly: true
     extraPortMappings:
-      - containerPort: 30080
+      - containerPort: 80
         hostPort: 80
         listenAddress: ${CK8S_LOCAL_LISTEN_ADDRESS}
         protocol: TCP
-      - containerPort: 30443
+      - containerPort: 443
         hostPort: 443
         listenAddress: ${CK8S_LOCAL_LISTEN_ADDRESS}
         protocol: TCP

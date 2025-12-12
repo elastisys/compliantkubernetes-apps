@@ -87,11 +87,17 @@ controller:
     {{- if .Values | get "ingressNginx.controller.service.type" "" | eq "LoadBalancer" }}
 
     allocateLoadBalancerNodePorts: {{ .Values.ingressNginx.controller.service.allocateLoadBalancerNodePorts }}
+    {{- with .Values | get "ingressNginx.controller.service.externalIPs" list }}
+    externalIPs: {{- toYaml . | nindent 6 }}
+    {{- end }}
     {{- with .Values | get "ingressNginx.controller.service.loadBalancerSourceRanges" list }}
     loadBalancerSourceRanges: {{- toYaml . | nindent 6 }}
     {{- end }}
     {{- with .Values | get "ingressNginx.controller.service.loadBalancerIP" "" }}
     loadBalancerIP: {{ . }}
+    {{- end }}
+    {{- if .Values.ingressNginx.controller.service.allocateLoadBalancerNodePorts }}
+    nodePorts: {{- toYaml .Values.ingressNginx.controller.service.nodePorts | nindent 6 }}
     {{- end }}
 
     {{- else if .Values | get "ingressNginx.controller.service.type" "" | eq "NodePort" }}

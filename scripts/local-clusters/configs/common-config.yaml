@@ -35,10 +35,7 @@ ingressNginx:
       annotations:
         elastisys.io/local-cluster: tests
       clusterIP: 10.96.0.20
-      type: NodePort
-      nodePorts:
-        http: 30080
-        https: 30443
+      type: LoadBalancer
       allocateLoadBalancerNodePorts: false
     config:
       useProxyProtocol: false
@@ -90,4 +87,6 @@ networkPolicies:
         - 0.0.0.0/0
   ingressNginx:
     ingressOverride:
-      enabled: false
+      enabled: true
+      ips:
+        - 0.0.0.0/0
