@@ -138,7 +138,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* && \
     ln -s /usr/bin/podman-remote /usr/bin/podman
 
-ARG KIND_VERSION="0.27.0"
+ARG KIND_VERSION="0.30.0"
 RUN curl -LOs "https://github.com/kubernetes-sigs/kind/releases/download/v${KIND_VERSION}/kind-linux-amd64" && \
     install -Tm 755 kind-linux-amd64 /usr/local/bin/kind && \
     rm kind-linux-amd64
