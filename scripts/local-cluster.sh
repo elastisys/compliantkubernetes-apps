@@ -553,7 +553,7 @@ status() {
     if [[ -f "$index_file" ]]; then
       readarray -t clusters_to_check < <(yq e 'keys | .[]' "$index_file")
     else
-      log.warn "⚠️  Index file not found. Falling back to 'kind get clusters'"
+      log.warn "⚠️  Index file not found. Using 'kind get clusters'"
       readarray -t clusters_to_check < <(kind get clusters)
     fi
   fi
@@ -646,8 +646,6 @@ status() {
   if [[ -f "${CK8S_CONFIG_PATH}/common-config.yaml" ]]; then
     local domain
     domain="$(yq e ".global.baseDomain" "${CK8S_CONFIG_PATH}/common-config.yaml")"
-    domain="${domain%\"}"
-    domain="${domain#\"}"
 
     if [[ -z "${domain}" || "${domain}" == "null" ]]; then
       log.warn "⚠️  [WARN] Could not determine baseDomain."
