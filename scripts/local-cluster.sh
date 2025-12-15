@@ -640,20 +640,7 @@ status() {
     fi
   done
 
-  # 7. Cache Status Check
-  log.info "Checking Local Cache..."
-  local cache_containers
-  cache_containers=$(docker ps --format '{{.Names}}' --filter "status=running" | grep -E "^local-cache-|^kind-registry")
-
-  if [[ -n "$cache_containers" ]]; then
-    for cache in $cache_containers; do
-      log.info "✅ [PASS] Cache container '${cache}' is running."
-    done
-  else
-    log.warn "⚠️ [WARN] No running cache containers found. Run './scripts/local-cluster.sh cache create'"
-  fi
-
-  # 8. Resolve Status
+  # 7. Resolve Status
   log.info "Checking Resolve Status..."
 
   if [[ -f "${CK8S_CONFIG_PATH}/common-config.yaml" ]]; then
