@@ -622,11 +622,9 @@ status() {
     if [[ -f "${CK8S_CONFIG_PATH}/common-config.yaml" ]]; then
       local s3_endpoint
       s3_endpoint="$(yq e ".objectStorage.s3.regionEndpoint" "${CK8S_CONFIG_PATH}/common-config.yaml")"
-      s3_endpoint="${s3_endpoint%\"}"
-      s3_endpoint="${s3_endpoint#\"}"
 
       if [[ -n "${s3_endpoint}" && "${s3_endpoint}" != "null" ]]; then
-        log.info "Testing S3 Reachability from INSIDE the cluster..."
+        log.info "Testing S3 reachability from ${cluster} the cluster..."
         set +e
         #using existing pod from the cluster to check status
         kubectl exec -it -n monitoring prometheus-kube-prometheus-stack-prometheus-0 -- wget -q --spider -S --no-check-certificate "${s3_endpoint}/minio/health/live" >/dev/null 2>&1
