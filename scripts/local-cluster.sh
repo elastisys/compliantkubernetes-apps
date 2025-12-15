@@ -541,6 +541,155 @@ delete() {
   fi
 }
 
+status() {
+  local target_cluster="${1:-}"
+
+  local index_file="${CK8S_CONFIG_PATH}/cluster-index.yaml"
+  local clusters_to_check=()
+
+  if [[ -n "$target_cluster" ]]; then
+    clusters_to_check+=("$target_cluster")
+  else
+    if [[ -f "$index_file" ]]; then
+      readarray -t clusters_to_check < <(yq e 'keys | .[]' "$index_file")
+    else
+      log.warn "⚠️  Index file not found. Falling back to 'kind get clusters'"
+      readarray -t clusters_to_check < <(kind get clusters)
+    fi
+  fi
+
+  if [[ ${#clusters_to_check[@]} -eq 0 ]]; then
+    log.error "❌ No clusters found to check."
+    return 1
+  fi
+
+  log.info "Running status checks..."
+  domain="$(yq e ".global.baseDomain" "${CK8S_CONFIG_PATH}/common-config.yaml")"
+
+  for cluster in "${clusters_to_check[@]}"; do
+    local affix=""
+    case "$cluster" in
+    *-wc) affix="wc" ;;
+    *-sc) affix="sc" ;;
+    *) ;;
+    esac
+    log.info "Checking Cluster: ${cluster}"
+
+    # 1. Cluster Status Check
+    if ! kind get clusters | grep -q "^${cluster}$"; then
+      log.fatal "❌ [FAIL] Cluster '${cluster}' is not running."
+    fi
+
+    # Load Kubeconfig
+    export KUBECONFIG="${CK8S_CONFIG_PATH}/.state/kube_config_${affix}.yaml"
+
+    # 2. Node Status Check
+    log.info "Checking Nodes..."
+    if kubectl get nodes | grep -q "NotReady"; then
+      log.error "❌ [FAIL] Some nodes are NotReady:"
+      kubectl get nodes
+    else
+      log.info "✅ [PASS] All nodes are Ready."
+    fi
+
+    # 3. Cluster Networking Check
+    log.info "Checking Networking (Calico)..."
+    if kubectl get pods -n calico-system --field-selector=status.phase!=Running 2>&1 | grep -q "No resources found"; then
+      log.info "✅ [PASS] Calico is running."
+    else
+      log.error "❌ [FAIL] Calico pods are not running. Check 'kubectl get pods -n calico-system'."
+    fi
+
+    # 4. Block Storage (Local Path) Check
+    log.info "Checking Block Storage..."
+    if kubectl get pods -n local-path-storage | grep -q "Running"; then
+      log.info "✅ [PASS] Local Path Provisioner is running."
+    else
+      log.error "❌ [FAIL] Block storage provider is missing."
+    fi
+
+    #5. Checking Storage Status
+    if [[ "$affix" == "sc" ]]; then
+      log.info "Checking Object Storage..."
+      if kubectl get ns minio-system >/dev/null 2>&1 && kubectl get pods -n minio-system | grep -q "Running"; then
+        log.info "✅ [PASS] Minio pods are running."
+      else
+        log.error "❌ [FAIL] Minio pods not found or not running. Check 'kubectl get pods -n minio-system'"
+      fi
+    fi
+
+    # 6. S3 Connectivity (Internal)
+    if [[ -f "${CK8S_CONFIG_PATH}/common-config.yaml" ]]; then
+      local s3_endpoint
+      s3_endpoint="$(yq e ".objectStorage.s3.regionEndpoint" "${CK8S_CONFIG_PATH}/common-config.yaml")"
+      s3_endpoint="${s3_endpoint%\"}"
+      s3_endpoint="${s3_endpoint#\"}"
+
+      if [[ -n "${s3_endpoint}" && "${s3_endpoint}" != "null" ]]; then
+        log.info "Testing S3 Reachability from INSIDE the cluster..."
+        set +e
+        #using existing pod from the cluster to check status
+        kubectl exec -it -n monitoring prometheus-kube-prometheus-stack-prometheus-0 -- wget -q --spider -S --no-check-certificate "${s3_endpoint}/minio/health/live" >/dev/null 2>&1
+        local check_result=$?
+        set -e
+
+        if [[ $check_result -eq 0 ]]; then
+          log.info "✅ [PASS] S3 Endpoint is reachable."
+        else
+          log.error "❌ [FAIL] S3 Endpoint (${s3_endpoint}) is NOT reachable from inside ${cluster}."
+        fi
+      fi
+    fi
+  done
+
+  # 7. Cache Status Check
+  log.info "Checking Local Cache..."
+  local cache_containers
+  cache_containers=$(docker ps --format '{{.Names}}' --filter "status=running" | grep -E "^local-cache-|^kind-registry")
+
+  if [[ -n "$cache_containers" ]]; then
+    for cache in $cache_containers; do
+      log.info "✅ [PASS] Cache container '${cache}' is running."
+    done
+  else
+    log.warn "⚠️ [WARN] No running cache containers found. Run './scripts/local-cluster.sh cache create'"
+  fi
+
+  # 8. Resolve Status
+  log.info "Checking Resolve Status..."
+
+  if [[ -f "${CK8S_CONFIG_PATH}/common-config.yaml" ]]; then
+    local domain
+    domain="$(yq e ".global.baseDomain" "${CK8S_CONFIG_PATH}/common-config.yaml")"
+    domain="${domain%\"}"
+    domain="${domain#\"}"
+
+    if [[ -z "${domain}" || "${domain}" == "null" ]]; then
+      log.warn "⚠️  [WARN] Could not determine baseDomain."
+    else
+      local expected_ip="127.0.64.43"
+      local services=("grafana" "harbor")
+
+      for svc in "${services[@]}"; do
+        local fqdn="${svc}.${domain}"
+        local resolved_ip
+        set +e
+        resolved_ip=$(getent hosts "${fqdn}" | awk '{print $1}' | head -n 1)
+
+        if [[ "$resolved_ip" == "$expected_ip" ]]; then
+          log.info "✅ [PASS] ${fqdn} resolves to ${expected_ip}."
+        else
+          log.error "❌ [FAIL] ${fqdn} resolves to '${resolved_ip}' (Expected: ${expected_ip})."
+          log.info "If empty, ensure 'resolve' container is running: ./scripts/local-clusters.sh resolve create ${domain}"
+        fi
+      done
+      set -e
+    fi
+  else
+    log.warn "⚠️  [WARN] common-config.yaml not found."
+  fi
+}
+
 main() {
   local command subcommand
   command="${1:-}"
@@ -582,6 +731,10 @@ main() {
     ;;
   create)
     create "${@:2}"
+    ;;
+  status)
+    shift
+    status "$@"
     ;;
   delete)
     delete "${@:2}"
