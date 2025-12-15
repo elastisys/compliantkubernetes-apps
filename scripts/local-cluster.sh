@@ -314,8 +314,9 @@ config() {
     pgp_key_was_unset=true
     if [[ -x "${ROOT}/bin/setup-local-gpg" ]]; then
       eval "$("${ROOT}/bin/setup-local-gpg")"
-      log.info "CK8S_PGP_FP is unset. Using temp gpgkey: ${CK8S_PGP_FP}"
+      log.info "CK8S_PGP_FP is unset. Using temporary GPP key: ${CK8S_PGP_FP}"
       log.info "Using temp GNUPGHOME: ${GNUPGHOME}"
+      log.warn "Once this is cleared you will loose the ability to decrypt the secrets for this config path."
     fi
 
     if [[ -z "${CK8S_PGP_FP:-}" ]]; then
