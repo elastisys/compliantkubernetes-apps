@@ -12,6 +12,7 @@ networking:
   serviceSubnet: 10.96.0.0/12
 nodes:
   - role: control-plane
+    image: "${KIND_NODE_IMAGE}"
     kubeadmConfigPatches:
       - |
         kind: ClusterConfiguration
@@ -42,6 +43,7 @@ nodes:
     labels:
       elastisys.io/node-group: control-plane
   - role: worker
+    image: "${KIND_NODE_IMAGE}"
     extraMounts:
       - containerPath: /etc/containerd/certs.d
         hostPath: ${ROOT}/scripts/local-clusters/registries
@@ -58,6 +60,7 @@ nodes:
     labels:
       elastisys.io/node-group: worker
   - role: worker
+    image: "${KIND_NODE_IMAGE}"
     extraMounts:
       - containerPath: /etc/containerd/certs.d
         hostPath: ${ROOT}/scripts/local-clusters/registries
@@ -65,6 +68,7 @@ nodes:
     labels:
       elastisys.io/node-group: worker
   - role: worker
+    image: "${KIND_NODE_IMAGE}"
     extraMounts:
       - containerPath: /etc/containerd/certs.d
         hostPath: ${ROOT}/scripts/local-clusters/registries
