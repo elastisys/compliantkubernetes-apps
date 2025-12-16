@@ -341,10 +341,15 @@ auto_setup() {
   local_cluster.setup dev test.dev-ck8s.com
   local_cluster.create "${cluster}" single-node-cache
 
+  log.trace "setup apply ${cluster} ${*}"
+
+  if [[ "${1}" == "--enable-crd-shim" ]]; then
+    local_cluster.enable_crd_shim
+    shift
+  fi
   local_cluster.configure_selfsigned
   local_cluster.configure_node_local_dns
 
-  log.trace "setup apply ${cluster} ${*}"
   ck8s ops helmfile "${cluster}" apply --include-transitive-needs --output simple "${@/#''/-l}"
 }
 
