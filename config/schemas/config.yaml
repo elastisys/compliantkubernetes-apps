@@ -8820,6 +8820,7 @@ properties:
   kubeVIPMonitoring:
     title: Kube-VIP Monitoring
     description: Settings for Kube-VIP ServiceMonitor
+    type: object
     properties:
       enabled:
         type: boolean
