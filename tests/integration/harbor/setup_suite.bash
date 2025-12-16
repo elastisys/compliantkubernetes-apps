@@ -11,6 +11,8 @@ setup_suite() {
 teardown_suite() {
   load "../../bats.lib.bash"
 
+  ck8s ops helm sc list -A
+
   auto_teardown sc
 }
 
