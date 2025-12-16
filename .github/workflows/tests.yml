@@ -23,14 +23,12 @@ jobs:
           - harbor
     steps:
       - name: maximize build space
-        uses: easimon/maximize-build-space@v9
-        with:
-          root-reserve-mb: 15360
-          swap-size-mb: 512
-          remove-dotnet: 'true'
-          remove-android: 'true'
-          remove-haskell: 'true'
-          remove-codeql: 'true'
+        shell: bash
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /opt/hostedtoolcache/CodeQL
       - name: checkout compliantkubernetes-apps
         uses: actions/checkout@v4
       - name: setup docker with buildx
@@ -58,7 +56,7 @@ jobs:
           df -h
           echo -e "\n=== Largest directories (top 20) ==="
           sudo du -h --max-depth=2 / 2>/dev/null | sort -hr | head -n 20
-          echo -e "\n=== Docker disk usage ==="
+          echo -e "\n=== Docker disk usage before cleanup ==="
           docker system df
           echo -e "\n=== Docker images before cleanup ==="
           docker images
@@ -76,6 +74,8 @@ jobs:
           # Remove build cache
           docker builder prune -af
 
+          echo -e "\n=== Docker disk usage after cleanup ==="
+          docker system df
           echo -e "\n=== Docker images after cleanup ==="
           docker images
           echo -e "\n=== Disk usage after cleanup ==="
