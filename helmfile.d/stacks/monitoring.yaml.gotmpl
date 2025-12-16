@@ -6,6 +6,18 @@ templates:
     labels:
       app: monitoring
 
+  monitoring-shim:
+    disableValidationOnInstall: true
+    inherit:
+      - template: monitoring
+    name: monitoring-shim
+    installed: {{ .Values | get "ck8sAnyCluster.enabled" false }}
+    needs:
+      - kube-system/admin-namespaces
+    labels:
+      shim: crds
+    chart: charts/monitoring-shim
+
   monitoring-networkpolicy:
     inherit:
       - template: monitoring
