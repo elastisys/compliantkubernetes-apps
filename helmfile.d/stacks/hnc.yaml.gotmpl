@@ -41,6 +41,10 @@ templates:
       - gatekeeper-system/gatekeeper # creates mutations
       - hnc-system/networkpolicy
       - kube-system/user-rbac # creates resources in its namespaces
+      {{- if .Values | get "prometheus.enableCRDShim" false }}
+      - monitoring/monitoring-shim # creates servicemonitors
+      {{- else }}
       - monitoring/kube-prometheus-stack # creates servicemonitors
+      {{- end }}
     values:
       - values/hnc/controller.yaml.gotmpl

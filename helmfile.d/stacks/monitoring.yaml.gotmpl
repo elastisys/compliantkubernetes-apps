@@ -74,7 +74,11 @@ templates:
     version: 0.1.0
     namespace: capi-cluster
     needs:
+      {{- if .Values | get "prometheus.enableCRDShim" false }}
+      - monitoring/monitoring-shim # creates servicemonitors
+      {{- else }}
       - monitoring/kube-prometheus-stack # creates servicemonitors
+      {{- end }}
     values:
       - values/autoscaling-monitoring.yaml.gotmpl
 
@@ -93,7 +97,11 @@ templates:
     labels:
       app: openstack-monitoring
     needs:
+      {{- if .Values | get "prometheus.enableCRDShim" false }}
+      - monitoring/monitoring-shim # creates servicemonitors and prometheusrules
+      {{- else }}
       - monitoring/kube-prometheus-stack # creates servicemonitors and prometheusrules
+      {{- end }}
     values:
       - values/openstack-monitoring.yaml.gotmpl
 
@@ -107,7 +115,11 @@ templates:
     labels:
       app: trivy-operator
     needs:
-      - monitoring/kube-prometheus-stack
+      {{- if .Values | get "prometheus.enableCRDShim" false }}
+      - monitoring/monitoring-shim # creates servicemonitors
+      {{- else }}
+      - monitoring/kube-prometheus-stack # creates servicemonitors
+      {{- end }}
     values:
       - values/trivy/trivy-operator.yaml.gotmpl
 
@@ -120,7 +132,11 @@ templates:
     version: 0.1.0
     name: s3-exporter
     needs:
+      {{- if .Values | get "prometheus.enableCRDShim" false }}
+      - monitoring/monitoring-shim # creates servicemonitors
+      {{- else }}
       - monitoring/kube-prometheus-stack # creates servicemonitors
+      {{- end }}
     values:
       - values/s3-exporter.yaml.gotmpl
 
