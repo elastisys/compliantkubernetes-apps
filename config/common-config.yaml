@@ -494,6 +494,7 @@ kubeVIPMonitoring:
   enabled: false
 
 prometheus:
+  enableCRDShim: false
   replicas: 1
   devAlertmanager:
     enabled: true

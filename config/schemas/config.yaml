@@ -4991,6 +4991,12 @@ properties:
               type: string
     additionalProperties: false
     properties:
+      enableCRDShim:
+        title: Enable the CRD shim
+        description: |-
+          Uses the monitoring-shim chart to install CRDs and break the dependency between various components and the full monitoring stack.
+        type: boolean
+        default: false
       replicas:
         title: Prometheus Relicas
         type: number
