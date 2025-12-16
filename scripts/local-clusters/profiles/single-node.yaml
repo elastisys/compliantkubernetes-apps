@@ -8,7 +8,7 @@ networking:
   serviceSubnet: 10.96.0.0/12
 nodes:
   - role: control-plane
-    image: kindest/node:v1.33.4@sha256:25a6018e48dfcaee478f4a59af81157a437f15e6e140bf103f85a2e7cd0cbbf2
+    image: "${KIND_NODE_IMAGE}"
     labels:
       elastisys.io/node-group: control-plane
     kubeadmConfigPatches:
@@ -36,7 +36,7 @@ nodes:
         containerPath: /etc/kubernetes/audit-policy/apiserver-audit-policy.yaml
         readOnly: true
   - role: worker
-    image: kindest/node:v1.33.4@sha256:25a6018e48dfcaee478f4a59af81157a437f15e6e140bf103f85a2e7cd0cbbf2
+    image: "${KIND_NODE_IMAGE}"
     extraPortMappings:
       - containerPort: 30080
         hostPort: 80

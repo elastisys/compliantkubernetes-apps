@@ -10,6 +10,10 @@ ROOT="$(dirname "${HERE}")"
 export HERE
 export ROOT
 
+# Check the kind releases page for available images, and always specify an image with its full SHA256 digest:
+# https://github.com/kubernetes-sigs/kind/releases
+export KIND_NODE_IMAGE="kindest/node:v1.33.4@sha256:25a6018e48dfcaee478f4a59af81157a437f15e6e140bf103f85a2e7cd0cbbf2"
+
 log.info.no_newline() {
   echo -en "[\e[34mck8s\e[0m] ${*}" 1>&2
 }
