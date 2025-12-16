@@ -8827,4 +8827,14 @@ properties:
               default: false
               type: boolean
         additionalProperties: false
+  kubeVIPMonitoring:
+    title: Kube-VIP Monitoring
+    description: Settings for Kube-VIP ServiceMonitor
+    type: object
+    properties:
+      enabled:
+        type: boolean
+        title: Enable Kube-VIP ServiceMonitor
+        description: Whether a ServiceMonitor for Kube-VIP is enabled.
+    additionalProperties: false
 additionalProperties: false
