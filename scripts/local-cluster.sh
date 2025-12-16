@@ -503,9 +503,11 @@ setup_node_local_dns() {
   mv -f "$CK8S_CONFIG_PATH/wc-config.yaml.new" "$CK8S_CONFIG_PATH/wc-config.yaml"
 
   if [[ -f "${CK8S_CONFIG_PATH}/.state/kube_config_sc.yaml" ]]; then
+    "$ROOT/bin/ck8s" ops helmfile sc -lshim=crds sync --include-transitive-needs
     "$ROOT/bin/ck8s" ops helmfile sc -lapp=node-local-dns apply --include-transitive-needs
   fi
   if [[ -f "${CK8S_CONFIG_PATH}/.state/kube_config_wc.yaml" ]]; then
+    "$ROOT/bin/ck8s" ops helmfile wc -lshim=crds sync --include-transitive-needs
     "$ROOT/bin/ck8s" ops helmfile wc -lapp=node-local-dns apply --include-transitive-needs
   fi
 }

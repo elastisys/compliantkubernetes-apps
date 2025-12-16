@@ -60,3 +60,7 @@ local_cluster.configure_node_local_dns() {
   declares
   "${scripts}/local-cluster.sh" setup node-local-dns
 }
+
+local_cluster.enable_crd_shim() {
+  yq.set 'common' '.prometheus.enableCRDShim' 'true'
+}
