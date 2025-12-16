@@ -54,7 +54,11 @@ templates:
       {{- end }}
       - harbor/podsecuritypolicy
       - harbor/harbor-certs
+      {{- if .Values | get "prometheus.enableCRDShim" false }}
+      - monitoring/monitoring-shim # creates servicemonitors
+      {{- else }}
       - monitoring/kube-prometheus-stack # creates servicemonitors
+      {{- end }}
     values:
       - values/harbor/harbor.yaml.gotmpl
     wait: true

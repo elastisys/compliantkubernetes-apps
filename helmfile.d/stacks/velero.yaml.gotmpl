@@ -37,7 +37,11 @@ templates:
     installed: {{ .Values | get "velero.enabled" false }}
     name: velero
     needs:
+      {{- if .Values | get "prometheus.enableCRDShim" false }}
+      - monitoring/monitoring-shim # creates servicemonitors
+      {{- else }}
       - monitoring/kube-prometheus-stack # creates servicemonitors
+      {{- end }}
       - velero/networkpolicy
       - velero/podsecuritypolicy
     values:
