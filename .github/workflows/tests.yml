@@ -108,6 +108,16 @@ jobs:
           - general
           - harbor
     steps:
+      - name: cleanup preinstalled software
+        shell: bash
+        run: |
+          echo -e "\n=== Disk usage before cleanup ==="
+          df -h
+
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+
+          echo -e "\n=== Disk usage after cleanup ==="
+          df -h
       - name: checkout compliantkubernetes-apps
         uses: actions/checkout@v4
       - name: setup docker with buildx
@@ -127,6 +137,18 @@ jobs:
           push: false
           provenance: false
           tags: compliantkubernetes-apps-tests:main
+      - name: prune docker artefacts
+        run: |
+          echo -e "\n=== Disk usage before docker prune ==="
+          df -h
+
+          docker stop $(docker ps -q)
+          docker container prune -f
+          docker volume prune -af
+          docker builder prune -af
+
+          echo -e "\n=== Disk usage after docker prune ==="
+          df -h
       - name: create local cache
         run: ./scripts/local-cluster.sh cache create
       - name: create local resolve
