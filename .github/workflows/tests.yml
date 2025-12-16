@@ -10,6 +10,22 @@ on:
       - main
 
 jobs:
+  system-info:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install inxi
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y inxi
+      - name: Run inxi in verbose mode
+        run: |
+          echo "=== Full System Information ==="
+          inxi -Fxxxz
+      - name: Run inxi with extra details
+        run: |
+          echo -e "\n=== Additional System Details ==="
+          inxi -v8
+
   unit:
     runs-on: ubuntu-latest
     env:
