@@ -53,6 +53,10 @@ templates:
     name: tekton-monitoring
     needs:
       - tekton-pipelines/tekton-pipelines
+      {{- if .Values | get "prometheus.enableCRDShim" false }}
+      - monitoring/monitoring-shim # creates servicemonitors and prometheusrules
+      {{- else }}
       - monitoring/kube-prometheus-stack # creates servicemonitors and prometheusrules
+      {{- end }}
     values:
       - values/tekton.gotmpl

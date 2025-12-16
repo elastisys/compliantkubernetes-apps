@@ -50,7 +50,11 @@ templates:
       - fluentd-system/networkpolicy
       {{- end }}
       - fluentd-system/podsecuritypolicy
+      {{- if .Values | get "prometheus.enableCRDShim" false }}
+      - monitoring/monitoring-shim # creates servicemonitors
+      {{- else }}
       - monitoring/kube-prometheus-stack # creates servicemonitors
+      {{- end }}
     values:
       - values/fluentd/aggregator-common.yaml.gotmpl
       {{- if .Values | get "ck8sManagementCluster.enabled" false }}
@@ -75,7 +79,11 @@ templates:
       - fluentd-system/networkpolicy
       {{- end }}
       - fluentd-system/podsecuritypolicy
+      {{- if .Values | get "prometheus.enableCRDShim" false }}
+      - monitoring/monitoring-shim # creates servicemonitors and prometheusrules
+      {{- else }}
       - monitoring/kube-prometheus-stack # creates servicemonitors and prometheusrules
+      {{- end }}
     values:
       - values/fluentd/forwarder-common.yaml.gotmpl
       {{- if .Values | get "ck8sManagementCluster.enabled" false }}
@@ -99,7 +107,11 @@ templates:
       - fluentd-system/networkpolicy
       {{- end }}
       - fluentd-system/podsecuritypolicy
+      {{- if .Values | get "prometheus.enableCRDShim" false }}
+      - monitoring/monitoring-shim # creates servicemonitors and prometheusrules
+      {{- else }}
       - monitoring/kube-prometheus-stack # creates servicemonitors and prometheusrules
+      {{- end }}
     hooks:
       - events: [ presync ]
         showlogs: true

@@ -61,7 +61,11 @@ templates:
     labels:
       app: node-local-dns
     needs:
-      - monitoring/kube-prometheus-stack # creates prometheus-operator/servicemonitors
+      {{- if .Values | get "prometheus.enableCRDShim" false }}
+      - monitoring/monitoring-shim # creates servicemonitors
+      {{- else }}
+      - monitoring/kube-prometheus-stack # creates servicemonitors
+      {{- end }}
     values:
       - values/node-local-dns.yaml.gotmpl
 

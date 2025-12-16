@@ -43,7 +43,11 @@ templates:
       {{- if .Values | get "ingressNginx.controller.chroot" false }}
       - kube-system/file-copier
       {{- end }}
+      {{- if .Values | get "prometheus.enableCRDShim" false }}
+      - monitoring/monitoring-shim # creates servicemonitors
+      {{- else }}
       - monitoring/kube-prometheus-stack # creates servicemonitors
+      {{- end }}
     values:
       - values/ingress-nginx.yaml.gotmpl
     wait: true

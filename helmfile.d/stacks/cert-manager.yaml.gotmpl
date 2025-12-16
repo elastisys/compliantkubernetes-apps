@@ -31,7 +31,11 @@ templates:
       {{- if .Values | get "networkPolicies.certManager.enabled" false }}
       - cert-manager/networkpolicy
       {{- end }}
+      {{- if .Values | get "prometheus.enableCRDShim" false }}
+      - monitoring/monitoring-shim # creates servicemonitors
+      {{- else }}
       - monitoring/kube-prometheus-stack # creates servicemonitors
+      {{- end }}
     values:
       - values/cert-manager.yaml.gotmpl
 

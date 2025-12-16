@@ -11,7 +11,11 @@ templates:
       app: dex
     needs:
       - kube-system/service-cluster-np
+      {{- if .Values | get "prometheus.enableCRDShim" false }}
+      - monitoring/monitoring-shim # creates servicemonitors
+      {{- else }}
       - monitoring/kube-prometheus-stack # creates servicemonitors
+      {{- end }}
     values:
       - values/dex.yaml.gotmpl
     wait: true
