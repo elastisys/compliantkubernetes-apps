@@ -7,6 +7,8 @@ templates:
     installed: {{ .Values | get "gpu.enabled" false }}
     namespace: gpu-operator
     name: nvidia-gpu-operator
+    needs:
+      - kube-system/admin-namespaces
     labels:
       app: gpu-operator
     values:
