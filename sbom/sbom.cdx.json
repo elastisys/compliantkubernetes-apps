@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:7351f4eb-6085-450a-b87d-e333a4659fe3",
+  "serialNumber": "urn:uuid:a50faa8b-843d-49bc-bfef-0231755921fa",
   "version": 1,
   "metadata": {
-    "timestamp": "2025-12-01T10:59:51Z",
+    "timestamp": "2025-12-17T07:48:55Z",
     "lifecycles": [
       {
         "phase": "build"
@@ -2199,13 +2199,13 @@
       }
     },
     {
-      "bom-ref": "pkg:helm/opensearch@2.35.0",
+      "bom-ref": "pkg:helm/opensearch@2.36.0",
       "type": "library",
       "supplier": {
         "name": "opensearch-project"
       },
       "name": "opensearch",
-      "version": "2.35.0",
+      "version": "2.36.0",
       "description": "A Helm chart for OpenSearch",
       "licenses": [
         {
@@ -2214,7 +2214,7 @@
           }
         }
       ],
-      "purl": "pkg:helm/opensearch@2.35.0",
+      "purl": "pkg:helm/opensearch@2.36.0",
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -4104,15 +4104,15 @@
       "purl": "pkg:oci/opensearchproject/opensearch@2.18.0"
     },
     {
-      "bom-ref": "pkg:oci/opensearchproject/opensearch@2.19.3?repository_url=docker.io",
+      "bom-ref": "pkg:oci/opensearchproject/opensearch@2.19.4?repository_url=docker.io",
       "type": "container",
       "supplier": {
         "name": "opensearchproject"
       },
       "name": "docker.io/opensearchproject/opensearch",
-      "version": "2.19.3",
-      "cpe": "cpe:2.3:a:opensearchproject:opensearch:2.19.3:*:*:*:*:*:*:*",
-      "purl": "pkg:oci/opensearchproject/opensearch@2.19.3?repository_url=docker.io"
+      "version": "2.19.4",
+      "cpe": "cpe:2.3:a:opensearchproject:opensearch:2.19.4:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/opensearchproject/opensearch@2.19.4?repository_url=docker.io"
     },
     {
       "bom-ref": "pkg:oci/prometheus-community/windows-exporter@0.31.3",
@@ -4406,7 +4406,7 @@
         "pkg:helm/opensearch-dashboards@2.31.0",
         "pkg:helm/opensearch-secrets@0.1.0",
         "pkg:helm/opensearch-securityadmin@0.1.0",
-        "pkg:helm/opensearch@2.35.0",
+        "pkg:helm/opensearch@2.36.0",
         "pkg:helm/openstack-monitoring@0.1.0",
         "pkg:helm/podsecuritypolicies@0.1.0",
         "pkg:helm/prometheus-alerts@0.1.1",
@@ -4993,7 +4993,7 @@
       "dependsOn": [
         "pkg:oci/elastisys/bitnami/elasticsearch-curator@5.8.4-debian-10-r235?repository_url=ghcr.io",
         "pkg:oci/elastisys/curl-jq@1.0.0?repository_url=ghcr.io",
-        "pkg:oci/opensearchproject/opensearch@2.19.3?repository_url=docker.io"
+        "pkg:oci/opensearchproject/opensearch@2.19.4?repository_url=docker.io"
       ]
     },
     {
@@ -5001,7 +5001,7 @@
       "dependsOn": [
         "pkg:oci/elastisys/bitnami/elasticsearch-curator@5.8.4-debian-10-r235?repository_url=ghcr.io",
         "pkg:oci/elastisys/curl-jq@1.0.0?repository_url=ghcr.io",
-        "pkg:oci/opensearchproject/opensearch@2.19.3?repository_url=docker.io"
+        "pkg:oci/opensearchproject/opensearch@2.19.4?repository_url=docker.io"
       ]
     },
     {
@@ -5010,7 +5010,7 @@
         "pkg:oci/elastisys/bitnami/elasticsearch-curator@5.8.4-debian-10-r235?repository_url=ghcr.io",
         "pkg:oci/elastisys/curl-jq@1.0.0?repository_url=ghcr.io",
         "pkg:oci/opensearchproject/opensearch-dashboards@2.19.3?repository_url=docker.io",
-        "pkg:oci/opensearchproject/opensearch@2.19.3?repository_url=docker.io"
+        "pkg:oci/opensearchproject/opensearch@2.19.4?repository_url=docker.io"
       ]
     },
     {
@@ -5018,7 +5018,7 @@
       "dependsOn": [
         "pkg:oci/elastisys/bitnami/elasticsearch-curator@5.8.4-debian-10-r235?repository_url=ghcr.io",
         "pkg:oci/elastisys/curl-jq@1.0.0?repository_url=ghcr.io",
-        "pkg:oci/opensearchproject/opensearch@2.19.3?repository_url=docker.io"
+        "pkg:oci/opensearchproject/opensearch@2.19.4?repository_url=docker.io"
       ]
     },
     {
@@ -5027,15 +5027,15 @@
         "pkg:oci/elastisys/bitnami/elasticsearch-curator@5.8.4-debian-10-r235?repository_url=ghcr.io",
         "pkg:oci/elastisys/curl-jq@1.0.0?repository_url=ghcr.io",
         "pkg:oci/opensearchproject/opensearch@2.18.0",
-        "pkg:oci/opensearchproject/opensearch@2.19.3?repository_url=docker.io"
+        "pkg:oci/opensearchproject/opensearch@2.19.4?repository_url=docker.io"
       ]
     },
     {
-      "ref": "pkg:helm/opensearch@2.35.0",
+      "ref": "pkg:helm/opensearch@2.36.0",
       "dependsOn": [
         "pkg:oci/elastisys/bitnami/elasticsearch-curator@5.8.4-debian-10-r235?repository_url=ghcr.io",
         "pkg:oci/elastisys/curl-jq@1.0.0?repository_url=ghcr.io",
-        "pkg:oci/opensearchproject/opensearch@2.19.3?repository_url=docker.io"
+        "pkg:oci/opensearchproject/opensearch@2.19.4?repository_url=docker.io"
       ]
     },
     {
@@ -5652,7 +5652,7 @@
       "dependsOn": []
     },
     {
-      "ref": "pkg:oci/opensearchproject/opensearch@2.19.3?repository_url=docker.io",
+      "ref": "pkg:oci/opensearchproject/opensearch@2.19.4?repository_url=docker.io",
       "dependsOn": []
     },
     {
