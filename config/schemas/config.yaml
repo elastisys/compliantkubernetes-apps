@@ -4991,6 +4991,13 @@ properties:
               type: string
     additionalProperties: false
     properties:
+      kubeResourceOvercommitAlertExclude:
+        title: Exclude Resource Overcommit Alerts
+        description: This excludes a list of strings from being picked up by both of the KubeOvercommit alerts, for example to exclude multiple node groups you can use a list with a similar style to ["control-plane","database",".*worker.*"]
+        type: array
+        items:
+          type: string
+          default: "control-plane"
       replicas:
         title: Prometheus Relicas
         type: number

@@ -10,6 +10,9 @@ prometheusJob: kube-prometheus-stack-prometheus
 operatorJob: kube-prometheus-stack-operator
 prometheusNamespace: monitoring
 
+kubeResourceOvercommitAlertExclude:
+- "control-plane"
+
 networkType: calico
 
 s3BucketAlerts:

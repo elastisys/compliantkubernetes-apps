@@ -553,6 +553,10 @@ prometheus:
     enabled: true
     groupLabel: "node-restriction.kubernetes.io/autoscaled-node-type"
     groupLabelValues: []
+  # This will exclude a list of node groups from being picked up by both of the kubeOvercommit alerts
+  # As this is a list of strings, for example to exclude multiple node groups you can use a list with a similar style to ["control-plane","database",".*worker.*"]
+  kubeResourceOvercommitAlertExclude:
+  - "control-plane"
   ## Predictive alert if the resource usage will hit the set percentage in 3 days
   capacityManagementAlerts:
     enabled: true

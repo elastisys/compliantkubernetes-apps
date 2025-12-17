@@ -19,13 +19,34 @@ spec:
     rules:
     - alert: KubeCPUOvercommit
       annotations:
-        description: Cluster has overcommitted CPU resource requests for Pods by {{`{{`}} $value {{`}}`}} CPU shares and cannot tolerate node failure.
+        description: Node group {{`{{`}} $labels.label_elastisys_io_node_group {{`}}`}} has overcommitted CPU resource requests for Pods by {{`{{`}} $value {{`}}`}} CPU shares and cannot tolerate node failure.
         runbook_url: {{ .Values.runbookUrls.kubernetesResources.KubeCPUOvercommit }}
-        summary: Cluster has overcommitted CPU resource requests.
+        summary: Node group {{`{{`}} $labels.label_elastisys_io_node_group {{`}}`}} has overcommitted CPU resource requests.
       expr: |-
-        sum(namespace_cpu:kube_pod_container_resource_requests:sum{}) by (cluster) - (sum(kube_node_status_allocatable{resource="cpu"}) by (cluster) - max(kube_node_status_allocatable{resource="cpu"}) by (cluster)) > 0
+        sum by (label_elastisys_io_node_group, cluster) (
+          cluster:namespace:pod_cpu:active:kube_pod_container_resource_requests
+            * on (node) group_left (label_elastisys_io_node_group) label_replace(kube_node_labels{label_elastisys_io_node_group!~"{{ .Values.kubeResourceOvercommitAlertExclude }}"}, "instance", "$1", "node", "(.*)")
+        )
+        -
+        (
+          sum by (label_elastisys_io_node_group, cluster) (kube_node_status_allocatable{resource="cpu"}
+            * on (node) group_left (label_elastisys_io_node_group) label_replace(kube_node_labels{label_elastisys_io_node_group!~"{{ .Values.kubeResourceOvercommitAlertExclude }}"}, "instance", "$1", "node", "(.*)"))
+          -
+          max by (label_elastisys_io_node_group, cluster) (kube_node_status_allocatable{resource="cpu"}
+            * on (node) group_left (label_elastisys_io_node_group) label_replace(kube_node_labels{label_elastisys_io_node_group!~"{{ .Values.kubeResourceOvercommitAlertExclude }}"}, "instance", "$1", "node", "(.*)"))
+        )
+        > 0
         and
-        (sum(kube_node_status_allocatable{resource="cpu"}) by (cluster) - max(kube_node_status_allocatable{resource="cpu"}) by (cluster)) > 0
+        sum by (label_elastisys_io_node_group, cluster) (
+          kube_node_status_allocatable{resource="cpu"}
+            * on (node) group_left (label_elastisys_io_node_group) label_replace(kube_node_labels{label_elastisys_io_node_group!~"{{ .Values.kubeResourceOvercommitAlertExclude }}"}, "instance", "$1", "node", "(.*)")
+        )
+        -
+        max by (label_elastisys_io_node_group, cluster) (
+          kube_node_status_allocatable{resource="cpu"}
+            * on (node) group_left (label_elastisys_io_node_group) label_replace(kube_node_labels{label_elastisys_io_node_group!~"{{ .Values.kubeResourceOvercommitAlertExclude}}"}, "instance", "$1", "node", "(.*)")
+        )
+        > 0
       for: 10m
       labels:
         severity: warning
@@ -35,13 +56,34 @@ spec:
 {{- end }}
     - alert: KubeMemoryOvercommit
       annotations:
-        description: Cluster has overcommitted memory resource requests for Pods by {{`{{`}} $value | humanize {{`}}`}} bytes and cannot tolerate node failure.
+        description: Node group {{`{{`}} $labels.label_elastisys_io_node_group {{`}}`}} has overcommitted memory resource requests for Pods by {{`{{`}} $value | humanize {{`}}`}} bytes and cannot tolerate node failure.
         runbook_url: {{ .Values.runbookUrls.kubernetesResources.KubeMemoryOvercommit }}
-        summary: Cluster has overcommitted memory resource requests.
+        summary: Node group {{`{{`}} $labels.label_elastisys_io_node_group {{`}}`}} has overcommitted memory resource requests.
       expr: |-
-        sum(namespace_memory:kube_pod_container_resource_requests:sum{}) by (cluster) - (sum(kube_node_status_allocatable{resource="memory"}) by (cluster) - max(kube_node_status_allocatable{resource="memory"}) by (cluster)) > 0
+        sum by (label_elastisys_io_node_group, cluster) (
+          cluster:namespace:pod_memory:active:kube_pod_container_resource_requests
+            * on (node) group_left (label_elastisys_io_node_group) label_replace(kube_node_labels{label_elastisys_io_node_group!~"{{ .Values.kubeResourceOvercommitAlertExclude }}"}, "instance", "$1", "node", "(.*)")
+        )
+        -
+        (
+          sum by (label_elastisys_io_node_group, cluster) (kube_node_status_allocatable{resource="memory"}
+            * on (node) group_left (label_elastisys_io_node_group) label_replace(kube_node_labels{label_elastisys_io_node_group!~"{{ .Values.kubeResourceOvercommitAlertExclude }}"}, "instance", "$1", "node", "(.*)"))
+          -
+          max by (label_elastisys_io_node_group, cluster) (kube_node_status_allocatable{resource="memory"}
+            * on (node) group_left (label_elastisys_io_node_group) label_replace(kube_node_labels{label_elastisys_io_node_group!~"{{ .Values.kubeResourceOvercommitAlertExclude }}"}, "instance", "$1", "node", "(.*)"))
+        )
+        > 0
         and
-        (sum(kube_node_status_allocatable{resource="memory"}) by (cluster) - max(kube_node_status_allocatable{resource="memory"}) by (cluster)) > 0
+        sum by (label_elastisys_io_node_group, cluster) (
+          kube_node_status_allocatable{resource="memory"}
+            * on (node) group_left (label_elastisys_io_node_group) label_replace(kube_node_labels{label_elastisys_io_node_group!~"{{ .Values.kubeResourceOvercommitAlertExclude }}"}, "instance", "$1", "node", "(.*)")
+        )
+        -
+        max by (label_elastisys_io_node_group, cluster) (
+          kube_node_status_allocatable{resource="memory"}
+            * on (node) group_left (label_elastisys_io_node_group) label_replace(kube_node_labels{label_elastisys_io_node_group!~"{{ .Values.kubeResourceOvercommitAlertExclude }}"}, "instance", "$1", "node", "(.*)")
+        )
+        > 0
       for: 10m
       labels:
         severity: warning
