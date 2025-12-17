@@ -8,7 +8,7 @@ ENV LANG="en_US.utf8"
 ARG TZ="Etc/UTC"
 
 RUN apt-get update -q=2 && \
-    apt-get install -q=2 apache2-utils curl dnsutils gettext-base git gpg iputils-ping jq locales make net-tools nodejs parallel pwgen python3-venv s3cmd ssh unzip && \
+    apt-get install -q=2 apache2-utils curl dnsutils gettext-base git gpg iputils-ping jq locales make net-tools parallel pwgen python3-venv s3cmd ssh unzip && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
     localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
@@ -137,11 +137,18 @@ RUN curl -LOs "https://github.com/vmware-tanzu/velero/releases/download/v${VELER
 
 ENV NODE_PATH="/usr/local/lib/node_modules"
 ENV PATH="${PATH}:${NODE_PATH}/.bin"
-
-COPY ./tests/package.json ./tests/package-lock.json ./
-RUN apt-get update -q=2 && apt-get install -q=2 npm && \
-    npm ci --omit dev && mv node_modules /usr/local/lib/ && \
-    apt-get autoremove --purge npm -q=2 && rm -rf /var/lib/apt/lists/* && rm -rf /root/.cache
-
 ENV CYPRESS_CACHE_FOLDER=/usr/local/lib/cypress
-RUN cypress install && cypress verify
+
+ARG BUN_VERSION="1.3.5"
+RUN curl -LOs "https://github.com/oven-sh/bun/releases/download/bun-v${BUN_VERSION}/bun-linux-x64.zip" && \
+    unzip bun-linux-x64.zip && \
+    install -Tm 755 bun-linux-x64/bun /usr/local/bin/bun && \
+    ln -sf /usr/local/bin/bun /usr/local/bin/node && \
+    rm -r bun-linux-x64.zip bun-linux-x64
+
+WORKDIR /packages
+COPY ./tests/package.json ./tests/bun.lock ./
+RUN bun install --frozen-lockfile --production && mv /packages/node_modules /usr/local/lib/
+WORKDIR /
+
+RUN cypress verify
