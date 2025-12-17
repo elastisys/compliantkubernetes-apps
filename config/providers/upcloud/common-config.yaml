@@ -2,8 +2,6 @@ storageClasses:
   default: standard
 networkPolicies:
   global:
-    externalLoadBalancer: true
-    ingressUsingHostNetwork: false
     ingressMode: ExternalProxy
   kubeSystem:
     upcloud:

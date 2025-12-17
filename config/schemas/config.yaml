@@ -1254,28 +1254,6 @@ allOf:
                       ips:
                         $ref: '#/$defs/iplist'
 - if:
-    properties:
-      networkPolicies:
-        properties:
-          ingressNginx:
-            properties:
-              ingressOverride:
-                properties:
-                  enabled:
-                    type: boolean
-                    const: true
-  then:
-    properties:
-      networkPolicies:
-        properties:
-          ingressNginx:
-            properties:
-              ingressOverride:
-                properties:
-                  ips:
-                    title: Network Policies Ingress Override IPs
-                    $ref: '#/$defs/iplist'
-- if:
     allOf:
       - properties:
           harbor:
@@ -7217,16 +7195,6 @@ properties:
         type: object
         additionalProperties: false
         properties:
-          externalLoadBalancer:
-            title: Network Policies External Load Balancer
-            description: |-
-              When enabled create Network Policy rules for ingress via external load balancer.
-            type: boolean
-          ingressUsingHostNetwork:
-            title: Network Policies Ingress Host Network
-            description: |-
-              When enabled create Network Policy rules for ingress via host network.
-            type: boolean
           ingressMode:
             title: Network Policies Ingress Mode
             description: |-
@@ -7380,8 +7348,7 @@ properties:
               - ips
             type: object
         required:
-          - externalLoadBalancer
-          - ingressUsingHostNetwork
+          - ingressMode
       ingressNginx:
         title: Network Policies Ingress NGINX
         description: Configure Ingress NGINX network policy rules.
@@ -7392,20 +7359,6 @@ properties:
             title: Network Policies Ingress NGINX Enabled
             type: boolean
             default: true
-          ingressOverride:
-            title: Network Policies Ingress Override
-            description: |-
-              Configure override to the ingress rules for Ingress NGINX.
-
-              Required when cluster ingress uses direct routing.
-            type: object
-            additionalProperties: false
-            properties:
-              enabled:
-                title: Network Policies Ingress Override Enabled
-                type: boolean
-                default: false
-              ips: true
       certManager:
         title: Network Policies cert-manager
         description: Configure cert-manager network policy rules.

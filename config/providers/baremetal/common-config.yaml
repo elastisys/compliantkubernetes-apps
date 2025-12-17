@@ -12,14 +12,9 @@ ingressNginx:
       allocateLoadBalancerNodePorts: true
 networkPolicies:
   global:
-    externalLoadBalancer: true
-    ingressUsingHostNetwork: true
     ingressMode: HostNetwork
   rookCeph:
     enabled: true
-  ingressNginx:
-    ingressOverride:
-      enabled: false
 opa:
   rejectLoadBalancerService:
     enabled: true

@@ -6,11 +6,8 @@ storageClasses:
   default: cinder-csi
 networkPolicies:
   global:
-    externalLoadBalancer: true
-    ingressUsingHostNetwork: true
-    ingressMode: DirectRouting
-    ingressDirectRoutingAllowlistPeers:
-       - cidr: 0.0.0.0/0
+    ingressMode: HostNetwork
+    ingressDirectRoutingAllowlistPeers: []
   kubeSystem:
     openstack:
       enabled: true
