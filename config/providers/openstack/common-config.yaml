@@ -13,11 +13,7 @@ networkPolicies:
         - 8774
         - 8776
   global:
-    externalLoadBalancer: false
-    ingressUsingHostNetwork: false
-  ingressNginx:
-    ingressOverride:
-      enabled: false
+    ingressMode: InternalProxy
 objectStorage:
   type: s3
   s3:

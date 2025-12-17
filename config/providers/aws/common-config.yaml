@@ -19,11 +19,9 @@ ingressNginx:
       allocateLoadBalancerNodePorts: true
 networkPolicies:
   global:
-    externalLoadBalancer: false
-    ingressUsingHostNetwork: false
-  ingressNginx:
-    ingressOverride:
-      enabled: false
+    ingressMode: DirectRouting
+    ingressDirectRoutingAllowlistPeers:
+       - cidr: 0.0.0.0/0
 opa:
   rejectLoadBalancerService:
     enabled: false

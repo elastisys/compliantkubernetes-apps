@@ -27,8 +27,6 @@ global:
   objectStorage:
     ips: {{- toYaml .Values.networkPolicies.global.objectStorage.ips | nindent 6 }}
     ports: {{- toYaml .Values.networkPolicies.global.objectStorage.ports | nindent 6 }}
-  externalLoadBalancer: {{ .Values.networkPolicies.global.externalLoadBalancer }}
-  ingressUsingHostNetwork: {{ .Values.ingressNginx.controller.useHostPort }}
   trivy:
     ips: {{- toYaml .Values.networkPolicies.global.trivy.ips | nindent 6 }}
     port: {{ .Values.networkPolicies.global.trivy.port }}

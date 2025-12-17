@@ -8,8 +8,6 @@ global:
     ips: {{- toYaml .Values.networkPolicies.global.wcIngress.ips | nindent 6 }}
   scIngress:
     ips: {{- toYaml .Values.networkPolicies.global.scIngress.ips | nindent 6 }}
-  ingressUsingHostNetwork: {{ .Values.ingressNginx.controller.useHostPort }}
-  externalLoadBalancer: {{ .Values.networkPolicies.global.externalLoadBalancer }}
 
 
   apiServerEgress:
@@ -40,11 +38,6 @@ monitoring:
 ingressNginx:
   enabled: {{ .Values.networkPolicies.ingressNginx.enabled }}
   externalTrafficPolicyLocal: {{ .Values.externalTrafficPolicy.local }}
-  ingressOverride:
-    enabled : {{ .Values.networkPolicies.ingressNginx.ingressOverride.enabled }}
-    {{- if .Values.networkPolicies.ingressNginx.ingressOverride.enabled }}
-    ips: {{- toYaml .Values.networkPolicies.ingressNginx.ingressOverride.ips | nindent 4 }}
-    {{- end }}
 
 alertmanager:
   enabled: {{ and .Values.prometheus.devAlertmanager.enabled .Values.networkPolicies.alertmanager.enabled }}

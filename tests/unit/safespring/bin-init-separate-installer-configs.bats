@@ -38,17 +38,11 @@ teardown_file() {
   env.init safespring capi prod
   test_init_successful
 
-  assert_equal "$(yq.get sc '.networkPolicies.global.externalLoadBalancer')" "false"
-  assert_equal "$(yq.get sc '.networkPolicies.global.ingressUsingHostNetwork')" "false"
-  assert_equal "$(yq.get sc '.networkPolicies.ingressNginx.ingressOverride.enabled')" "true"
-  assert_equal "$(yq.get sc '.networkPolicies.ingressNginx.ingressOverride.ips[0]')" "0.0.0.0/0"
+  assert_equal "$(yq.get sc '.networkPolicies.global.ingressMode')" "InternalProxy"
   assert_equal "$(yq.get sc '.ingressNginx.controller.service.enabled')" "true"
   assert_equal "$(yq.get sc '.ingressNginx.controller.service.type')" "LoadBalancer"
   assert_equal "$(yq.get sc '.ingressNginx.controller.useHostPort')" "false"
-  assert_equal "$(yq.get wc '.networkPolicies.global.externalLoadBalancer')" "false"
-  assert_equal "$(yq.get wc '.networkPolicies.global.ingressUsingHostNetwork')" "false"
-  assert_equal "$(yq.get wc '.networkPolicies.ingressNginx.ingressOverride.enabled')" "true"
-  assert_equal "$(yq.get wc '.networkPolicies.ingressNginx.ingressOverride.ips[0]')" "0.0.0.0/0"
+  assert_equal "$(yq.get wc '.networkPolicies.global.ingressMode')" "InternalProxy"
   assert_equal "$(yq.get wc '.ingressNginx.controller.service.enabled')" "true"
   assert_equal "$(yq.get wc '.ingressNginx.controller.service.type')" "LoadBalancer"
   assert_equal "$(yq.get wc '.ingressNginx.controller.useHostPort')" "false"
@@ -58,15 +52,11 @@ teardown_file() {
   env.init safespring kubespray prod
   test_init_successful
 
-  assert_equal "$(yq.get sc '.networkPolicies.global.externalLoadBalancer')" "true"
-  assert_equal "$(yq.get sc '.networkPolicies.global.ingressUsingHostNetwork')" "true"
-  assert_equal "$(yq.get sc '.networkPolicies.ingressNginx.ingressOverride.enabled')" "false"
+  assert_equal "$(yq.get sc '.networkPolicies.global.ingressMode')" "DirectRouting"
   assert_equal "$(yq.get sc '.ingressNginx.controller.service.enabled')" "false"
   assert_equal "$(yq.get sc '.ingressNginx.controller.service.type')" "NodePort"
   assert_equal "$(yq.get sc '.ingressNginx.controller.useHostPort')" "true"
-  assert_equal "$(yq.get wc '.networkPolicies.global.externalLoadBalancer')" "true"
-  assert_equal "$(yq.get wc '.networkPolicies.global.ingressUsingHostNetwork')" "true"
-  assert_equal "$(yq.get wc '.networkPolicies.ingressNginx.ingressOverride.enabled')" "false"
+  assert_equal "$(yq.get wc '.networkPolicies.global.ingressMode')" "DirectRouting"
   assert_equal "$(yq.get wc '.ingressNginx.controller.service.enabled')" "false"
   assert_equal "$(yq.get wc '.ingressNginx.controller.service.type')" "NodePort"
   assert_equal "$(yq.get wc '.ingressNginx.controller.useHostPort')" "true"

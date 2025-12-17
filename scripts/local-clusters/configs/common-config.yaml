@@ -60,8 +60,7 @@ networkPolicies:
     wcIngress:
       ips:
         - 0.0.0.0/0
-    externalLoadBalancer: false
-    ingressUsingHostNetwork: false
+    ingressMode: InternalProxy
     trivy:
       ips:
         - 0.0.0.0/0
@@ -88,6 +87,3 @@ networkPolicies:
     packageRegistry:
       ips:
         - 0.0.0.0/0
-  ingressNginx:
-    ingressOverride:
-      enabled: false

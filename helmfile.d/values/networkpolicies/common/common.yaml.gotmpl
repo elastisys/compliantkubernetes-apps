@@ -18,7 +18,7 @@
 
 {{- end -}}
 
-{{- if not $netpol.global.externalLoadBalancer | and $netpol.global.ingressUsingHostNetwork }}
+{{- if eq $netpol.global.ingressMode "HostNetwork" }}
 {{- $ingress = $nodes }}
 {{- end -}}
 
@@ -44,7 +44,7 @@ rules:
 
   egress-rule-ingress:
     peers:
-      {{- if or $netpol.global.externalLoadBalancer $netpol.global.ingressUsingHostNetwork | not }}
+      {{- if eq $netpol.global.ingressMode "InternalProxy" "DirectRouting" }}
       - namespaceSelectorLabels:
           kubernetes.io/metadata.name: ingress-nginx
         podSelectorLabels:
@@ -106,7 +106,7 @@ rules:
 
   ingress-rule-ingress:
     peers:
-      {{- if and $netpol.global.ingressUsingHostNetwork $nodes.ips }}
+      {{- if and (eq $netpol.global.ingressMode "HostNetwork") $nodes.ips }}
       {{- range $nodes.ips }}
       - cidr: {{ . }}
       {{- end }}
@@ -116,6 +116,29 @@ rules:
         podSelectorLabels:
           app.kubernetes.io/component: controller
           app.kubernetes.io/name: ingress-nginx
+      {{- end }}
+
+  ingress-rule-ingress-controller:
+    peers:
+      {{- if eq $netpol.global.ingressMode "HostNetwork" -}}
+      {{- range $nodes.ips }}
+      - cidr: {{ . }}
+      {{- end }}
+      {{- else if eq $netpol.global.ingressMode "InternalProxy" -}}
+      {{- range $nodes.ips }}
+      - cidr: {{ . }}
+      {{- end }}
+      {{- else if eq $netpol.global.ingressMode "ExternalProxy" -}}
+      {{- range $ingress.ips }}
+      - cidr: {{ . }}
+      {{- end }}
+      {{- else if eq $netpol.global.ingressMode "DirectRouting" -}}
+      {{- range $nodes.ips }}
+      - cidr: {{ . }}
+      {{- end }}
+      {{- with $netpol.global.ingressDirectRoutingAllowlistPeers }}
+      {{- . | toYaml | nindent 6 }}
+      {{- end }}
       {{- end }}
 
   ingress-rule-blackbox:
