@@ -501,7 +501,9 @@ allow_subnet() {
 
   # Allowing the subnet is currently only supported for clusters setup with
   # CAPI on OpenStack. Fallback on allowing individual nodes otherwise.
-  if [ "$(yq_read "${cluster}" '.global.ck8sK8sInstaller' "")" != "capi" ] || [ "$(yq_read "${cluster}" '.global.ck8sCloudProvider' "")" != "openstack" ]; then
+  if [ "$(yq_read "${cluster}" '.global.ck8sK8sInstaller' "")" != "capi" ] ||
+    { [ "$(yq_read "${cluster}" '.global.ck8sCloudProvider' "")" != "openstack" ] &&
+      [ "$(yq_read "${cluster}" '.global.ck8sCloudProvider' "")" != "elastx" ]; }; then
     allow_nodes "${cluster}" "${config_option}" "${label}"
     return
   fi
