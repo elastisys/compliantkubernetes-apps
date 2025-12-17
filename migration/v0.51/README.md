@@ -1,7 +1,7 @@
-# Upgrade to ${new_version}.x
+# Upgrade to v0.51.x
 
 > [!WARNING]
-> Upgrade only supported from ${old_version}.x.
+> Upgrade only supported from v0.50.x.
 
 <!--
 Notice to developers on writing migration steps:
@@ -58,7 +58,7 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 
     ```bash
     git pull
-    git switch -d ${new_version}.x
+    git switch -d v0.51.x
     ```
 
 1. Prepare upgrade - _non-disruptive_
@@ -66,7 +66,7 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     > _Done before maintenance window._
 
     ```bash
-    ./bin/ck8s upgrade both ${new_version} prepare
+    ./bin/ck8s upgrade both v0.51 prepare
 
     # check if the netpol IPs need to be updated
     ./bin/ck8s update-ips both dry-run
@@ -78,8 +78,8 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     > It is possible to upgrade `wc` and `sc` clusters separately by replacing `both` when running the `upgrade` command, e.g. the following will only upgrade the workload cluster:
 
     ```bash
-    ./bin/ck8s upgrade wc ${new_version} prepare
-    ./bin/ck8s upgrade wc ${new_version} apply
+    ./bin/ck8s upgrade wc v0.51 prepare
+    ./bin/ck8s upgrade wc v0.51 apply
     ```
 
 1. Apply upgrade - _disruptive_
@@ -88,12 +88,12 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 
     ```bash
     # Check which changes are going to be applied
-    ./bin/ck8s upgrade both ${new_version} apply --dry-run
+    ./bin/ck8s upgrade both v0.51 apply --dry-run
     ```
 
     ```bash
     # If you agree with the changes, continue with apply
-    ./bin/ck8s upgrade both ${new_version} apply
+    ./bin/ck8s upgrade both v0.51 apply
     ```
 
 ## Manual method
@@ -106,7 +106,7 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 
     ```bash
     git pull
-    git switch -d ${new_version}.x
+    git switch -d v0.51.x
     ```
 
 1. Set whether or not upgrade should be prepared for `both` clusters or for one of `sc` or `wc`:
@@ -122,7 +122,7 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ```bash
     ./bin/ck8s init ${CK8S_CLUSTER}
     # or
-    ./migration/${new_version}/prepare/50-init.sh
+    ./migration/v0.51/prepare/50-init.sh
 
     # check if the netpol IPs need to be updated
     ./bin/ck8s update-ips ${CK8S_CLUSTER} dry-run
@@ -145,14 +145,14 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ```bash
     # Check the changes of each applicable migration script
     export CK8S_DRY_RUN_INSTALL=true
-    ./migration/${new_version}/apply/${script} execute
+    ./migration/v0.51/apply/${script} execute
     ```
 
     ```bash
     unset CK8S_DRY_RUN_INSTALL
     ./bin/ck8s apply {sc|wc}
     # or
-    ./migration/${new_version}/apply/80-apply.sh execute
+    ./migration/v0.51/apply/80-apply.sh execute
     ```
 
 ## Postrequisite
