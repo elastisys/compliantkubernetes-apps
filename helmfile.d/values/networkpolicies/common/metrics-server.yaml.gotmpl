@@ -1,0 +1,15 @@
+policies:
+  kube-system:
+    metrics-server:
+      podSelectorLabels:
+        app.kubernetes.io/name: metrics-server
+      ingress:
+        - rule: ingress-rule-apiserver
+          ports:
+            - tcp: 8443
+      egress:
+        - rule: egress-rule-dns
+        - rule: egress-rule-apiserver
+        - rule: egress-rule-nodes
+          ports:
+            - tcp: 10250
