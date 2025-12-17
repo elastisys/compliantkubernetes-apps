@@ -1,0 +1,161 @@
+{{- define "old-style.rule.gen" -}}{{- if and .ips .ports -}}
+{{- $peers := list }}{{ range .ips }}{{ $peers = dict "cidr" . | append $peers }}{{ end -}}
+{{- $ports := list }}{{ range .ports }}{{ $ports = dict "tcp" . | append $ports }}{{ end -}}
+{{- dict "peers" $peers "ports" $ports | toYaml | trim -}}
+{{- end -}}{{- end -}}
+
+rules:
+  ingress-egress-rule-opensearch:
+    peers:
+      - podSelectorLabels:
+          app.kubernetes.io/component: opensearch-master
+      - podSelectorLabels:
+          app.kubernetes.io/component: opensearch-data
+      - podSelectorLabels:
+          app.kubernetes.io/component: opensearch-client
+    ports:
+      - tcp: 9300
+
+  egress-rule-plugins:
+    {{- include "old-style.rule.gen" .Values.networkPolicies.opensearch.plugins | nindent 4 }}
+
+  egress-rule-master:
+    peers:
+      - podSelectorLabels:
+          app.kubernetes.io/component: opensearch-master
+    ports:
+      - tcp: 9200
+
+  egress-rule-dashboards:
+    peers:
+      - podSelectorLabels:
+          app.kubernetes.io/name: opensearch-dashboards
+    ports:
+      - tcp: 5601
+
+  egress-rule-dex:
+    peers:
+      - podSelectorLabels:
+          app.kubernetes.io/name: dex
+          app.kubernetes.io/instance: dex
+      - namespaceSelectorLabels:
+          kubernetes.io/metadata.name: dex
+    ports:
+      - tcp: 5556
+
+policies:
+  opensearch-system:
+    all-deny:
+      podSelectorLabels: {}
+      egress: {}
+      ingress: {}
+
+    master:
+      podSelectorLabels:
+        app.kubernetes.io/component: opensearch-master
+      ingress:
+        - rule: ingress-egress-rule-opensearch
+        {{- if not .Values.opensearch.clientNode.dedicatedPods }}
+        - rule: ingress-rule-ingress
+          ports:
+            - tcp: 9200
+        {{- end }}
+        - name: ingress-rule-common-master
+          peers:
+            - podSelectorLabels:
+                app.kubernetes.io/instance: opensearch-curator
+            - podSelectorLabels:
+                app.kubernetes.io/name: opensearch-dashboards
+            - podSelectorLabels:
+                app.kubernetes.io/name: prometheus-elasticsearch-exporter
+            - podSelectorLabels:
+                app: configurer
+            - podSelectorLabels:
+                app.kubernetes.io/instance: opensearch-securityadmin
+          ports:
+            - tcp: 9200
+      egress:
+        - rule: ingress-egress-rule-opensearch
+        - rule: egress-rule-object-storage
+        - rule: egress-rule-ingress
+        - rule: egress-rule-plugins
+        - rule: egress-rule-dns
+        - rule: egress-rule-dex
+
+    client:
+      podSelectorLabels:
+        app.kubernetes.io/component: opensearch-client
+      ingress:
+        - rule: ingress-egress-rule-opensearch
+        - rule: ingress-rule-ingress
+          ports:
+            - tcp: 9200
+      egress:
+        - rule: ingress-egress-rule-opensearch
+        - rule: egress-rule-object-storage
+        - rule: egress-rule-plugins
+        - rule: egress-rule-dns
+
+    data:
+      podSelectorLabels:
+        app.kubernetes.io/component: opensearch-data
+      ingress:
+        - rule: ingress-egress-rule-opensearch
+      egress:
+        - rule: ingress-egress-rule-opensearch
+        - rule: egress-rule-object-storage
+        - rule: egress-rule-plugins
+        - rule: egress-rule-dns
+
+    dashboard:
+      podSelectorLabels:
+        app.kubernetes.io/name: opensearch-dashboards
+      ingress:
+        - rule: ingress-rule-ingress
+          ports:
+            - tcp: 5601
+        - name: ingress-rule-configurer
+          peers:
+            - podSelectorLabels:
+                app: configurer
+          ports:
+            - tcp: 5601
+      egress:
+        - rule: egress-rule-master
+        - rule: egress-rule-ingress
+        - rule: egress-rule-dns
+        - rule: egress-rule-dex
+
+
+    configurer:
+      podSelectorLabels:
+        app: configurer
+      egress:
+        - rule: egress-rule-dashboards
+        - rule: egress-rule-master
+        - rule: egress-rule-dns
+
+    curator:
+      podSelectorLabels:
+        app.kubernetes.io/instance: opensearch-curator
+      egress:
+        - rule: egress-rule-master
+        - rule: egress-rule-dns
+
+    security-admin:
+      podSelectorLabels:
+        app.kubernetes.io/instance: opensearch-securityadmin
+      egress:
+        - rule: egress-rule-master
+        - rule: egress-rule-dns
+
+    prometheus-exporter:
+      podSelectorLabels:
+        app.kubernetes.io/name: prometheus-elasticsearch-exporter
+      ingress:
+        - rule: ingress-rule-prometheus
+          ports:
+            - tcp: 9108
+      egress:
+        - rule: egress-rule-master
+        - rule: egress-rule-dns
