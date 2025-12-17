@@ -1,12 +1,3 @@
-# Container to install npm dependencies
-FROM ubuntu:24.04 AS node-deps
-
-RUN apt-get update && apt-get install -y npm && apt-get clean && rm -rf /var/lib/apt/lists/*
-
-WORKDIR /welkin-test
-COPY ./tests/package.json ./tests/package-lock.json ./
-RUN npm install --global --omit dev
-
 # Container to run unit tests
 FROM ubuntu:24.04 AS unit
 LABEL org.opencontainers.image.source=https://github.com/elastisys/compliantkubernetes-apps
@@ -16,14 +7,11 @@ ENV LANGUAGE="en"
 ENV LANG="en_US.utf8"
 ARG TZ="Etc/UTC"
 
-RUN apt-get update && \
-    apt-get upgrade -y && \
-    apt-get install -y apache2-utils curl dnsutils gettext-base git gpg iputils-ping jq locales make net-tools nodejs parallel pwgen python3-venv s3cmd ssh unzip && \
+RUN apt-get update -q=2 && \
+    apt-get install -q=2 apache2-utils curl dnsutils gettext-base git gpg iputils-ping jq locales make net-tools nodejs parallel pwgen python3-venv s3cmd ssh unzip && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
     localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
-
-ENV NODE_PATH="/usr/local/lib/node_modules"
 
 ARG GOMPLATE_VERSION="4.3.1"
 RUN curl -LOs "https://github.com/hairyhenderson/gomplate/releases/download/v${GOMPLATE_VERSION}/gomplate_linux-amd64" && \
@@ -110,9 +98,7 @@ RUN git clone --depth 1 --recurse-submodules --shallow-submodules https://github
     /opt/docs-venv/bin/python -m pip install --upgrade pip && \
     cd "${DOCS_PATH}" && \
     /opt/docs-venv/bin/pip install --no-cache-dir -r requirements.txt
-
-ENV PATH="/opt/docs-venv/bin:${PATH}:/usr/local/lib/node_modules/.bin"
-COPY --from=node-deps /usr/local/lib/node_modules/welkin-test/node_modules /usr/local/lib/node_modules
+ENV PATH="/opt/docs-venv/bin:${PATH}"
 
 # Container to run integration and end-to-end tests
 FROM unit AS main
@@ -130,8 +116,8 @@ Architectures: $(dpkg --print-architecture) \n\
 Signed-by: /etc/apt/keyrings/microsoft.gpg" | tee /etc/apt/sources.list.d/azure-cli.sources
 
 ARG AZ_VERSION=2.63.0
-RUN apt-get update && \
-    apt-get install -y azure-cli=${AZ_VERSION}-1~${DIST} buildah docker.io libasound2t64 libatk1.0-0 libatk-bridge2.0-0 libcanberra-gtk-module \
+RUN apt-get update -q=2 && \
+    apt-get install -q=2 azure-cli=${AZ_VERSION}-1~${DIST} buildah docker.io libasound2t64 libatk1.0-0 libatk-bridge2.0-0 libcanberra-gtk-module \
     libcanberra-gtk3-module libcups2 libgbm-dev libgbm1 libglib2.0-0 libgtk2.0-0 libgtk2.0-0t64 libgtk-3-0 \
     libgtk-3-0t64 libnotify-dev libnss3 libxss1 libxtst6 podman-remote skopeo socat xauth xvfb zstd && \
     apt-get clean && \
@@ -149,6 +135,13 @@ RUN curl -LOs "https://github.com/vmware-tanzu/velero/releases/download/v${VELER
     install -Tm 755 "velero-v${VELERO_VERSION}-linux-amd64/velero" /usr/local/bin/velero && \
     rm -r "velero-v${VELERO_VERSION}-linux-amd64.tar.gz" "velero-v${VELERO_VERSION}-linux-amd64"
 
-ENV PATH="$PATH:/usr/local/lib/node_modules/.bin"
+ENV NODE_PATH="/usr/local/lib/node_modules"
+ENV PATH="${PATH}:${NODE_PATH}/.bin"
+
+COPY ./tests/package.json ./tests/package-lock.json ./
+RUN apt-get update -q=2 && apt-get install -q=2 npm && \
+    npm ci --omit dev && mv node_modules /usr/local/lib/ && \
+    apt-get autoremove --purge npm -q=2 && rm -rf /var/lib/apt/lists/* && rm -rf /root/.cache
+
 ENV CYPRESS_CACHE_FOLDER=/usr/local/lib/cypress
 RUN cypress install && cypress verify
