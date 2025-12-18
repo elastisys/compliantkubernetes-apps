@@ -116,6 +116,10 @@ rules:
         podSelectorLabels:
           app.kubernetes.io/component: controller
           app.kubernetes.io/name: ingress-nginx
+      - namespaceSelectorLabels:
+          kubernetes.io/metadata.name: traefik-system
+        podSelectorLabels:
+          app.kubernetes.io/name: traefik
       {{- end }}
 
   ingress-rule-blackbox:
