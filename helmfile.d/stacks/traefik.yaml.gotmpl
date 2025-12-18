@@ -1,0 +1,27 @@
+---
+templates:
+  traefik:
+    condition: ck8sAnyCluster.enabled
+    namespace: traefik-system
+    labels:
+      app: traefik
+
+  traefik-proxy:
+    inherit: [ template: traefik ]
+    name: traefik
+    chart: upstream/traefik/traefik
+    version: v37.4.0
+    needs:
+      - kube-system/admin-namespaces
+    values:
+      - values/traefik/traefik.yaml.gotmpl
+
+  traefik-middleware:
+    inherit: [ template: traefik ]
+    name: traefik-middleware
+    chart: charts/traefik-middleware
+    version: v37.4.0
+    needs:
+      - traefik-system/traefik
+    values:
+      - values/traefik/middleware.yaml.gotmpl

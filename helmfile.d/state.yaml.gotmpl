@@ -31,6 +31,7 @@ bases:
   - stacks/tekton.yaml.gotmpl
   - stacks/thanos.yaml.gotmpl
   - stacks/velero.yaml.gotmpl
+  - stacks/traefik.yaml.gotmpl
 ---
 releases:
   - inherit: [ template: tigera ]
@@ -87,6 +88,9 @@ releases:
   - inherit: [ template: ingress-nginx-controller ]
   - inherit: [ template: ingress-nginx-probe-ingress ]
   - inherit: [ template: ingress-nginx-networkpolicy ]
+
+  - inherit: [ template: traefik-proxy ]
+  - inherit: [ template: traefik-middleware ]
 
   - inherit: [ template: prometheus-blackbox-exporter ]
   - inherit: [ template: prometheus-sc-monitors ]

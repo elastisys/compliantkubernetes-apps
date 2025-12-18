@@ -1,0 +1,32 @@
+deployment:
+  kind: DaemonSet
+
+# ingressClass:
+#   isDefaultClass: false
+
+# service:
+#   spec:
+#     externalTrafficPolicy: Local
+#   enabled: true
+#   type: LoadBalancer
+
+# ports:
+#   web:
+#     redirections: # Redirect http to https
+#       entryPoint:
+#         to: websecure
+#         scheme: https
+#         permanent: true
+
+providers:
+  kubernetesIngressNginx:
+    enabled: true
+
+securityContext:
+  seccompProfile:
+    type: RuntimeDefault
+
+metrics:
+  prometheus:
+    serviceMonitor:
+      enabled: true
