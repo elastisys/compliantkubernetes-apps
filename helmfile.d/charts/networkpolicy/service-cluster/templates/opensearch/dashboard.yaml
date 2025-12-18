@@ -26,6 +26,12 @@ spec:
             matchLabels:
               app.kubernetes.io/component: controller
               app.kubernetes.io/instance: ingress-nginx
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: traefik-system
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: traefik
       {{- end }}
         - podSelector:
             matchLabels:
@@ -73,6 +79,12 @@ spec:
             matchLabels:
               app.kubernetes.io/component: controller
               app.kubernetes.io/instance: ingress-nginx
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: traefik-system
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: traefik
       {{- end }}
       ports:
         - protocol: TCP
