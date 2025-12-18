@@ -13,7 +13,7 @@ objectStorage:
   type: s3
   s3:
     region: local
-    regionEndpoint: http://minio.minio-system.svc.cluster.local:9000
+    regionEndpoint: http://minio.${domain}:30080
     forcePathStyle: true
 calicoAccountant:
   backend: nftables
@@ -50,7 +50,8 @@ networkPolicies:
       ips:
         - 0.0.0.0/0
       ports:
-        - 9000
+        - 30080
+        - 80
     scIngress:
       ips:
         - 0.0.0.0/0

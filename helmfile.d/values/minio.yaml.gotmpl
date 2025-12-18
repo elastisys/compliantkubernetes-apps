@@ -14,3 +14,9 @@ buckets:
   {{- range $key, $value := .Values.objectStorage.buckets }}
   - name: {{ $value }}
   {{- end }}
+
+ingress:
+  enabled: true
+  ingressClassName: nginx
+  hosts:
+    - minio.{{ .Values.global.baseDomain }}
