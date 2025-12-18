@@ -35,6 +35,8 @@ repositories:
 
   nvidia: https://helm.ngc.nvidia.com/nvidia
 
+  traefik: https://traefik.github.io/charts
+
 charts:
   aquasecurity/trivy-operator: 0.26.0
 
@@ -74,3 +76,5 @@ charts:
   vmware-tanzu/velero: 10.0.11
 
   nvidia/gpu-operator: v24.9.2
+
+  traefik/traefik: v37.4.0
