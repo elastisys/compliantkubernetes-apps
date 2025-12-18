@@ -62,4 +62,8 @@ templates:
     name: gatekeeper-metrics
     needs:
       - gatekeeper-system/gatekeeper
+      {{- if .Values | get "prometheus.enableCRDShim" false }}
+      - monitoring/monitoring-shim # creates servicemonitors
+      {{- else }}
       - monitoring/kube-prometheus-stack # creates servicemonitors
+      {{- end }}

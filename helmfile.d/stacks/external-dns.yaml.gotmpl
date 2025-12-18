@@ -41,7 +41,11 @@ templates:
       {{- if .Values | get "networkPolicies.externalDns.enabled" false }}
       - external-dns/networkpolicy
       {{- end }}
+      {{- if .Values | get "prometheus.enableCRDShim" false }}
+      - monitoring/monitoring-shim # creates servicemonitors
+      {{- else }}
       - monitoring/kube-prometheus-stack # creates servicemonitors
+      {{- end }}
     values:
       - values/external-dns/external-dns.yaml.gotmpl
 

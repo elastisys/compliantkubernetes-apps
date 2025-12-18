@@ -18,7 +18,11 @@ templates:
     version: 0.1.0
     name: calico-accountant
     needs:
+      {{- if .Values | get "prometheus.enableCRDShim" false }}
+      - monitoring/monitoring-shim # creates servicemonitors
+      {{- else }}
       - monitoring/kube-prometheus-stack # creates servicemonitors
+      {{- end }}
     values:
       - values/calico-accountant.yaml.gotmpl
 
@@ -40,6 +44,10 @@ templates:
     version: 0.1.0
     name: calico-felix-metrics
     needs:
+      {{- if .Values | get "prometheus.enableCRDShim" false }}
+      - monitoring/monitoring-shim # creates servicemonitors
+      {{- else }}
       - monitoring/kube-prometheus-stack # creates servicemonitors
+      {{- end }}
     values:
       - values/calico-felix-metrics.yaml.gotmpl

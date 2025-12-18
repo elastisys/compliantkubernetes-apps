@@ -5,11 +5,13 @@ setup_suite() {
 
   load "../../bats.lib.bash"
 
-  auto_setup sc app=cert-manager app=dex app=harbor app=ingress-nginx app=node-local-dns
+  auto_setup sc --enable-crd-shim app=cert-manager app=dex app=harbor app=ingress-nginx app=node-local-dns
 }
 
 teardown_suite() {
   load "../../bats.lib.bash"
+
+  ck8s ops helm sc list -A
 
   auto_teardown sc
 }

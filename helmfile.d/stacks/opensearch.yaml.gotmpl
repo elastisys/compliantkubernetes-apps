@@ -147,7 +147,11 @@ templates:
     installed: {{ and (.Values | get "ck8sManagementCluster.enabled" false) (.Values | get "opensearch.enabled" false) }}
     name: prometheus-opensearch-exporter
     needs:
-      - monitoring/kube-prometheus-stack
+      {{- if .Values | get "prometheus.enableCRDShim" false }}
+      - monitoring/monitoring-shim # creates servicemonitors
+      {{- else }}
+      - monitoring/kube-prometheus-stack # creates servicemonitors
+      {{- end }}
       - opensearch-system/opensearch-configurer
     values:
       - values/prometheus-opensearch-exporter.yaml.gotmpl

@@ -39,7 +39,11 @@ templates:
     installed: {{ .Values | get "falco.enabled" false }}
     name: falco
     needs:
+      {{- if .Values | get "prometheus.enableCRDShim" false }}
+      - monitoring/monitoring-shim # creates servicemonitors
+      {{- else }}
       - monitoring/kube-prometheus-stack # creates servicemonitors
+      {{- end }}
       {{- if .Values | get "networkPolicies.falco.enabled" false }}
       - falco/networkpolicy
       {{- end }}
