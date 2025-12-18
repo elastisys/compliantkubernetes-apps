@@ -284,22 +284,16 @@ resolve() {
 }
 
 config() {
-  local name flavor domain ops_prefix self_signed="false" share_object_storage="false"
+  local name flavor domain ops_prefix self_signed="false"
   name="${1:-}"
   flavor="${2:-}"
   domain="${3:-}"
   if [[ "${4:-}" != "--self-signed" ]]; then
     ops_prefix="${4:-"ops"}"
   fi
-
-  for arg in "${@:4}"; do
-    if [[ "$arg" == "--self-signed" ]]; then
-      self_signed="true"
-    fi
-    if [[ "$arg" == "--share-object-storage" ]]; then
-      share_object_storage="true"
-    fi
-  done
+  if [[ "${4:-}" == "--self-signed" ]] || [[ "${5:-}" == "--self-signed" ]]; then
+    self_signed="true"
+  fi
 
   export name
   export domain
@@ -363,26 +357,12 @@ config() {
   fi
 
   "${ROOT}/bin/ck8s" init both
-  log.info "Adding Shared object storage configs"
-  if [[ "${share_object_storage}" == "true" ]]; then
-    log.info "Configuring shared object storage endpoint for Minio"
-    yq -Pi ".objectStorage.s3.regionEndpoint = \"http://minio.${domain}:30080\"" "${CK8S_CONFIG_PATH}/common-config.yaml"
-    yq -Pi '.networkPolicies.global.objectStorage.ports[0] = 30080' "${CK8S_CONFIG_PATH}/common-config.yaml"
-    yq -Pi '.networkPolicies.global.objectStorage.ports[1] = 80' "${CK8S_CONFIG_PATH}/common-config.yaml"
-    yq -Pi '.networkPolicies.ingressNginx.ingressOverride.enabled = false' "${CK8S_CONFIG_PATH}/common-config.yaml"
-  fi
 }
 
 create() {
-  local cluster config affix share_object_storage=false
+  local cluster config affix
   cluster="${1:-}"
   config="${2:-}"
-
-  for arg in "${@:3}"; do
-    if [[ "$arg" == "--share-object-storage" ]]; then
-      share_object_storage="true"
-    fi
-  done
 
   if [[ -z "${cluster}" ]]; then
     log.usage
@@ -472,6 +452,10 @@ create() {
     helmfile -e local_cluster -f "${ROOT}/helmfile.d" -lapp=tigera apply --output simple
   fi
 
+  #install ingress-nginx
+  log.info "Installing ingress-nginx in SC"
+  "${ROOT}/bin/ck8s" ops helmfile sc -lapp=ingress-nginx apply --include-transitive-needs --output simple
+
   # install s3
   if ! [[ "${*}" =~ --skip-minio ]]; then
     log.info "installing minio"
@@ -481,18 +465,6 @@ create() {
     kubectl label namespace minio-system owner=operator
 
     helmfile -e local_cluster -f "${ROOT}/helmfile.d" -lapp=minio apply --output simple
-  fi
-
-  if [[ "${share_object_storage}" == "true" ]]; then
-    log.info "Installing ingress-nginx in service cluster for shared object storage"
-    "${ROOT}/bin/ck8s" ops helmfile sc -lapp=ingress-nginx apply --include-transitive-needs --output simple
-    log.info "Enabling Ingress in Minio"
-    domain="$(yq ".global.baseDomain" <"${CK8S_CONFIG_PATH}/common-config.yaml")"
-    "${ROOT}/bin/ck8s" ops helm sc upgrade -n minio-system minio "${ROOT}/helmfile.d/upstream/minio/minio" \
-      --reuse-values \
-      --set ingress.enabled=true \
-      --set ingress.ingressClassName=nginx \
-      --set ingress.hosts[0]=minio."${domain}"
   fi
 
   index.state "${cluster}" "ready"

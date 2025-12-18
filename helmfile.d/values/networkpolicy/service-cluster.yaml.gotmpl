@@ -81,3 +81,14 @@ dex:
   connectors:
     ips: {{- toYaml .Values.networkPolicies.dex.connectors.ips | nindent 6 }}
     ports: {{- toYaml .Values.networkPolicies.dex.connectors.ports | nindent 6 }}
+
+{{- with .Values.objectStorage }}
+{{- if and
+  (eq .type "s3")
+  (.s3.regionEndpoint | hasPrefix "http://minio.")
+  (eq .s3.region "local")
+}}
+objectStorage:
+  localEnabled: true
+{{- end }}
+{{- end }}
