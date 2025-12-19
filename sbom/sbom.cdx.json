@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:6b81f7db-087c-436b-ba19-7f4dc90c35d3",
+  "serialNumber": "urn:uuid:ef2f5428-95c4-4818-afc5-de2b1d7a77ef",
   "version": 1,
   "metadata": {
-    "timestamp": "2025-11-04T11:59:08Z",
+    "timestamp": "2025-12-19T16:42:21Z",
     "lifecycles": [
       {
         "phase": "build"
@@ -33,10 +33,10 @@
       }
     ],
     "component": {
-      "bom-ref": "pkg:generic/compliantkubernetes-apps@v0.50.0",
+      "bom-ref": "pkg:generic/compliantkubernetes-apps@latest",
       "type": "application",
       "name": "compliantkubernetes-apps",
-      "version": "v0.50.0",
+      "version": "latest",
       "licenses": [
         {
           "license": {
@@ -44,11 +44,11 @@
           }
         }
       ],
-      "purl": "pkg:generic/compliantkubernetes-apps@v0.50.0",
+      "purl": "pkg:generic/compliantkubernetes-apps@latest",
       "properties": [
         {
           "name": "vcs:tag",
-          "value": "v0.50.0"
+          "value": "latest"
         }
       ]
     },
@@ -2602,6 +2602,68 @@
       }
     },
     {
+      "bom-ref": "pkg:helm/traefik-middleware@0.1.0",
+      "type": "library",
+      "supplier": {
+        "name": "Elastisys"
+      },
+      "name": "traefik-middleware",
+      "version": "0.1.0",
+      "description": "A Helm chart for",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "purl": "pkg:helm/traefik-middleware@0.1.0",
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "Not evaluated"
+        }
+      ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/traefik-middleware"
+          }
+        ]
+      }
+    },
+    {
+      "bom-ref": "pkg:helm/traefik@38.0.0",
+      "type": "library",
+      "supplier": {
+        "name": "traefik"
+      },
+      "name": "traefik",
+      "version": "38.0.0",
+      "description": "A Traefik based Kubernetes ingress controller",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "purl": "pkg:helm/traefik@38.0.0",
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "Not evaluated"
+        }
+      ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/traefik/traefik"
+          }
+        ]
+      }
+    },
+    {
       "bom-ref": "pkg:helm/trivy-operator@0.26.0",
       "type": "library",
       "supplier": {
@@ -4101,6 +4163,28 @@
       "purl": "pkg:oci/thanos/thanos@v0.39.2"
     },
     {
+      "bom-ref": "pkg:oci/traefik-hub@latest",
+      "type": "container",
+      "supplier": {
+        "name": "traefik-hub"
+      },
+      "name": "traefik-hub",
+      "version": "latest",
+      "cpe": "cpe:2.3:a:traefik-hub:traefik-hub:*:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/traefik-hub@latest"
+    },
+    {
+      "bom-ref": "pkg:oci/traefik@latest",
+      "type": "container",
+      "supplier": {
+        "name": "traefik"
+      },
+      "name": "traefik",
+      "version": "latest",
+      "cpe": "cpe:2.3:a:traefik:traefik:*:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/traefik@latest"
+    },
+    {
       "bom-ref": "pkg:oci/velero/velero-plugin-for-aws@v1.9.0?repository_url=docker.io",
       "type": "container",
       "supplier": {
@@ -4169,7 +4253,7 @@
   ],
   "dependencies": [
     {
-      "ref": "pkg:generic/compliantkubernetes-apps@v0.50.0",
+      "ref": "pkg:generic/compliantkubernetes-apps@latest",
       "dependsOn": [
         "pkg:helm/autoscaling-monitoring@0.1.0",
         "pkg:helm/calico-accountant@0.1.1",
@@ -4252,6 +4336,8 @@
         "pkg:helm/thanos-ruler@0.1.0",
         "pkg:helm/thanos@15.13.1",
         "pkg:helm/tigera-operator@v3.26.4",
+        "pkg:helm/traefik-middleware@0.1.0",
+        "pkg:helm/traefik@38.0.0",
         "pkg:helm/trivy-operator@0.26.0",
         "pkg:helm/user-crds@0.1.0",
         "pkg:helm/user-rbac@0.1.0",
@@ -4954,6 +5040,17 @@
       ]
     },
     {
+      "ref": "pkg:helm/traefik-middleware@0.1.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:helm/traefik@38.0.0",
+      "dependsOn": [
+        "pkg:oci/traefik-hub@latest",
+        "pkg:oci/traefik@latest"
+      ]
+    },
+    {
       "ref": "pkg:helm/trivy-operator@0.26.0",
       "dependsOn": [
         "pkg:oci/aquasec/trivy-checks@1",
@@ -5480,6 +5577,14 @@
     },
     {
       "ref": "pkg:oci/thanos/thanos@v0.39.2",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:oci/traefik-hub@latest",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:oci/traefik@latest",
       "dependsOn": []
     },
     {
