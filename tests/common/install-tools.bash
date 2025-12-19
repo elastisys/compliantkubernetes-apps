@@ -7,7 +7,7 @@ trap 'rm -rf $TMPDIR' EXIT
 cd "$TMPDIR"
 
 # --------- Installers for the 'unit' stage ----------
-# NOTE: functions prefixed with 'unit_install_' will be automatically executed by the 'do_unit' wrapper.
+# NOTE: functions prefixed with 'unit_install_' will be automatically executed in the 'unit' stage.
 
 unit_install_bats() {
   _parse_version "${BATS_CORE_VERSION}"
@@ -133,7 +133,7 @@ unit_install_yq() {
 }
 
 # --------- Installers for the 'main' stage ----------
-# NOTE: functions prefixed with 'main_install_' will be automatically executed by the 'do_main' wrapper.
+# NOTE: functions prefixed with 'main_install_' will be automatically executed in the 'main' stage.
 
 main_install_kind() {
   _parse_version "${KIND_VERSION}"
@@ -186,23 +186,37 @@ _parse_version() {
   SHA="${1#*@sha256:}"
 }
 
-# Re-export shell options so we fail on error
-export SHELLOPTS TMPDIR
+usage() {
+  echo "fatal: You must specify a stage to install.
 
-# Export all utility + installer functions
-mapfile -t _unit_installer_fns < <(declare -F | grep -oP '.+\Kunit_install_.+')
-mapfile -t _main_installer_fns < <(declare -F | grep -oP '.+\Kmain_install_.+')
-export -f _git_clone_revision _parse_version "${_unit_installer_fns[@]}" "${_main_installer_fns[@]}"
+usage: $0 <stage>
 
-do_unit() {
-  echo "Installing unit tools in parallel..."
-  git config --global advice.detachedHead false
-  parallel -j "$(nproc)" --will-cite --halt now,fail=1 ::: "${_unit_installer_fns[@]}"
+supported stages:
+  - unit
+  - main"
 }
 
-do_main() {
-  echo "Installing main tools in parallel..."
-  parallel -j "$(nproc)" --will-cite --halt now,fail=1 ::: "${_main_installer_fns[@]}"
+dispatch() {
+  local stage install_fns
+  stage="${1:-}"
+
+  case "${stage}" in
+  unit | main)
+    # Re-export shell options so we fail on error
+    export SHELLOPTS TMPDIR
+
+    # Export utility + installer functions
+    mapfile -t install_fns < <(declare -F | grep -oP ".+\K${stage}_install_.+")
+    export -f _git_clone_revision _parse_version "${install_fns[@]}"
+
+    echo "Installing ${stage} tools in parallel..."
+    git config --global advice.detachedHead false
+    parallel -j "$(nproc)" --will-cite --halt now,fail=1 ::: "${install_fns[@]}"
+    ;;
+  *)
+    usage 1>&2
+    ;;
+  esac
 }
 
-"$@"
+dispatch "${@}"

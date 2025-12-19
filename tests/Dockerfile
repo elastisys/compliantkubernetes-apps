@@ -34,7 +34,7 @@ RUN BATS_CORE_VERSION="1.11.1@sha256:b036dd11d2d22ff82a191233429f9d3e33c62ec6d3e
     SOPS_VERSION="3.10.1@sha256:1bc9fbce48e3fcc7e684d604d50f7c56721b6cd2d27f96ec74b8b56b5a96c942" \
     YAJSV_VERSION="1.4.1@sha256:4bd6d2b1d6292ab1f7ba63db83c182a603a790d431429cf71f05cb0fcc677def" \
     YQ_VERSION="4.45.1@sha256:654d2943ca1d3be2024089eb4f270f4070f491a0610481d128509b2834870049" \
-    /opt/install-tools.bash do_unit
+    /opt/install-tools.bash unit
 
 ENV PATH="${DOCS_PATH}/.venv/bin:${PATH}"
 
@@ -68,7 +68,7 @@ ENV CYPRESS_CACHE_FOLDER=/usr/local/lib/cypress
 RUN KIND_VERSION="0.30.0@sha256:517ab7fc89ddeed5fa65abf71530d90648d9638ef0c4cde22c2c11f8097b8889" \
     VELERO_VERSION="1.13.0@sha256:1b6662eb06ecb974c96edd32296cc334c51af5e6c4d2d19408a285a20b771aba" \
     BUN_VERSION="1.3.5@sha256:a56093cbdd2efc7290a744ccc39971dcc4be52c5732be15c7fb1465cc119c8de" \
-    /opt/install-tools.bash do_main
+    /opt/install-tools.bash main
 
 WORKDIR /opt/node-packages
 COPY ./tests/package.json ./tests/bun.lock ./
