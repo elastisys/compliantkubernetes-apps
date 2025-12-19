@@ -6,8 +6,7 @@ ENV DEBIAN_FRONTEND="noninteractive"
 ENV LANGUAGE="en"
 ENV LANG="en_US.utf8"
 
-RUN apt-get -q=2 update && \
-    apt-get -q=2 install apache2-utils curl dnsutils gettext-base git gpg iputils-ping jq locales make net-tools parallel pwgen python3-venv s3cmd ssh unzip >/dev/null && \
+RUN apt-get -q=2 --update install apache2-utils curl dnsutils gettext-base git gpg iputils-ping jq locales make net-tools parallel pwgen python3-venv s3cmd ssh unzip >/dev/null && \
     apt-get -q=2 clean && \
     rm -rf /var/lib/apt/lists/* && \
     localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
@@ -55,8 +54,7 @@ Architectures: $(dpkg --print-architecture) \n\
 Signed-by: /etc/apt/keyrings/microsoft.gpg" | tee /etc/apt/sources.list.d/azure-cli.sources
 
 ARG AZ_VERSION=2.63.0
-RUN apt-get -q=2 update && \
-    apt-get -q=2 install azure-cli=${AZ_VERSION}-1~${DIST} buildah docker.io libasound2t64 libatk1.0-0 libatk-bridge2.0-0 libcanberra-gtk-module \
+RUN apt-get -q=2 --update install azure-cli=${AZ_VERSION}-1~${DIST} buildah docker.io libasound2t64 libatk1.0-0 libatk-bridge2.0-0 libcanberra-gtk-module \
     libcanberra-gtk3-module libcups2 libgbm-dev libgbm1 libglib2.0-0 libgtk2.0-0 libgtk2.0-0t64 libgtk-3-0 \
     libgtk-3-0t64 libnotify-dev libnss3 libxss1 libxtst6 podman-remote skopeo socat xauth xvfb zstd >/dev/null && \
     apt-get -q=2 clean && \
