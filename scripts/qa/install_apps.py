@@ -170,6 +170,9 @@ def configure_apps(
     # Disable OpsGenie heartbeat
     sc_config.set("alerts", {"opsGenieHeartbeat": {"enabled": False}})
 
+    # Enable monitoring CRD shim initially
+    common_config.set("prometheus", {"enableCRDShim": True})
+
     # Disable Calico Felix metrics
     common_config.set("networkPlugin.calico.calicoFelixMetrics", {"enabled": False})
 
@@ -275,6 +278,11 @@ def configure_secrets(secrets_path: Path, args: Args) -> None:
 def install_ingress(cluster: str, args: Args) -> None:
     """Install Ingress"""
     # fmt: off
+    _run_ck8s(
+        "ops", "helmfile", cluster,
+        "-l", "shim=crds", "sync",
+        "--include-transitive-needs",
+    )
     _run_ck8s(
         "ops", "helmfile", cluster,
         "-l", "app=ingress-nginx",
@@ -419,6 +427,11 @@ def reconfigure_ips(
         )
 
 
+def disable_monitoring_shim(common_config: AppsConfig) -> None:
+    """Disable the monitoring shim"""
+    common_config.set("prometheus", {"enableCRDShim": False})
+
+
 # Apps commands
 
 
@@ -474,6 +487,7 @@ def main() -> None:
     _step(install_external_dns, doc_suffix="in WC")(wc_config, "wc", ["*"], args)
     _step(reconfigure_ips)(common_config, sc_config, wc_config, args)
     _step(update_ips, doc_suffix="for both clusters")("both")
+    _step(disable_monitoring_shim)(common_config)
     if args.use_sync:
         _step(sync_apps, doc_suffix="in SC")("sc")
         _step(sync_apps, doc_suffix="in WC")("wc")
