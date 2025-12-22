@@ -1,11 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-TMPDIR=$(mktemp -d)
-trap 'rm -rf $TMPDIR' EXIT
-
-cd "$TMPDIR"
-
 # --------- Installers for the 'unit' stage ----------
 # NOTE: functions prefixed with 'unit_install_' will be automatically executed in the 'unit' stage.
 
@@ -33,7 +28,7 @@ unit_install_docs() {
 
 unit_install_gomplate() {
   _parse_version "${GOMPLATE_VERSION}"
-  curl -LOs "https://github.com/hairyhenderson/gomplate/releases/download/v${VERSION}/gomplate_linux-amd64"
+  _recurl "https://github.com/hairyhenderson/gomplate/releases/download/v${VERSION}/gomplate_linux-amd64"
   echo "${SHA}  gomplate_linux-amd64" | sha256sum -c -
   install -Tm 755 gomplate_linux-amd64 /usr/local/bin/gomplate
   echo "✓ gomplate installed"
@@ -41,7 +36,7 @@ unit_install_gomplate() {
 
 unit_install_helm() {
   _parse_version "${HELM_VERSION}"
-  curl -LOs "https://get.helm.sh/helm-v${VERSION}-linux-amd64.tar.gz"
+  _recurl "https://get.helm.sh/helm-v${VERSION}-linux-amd64.tar.gz"
   tar -zxf "helm-v${VERSION}-linux-amd64.tar.gz" linux-amd64/helm
   echo "${SHA}  linux-amd64/helm" | sha256sum -c -
   install -Tm 755 linux-amd64/helm /usr/local/bin/helm
@@ -58,7 +53,7 @@ unit_install_helm() {
 
 unit_install_helmfile() {
   _parse_version "${HELMFILE_VERSION}"
-  curl -LOs "https://github.com/helmfile/helmfile/releases/download/v${VERSION}/helmfile_${VERSION}_linux_amd64.tar.gz"
+  _recurl "https://github.com/helmfile/helmfile/releases/download/v${VERSION}/helmfile_${VERSION}_linux_amd64.tar.gz"
   tar -zxf "helmfile_${VERSION}_linux_amd64.tar.gz" helmfile
   echo "${SHA}  helmfile" | sha256sum -c -
   install -Tm 755 helmfile /usr/local/bin/helmfile
@@ -67,7 +62,7 @@ unit_install_helmfile() {
 
 unit_install_kubectl() {
   _parse_version "${KUBECTL_VERSION}"
-  curl -LOs "https://dl.k8s.io/release/v${VERSION}/bin/linux/amd64/kubectl"
+  _recurl "https://dl.k8s.io/release/v${VERSION}/bin/linux/amd64/kubectl"
   echo "${SHA}  kubectl" | sha256sum -c -
   install -Tm 755 kubectl /usr/local/bin/kubectl
   echo "✓ kubectl installed"
@@ -75,7 +70,7 @@ unit_install_kubectl() {
 
 unit_install_kubeconform() {
   _parse_version "${KUBECONFORM_VERSION}"
-  curl -LOs "https://github.com/yannh/kubeconform/releases/download/v${VERSION}/kubeconform-linux-amd64.tar.gz"
+  _recurl "https://github.com/yannh/kubeconform/releases/download/v${VERSION}/kubeconform-linux-amd64.tar.gz"
   tar -zxf kubeconform-linux-amd64.tar.gz kubeconform
   echo "${SHA}  kubeconform" | sha256sum -c -
   install -Tm 755 kubeconform /usr/local/bin/kubeconform
@@ -84,7 +79,7 @@ unit_install_kubeconform() {
 
 unit_install_kubelogin() {
   _parse_version "${KUBELOGIN_VERSION}"
-  curl -LOs "https://github.com/int128/kubelogin/releases/download/v${VERSION}/kubelogin_linux_amd64.zip"
+  _recurl "https://github.com/int128/kubelogin/releases/download/v${VERSION}/kubelogin_linux_amd64.zip"
   unzip -q kubelogin_linux_amd64.zip
   echo "${SHA}  kubelogin" | sha256sum -c -
   install -Tm 755 kubelogin /usr/local/bin/kubectl-oidc_login
@@ -93,7 +88,7 @@ unit_install_kubelogin() {
 
 unit_install_opa() {
   _parse_version "${OPA_VERSION}"
-  curl -LOs "https://github.com/open-policy-agent/opa/releases/download/v${VERSION}/opa_linux_amd64"
+  _recurl "https://github.com/open-policy-agent/opa/releases/download/v${VERSION}/opa_linux_amd64"
   echo "${SHA}  opa_linux_amd64" | sha256sum -c -
   install -Tm 755 opa_linux_amd64 /usr/local/bin/opa
   echo "✓ opa installed"
@@ -101,8 +96,8 @@ unit_install_opa() {
 
 unit_install_promtool() {
   _parse_version "${PROMTOOL_VERSION}"
-  curl -fsSL "https://github.com/prometheus/prometheus/releases/download/v${VERSION}/prometheus-${VERSION}.linux-amd64.tar.gz" |
-    tar -zxf - "prometheus-${VERSION}.linux-amd64/promtool" --strip-components=1
+  _recurl "https://github.com/prometheus/prometheus/releases/download/v${VERSION}/prometheus-${VERSION}.linux-amd64.tar.gz"
+  tar -zxf "prometheus-${VERSION}.linux-amd64.tar.gz" "prometheus-${VERSION}.linux-amd64/promtool" --strip-components=1
   echo "${SHA}  promtool" | sha256sum -c -
   install -Tm 755 promtool /usr/local/bin/promtool
   echo "✓ promtool installed"
@@ -110,7 +105,7 @@ unit_install_promtool() {
 
 unit_install_sops() {
   _parse_version "${SOPS_VERSION}"
-  curl -LOs "https://github.com/getsops/sops/releases/download/v${VERSION}/sops-v${VERSION}.linux.amd64"
+  _recurl "https://github.com/getsops/sops/releases/download/v${VERSION}/sops-v${VERSION}.linux.amd64"
   echo "${SHA}  sops-v${VERSION}.linux.amd64" | sha256sum -c -
   install -Tm 755 "sops-v${VERSION}.linux.amd64" /usr/local/bin/sops
   echo "✓ sops installed"
@@ -118,7 +113,7 @@ unit_install_sops() {
 
 unit_install_yajsv() {
   _parse_version "${YAJSV_VERSION}"
-  curl -LOs "https://github.com/neilpa/yajsv/releases/download/v${VERSION}/yajsv.linux.amd64"
+  _recurl "https://github.com/neilpa/yajsv/releases/download/v${VERSION}/yajsv.linux.amd64"
   echo "${SHA}  yajsv.linux.amd64" | sha256sum -c -
   install -Tm 755 yajsv.linux.amd64 /usr/local/bin/yajsv
   echo "✓ yajsv installed"
@@ -126,7 +121,7 @@ unit_install_yajsv() {
 
 unit_install_yq() {
   _parse_version "${YQ_VERSION}"
-  curl -LOs "https://github.com/mikefarah/yq/releases/download/v${VERSION}/yq_linux_amd64"
+  _recurl "https://github.com/mikefarah/yq/releases/download/v${VERSION}/yq_linux_amd64"
   echo "${SHA}  yq_linux_amd64" | sha256sum -c -
   install -Tm 755 yq_linux_amd64 /usr/local/bin/yq
   echo "✓ yq installed"
@@ -137,7 +132,7 @@ unit_install_yq() {
 
 main_install_kind() {
   _parse_version "${KIND_VERSION}"
-  curl -LOs "https://github.com/kubernetes-sigs/kind/releases/download/v${VERSION}/kind-linux-amd64"
+  _recurl "https://github.com/kubernetes-sigs/kind/releases/download/v${VERSION}/kind-linux-amd64"
   echo "${SHA}  kind-linux-amd64" | sha256sum -c -
   install -Tm 755 kind-linux-amd64 /usr/local/bin/kind
   echo "✓ kind installed"
@@ -145,7 +140,7 @@ main_install_kind() {
 
 main_install_velero() {
   _parse_version "${VELERO_VERSION}"
-  curl -LOs "https://github.com/vmware-tanzu/velero/releases/download/v${VERSION}/velero-v${VERSION}-linux-amd64.tar.gz"
+  _recurl "https://github.com/vmware-tanzu/velero/releases/download/v${VERSION}/velero-v${VERSION}-linux-amd64.tar.gz"
   tar -zxf "velero-v${VERSION}-linux-amd64.tar.gz" "velero-v${VERSION}-linux-amd64"
   echo "${SHA}  velero-v${VERSION}-linux-amd64/velero" | sha256sum -c -
   install -Tm 755 "velero-v${VERSION}-linux-amd64/velero" /usr/local/bin/velero
@@ -154,7 +149,7 @@ main_install_velero() {
 
 main_install_bun() {
   _parse_version "${BUN_VERSION}"
-  curl -LOs "https://github.com/oven-sh/bun/releases/download/bun-v${VERSION}/bun-linux-x64.zip"
+  _recurl "https://github.com/oven-sh/bun/releases/download/bun-v${VERSION}/bun-linux-x64.zip"
   unzip -q bun-linux-x64.zip
   echo "${SHA}  bun-linux-x64/bun" | sha256sum -c -
   install -Tm 755 bun-linux-x64/bun /usr/local/bin/bun
@@ -163,6 +158,19 @@ main_install_bun() {
 }
 
 # --------- Utility functions ----------
+
+_recurl() {
+  local -r curl_opts=(
+    "--retry" "5"
+    "--retry-delay" "3"
+    "--retry-all-errors"
+    "--connect-timeout" "15"
+    "--location"
+    "--silent"
+    "--remote-name"
+  )
+  curl "${curl_opts[@]}" "${@}"
+}
 
 _git_clone_revision() {
   if [[ $# -lt 3 ]]; then
@@ -202,12 +210,17 @@ dispatch() {
 
   case "${stage}" in
   unit | main)
+    # Do all work in a temp dir
+    TMPDIR=$(mktemp -d)
+    trap 'rm -rf $TMPDIR' EXIT
+    cd "$TMPDIR"
+
     # Re-export shell options so we fail on error
     export SHELLOPTS TMPDIR
 
     # Export utility + installer functions
     mapfile -t install_fns < <(declare -F | grep -oP ".+\K${stage}_install_.+")
-    export -f _git_clone_revision _parse_version "${install_fns[@]}"
+    export -f _recurl _git_clone_revision _parse_version "${install_fns[@]}"
 
     echo "Installing ${stage} tools in parallel..."
     git config --global advice.detachedHead false
