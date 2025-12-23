@@ -17,6 +17,7 @@ setup_file() {
   env.init openstack capi dev
 
   yq.set sc .externalDns.enabled 'true'
+  yq.set sc .falco.enabled 'true'
   yq.set sc .falco.driver.kind '"kmod"'
   yq.set sc .fluentd.enabled 'true'
   yq.set sc .gpu.enabled 'true'
@@ -25,6 +26,7 @@ setup_file() {
   yq.set sc .kured.enabled 'true'
   yq.set sc .kyverno.enabled 'true'
   yq.set sc .kyverno.policies.verifyImageSignature.enabled 'false'
+  yq.set sc .opensearch.enabled 'true'
   yq.set sc .opensearch.snapshot.enabled 'true'
   yq.set sc .tektonPipelines.enabled 'true'
   yq.set sc .thanos.enabled 'true'
@@ -36,6 +38,7 @@ setup_file() {
 
   yq.set wc .hnc.enabled 'true'
   yq.set wc .velero.enabled 'true'
+  yq.set wc .falco.enabled 'true'
   yq.set wc .falco.driver.kind '"kmod"'
   _setup_rclone wc sync
 }
