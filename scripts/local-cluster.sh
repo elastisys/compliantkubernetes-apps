@@ -432,6 +432,11 @@ create() {
     kubectl get configmap -n kube-system coredns -oyaml | sed '/forward/a \           prefer_udp' | kubectl apply -f -
   fi
 
+  declare workers
+  workers="$(kubectl get no -oyaml | yq -I0 -oj '[.items[] | select(.metadata.labels."node-role.kubernetes.io/control-plane" != "") | .status.addresses[] | select(.type == "InternalIP") | .address] | sort')"
+
+  yq -i ".ingressNginx.controller.service.externalIPs = ${workers}" "${CK8S_CONFIG_PATH}/${affix}-config.yaml"
+
   kubectl label namespace local-path-storage owner=operator
 
   # install calico
@@ -446,6 +451,10 @@ create() {
 
     helmfile -e local_cluster -f "${ROOT}/helmfile.d" -lapp=tigera apply --output simple
   fi
+
+  #install ingress-nginx
+  log.info "Installing ingress-nginx in SC"
+  "${ROOT}/bin/ck8s" ops helmfile sc -lapp=ingress-nginx apply --include-transitive-needs --output simple
 
   # install s3
   if ! [[ "${*}" =~ --skip-minio ]]; then
