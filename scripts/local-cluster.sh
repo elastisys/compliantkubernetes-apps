@@ -347,7 +347,11 @@ config() {
 create() {
   local cluster config affix
   cluster="${1:-}"
-  config="${2:-single-node}"
+  if [[ -n "${2:-}" ]] && [[ "${2}" != --* ]]; then
+    config="${2}"
+  else
+    config="single-node"
+  fi
 
   if [[ -z "${cluster}" ]]; then
     log.usage
