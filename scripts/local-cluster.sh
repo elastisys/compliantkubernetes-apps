@@ -304,10 +304,7 @@ config() {
   fi
 
   if [[ -z "${CK8S_CONFIG_PATH:-}" ]]; then
-    config_path_was_unset=true
-    export CK8S_CONFIG_PATH="${HOME}/.ck8s/welkin-quick-start"
-    mkdir -p "${CK8S_CONFIG_PATH}"
-    log.info "CK8S_CONFIG_PATH is unset. Using default: ${CK8S_CONFIG_PATH}"
+    log.fatal "CK8S_CONFIG_PATH is unset"
   fi
 
   if [[ -z "${CK8S_PGP_FP:-}" ]]; then
