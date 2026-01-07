@@ -107,6 +107,45 @@ If this is all new to you, here's a [link](https://riseup.net/en/security/messag
 ### Quickstart
 
 > [!NOTE]
+> This Quickstart sets up a local learning environment.
+> It is **NOT production-ready** and **NOT security-hardened**.
+
+#### Limitations
+
+- **Security**: Uses temporary GPG keys and permissive security settings.
+- **Persistence**: Uses local storage; data may be lost if containers are removed.
+- **Infrastructure**: Runs on local Docker containers (Kind cluster).
+
+> [!NOTE]
+> Use this environment only to learn, test, and develop against the Welkin platform.
+
+This script orchestrates the creation of local Kind clusters, initializes configuration, and installs the Welkin application stack automatically.
+
+#### Prerequisites
+
+- **Container runtime**: Docker or Podman installed and running
+- **Resources**: Minimum 4 vCPUs and 16 GB RAM
+- **Dependencies**: Install the repository requirements
+
+#### Running setup
+
+The following command will create local clusters, generate a temporary GPG key, configure the environment, and install welkin:
+
+```bash
+./bin/quick-start setup
+```
+
+#### Teardown Setup
+
+The following command will delete the local Kind clusters:
+
+```bash
+./bin/quick-start delete
+```
+
+### Standard Installation
+
+> [!NOTE]
 > **You probably want to check the [compliantkubernetes-kubespray][compliantkubernetes-kubespray] repository first, since compliantkubernetes-apps depends on having two clusters already set up.**
 
 > [!NOTE]

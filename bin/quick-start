@@ -1,0 +1,209 @@
+#!/usr/bin/env bash
+
+# local quickstart using dev flavour
+
+set -euo pipefail
+
+HERE="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
+ROOT="$(dirname "${HERE}")"
+LOCAL_CLUSTERS_SCRIPT="${ROOT}/scripts/local-cluster.sh"
+
+export CK8S_ENVIRONMENT_NAME="welkin-quick-start"
+export CK8S_FLAVOR="dev"
+export CK8S_CONFIG_PATH="${HOME}/.ck8s/${CK8S_ENVIRONMENT_NAME}"
+DOMAIN="welkin.test"
+
+log_header() {
+  echo -e "\n\033[1;34m[welkin-quickstart] $1\033[0m"
+}
+
+log.info.no_newline() {
+  echo -en "[\e[34mck8s\e[0m] ${*}" 1>&2
+}
+log.info() {
+  log.info.no_newline "${*}\n"
+}
+log.warn.no_newline() {
+  echo -e -n "[\e[33mck8s\e[0m] ${*}" 1>&2
+}
+log.warn() {
+  log.warn.no_newline "${*}\n"
+}
+log.error.no_newline() {
+  echo -e -n "[\e[31mck8s\e[0m] ${*}" 1>&2
+}
+log.error() {
+  log.error.no_newline "${*}\n"
+}
+log.fatal() {
+  log.error "${*}"
+  exit 1
+}
+
+if [[ ! -f "${LOCAL_CLUSTERS_SCRIPT}" ]]; then
+  log.error "Error: Could not find helper script at ${LOCAL_CLUSTERS_SCRIPT}"
+  exit 1
+fi
+
+check_prerequisites() {
+  log_header "Checking System Prerequisites..."
+
+  if [[ "$(uname)" == "Linux" ]]; then
+    local needs_fix=false
+    local current_watches
+
+    current_watches=$(sysctl -n fs.inotify.max_user_watches 2>/dev/null || echo 0)
+    if ((current_watches < 102400)); then
+      log.warn "fs.inotify.max_user_watches is too low ($current_watches < 102400)."
+      needs_fix=true
+    fi
+
+    local current_instances
+    current_instances=$(sysctl -n fs.inotify.max_user_instances 2>/dev/null || echo 0)
+    if ((current_instances < 1024)); then
+      log.warn "fs.inotify.max_user_instances is too low ($current_instances < 1024)."
+      needs_fix=true
+    fi
+
+    local unpriv_port
+    unpriv_port=$(sysctl -n net.ipv4.ip_unprivileged_port_start 2>/dev/null || echo 1024)
+    if ((unpriv_port = 53)); then
+      log.warn "net.ipv4.ip_unprivileged_port_start is $unpriv_port (Recommended: 53 for rootless setups)."
+    fi
+
+    if [[ "$needs_fix" == "true" ]]; then
+      log.info ""
+      log.warn "Your system limits are too low. Pods may fail to start."
+      log.info -n "❓  Would you like to fix these settings via sudo now? [y/N] "
+      read -r reply
+      if [[ "$reply" =~ ^[Yy]$ ]]; then
+        log.info "Applying fixes..."
+        sudo sysctl -w fs.inotify.max_user_watches=102400
+        sudo sysctl -w fs.inotify.max_user_instances=1024
+        sudo sysctl -w net.ipv4.ip_unprivileged_port_start=53
+        log.info "✅ Limits updated."
+      else
+        log.warn "Proceeding without fixing limits. Instability is likely."
+      fi
+    else
+      log.info "✅ System limits are healthy."
+    fi
+  fi
+}
+
+teardown() {
+  log_header "Tearing down Welkin Quickstart Environment..."
+
+  log.info "Deleting Workload Cluster..."
+  "${LOCAL_CLUSTERS_SCRIPT}" delete "${CK8S_ENVIRONMENT_NAME}-wc" || true
+
+  log.info "Deleting Service Cluster..."
+  "${LOCAL_CLUSTERS_SCRIPT}" delete "${CK8S_ENVIRONMENT_NAME}-sc" || true
+
+  log.info "Cleaning up DNS..."
+  "${LOCAL_CLUSTERS_SCRIPT}" resolve delete "${DOMAIN}" || true
+
+  log.warn "⚠️Environment deleted."
+  log.info "Note: The config directory at ${CK8S_CONFIG_PATH} was preserved."
+  log.info "To remove it, run: rm -rf ${CK8S_CONFIG_PATH}"
+}
+
+setup() {
+  log_header "Setting up Welkin Quick Start Local cluster"
+
+  if [[ ! -d "${CK8S_CONFIG_PATH}" ]]; then
+    mkdir -p "${CK8S_CONFIG_PATH}"
+  fi
+
+  local env_file="${CK8S_CONFIG_PATH}/.temp_gpg_env"
+
+  check_prerequisites
+
+  if [[ -f "${CK8S_CONFIG_PATH}/secrets.yaml" ]]; then
+    log.info "✅ Configuration exists. Skipping setup."
+  else
+    log_header "Starting Welkin Local Quickstart"
+    log.info "Flavor: ${CK8S_FLAVOR}"
+
+    log_header "Setting up local domain resolve..."
+    "${LOCAL_CLUSTERS_SCRIPT}" cache create
+    "${LOCAL_CLUSTERS_SCRIPT}" resolve create "${DOMAIN}"
+
+    log_header "Init Configuration..."
+
+    "${LOCAL_CLUSTERS_SCRIPT}" config "${CK8S_ENVIRONMENT_NAME}" "${CK8S_FLAVOR}" "${DOMAIN}"
+
+    if [[ -f "${env_file}" ]]; then
+      # shellcheck disable=SC1090
+      source "${env_file}"
+    else
+      log.error "Temp GPG env file not found."
+    fi
+
+    log_header "Creating Clusters..."
+    "${LOCAL_CLUSTERS_SCRIPT}" create "${CK8S_ENVIRONMENT_NAME}-sc" single-node-cache
+    "${LOCAL_CLUSTERS_SCRIPT}" create "${CK8S_ENVIRONMENT_NAME}-wc" single-node-cache --skip-minio
+
+    wait_for_ready "sc"
+    wait_for_ready "wc"
+
+    log_header "Configuring node local dns setup..."
+    "${LOCAL_CLUSTERS_SCRIPT}" setup node-local-dns
+
+    log_header "Verifying Environment Status..."
+
+    set +e
+    "${LOCAL_CLUSTERS_SCRIPT}" status
+    STATUS_CODE=$?
+    set -e
+
+    log.info ""
+    if [[ ${STATUS_CODE} -eq 0 ]]; then
+      log.info "✅ Welkin Quickstart Complete!"
+      log.info "---------------------------------------------------"
+      log.info "  Grafana:     https://grafana.${DOMAIN}"
+      log.info "  Harbor:      https://harbor.${DOMAIN}"
+      log.info "---------------------------------------------------"
+      log.info "To view/edit secrets manually, run:"
+      log.info "  source ${CK8S_CONFIG_PATH}/..temp_gpg_env"
+      log.info "---------------------------------------------------"
+      log.info "To tear down environment:"
+      log.info "  $0 delete"
+    else
+      log.warn "⚠️  Setup finished, but some status checks failed."
+      log.warn "---------------------------------------------------"
+      log.warn "Please check the logs above."
+      log.warn "You can retry the status check with:"
+      log.warn "  ./bin/ck8s local-quickstart status"
+    fi
+  fi
+}
+
+wait_for_ready() {
+  local affix="$1"
+  local kubeconfig="${CK8S_CONFIG_PATH}/.state/kube_config_${affix}.yaml"
+
+  log.info "Waiting for ${affix^^} cluster to be ready..."
+
+  export KUBECONFIG="${kubeconfig}"
+  if ! kubectl wait --for=condition=Ready nodes --all --timeout=120s >/dev/null 2>&1; then
+    log.warn "Nodes are not ready yet. Waiting a bit longer..."
+    sleep 10
+  fi
+
+  log.info "Waiting for system pods in ${affix^^}..."
+
+  kubectl wait --for=condition=Available deployment -n calico-system --all --timeout=300s >/dev/null 2>&1 || true
+
+  kubectl wait --for=condition=Available deployment/coredns -n kube-system --timeout=300s >/dev/null 2>&1 || true
+
+  kubectl wait --for=condition=Available deployment -n gatekeeper-system --all --timeout=300s >/dev/null 2>&1 || true
+
+  log.info "✅ ${affix^^} is stable."
+}
+
+if [[ "${1:-}" == "delete" ]]; then
+  teardown
+else
+  setup
+fi
