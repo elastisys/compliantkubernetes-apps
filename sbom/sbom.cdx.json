@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:a50faa8b-843d-49bc-bfef-0231755921fa",
+  "serialNumber": "urn:uuid:f02ab182-18e9-47ad-b54c-ba4f7bd5c937",
   "version": 1,
   "metadata": {
-    "timestamp": "2025-12-17T07:48:55Z",
+    "timestamp": "2026-01-08T13:26:53Z",
     "lifecycles": [
       {
         "phase": "build"
@@ -499,13 +499,13 @@
       }
     },
     {
-      "bom-ref": "pkg:helm/dex@0.18.0",
+      "bom-ref": "pkg:helm/dex@0.24.0",
       "type": "library",
       "supplier": {
         "name": "dexidp"
       },
       "name": "dex",
-      "version": "0.18.0",
+      "version": "0.24.0",
       "description": "OpenID Connect (OIDC) identity and OAuth 2.0 provider with pluggable connectors.",
       "licenses": [
         {
@@ -514,7 +514,7 @@
           }
         }
       ],
-      "purl": "pkg:helm/dex@0.18.0",
+      "purl": "pkg:helm/dex@0.24.0",
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -3147,15 +3147,15 @@
       "purl": "pkg:oci/defaultbackend-amd64@1.5?repository_url=registry.k8s.io"
     },
     {
-      "bom-ref": "pkg:oci/dexidp/dex@v2.40.0?repository_url=ghcr.io",
+      "bom-ref": "pkg:oci/dexidp/dex@v2.44.0?repository_url=ghcr.io",
       "type": "container",
       "supplier": {
         "name": "dexidp"
       },
       "name": "ghcr.io/dexidp/dex",
-      "version": "v2.40.0",
-      "cpe": "cpe:2.3:a:dexidp:dex:2.40.0:*:*:*:*:*:*:*",
-      "purl": "pkg:oci/dexidp/dex@v2.40.0?repository_url=ghcr.io"
+      "version": "v2.44.0",
+      "cpe": "cpe:2.3:a:dexidp:dex:2.44.0:*:*:*:*:*:*:*",
+      "purl": "pkg:oci/dexidp/dex@v2.44.0?repository_url=ghcr.io"
     },
     {
       "bom-ref": "pkg:oci/dns/k8s-dns-node-cache@1.25.0?repository_url=registry.k8s.io",
@@ -4351,7 +4351,7 @@
         "pkg:helm/crds@3.3.6",
         "pkg:helm/crossplane-packages@0.1.0",
         "pkg:helm/crossplane@2.0.2",
-        "pkg:helm/dex@0.18.0",
+        "pkg:helm/dex@0.24.0",
         "pkg:helm/external-dns-endpoints@0.1.0",
         "pkg:helm/external-dns-secrets@0.1.0",
         "pkg:helm/external-dns@1.14.4",
@@ -4528,9 +4528,9 @@
       ]
     },
     {
-      "ref": "pkg:helm/dex@0.18.0",
+      "ref": "pkg:helm/dex@0.24.0",
       "dependsOn": [
-        "pkg:oci/dexidp/dex@v2.40.0?repository_url=ghcr.io"
+        "pkg:oci/dexidp/dex@v2.44.0?repository_url=ghcr.io"
       ]
     },
     {
@@ -5304,7 +5304,7 @@
       "dependsOn": []
     },
     {
-      "ref": "pkg:oci/dexidp/dex@v2.40.0?repository_url=ghcr.io",
+      "ref": "pkg:oci/dexidp/dex@v2.44.0?repository_url=ghcr.io",
       "dependsOn": []
     },
     {
