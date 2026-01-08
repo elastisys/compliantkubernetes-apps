@@ -39,6 +39,13 @@ update_images_yaml_tag() {
   local current_ref="${2}"
   local new_tag="${3}"
 
+  # shellcheck disable=SC2155
+  local current_tag=$(echo "${current_ref}" | awk -F '[:@]' '{print $NF}')
+
+  if [[ "${current_tag}" =~ ^[vV] ]] && [[ ! "${new_tag}" =~ ^[vV] ]]; then
+    new_tag="v${new_tag}"
+  fi
+
   local repo="${current_ref%:*}"
   local updated="${repo}:${new_tag}"
   # shellcheck disable=SC2016
