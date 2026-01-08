@@ -49,7 +49,7 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
-{{- if not (.Values.defaultRules.disabled.CPUThrottlingHigh | default false) }}
+{{- if .Values.defaultRules.enabled.CPUThrottlingHigh }}
     - alert: CPUThrottlingHigh
       annotations:
         description: '{{`{{`}} $value | humanizePercentage {{`}}`}} throttling of CPU in namespace {{`{{`}} $labels.namespace {{`}}`}} for container {{`{{`}} $labels.container {{`}}`}} in pod {{`{{`}} $labels.pod {{`}}`}}.'

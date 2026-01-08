@@ -58,8 +58,8 @@ defaultRules:
       evaluate_prometheus: "1"
   {{- end }}
 
-  disabled:
-    CPUThrottlingHigh: {{ .Values.alerts.disabled.CPUThrottlingHigh }}
+  enabled:
+    CPUThrottlingHigh: {{ .Values.alerts.enabled.CPUThrottlingHigh }}
 
 capacityManagementAlertsPersistentVolumeEnabled: {{ .Values.prometheus.capacityManagementAlerts.persistentVolume.enabled }}
 capacityManagementAlertsPersistentVolumeLimit: {{ .Values.prometheus.capacityManagementAlerts.persistentVolume.limit }}
