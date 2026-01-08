@@ -87,6 +87,171 @@ teardown_file() {
   assert_failure
 }
 
+@test "opa gatekeeper policies - error insufficient replicas" {
+  run helm -n "${NAMESPACE}" upgrade --atomic --install opa-replicas "${user_demo_chart}" \
+    --set "image.repository=${user_demo_image%:*}" \
+    --set "image.tag=${user_demo_image#*:}" \
+    --set "replicaCount=1" \
+    --set "ingress.enabled=false"
+
+  assert_line --regexp '.*admission webhook "validation.gatekeeper.sh" denied the request.*'
+  assert_line --regexp '.*The provided number of replicas is too low.*'
+  assert_failure
+}
+
+@test "opa gatekeeper policies - error loadbalancer service" {
+  run kubectl apply -f - <<EOF
+apiVersion: v1
+kind: Service
+metadata:
+  name: opa-loadbalancer-test
+  namespace: ${NAMESPACE}
+spec:
+  type: LoadBalancer
+  selector:
+    app.kubernetes.io/name: welkin-user-demo
+    app.kubernetes.io/instance: test
+  ports:
+  - port: 80
+    targetPort: 8080
+EOF
+
+  assert_line --regexp '.*admission webhook "validation.gatekeeper.sh" denied the request.*'
+  assert_line --regexp '.*Creation of LoadBalancer Service is not supported.*'
+  assert_failure
+
+  # Clean up
+  kubectl -n "${NAMESPACE}" delete svc opa-loadbalancer-test --ignore-not-found
+}
+
+@test "opa gatekeeper policies - error localhost seccomp" {
+  run kubectl apply -f - <<EOF
+apiVersion: v1
+kind: Pod
+metadata:
+  name: opa-seccomp-test
+  namespace: ${NAMESPACE}
+spec:
+  securityContext:
+    seccompProfile:
+      type: Localhost
+      localhostProfile: profile.json
+  containers:
+  - name: test
+    image: ${user_demo_image}
+EOF
+
+  assert_line --regexp '.*admission webhook "validation.gatekeeper.sh" denied the request.*'
+  assert_line --regexp '.*localhost seccomp profile.*'
+  assert_failure
+
+  # Clean up
+  kubectl -n "${NAMESPACE}" delete pod opa-seccomp-test --ignore-not-found
+}
+
+@test "opa gatekeeper policies - warn accidental deletion" {
+  # This test would require creating Cluster resources which is complex in e2e
+  # For now, we'll skip this test as it requires cluster-level resources
+  skip "Cluster-level resources test - requires cluster admin access"
+}
+
+@test "opa gatekeeper policies - error local storage empty dir" {
+  run kubectl apply -f - <<EOF
+apiVersion: v1
+kind: Pod
+metadata:
+  name: opa-storage-test
+  namespace: ${NAMESPACE}
+spec:
+  containers:
+  - name: test
+    image: ${user_demo_image}
+    volumeMounts:
+    - name: test-volume
+      mountPath: /data
+  volumes:
+  - name: test-volume
+    emptyDir: {}
+EOF
+
+  assert_line --regexp '.*admission webhook "validation.gatekeeper.sh" denied the request.*'
+  assert_line --regexp '.*emptyDir or local storage.*'
+  assert_failure
+
+  # Clean up
+  kubectl -n "${NAMESPACE}" delete pod opa-storage-test --ignore-not-found
+}
+
+@test "opa gatekeeper policies - error pod without controller" {
+  run kubectl apply -f - <<EOF
+apiVersion: v1
+kind: Pod
+metadata:
+  name: opa-standalone-test
+  namespace: ${NAMESPACE}
+spec:
+  containers:
+  - name: test
+    image: ${user_demo_image}
+EOF
+
+  assert_line --regexp '.*admission webhook "validation.gatekeeper.sh" denied the request.*'
+  assert_line --regexp '.*Pod without controller.*'
+  assert_failure
+
+  # Clean up
+  kubectl -n "${NAMESPACE}" delete pod opa-standalone-test --ignore-not-found
+}
+
+@test "opa gatekeeper policies - error pod disruption budgets outside allowed namespaces" {
+  run kubectl apply -f - <<EOF
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: opa-pdb-test
+  namespace: ${NAMESPACE}
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: test
+EOF
+
+  assert_line --regexp '.*admission webhook "validation.gatekeeper.sh" denied the request.*'
+  assert_line --regexp '.*PodDisruptionBudget not allowed.*'
+  assert_failure
+
+  # Clean up
+  kubectl -n "${NAMESPACE}" delete pdb opa-pdb-test --ignore-not-found
+}
+
+@test "opa gatekeeper policies - error non-whitelisted CRDs" {
+  run kubectl apply -f - <<EOF
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: testcrds.example.com
+spec:
+  group: example.com
+  versions:
+  - name: v1
+    served: true
+    storage: true
+  scope: Namespaced
+  names:
+    plural: testcrds
+    singular: testcrd
+    kind: TestCRD
+EOF
+
+  assert_line --regexp '.*admission webhook "validation.gatekeeper.sh" denied the request.*'
+  assert_line --regexp '.*CRD not whitelisted.*'
+  assert_failure
+
+  # Clean up
+  kubectl delete crd testcrds.example.com --ignore-not-found
+}
+
 @test "opa gatekeeper policies - allow and mutate valid deployment" {
   run helm -n "${NAMESPACE}" upgrade --atomic --install opa-valid "${user_demo_chart}" \
     --set "image.repository=${user_demo_image%:*}" \
