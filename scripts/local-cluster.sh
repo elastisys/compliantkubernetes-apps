@@ -452,12 +452,12 @@ create() {
     helmfile -e local_cluster -f "${ROOT}/helmfile.d" -lapp=tigera apply --output simple
   fi
 
-  #install ingress-nginx
-  log.info "Installing ingress-nginx in SC"
-  "${ROOT}/bin/ck8s" ops helmfile sc -lapp=ingress-nginx apply --include-transitive-needs --output simple
-
   # install s3
   if ! [[ "${*}" =~ --skip-minio ]]; then
+    #install ingress-nginx
+    log.info "Installing ingress-nginx in SC"
+    "${ROOT}/bin/ck8s" ops helmfile sc -lapp=ingress-nginx apply --include-transitive-needs --output simple
+
     log.info "installing minio"
 
     kubectl get namespace minio-system &>/dev/null || kubectl create namespace minio-system
