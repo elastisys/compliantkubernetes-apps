@@ -4,7 +4,7 @@ set -euo pipefail
 GNUPGHOME="$(mktemp -d)"
 export GNUPGHOME
 
-cat >"$GNUPGHOME/gpg-batch" <<EOF
+cat >"${GNUPGHOME}/gpg-batch" <<EOF
 %echo Generating a basic OpenPGP key
 Key-Type: RSA
 Key-Length: 4096
@@ -16,10 +16,10 @@ Expire-Date: 0
 %echo done
 EOF
 
-gpg --batch --generate-key "$GNUPGHOME/gpg-batch" >/dev/null 2>&1
+gpg --batch --generate-key "${GNUPGHOME}/gpg-batch" >/dev/null 2>&1
 
 # SOPS needs this fingerprint to know which key to use
 FINGERPRINT=$(gpg --list-secret-keys --keyid-format LONG | grep sec | awk '{print $2}' | cut -d'/' -f2)
 
-echo "export GNUPGHOME='$GNUPGHOME'"
-echo "export CK8S_PGP_FP='$FINGERPRINT'"
+export GNUPGHOME="${GNUPGHOME}"
+export CK8S_PGP_FP="${FINGERPRINT}"
