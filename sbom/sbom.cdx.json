@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:f02ab182-18e9-47ad-b54c-ba4f7bd5c937",
+  "serialNumber": "urn:uuid:9cdf549f-c57f-4103-af59-65ebc63614f7",
   "version": 1,
   "metadata": {
-    "timestamp": "2026-01-08T13:26:53Z",
+    "timestamp": "2026-01-12T15:07:20Z",
     "lifecycles": [
       {
         "phase": "build"
@@ -1854,6 +1854,37 @@
         "occurrences": [
           {
             "location": "helmfile.d/upstream/minio/minio"
+          }
+        ]
+      }
+    },
+    {
+      "bom-ref": "pkg:helm/monitoring-shim@0.1.0",
+      "type": "library",
+      "supplier": {
+        "name": "Elastisys"
+      },
+      "name": "monitoring-shim",
+      "version": "0.1.0",
+      "description": "A shim Helm chart that currently installs monitoring CRDs only",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "purl": "pkg:helm/monitoring-shim@0.1.0",
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "Not evaluated"
+        }
+      ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/monitoring-shim"
           }
         ]
       }
@@ -4395,6 +4426,7 @@
         "pkg:helm/metrics-server@3.13.0",
         "pkg:helm/minio@17.0.19",
         "pkg:helm/minio@5.0.14",
+        "pkg:helm/monitoring-shim@0.1.0",
         "pkg:helm/namespaces@0.1.1",
         "pkg:helm/networkpolicy-generator@0.1.0",
         "pkg:helm/networkpolicy-service@0.2.0",
@@ -4957,6 +4989,16 @@
       "dependsOn": [
         "pkg:oci/minio/mc@RELEASE.2023-09-29T16-41-22Z?repository_url=quay.io",
         "pkg:oci/minio/minio@RELEASE.2023-09-30T07-02-29Z?repository_url=quay.io"
+      ]
+    },
+    {
+      "ref": "pkg:helm/monitoring-shim@0.1.0",
+      "dependsOn": [
+        "pkg:oci/ingress-nginx/kube-webhook-certgen@v1.5.2?repository_url=registry.k8s.io",
+        "pkg:oci/kiwigrid/k8s-sidecar@1.30.3?repository_url=quay.io",
+        "pkg:oci/prometheus-operator/prometheus-config-reloader@v0.85.0?repository_url=quay.io",
+        "pkg:oci/prometheus-operator/prometheus-operator@v0.85.0?repository_url=quay.io",
+        "pkg:oci/prometheus/alertmanager@v0.28.1?repository_url=quay.io"
       ]
     },
     {
