@@ -21,5 +21,4 @@ gpg --batch --generate-key "${GNUPGHOME}/gpg-batch" >/dev/null 2>&1
 # SOPS needs this fingerprint to know which key to use
 FINGERPRINT=$(gpg --list-secret-keys --keyid-format LONG | grep sec | awk '{print $2}' | cut -d'/' -f2)
 
-export GNUPGHOME="${GNUPGHOME}"
 export CK8S_PGP_FP="${FINGERPRINT}"

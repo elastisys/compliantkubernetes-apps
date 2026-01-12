@@ -372,7 +372,6 @@ config() {
   fi
 
   "${ROOT}/bin/ck8s" init both
-
 }
 
 create() {
