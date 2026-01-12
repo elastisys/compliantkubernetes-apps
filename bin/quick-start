@@ -10,7 +10,7 @@ LOCAL_CLUSTERS_SCRIPT="${ROOT}/scripts/local-cluster.sh"
 
 export CK8S_ENVIRONMENT_NAME="welkin-quick-start"
 export CK8S_FLAVOR="dev"
-export CK8S_CONFIG_PATH="${HOME}/.ck8s/${CK8S_ENVIRONMENT_NAME}"
+export CK8S_CONFIG_PATH="${XDG_CONFIG_HOME:-${HOME}/.config}/welkin/${CK8S_ENVIRONMENT_NAME}"
 DOMAIN="welkin.test"
 
 log_header() {
@@ -67,7 +67,7 @@ check_prerequisites() {
 
     local unpriv_port
     unpriv_port=$(sysctl -n net.ipv4.ip_unprivileged_port_start 2>/dev/null || echo 1024)
-    if ((unpriv_port = 53)); then
+    if ((unpriv_port == 53)); then
       log.warn "net.ipv4.ip_unprivileged_port_start is $unpriv_port (Recommended: 53 for rootless setups)."
     fi
 
@@ -115,7 +115,7 @@ setup() {
     mkdir -p "${CK8S_CONFIG_PATH}"
   fi
 
-  local env_file="${CK8S_CONFIG_PATH}/.temp_gpg_env"
+  local env_file="${CK8S_CONFIG_PATH}/.temp-gpg-env"
 
   check_prerequisites
 
