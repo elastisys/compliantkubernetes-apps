@@ -67,14 +67,15 @@ check_prerequisites() {
 
     local unpriv_port
     unpriv_port=$(sysctl -n net.ipv4.ip_unprivileged_port_start 2>/dev/null || echo 1024)
-    if ((unpriv_port == 53)); then
+    if ((unpriv_port != 53)); then
       log.warn "net.ipv4.ip_unprivileged_port_start is $unpriv_port (Recommended: 53 for rootless setups)."
+      needs_fix=true
     fi
 
     if [[ "$needs_fix" == "true" ]]; then
       log.info ""
       log.warn "Your system limits are too low. Pods may fail to start."
-      log.info -n "❓  Would you like to fix these settings via sudo now? [y/N] "
+      log.info.no_newline "❓ Would you like to fix these settings via sudo now? [y/N] "
       read -r reply
       if [[ "$reply" =~ ^[Yy]$ ]]; then
         log.info "Applying fixes..."
