@@ -144,7 +144,7 @@ By default, all releases have `name=<release-name>` and `chart=<chart-name>` as 
 Enabling ingress and resolve requires a special setup.
 The ingress will by default be port-mapped on the local address `127.0.64.43`.
 
-The `local-clusters.sh` script provides commands to create and delete a local DNS server to resolve local domain queries. By default, the local resolve CoreDNS configuration will resolve the `dex`, `grafana`, `harbor`, `opensearch` and `ops` subdomains to the SC listen address of `127.0.64.43`, while all other subdomains of `<domain>` will resolve to the WC listen address of `127.0.64.143`.
+The `local-cluster.sh` script provides commands to create and delete a local DNS server to resolve local domain queries. By default, the local resolve CoreDNS configuration will resolve the `dex`, `grafana`, `harbor`, `opensearch` and `ops` subdomains to the SC listen address of `127.0.64.43`, while all other subdomains of `<domain>` will resolve to the WC listen address of `127.0.64.143`.
 
 To create the resolver, run `./scripts/local-cluster.sh resolve <create|delete> <domain>`, matching the base domain of the cluster.
 Note that this will make a temporary override of your current DNS server, and you may need to rerun it if you network settings are reset.
