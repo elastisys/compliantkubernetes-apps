@@ -60,7 +60,7 @@ networkPolicies:
     wcIngress:
       ips:
         - 0.0.0.0/0
-    ingressMode: InternalProxy
+    ingressMode: DirectRouting
     trivy:
       ips:
         - 0.0.0.0/0

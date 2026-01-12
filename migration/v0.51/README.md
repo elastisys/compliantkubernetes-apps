@@ -82,7 +82,12 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ./bin/ck8s upgrade wc ${new_version} apply
     ```
 
-1. Apply upgrade - _disruptive_
+> [!WARNING]
+> The ingress networking configuration has changed in the release. Make sure that you are using the correct ingressMode for the environment.
+> Especially if the environment is not using the default config. Otherwise network policies might block ingress traffic.
+
+<!-- markdownlint-disable MD029 -->
+3. Apply upgrade - _disruptive_
 
     > _Done during maintenance window._
 
