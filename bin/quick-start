@@ -48,6 +48,21 @@ fi
 check_prerequisites() {
   log_header "Checking System Prerequisites..."
 
+  local req_output
+  if ! req_output=$("${ROOT}/bin/ck8s" check-requirements 2>&1) || [[ "$req_output" =~ "Run the following command to install" ]]; then
+    log.warn "Missing or outdated requirements detected:"
+    log.info.no_newline "❓  Would you like to run the installer now? [y/N] "
+    read -r reply
+    if [[ "${reply}" =~ ^[Yy]$ ]]; then
+      "${ROOT}/bin/ck8s" install-requirements
+      log.info "✅ Dependencies installed."
+    else
+      log.warn "Proceeding with current tools. Unexpected behavior may occur."
+    fi
+  else
+    log.info "✅ Dependencies are up to date."
+  fi
+
   if [[ "$(uname)" == "Linux" ]]; then
     local needs_fix=false
     local current_watches
@@ -90,6 +105,9 @@ check_prerequisites() {
       log.info "✅ System limits are healthy."
     fi
   fi
+
+  #check for kind cluster
+  check_and_install_kind
 }
 
 teardown() {
@@ -121,12 +139,15 @@ setup() {
   check_prerequisites
 
   if [[ -f "${CK8S_CONFIG_PATH}/secrets.yaml" ]]; then
-    log.info "✅ Configuration exists. Skipping setup."
+    log.info "✅ Configuration found at: ${CK8S_CONFIG_PATH}"
+    log.info "Skipping setup steps."
+    log.info "💡 To rerun the quick start setup from scratch, remove the configuration by running:"
+    log.info "  rm -rf ${CK8S_CONFIG_PATH}"
   else
     log_header "Starting Welkin Local Quickstart"
     log.info "Flavor: ${CK8S_FLAVOR}"
 
-    log_header "Setting up local domain resolve..."
+    log_header "Setting up local domain resolve & cache..."
     "${LOCAL_CLUSTERS_SCRIPT}" cache create
     "${LOCAL_CLUSTERS_SCRIPT}" resolve create "${DOMAIN}"
 
@@ -162,6 +183,7 @@ setup() {
     if [[ ${STATUS_CODE} -eq 0 ]]; then
       log.info "✅ Welkin Quickstart Complete!"
       log.info "---------------------------------------------------"
+      log.info "  Welkin Configuration Path: ${CK8S_CONFIG_PATH}"
       log.info "  Grafana:     https://grafana.${DOMAIN}"
       log.info "  Harbor:      https://harbor.${DOMAIN}"
       log.info "---------------------------------------------------"
@@ -175,7 +197,7 @@ setup() {
       log.warn "---------------------------------------------------"
       log.warn "Please check the logs above."
       log.warn "You can retry the status check with:"
-      log.warn "  ./bin/ck8s local-quickstart status"
+      log.warn "  ./bin/ck8s quickstart status"
     fi
   fi
 }
@@ -201,6 +223,41 @@ wait_for_ready() {
   kubectl wait --for=condition=Available deployment -n gatekeeper-system --all --timeout=300s >/dev/null 2>&1 || true
 
   log.info "✅ ${affix^^} is stable."
+}
+
+check_and_install_kind() {
+  if ! command -v kind &>/dev/null; then
+    log.warn "'kind' is not installed. It is required to create a local cluster."
+    log.info.no_newline "❓ Would you like to install the latest 'kind' to /usr/local/bin now? [y/N] "
+    read -r reply
+    if [[ "${reply}" =~ ^[Yy]$ ]]; then
+      log.info "Fetching latest Kind version..."
+      local KIND_VERSION
+      KIND_VERSION=$(curl -s https://api.github.com/repos/kubernetes-sigs/kind/releases/latest | jq -r '.tag_name')
+
+      if [[ -z "$KIND_VERSION" || "$KIND_VERSION" == "null" ]]; then
+        log.fatal "Failed to fetch latest Kind version."
+      fi
+
+      local OS ARCH
+      OS="$(uname | tr '[:upper:]' '[:lower:]')"
+      ARCH="$(uname -m)"
+      [ "$ARCH" = "x86_64" ] && ARCH="amd64"
+      [ "$ARCH" = "aarch64" ] && ARCH="arm64"
+      log.info "Downloading..."
+      curl -Lo ./kind "https://kind.sigs.k8s.io/dl/${KIND_VERSION}/kind-${OS}-${ARCH}"
+      chmod +x ./kind
+      log.info "Installing to /usr/local/bin (requires sudo)..."
+      sudo mv ./kind /usr/local/bin/kind
+
+      log.info "✅ Kind ($KIND_VERSION) installed successfully."
+    else
+      log.error "Cannot proceed without 'kind'. Aborting."
+      exit 1
+    fi
+  else
+    log.info "✅ 'kind' is already installed."
+  fi
 }
 
 if [[ "${1:-}" == "delete" ]]; then
