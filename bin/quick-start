@@ -92,7 +92,7 @@ check_prerequisites() {
       log.warn "Your system limits are too low. Pods may fail to start."
       log.info.no_newline "❓ Would you like to fix these settings via sudo now? [y/N] "
       read -r reply
-      if [[ "$reply" =~ ^[Yy]$ ]]; then
+      if [[ "${reply}" =~ ^[Yy]$ ]]; then
         log.info "Applying fixes..."
         sudo sysctl -w fs.inotify.max_user_watches=102400
         sudo sysctl -w fs.inotify.max_user_instances=1024
