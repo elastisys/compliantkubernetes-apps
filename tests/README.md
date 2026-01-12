@@ -56,6 +56,11 @@ make run-integration
 
 > [!note]
 > For the end-to-end/opa-gatekeeper tests to work, you need to add `ghcr.io/elastisys` as trusted registry.
+>
+> The OPA Gatekeeper end-to-end tests are split into dev and admin suites:
+> `tests/end-to-end/opa-gatekeeper/policies.bats` (dev/workload policies) and
+> `tests/end-to-end/opa-gatekeeper/policies-admin.bats` (admin-only CAPI and CRD checks).
+> Run the admin suite only with cluster-admin credentials; CAPI tests skip when CRDs are missing.
 
 You must have `make` and either rootful `docker` or rootless `podman` installed!
 Check the [DEVELOPMENT](../DEVELOPMENT.md) docs additional requirements to run local-clusters for integration and regression tests.

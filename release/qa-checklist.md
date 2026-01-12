@@ -85,6 +85,26 @@ Elastisys Welkin® Apps
     ```
 
     </details>
+- [ ] Gatekeeper constraints - Enable user CRDs and policies needed for tests (some of these may already be enabled by default)
+    <details><summary>Commands</summary>
+
+    ```sh
+yq -i '.gatekeeper.allowUserCRDs.enabled = true' "${CK8S_CONFIG_PATH}/wc-config.yaml"
+yq -i '.gatekeeper.allowUserCRDs.enforcement = "deny"' "${CK8S_CONFIG_PATH}/wc-config.yaml"
+yq -i '.opa.rejectLoadBalancerService.enabled = true' "${CK8S_CONFIG_PATH}/common-config.yaml"
+yq -i '.opa.rejectLoadBalancerService.enforcement = "deny"' "${CK8S_CONFIG_PATH}/common-config.yaml"
+yq -i '.opa.rejectLocalStorageEmptyDir.enabled = true' "${CK8S_CONFIG_PATH}/common-config.yaml"
+yq -i '.opa.rejectLocalStorageEmptyDir.enforcement = "warn"' "${CK8S_CONFIG_PATH}/common-config.yaml"
+yq -i '.opa.rejectPodWithoutController.enabled = true' "${CK8S_CONFIG_PATH}/common-config.yaml"
+yq -i '.opa.rejectPodWithoutController.enforcement = "warn"' "${CK8S_CONFIG_PATH}/common-config.yaml"
+yq -i '.opa.minimumDeploymentReplicas.enabled = true' "${CK8S_CONFIG_PATH}/common-config.yaml"
+yq -i '.opa.minimumDeploymentReplicas.enforcement = "warn"' "${CK8S_CONFIG_PATH}/common-config.yaml"
+
+    # apply
+    ./bin/ck8s apply wc
+    ```
+
+    </details>
 - [ ] Grafana trailing dots - Disabled
     <details><summary>Commands</summary>
 

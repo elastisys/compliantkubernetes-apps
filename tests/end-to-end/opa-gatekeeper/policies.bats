@@ -9,7 +9,9 @@ setup_file() {
   export user_demo_chart="oci://ghcr.io/elastisys/welkin-user-demo"
   export user_demo_image="ghcr.io/elastisys/user-demo:test"
 
-  with_static_wc_kubeconfig
+  # Authenticate as dev@example.com via OIDC/Cypress
+  with_static_wc_kubeconfig dev
+
   if ! [[ $(kubectl get ns staging -o json | jq -r '.metadata.labels["hnc.x-k8s.io/included-namespace"]') == "true" ]]; then
     fail "these tests requires that you have a 'staging' user namespace"
   fi
@@ -28,10 +30,13 @@ setup() {
 }
 
 teardown_file() {
-  delete_static_wc_kubeconfig
+  load "../../bats.lib.bash"
+
+  # Clean up kubeconfig
+  delete_static_wc_kubeconfig dev
 }
 
-@test "static user can list opa rules" {
+@test "dev user can list opa rules" {
   run kubectl auth whoami
   assert_output --partial "dev@example.com"
   run kubectl get constraints
@@ -114,18 +119,16 @@ teardown_file() {
   assert_failure
 }
 
-@test "opa gatekeeper policies - warn loadbalancer service" {
+@test "opa gatekeeper policies - deny loadbalancer service" {
   run helm -n "${NAMESPACE}" upgrade --install opa-loadbalancer "${user_demo_chart}" \
     --set "image.repository=${user_demo_image%:*}" \
     --set "image.tag=${user_demo_image#*:}" \
     --set "service.type=LoadBalancer" \
     --set "ingress.enabled=false"
 
-  helm -n "${NAMESPACE}" uninstall opa-loadbalancer --wait
-  kubectl -n "${NAMESPACE}" delete po -l app.kubernetes.io/name=welkin-user-demo,app.kubernetes.io/instance=opa-loadbalancer
-
+  assert_line --regexp '.*admission webhook "validation.gatekeeper.sh" denied the request.*'
   assert_line --regexp '.*Creation of LoadBalancer Service is not supported.*'
-  assert_success
+  assert_failure
 }
 
 @test "opa gatekeeper policies - warn local storage emptydir" {
