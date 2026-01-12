@@ -1,5 +1,13 @@
 # Elastisys Welkin® Apps
 
+> [!IMPORTANT]
+>
+> As of January 2026, this repo is now **read-only**.
+>
+> The product lives on and development continues! However, we are focusing our efforts on developing it under the new name: **Elastisys Welkin® Enterprise**. While this repo will remain online, it will no longer receive updates or accept pull requests.
+>
+> Want to learn more about Elastisys Welkin® Enterprise? Visit :point_right: https://elastisys.com/welkin-enterprise for more info and news!
+
 [![tests](https://github.com/elastisys/compliantkubernetes-apps/actions/workflows/tests.yml/badge.svg)](https://github.com/elastisys/compliantkubernetes-apps/actions/workflows/tests.yml)
 
 ## Overview
