@@ -304,27 +304,8 @@ config() {
     log.fatal "CK8S_CONFIG_PATH is unset"
   fi
 
-  local env_file="${CK8S_CONFIG_PATH}/.temp-gpg-env"
   if [[ -z "${CK8S_PGP_FP:-}" ]]; then
-    if [[ -f "${env_file}" ]]; then
-      # shellcheck disable=SC1090
-      source "${env_file}"
-      log.info "CK8S_PGP_FP was unset. Reusing temporary GPG environment from ${env_file}"
-      log.info "To persist this in your current terminal, run:"
-      log.info "  source ${env_file}"
-    elif [[ -x "${ROOT}/bin/setup-local-gpg.bash" ]]; then
-      source "${ROOT}/bin/setup-local-gpg.bash"
-      echo "export GNUPGHOME='${GNUPGHOME}'" >"${env_file}"
-      echo "export CK8S_PGP_FP='${CK8S_PGP_FP}'" >>"${env_file}"
-      log.info "CK8S_PGP_FP was unset. Generated temporary GPG key: ${CK8S_PGP_FP}"
-      log.warn "Once this is cleared you will lose the ability to decrypt the secrets for this config path."
-      log.info "To load this in your current terminal, run:"
-      log.info "  source ${env_file}"
-    fi
-
-    if [[ -z "${CK8S_PGP_FP:-}" ]]; then
-      log.fatal "CK8S_PGP_FP is unset and automatic generation failed."
-    fi
+    log.fatal "CK8S_PGP_FP is unset"
   fi
 
   if ! [[ -d "${CK8S_CONFIG_PATH}" ]]; then
@@ -463,7 +444,7 @@ create() {
   fi
 
   # install s3
-  if [[ "${cluster}" == "sc" ]] && ! [[ "${*}" =~ --skip-minio ]]; then
+  if ! [[ "${*}" =~ --skip-minio ]]; then
     log.info "installing minio"
 
     kubectl get namespace minio-system &>/dev/null || kubectl create namespace minio-system
@@ -560,6 +541,147 @@ delete() {
   fi
 }
 
+status() {
+  local target_cluster="${1:-}"
+
+  local index_file="${CK8S_CONFIG_PATH}/cluster-index.yaml"
+  local clusters_to_check=()
+
+  if [[ -n "$target_cluster" ]]; then
+    clusters_to_check+=("$target_cluster")
+  else
+    if [[ -f "$index_file" ]]; then
+      readarray -t clusters_to_check < <(yq e 'keys | .[]' "$index_file")
+    else
+      log.warn "⚠️  Index file not found. Using 'kind get clusters'"
+      readarray -t clusters_to_check < <(kind get clusters)
+    fi
+  fi
+
+  if [[ ${#clusters_to_check[@]} -eq 0 ]]; then
+    log.error "❌ No clusters found to check."
+    return 1
+  fi
+
+  log.info "Running status checks..."
+  domain="$(yq e ".global.baseDomain" "${CK8S_CONFIG_PATH}/common-config.yaml")"
+
+  for cluster in "${clusters_to_check[@]}"; do
+    local affix=""
+    case "$cluster" in
+    *-wc) affix="wc" ;;
+    *-sc) affix="sc" ;;
+    *) ;;
+    esac
+    log.info "Checking Cluster: ${cluster}"
+
+    # 1. Cluster Status Check
+    if ! kind get clusters | grep -q "^${cluster}$"; then
+      log.fatal "❌ [FAIL] Cluster '${cluster}' is not running."
+    fi
+
+    # Load Kubeconfig
+    export KUBECONFIG="${CK8S_CONFIG_PATH}/.state/kube_config_${affix}.yaml"
+
+    # 2. Node Status Check
+    log.info "Checking Nodes..."
+    if kubectl get nodes | grep -q "NotReady"; then
+      log.error "❌ [FAIL] Some nodes are NotReady:"
+      kubectl get nodes
+    else
+      log.info "✅ [PASS] All nodes are Ready."
+    fi
+
+    # 3. Cluster Networking Check
+    log.info "Checking Networking (Calico)..."
+    if kubectl get pods -n calico-system --field-selector=status.phase!=Running 2>&1 | grep -q "No resources found"; then
+      log.info "✅ [PASS] Calico is running."
+    else
+      log.error "❌ [FAIL] Calico pods are not running. Check 'kubectl get pods -n calico-system'."
+    fi
+
+    # 4. Block Storage (Local Path) Check
+    log.info "Checking Block Storage..."
+    if kubectl get pods -n local-path-storage | grep -q "Running"; then
+      log.info "✅ [PASS] Local Path Provisioner is running."
+    else
+      log.error "❌ [FAIL] Block storage provider is missing."
+    fi
+
+    #5. Checking Storage Status
+    if [[ "$affix" == "sc" ]]; then
+      log.info "Checking Object Storage..."
+      if kubectl get ns minio-system >/dev/null 2>&1 && kubectl get pods -n minio-system | grep -q "Running"; then
+        log.info "✅ [PASS] Minio pods are running."
+      else
+        log.error "❌ [FAIL] Minio pods not found or not running. Check 'kubectl get pods -n minio-system'"
+      fi
+    fi
+  done
+
+  # 7. Resolve Status
+  log.info "Checking Resolve Status..."
+
+  if [[ -f "${CK8S_CONFIG_PATH}/common-config.yaml" ]]; then
+    local domain
+    domain="$(yq e ".global.baseDomain" "${CK8S_CONFIG_PATH}/common-config.yaml")"
+
+    if [[ -z "${domain}" || "${domain}" == "null" ]]; then
+      log.warn "⚠️  [WARN] Could not determine baseDomain."
+    else
+      local expected_ip="127.0.64.43"
+      local services=("grafana" "harbor" "minio" "console.minio.ops" "grafana.ops" "dex" "thanos-receiver.ops")
+
+      for svc in "${services[@]}"; do
+        local fqdn="${svc}.${domain}"
+        local resolved_ip
+        set +e
+        resolved_ip=$(getent hosts "${fqdn}" | awk '{print $1}' | head -n 1)
+
+        if [[ "$resolved_ip" == "$expected_ip" ]]; then
+          log.info "✅ [PASS] ${fqdn} resolves to ${expected_ip}."
+        else
+          log.error "❌ [FAIL] ${fqdn} resolves to '${resolved_ip}' (Expected: ${expected_ip})."
+          log.info "If empty, ensure 'resolve' container is running: ./scripts/local-clusters.sh resolve create ${domain}"
+        fi
+      done
+      set -e
+    fi
+
+    log.info "Checking Service Connectivity (HTTP)..."
+
+    FUNCS_PATH="${ROOT}/pipeline/test/services/funcs.sh"
+    if [[ -f "${FUNCS_PATH}" ]]; then
+      # Initialize variables that funcs.sh relies on
+      export SUCCESSES=0
+      export FAILURES=0
+      export RETRY_COUNT=6
+      export RETRY_WAIT=5
+      # shellcheck source=pipeline/test/services/funcs.sh
+      source "${FUNCS_PATH}"
+    else
+      log.error "Could not find funcs.sh at ${FUNCS_PATH}"
+      return 1
+    fi
+
+    testEndpointProtected "Dex" "https://dex.${domain}/.well-known/openid-configuration" "200"
+    testEndpointProtected "Harbor" "https://harbor.${domain}/api/v2.0/ping" "200"
+    testEndpointProtected "MiniO" "https://minio.${domain}/minio/health/live" "200"
+    testEndpointProtected "MinioConsole" "https://console.minio.ops.${domain}" "200"
+    testEndpointProtected "Grafana (Ops)" "https://grafana.ops.${domain}/login" "200"
+    testEndpointProtected "Grafana (User)" "https://grafana.${domain}/login" "200"
+    testEndpointProtected "Thanos Receiver" "https://thanos-receiver.ops.${domain}/" "401"
+
+    if [[ $FAILURES -gt 0 ]]; then
+      log.warn "⚠️  ${FAILURES} service(s) failed connectivity checks. See logs above."
+    else
+      log.info "✅ All services are reachable."
+    fi
+  else
+    log.warn "⚠️  [WARN] common-config.yaml not found."
+  fi
+}
+
 main() {
   local command subcommand
   command="${1:-}"
@@ -601,6 +723,10 @@ main() {
     ;;
   create)
     create "${@:2}"
+    ;;
+  status)
+    shift
+    status "$@"
     ;;
   delete)
     delete "${@:2}"
