@@ -46,14 +46,18 @@ if [[ ! -f "${LOCAL_CLUSTERS_SCRIPT}" ]]; then
 fi
 
 check_prerequisites() {
-  log_header "Checking System Prerequisites..."
+  log_header "📋 Checking System Prerequisites..."
   check_ports
   local req_output
-  if ! req_output=$("${ROOT}/bin/ck8s" check-requirements 2>&1) || [[ "$req_output" =~ "Run the following command to install" ]]; then
+  # We check requirements but mask the exit code so we can handle the output string manually
+  if ! req_output=$("${ROOT}/bin/ck8s" check-requirements 2>&1) ||
+    [[ "$req_output" =~ "Run the following command to install" ]] ||
+    [[ "$req_output" =~ "Run the following command to update" ]]; then
+
     log.warn "Missing or outdated requirements detected:"
-    log.info.no_newline "❓  Would you like to run the installer now? [y/N] "
+    log.info.no_newline "❓  Would you like to run the installer now? [Y/n] "
     read -r reply
-    if [[ "${reply}" =~ ^[Yy]$ ]]; then
+    if [[ -z "${reply}" || "${reply}" =~ ^[Yy]$ ]]; then
       "${ROOT}/bin/ck8s" install-requirements
       log.info "✅ Dependencies installed."
     else
@@ -88,11 +92,10 @@ check_prerequisites() {
     fi
 
     if [[ "$needs_fix" == "true" ]]; then
-      log.info ""
       log.warn "Your system limits are too low. Pods may fail to start."
-      log.info.no_newline "❓ Would you like to fix these settings via sudo now? [y/N] "
+      log.info.no_newline "❓ Would you like to fix these settings via sudo now? [Y/n] "
       read -r reply
-      if [[ "${reply}" =~ ^[Yy]$ ]]; then
+      if [[ -z "${reply}" || "${reply}" =~ ^[Yy]$ ]]; then
         log.info "Applying fixes..."
         sudo sysctl -w fs.inotify.max_user_watches=102400
         sudo sysctl -w fs.inotify.max_user_instances=1024
@@ -111,7 +114,7 @@ check_prerequisites() {
 }
 
 teardown() {
-  log_header "Tearing down Welkin Quickstart Environment..."
+  log_header "🗑️ Tearing down Welkin Quickstart Environment..."
 
   log.info "Deleting Workload Cluster..."
   "${LOCAL_CLUSTERS_SCRIPT}" delete "${CK8S_ENVIRONMENT_NAME}-wc" || true
@@ -128,7 +131,7 @@ teardown() {
 }
 
 setup() {
-  log_header "Setting up Welkin Quick Start Local cluster"
+  log_header "🚀 Setting up Welkin Quick Start Local cluster"
 
   if [[ ! -d "${CK8S_CONFIG_PATH}" ]]; then
     mkdir -p "${CK8S_CONFIG_PATH}"
@@ -148,11 +151,11 @@ setup() {
     log_header "Starting Welkin Local Quickstart"
     log.info "Flavor: ${CK8S_FLAVOR}"
     log.info "Welkin Config Path: ${CK8S_CONFIG_PATH}"
-    log_header "Setting up local domain resolve & cache..."
+    log_header "🌐 Setting up local domain resolve & cache..."
     "${LOCAL_CLUSTERS_SCRIPT}" cache create
     "${LOCAL_CLUSTERS_SCRIPT}" resolve create "${DOMAIN}"
 
-    log_header "Init Configuration..."
+    log_header "⚙️ Init Configuration..."
 
     "${LOCAL_CLUSTERS_SCRIPT}" config "${CK8S_ENVIRONMENT_NAME}" "${CK8S_FLAVOR}" "${DOMAIN}"
 
@@ -171,7 +174,7 @@ setup() {
     log_header "Configuring node local dns setup..."
     "${LOCAL_CLUSTERS_SCRIPT}" setup node-local-dns
 
-    log_header "Verifying Environment Status..."
+    log_header "🔍 Running final welkin environment checks..."
 
     set +e
     "${LOCAL_CLUSTERS_SCRIPT}" status
@@ -180,11 +183,12 @@ setup() {
 
     log.info ""
     if [[ ${STATUS_CODE} -eq 0 ]]; then
-      log.info "✅ Welkin Quickstart Complete!"
+      log.info "✅ Welkin Quickstart Completed!"
       log.info "---------------------------------------------------"
       log.info "  Welkin Configuration Path: ${CK8S_CONFIG_PATH}"
       log.info "  Grafana:     https://grafana.${DOMAIN}"
       log.info "  Harbor:      https://harbor.${DOMAIN}"
+      log.info "  Objectstroage: https://console.minio.ops.${DOMAIN}"
       log.info "---------------------------------------------------"
       log.info "To view/edit secrets manually, run:"
       log.info "  source ${CK8S_CONFIG_PATH}/..temp_gpg_env"
@@ -196,7 +200,7 @@ setup() {
       log.warn "---------------------------------------------------"
       log.warn "Please check the logs above."
       log.warn "You can retry the status check with:"
-      log.warn "  ./bin/ck8s quickstart status"
+      log.warn "  ./scripts/local-cluster.sh status"
     fi
   fi
 }
@@ -227,9 +231,9 @@ wait_for_ready() {
 check_and_install_kind() {
   if ! command -v kind &>/dev/null; then
     log.warn "'kind' is not installed. It is required to create a local cluster."
-    log.info.no_newline "❓ Would you like to install the latest 'kind' to /usr/local/bin now? [y/N] "
+    log.info.no_newline "❓ Would you like to install the latest 'kind' to /usr/local/bin now? [Y/n] "
     read -r reply
-    if [[ "${reply}" =~ ^[Yy]$ ]]; then
+    if [[ -z "${reply}" || "${reply}" =~ ^[Yy]$ ]]; then
       log.info "Fetching latest Kind version..."
       local KIND_VERSION
       KIND_VERSION=$(curl -s https://api.github.com/repos/kubernetes-sigs/kind/releases/latest | jq -r '.tag_name')
@@ -276,6 +280,17 @@ check_ports() {
         proc_name=$(sudo lsof -i ":${port}" -sTCP:LISTEN -t | head -n 1 | xargs -r ps -p | tail -n 1 | awk '{print $NF}')
       fi
       log.warn "Process blocking it: ${proc_name}"
+
+      if [[ "${proc_name}" == "docker-proxy" ]]; then
+        local container_name
+        container_name=$(docker ps --format '{{.Names}}' --filter "publish=${port}" | head -n 1)
+
+        if [[ "$container_name" == *"${CK8S_ENVIRONMENT_NAME}"* ]]; then
+          log.error "❌ Port ${port} is occupied by an existing Welkin Quickstart cluster ($container_name)."
+          log.warn "We cannot overwrite the existing cluster safely."
+          log.fatal "💡 Please run '$0 delete' to clean up the old cluster, then try again."
+        fi
+      fi
     fi
   done
 
