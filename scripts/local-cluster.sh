@@ -463,7 +463,7 @@ create() {
   fi
 
   # install s3
-  if ! [[ "${*}" =~ --skip-minio ]]; then
+  if [[ "${cluster}" == "sc" ]] && ! [[ "${*}" =~ --skip-minio ]]; then
     log.info "installing minio"
 
     kubectl get namespace minio-system &>/dev/null || kubectl create namespace minio-system
