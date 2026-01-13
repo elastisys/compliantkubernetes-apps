@@ -74,7 +74,10 @@ kind: OpenStackCluster
 metadata:
   name: test-openstack-cluster
   namespace: ${NAMESPACE}
-spec: {}
+spec:
+  identityRef:
+    name: test-openstack-credentials
+    cloudName: openstack
 EOF
 
   # Attempt to delete the test OpenStackCluster (should be denied by Gatekeeper)
