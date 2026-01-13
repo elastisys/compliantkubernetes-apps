@@ -1,0 +1,9 @@
+known_cidrs:
+  "1.0.0.0/32": "Object storage CIDR"
+  "2.0.0.0/32": "Cluster DNS Service IP"
+  "0.1.0.0/32": "Management Cluster API Server CIDR"
+  "0.0.1.0/32": "Management Cluster Ingress CIDR"
+  "0.0.0.1/32": "Management Cluster subnet CIDR"
+  "0.2.0.0/32": "Workload Cluster API Server CIDR"
+  "0.0.2.0/32": "Workload Cluster Ingress CIDR"
+  "0.0.0.2/32": "Workload Cluster subnet CIDR"
