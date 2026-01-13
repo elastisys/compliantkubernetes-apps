@@ -657,6 +657,7 @@ status() {
       export FAILURES=0
       export RETRY_COUNT=6
       export RETRY_WAIT=5
+      # shellcheck source=pipeline/test/services/funcs.sh
       source "${FUNCS_PATH}"
     else
       log.error "Could not find funcs.sh at ${FUNCS_PATH}"
