@@ -617,27 +617,6 @@ status() {
         log.error "❌ [FAIL] Minio pods not found or not running. Check 'kubectl get pods -n minio-system'"
       fi
     fi
-
-    # 6. S3 Connectivity (Internal)
-    if [[ -f "${CK8S_CONFIG_PATH}/common-config.yaml" ]]; then
-      local s3_endpoint
-      s3_endpoint="$(yq e ".objectStorage.s3.regionEndpoint" "${CK8S_CONFIG_PATH}/common-config.yaml")"
-
-      if [[ -n "${s3_endpoint}" && "${s3_endpoint}" != "null" ]]; then
-        log.info "Testing S3 reachability from ${cluster} the cluster..."
-        set +e
-        #using existing pod from the cluster to check status
-        kubectl exec -it -n monitoring prometheus-kube-prometheus-stack-prometheus-0 -- wget -q --spider -S --no-check-certificate "${s3_endpoint}/minio/health/live" >/dev/null 2>&1
-        local check_result=$?
-        set -e
-
-        if [[ $check_result -eq 0 ]]; then
-          log.info "✅ [PASS] S3 Endpoint is reachable."
-        else
-          log.error "❌ [FAIL] S3 Endpoint (${s3_endpoint}) is NOT reachable from inside ${cluster}."
-        fi
-      fi
-    fi
   done
 
   # 7. Resolve Status
@@ -651,7 +630,7 @@ status() {
       log.warn "⚠️  [WARN] Could not determine baseDomain."
     else
       local expected_ip="127.0.64.43"
-      local services=("grafana" "harbor")
+      local services=("grafana" "harbor" "minio" "console.minio.ops" "grafana.ops" "dex" "thanos-receiver.ops")
 
       for svc in "${services[@]}"; do
         local fqdn="${svc}.${domain}"
@@ -667,6 +646,35 @@ status() {
         fi
       done
       set -e
+    fi
+
+    log.info "Checking Service Connectivity (HTTP)..."
+
+    FUNCS_PATH="${ROOT}/pipeline/test/services/funcs.sh"
+    if [[ -f "${FUNCS_PATH}" ]]; then
+      # Initialize variables that funcs.sh relies on
+      export SUCCESSES=0
+      export FAILURES=0
+      export RETRY_COUNT=6
+      export RETRY_WAIT=5
+      source "${FUNCS_PATH}"
+    else
+      log.error "Could not find funcs.sh at ${FUNCS_PATH}"
+      return 1
+    fi
+
+    testEndpointProtected "Dex" "https://dex.${domain}/.well-known/openid-configuration" "200"
+    testEndpointProtected "Harbor" "https://harbor.${domain}/api/v2.0/ping" "200"
+    testEndpointProtected "MiniO" "https://minio.${domain}/minio/health/live" "200"
+    testEndpointProtected "MinioConsole" "https://console.minio.ops.${domain}" "200"
+    testEndpointProtected "Grafana (Ops)" "https://grafana.ops.${domain}/login" "200"
+    testEndpointProtected "Grafana (User)" "https://grafana.${domain}/login" "200"
+    testEndpointProtected "Thanos Receiver" "https://thanos-receiver.ops.${domain}/" "401"
+
+    if [[ $FAILURES -gt 0 ]]; then
+      log.warn "⚠️  ${FAILURES} service(s) failed connectivity checks. See logs above."
+    else
+      log.info "✅ All services are reachable."
     fi
   else
     log.warn "⚠️  [WARN] common-config.yaml not found."
