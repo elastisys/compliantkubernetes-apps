@@ -453,7 +453,7 @@ create() {
   fi
 
   # install s3
-  if ! [[ "${*}" =~ --skip-minio ]]; then
+  if [[ "${cluster}" == "sc" ]] && ! [[ "${*}" =~ --skip-minio ]]; then
     #install ingress-nginx
     log.info "Installing ingress-nginx in SC"
     "${ROOT}/bin/ck8s" ops helmfile sc -lapp=ingress-nginx apply --include-transitive-needs --output simple
