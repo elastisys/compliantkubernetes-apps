@@ -199,5 +199,6 @@ spec:
              app: minio
       ports:
         - port: 9000
+        - port: 9001
     {{- end }}
 {{- end }}
