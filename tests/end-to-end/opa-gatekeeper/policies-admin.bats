@@ -3,18 +3,13 @@
 # bats file_tags=opa-gatekeeper
 
 # OPA Gatekeeper E2E tests for cluster-level policies (CAPI + CRD policies).
-# Uses admin@example.com (cluster-admin) authentication via OIDC/Cypress.
+# CAPI tests run on SC (where Cluster API manages clusters).
+# CRD creation test runs on WC (where user workloads are deployed).
 
 setup_file() {
   load "../../bats.lib.bash"
 
   export BATS_NO_PARALLELIZE_WITHIN_FILE="true"
-
-  # Namespace for cluster-level policy tests (only used when CAPI is available)
-  export ADMIN_TEST_NAMESPACE="opa-admin-test"
-
-  # Authenticate as admin@example.com (cluster-admin) via OIDC/Cypress
-  with_static_wc_kubeconfig admin
 }
 
 setup() {
@@ -23,42 +18,39 @@ setup() {
   load_detik
 }
 
-teardown_file() {
-  load "../../bats.lib.bash"
-
-  # Clean up kubeconfig
-  delete_static_wc_kubeconfig admin
-}
-
 # ============================================
-# Cluster-level policy tests (CAPI)
-# These tests are skipped when Cluster API is not installed
+# Cluster-level policy tests (CAPI) - Run on SC
+# These tests verify that accidental deletion of CAPI resources is prevented.
+# Skipped when Cluster API is not installed (optional component).
 # ============================================
 
 @test "opa gatekeeper policies - error delete cluster without annotation" {
-  # Skip if CAPI Cluster CRD is not installed
+  with_kubeconfig sc
+  with_namespace opa-admin-test
+
+  # Skip if CAPI Cluster CRD is not installed (optional component)
   if ! kubectl get crd clusters.cluster.x-k8s.io &>/dev/null; then
     skip "Cluster API not installed (clusters.cluster.x-k8s.io CRD not found)"
   fi
 
   # Create test namespace and resource
-  kubectl create namespace "${ADMIN_TEST_NAMESPACE}" --dry-run=client -o yaml | kubectl apply -f -
+  create_namespace
   kubectl apply -f - <<EOF
 apiVersion: cluster.x-k8s.io/v1beta1
 kind: Cluster
 metadata:
   name: test-cluster
-  namespace: ${ADMIN_TEST_NAMESPACE}
+  namespace: ${NAMESPACE}
 spec: {}
 EOF
 
   # Attempt to delete the test cluster (should be denied by Gatekeeper)
-  run kubectl delete cluster test-cluster -n "${ADMIN_TEST_NAMESPACE}"
+  run kubectl delete cluster test-cluster -n "${NAMESPACE}"
 
   # Cleanup (force delete with annotation)
-  kubectl annotate cluster test-cluster -n "${ADMIN_TEST_NAMESPACE}" elastisys.io/ok-to-delete=true --overwrite 2>/dev/null || true
-  kubectl delete cluster test-cluster -n "${ADMIN_TEST_NAMESPACE}" --ignore-not-found 2>/dev/null || true
-  kubectl delete namespace "${ADMIN_TEST_NAMESPACE}" --ignore-not-found 2>/dev/null || true
+  kubectl annotate cluster test-cluster -n "${NAMESPACE}" elastisys.io/ok-to-delete=true --overwrite 2>/dev/null || true
+  kubectl delete cluster test-cluster -n "${NAMESPACE}" --ignore-not-found 2>/dev/null || true
+  delete_namespace 2>/dev/null || true
 
   assert_line --regexp '.*admission webhook "validation.gatekeeper.sh" denied the request.*'
   assert_line --regexp '.*deletion is not allowed.*'
@@ -66,29 +58,32 @@ EOF
 }
 
 @test "opa gatekeeper policies - error delete openstackcluster without annotation" {
-  # Skip if CAPI OpenStackCluster CRD is not installed
+  with_kubeconfig sc
+  with_namespace opa-admin-test
+
+  # Skip if CAPI OpenStackCluster CRD is not installed (optional component)
   if ! kubectl get crd openstackclusters.infrastructure.cluster.x-k8s.io &>/dev/null; then
     skip "Cluster API OpenStack provider not installed (openstackclusters CRD not found)"
   fi
 
   # Create test namespace and resource
-  kubectl create namespace "${ADMIN_TEST_NAMESPACE}" --dry-run=client -o yaml | kubectl apply -f -
+  create_namespace
   kubectl apply -f - <<EOF
 apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
 kind: OpenStackCluster
 metadata:
   name: test-openstack-cluster
-  namespace: ${ADMIN_TEST_NAMESPACE}
+  namespace: ${NAMESPACE}
 spec: {}
 EOF
 
   # Attempt to delete the test OpenStackCluster (should be denied by Gatekeeper)
-  run kubectl delete openstackcluster test-openstack-cluster -n "${ADMIN_TEST_NAMESPACE}"
+  run kubectl delete openstackcluster test-openstack-cluster -n "${NAMESPACE}"
 
   # Cleanup (force delete with annotation)
-  kubectl annotate openstackcluster test-openstack-cluster -n "${ADMIN_TEST_NAMESPACE}" elastisys.io/ok-to-delete=true --overwrite 2>/dev/null || true
-  kubectl delete openstackcluster test-openstack-cluster -n "${ADMIN_TEST_NAMESPACE}" --ignore-not-found 2>/dev/null || true
-  kubectl delete namespace "${ADMIN_TEST_NAMESPACE}" --ignore-not-found 2>/dev/null || true
+  kubectl annotate openstackcluster test-openstack-cluster -n "${NAMESPACE}" elastisys.io/ok-to-delete=true --overwrite 2>/dev/null || true
+  kubectl delete openstackcluster test-openstack-cluster -n "${NAMESPACE}" --ignore-not-found 2>/dev/null || true
+  delete_namespace 2>/dev/null || true
 
   assert_line --regexp '.*admission webhook "validation.gatekeeper.sh" denied the request.*'
   assert_line --regexp '.*deletion is not allowed.*'
@@ -96,29 +91,32 @@ EOF
 }
 
 @test "opa gatekeeper policies - error delete azurecluster without annotation" {
-  # Skip if CAPI AzureCluster CRD is not installed
+  with_kubeconfig sc
+  with_namespace opa-admin-test
+
+  # Skip if CAPI AzureCluster CRD is not installed (optional component)
   if ! kubectl get crd azureclusters.infrastructure.cluster.x-k8s.io &>/dev/null; then
     skip "Cluster API Azure provider not installed (azureclusters CRD not found)"
   fi
 
   # Create test namespace and resource
-  kubectl create namespace "${ADMIN_TEST_NAMESPACE}" --dry-run=client -o yaml | kubectl apply -f -
+  create_namespace
   kubectl apply -f - <<EOF
 apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
 kind: AzureCluster
 metadata:
   name: test-azure-cluster
-  namespace: ${ADMIN_TEST_NAMESPACE}
+  namespace: ${NAMESPACE}
 spec: {}
 EOF
 
   # Attempt to delete the test AzureCluster (should be denied by Gatekeeper)
-  run kubectl delete azurecluster test-azure-cluster -n "${ADMIN_TEST_NAMESPACE}"
+  run kubectl delete azurecluster test-azure-cluster -n "${NAMESPACE}"
 
   # Cleanup (force delete with annotation)
-  kubectl annotate azurecluster test-azure-cluster -n "${ADMIN_TEST_NAMESPACE}" elastisys.io/ok-to-delete=true --overwrite 2>/dev/null || true
-  kubectl delete azurecluster test-azure-cluster -n "${ADMIN_TEST_NAMESPACE}" --ignore-not-found 2>/dev/null || true
-  kubectl delete namespace "${ADMIN_TEST_NAMESPACE}" --ignore-not-found 2>/dev/null || true
+  kubectl annotate azurecluster test-azure-cluster -n "${NAMESPACE}" elastisys.io/ok-to-delete=true --overwrite 2>/dev/null || true
+  kubectl delete azurecluster test-azure-cluster -n "${NAMESPACE}" --ignore-not-found 2>/dev/null || true
+  delete_namespace 2>/dev/null || true
 
   assert_line --regexp '.*admission webhook "validation.gatekeeper.sh" denied the request.*'
   assert_line --regexp '.*deletion is not allowed.*'
@@ -126,42 +124,53 @@ EOF
 }
 
 @test "opa gatekeeper policies - allow delete cluster with annotation" {
-  # Skip if CAPI Cluster CRD is not installed
+  with_kubeconfig sc
+  with_namespace opa-admin-test
+
+  # Skip if CAPI Cluster CRD is not installed (optional component)
   if ! kubectl get crd clusters.cluster.x-k8s.io &>/dev/null; then
     skip "Cluster API not installed (clusters.cluster.x-k8s.io CRD not found)"
   fi
 
   # Create test namespace and resource with the bypass annotation
-  kubectl create namespace "${ADMIN_TEST_NAMESPACE}" --dry-run=client -o yaml | kubectl apply -f -
+  create_namespace
   kubectl apply -f - <<EOF
 apiVersion: cluster.x-k8s.io/v1beta1
 kind: Cluster
 metadata:
   name: test-cluster
-  namespace: ${ADMIN_TEST_NAMESPACE}
+  namespace: ${NAMESPACE}
   annotations:
     elastisys.io/ok-to-delete: "true"
 spec: {}
 EOF
 
   # Attempt to delete should succeed with annotation (use dry-run to not actually delete)
-  run kubectl delete cluster test-cluster -n "${ADMIN_TEST_NAMESPACE}" --dry-run=server
+  run kubectl delete cluster test-cluster -n "${NAMESPACE}" --dry-run=server
 
   # Cleanup
-  kubectl delete cluster test-cluster -n "${ADMIN_TEST_NAMESPACE}" --ignore-not-found 2>/dev/null || true
-  kubectl delete namespace "${ADMIN_TEST_NAMESPACE}" --ignore-not-found 2>/dev/null || true
+  kubectl delete cluster test-cluster -n "${NAMESPACE}" --ignore-not-found 2>/dev/null || true
+  delete_namespace 2>/dev/null || true
 
   refute_line --regexp '.*admission webhook "validation.gatekeeper.sh" denied the request.*'
   assert_success
 }
 
+# ============================================
+# CRD creation policy test - Run on WC
+# This test verifies that unauthorized users cannot create CRDs.
+# ============================================
+
 @test "opa gatekeeper policies - error unauthorized crd creation" {
+  with_kubeconfig wc
+
   local -r test_user="opa-unlisted@example.com"
   local -r rbac_name="opa-user-crd-test"
 
-  # Grant CRD create permission so Gatekeeper (not RBAC) does the denial.
+  # Grant CRD create and get permissions so Gatekeeper (not RBAC) does the denial.
+  # Note: 'get' is required because kubectl apply --dry-run=server checks if the resource exists.
   kubectl create clusterrole "${rbac_name}" \
-    --verb=create \
+    --verb=create,get \
     --resource=customresourcedefinitions.apiextensions.k8s.io \
     --dry-run=client -o yaml | kubectl apply -f -
   kubectl create clusterrolebinding "${rbac_name}" \

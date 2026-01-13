@@ -120,11 +120,30 @@ teardown_file() {
 }
 
 @test "opa gatekeeper policies - deny loadbalancer service" {
-  run helm -n "${NAMESPACE}" upgrade --install opa-loadbalancer "${user_demo_chart}" \
+  if ! kubectl get k8srejectloadbalancerservice.constraints.gatekeeper.sh \
+    elastisys-reject-load-balancer-service >/dev/null 2>&1; then
+    fail "reject-loadbalancer-service constraint not installed"
+  fi
+
+  local enforcement
+  enforcement="$(kubectl get k8srejectloadbalancerservice.constraints.gatekeeper.sh \
+    elastisys-reject-load-balancer-service \
+    -o jsonpath='{.spec.enforcementAction}')"
+  if [[ "${enforcement}" != "deny" ]]; then
+    fail "reject-loadbalancer-service enforcementAction is '${enforcement}', expected 'deny'"
+  fi
+
+  local release_name
+  release_name="opa-loadbalancer-${BATS_TEST_NUMBER}-${RANDOM}"
+
+  run helm -n "${NAMESPACE}" upgrade --install "${release_name}" "${user_demo_chart}" \
     --set "image.repository=${user_demo_image%:*}" \
     --set "image.tag=${user_demo_image#*:}" \
     --set "service.type=LoadBalancer" \
     --set "ingress.enabled=false"
+
+  helm -n "${NAMESPACE}" uninstall "${release_name}" --wait >/dev/null 2>&1 || true
+  kubectl -n "${NAMESPACE}" delete svc "${release_name}-welkin-user-demo" --ignore-not-found >/dev/null 2>&1 || true
 
   assert_line --regexp '.*admission webhook "validation.gatekeeper.sh" denied the request.*'
   assert_line --regexp '.*Creation of LoadBalancer Service is not supported.*'

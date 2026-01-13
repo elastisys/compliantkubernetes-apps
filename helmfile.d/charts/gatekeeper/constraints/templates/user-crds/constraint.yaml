@@ -13,5 +13,5 @@ spec:
     users: {{- toYaml .Values.userCRDs.admin.users | nindent 6 }}
     groups: {{- toYaml .Values.userCRDs.admin.groups | nindent 6 }}
     serviceAccounts: {{- toYaml .Values.userCRDs.admin.serviceAccounts | nindent 6 }}
-    allowedCRDs: {{- toYaml .Values.userCRDs.allowedCRDs | nindent 6 }}
+    allowedCRDs: {{- toYaml (default (list) .Values.userCRDs.allowedCRDs) | nindent 6 }}
 {{- end }}
