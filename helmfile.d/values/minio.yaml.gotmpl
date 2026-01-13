@@ -19,3 +19,8 @@ ingress:
   enabled: true
   hosts:
     - minio.{{ .Values.global.baseDomain }}
+
+consoleIngress:
+  enabled: true
+  hosts:
+    - console.minio.{{ .Values.global.opsDomain }}
