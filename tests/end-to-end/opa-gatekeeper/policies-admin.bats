@@ -48,9 +48,9 @@ EOF
   run kubectl delete cluster test-cluster -n "${NAMESPACE}"
 
   # Cleanup (force delete with annotation)
-  kubectl annotate cluster test-cluster -n "${NAMESPACE}" elastisys.io/ok-to-delete=true --overwrite 2>/dev/null || true
-  kubectl delete cluster test-cluster -n "${NAMESPACE}" --ignore-not-found 2>/dev/null || true
-  delete_namespace 2>/dev/null || true
+  kubectl annotate cluster test-cluster -n "${NAMESPACE}" elastisys.io/ok-to-delete=true --overwrite || true
+  kubectl delete cluster test-cluster -n "${NAMESPACE}" --ignore-not-found
+  delete_namespace
 
   assert_line --regexp '.*admission webhook "validation.gatekeeper.sh" denied the request.*'
   assert_line --regexp '.*deletion is not allowed.*'
@@ -84,9 +84,9 @@ EOF
   run kubectl delete openstackcluster test-openstack-cluster -n "${NAMESPACE}"
 
   # Cleanup (force delete with annotation)
-  kubectl annotate openstackcluster test-openstack-cluster -n "${NAMESPACE}" elastisys.io/ok-to-delete=true --overwrite 2>/dev/null || true
-  kubectl delete openstackcluster test-openstack-cluster -n "${NAMESPACE}" --ignore-not-found 2>/dev/null || true
-  delete_namespace 2>/dev/null || true
+  kubectl annotate openstackcluster test-openstack-cluster -n "${NAMESPACE}" elastisys.io/ok-to-delete=true --overwrite || true
+  kubectl delete openstackcluster test-openstack-cluster -n "${NAMESPACE}" --ignore-not-found
+  delete_namespace
 
   assert_line --regexp '.*admission webhook "validation.gatekeeper.sh" denied the request.*'
   assert_line --regexp '.*deletion is not allowed.*'
@@ -110,16 +110,19 @@ kind: AzureCluster
 metadata:
   name: test-azure-cluster
   namespace: ${NAMESPACE}
-spec: {}
+spec:
+  location: eastus
+  subscriptionID: "00000000-0000-0000-0000-000000000000"
+  resourceGroup: test-resource-group
 EOF
 
   # Attempt to delete the test AzureCluster (should be denied by Gatekeeper)
   run kubectl delete azurecluster test-azure-cluster -n "${NAMESPACE}"
 
   # Cleanup (force delete with annotation)
-  kubectl annotate azurecluster test-azure-cluster -n "${NAMESPACE}" elastisys.io/ok-to-delete=true --overwrite 2>/dev/null || true
-  kubectl delete azurecluster test-azure-cluster -n "${NAMESPACE}" --ignore-not-found 2>/dev/null || true
-  delete_namespace 2>/dev/null || true
+  kubectl annotate azurecluster test-azure-cluster -n "${NAMESPACE}" elastisys.io/ok-to-delete=true --overwrite || true
+  kubectl delete azurecluster test-azure-cluster -n "${NAMESPACE}" --ignore-not-found
+  delete_namespace
 
   assert_line --regexp '.*admission webhook "validation.gatekeeper.sh" denied the request.*'
   assert_line --regexp '.*deletion is not allowed.*'
@@ -148,12 +151,11 @@ metadata:
 spec: {}
 EOF
 
-  # Attempt to delete should succeed with annotation (use dry-run to not actually delete)
-  run kubectl delete cluster test-cluster -n "${NAMESPACE}" --dry-run=server
+  # Attempt to delete should succeed with annotation
+  run kubectl delete cluster test-cluster -n "${NAMESPACE}"
 
   # Cleanup
-  kubectl delete cluster test-cluster -n "${NAMESPACE}" --ignore-not-found 2>/dev/null || true
-  delete_namespace 2>/dev/null || true
+  delete_namespace
 
   refute_line --regexp '.*admission webhook "validation.gatekeeper.sh" denied the request.*'
   assert_success
@@ -208,8 +210,8 @@ spec:
 EOF
 
   # Cleanup
-  kubectl delete clusterrolebinding "${rbac_name}" --ignore-not-found >/dev/null 2>&1 || true
-  kubectl delete clusterrole "${rbac_name}" --ignore-not-found >/dev/null 2>&1 || true
+  kubectl delete clusterrolebinding "${rbac_name}" --ignore-not-found
+  kubectl delete clusterrole "${rbac_name}" --ignore-not-found
 
   assert_line --regexp '.*is not allowed to .* CRD.*'
   assert_failure

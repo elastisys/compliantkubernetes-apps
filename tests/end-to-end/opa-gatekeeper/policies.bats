@@ -30,8 +30,6 @@ setup() {
 }
 
 teardown_file() {
-  load "../../bats.lib.bash"
-
   # Clean up kubeconfig
   delete_static_wc_kubeconfig dev
 }
@@ -92,6 +90,28 @@ teardown_file() {
   assert_failure
 }
 
+@test "opa gatekeeper policies - allow and mutate valid deployment" {
+  run helm -n "${NAMESPACE}" upgrade --atomic --install opa-valid "${user_demo_chart}" \
+    --set "image.repository=${user_demo_image%:*}" \
+    --set "image.tag=${user_demo_image#*:}" \
+    --set "ingress.enabled=false"
+
+  refute_line --regexp '.*admission webhook "validation.gatekeeper.sh" denied the request.*'
+  refute_line --regexp '.*does not have an allowed image registry.*'
+  refute_line --regexp '.*uses the :latest tag.*'
+  refute_line --regexp '.*No matching networkpolicy found.*'
+  refute_line --regexp '.*The container named .* has no resource requests.*'
+  refute_line --regexp '.*The provided number of replicas is too low.*'
+  refute_line --regexp '.*uses Localhost seccompProfile.*'
+  refute_line --regexp '.*Creation of LoadBalancer Service is not supported.*'
+  assert_success
+
+  test_deployment opa-valid-welkin-user-demo 2
+
+  helm -n "${NAMESPACE}" uninstall opa-valid --wait
+  kubectl -n "${NAMESPACE}" delete po -l app.kubernetes.io/name=welkin-user-demo,app.kubernetes.io/instance=opa-valid
+}
+
 @test "opa gatekeeper policies - warn minimum replicas" {
   run helm -n "${NAMESPACE}" upgrade --install opa-min-replicas "${user_demo_chart}" \
     --set "image.repository=${user_demo_image%:*}" \
@@ -142,8 +162,8 @@ teardown_file() {
     --set "service.type=LoadBalancer" \
     --set "ingress.enabled=false"
 
-  helm -n "${NAMESPACE}" uninstall "${release_name}" --wait >/dev/null 2>&1 || true
-  kubectl -n "${NAMESPACE}" delete svc "${release_name}-welkin-user-demo" --ignore-not-found >/dev/null 2>&1 || true
+  helm -n "${NAMESPACE}" uninstall "${release_name}" --wait || true
+  kubectl -n "${NAMESPACE}" delete svc "${release_name}-welkin-user-demo" --ignore-not-found
 
   assert_line --regexp '.*admission webhook "validation.gatekeeper.sh" denied the request.*'
   assert_line --regexp '.*Creation of LoadBalancer Service is not supported.*'
@@ -230,26 +250,4 @@ EOF
   assert_line --regexp '.*admission webhook "validation.gatekeeper.sh" denied the request.*'
   assert_line --regexp '.*minAvailable should always be lower than replica.*'
   assert_failure
-}
-
-@test "opa gatekeeper policies - allow and mutate valid deployment" {
-  run helm -n "${NAMESPACE}" upgrade --atomic --install opa-valid "${user_demo_chart}" \
-    --set "image.repository=${user_demo_image%:*}" \
-    --set "image.tag=${user_demo_image#*:}" \
-    --set "ingress.enabled=false"
-
-  refute_line --regexp '.*admission webhook "validation.gatekeeper.sh" denied the request.*'
-  refute_line --regexp '.*does not have an allowed image registry.*'
-  refute_line --regexp '.*uses the :latest tag.*'
-  refute_line --regexp '.*No matching networkpolicy found.*'
-  refute_line --regexp '.*The container named .* has no resource requests.*'
-  refute_line --regexp '.*The provided number of replicas is too low.*'
-  refute_line --regexp '.*uses Localhost seccompProfile.*'
-  refute_line --regexp '.*Creation of LoadBalancer Service is not supported.*'
-  assert_success
-
-  test_deployment opa-valid-welkin-user-demo 2
-
-  helm -n "${NAMESPACE}" uninstall opa-valid --wait
-  kubectl -n "${NAMESPACE}" delete po -l app.kubernetes.io/name=welkin-user-demo,app.kubernetes.io/instance=opa-valid
 }
