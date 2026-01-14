@@ -304,8 +304,27 @@ config() {
     log.fatal "CK8S_CONFIG_PATH is unset"
   fi
 
+  local env_file="${CK8S_CONFIG_PATH}/.temp-gpg-env"
   if [[ -z "${CK8S_PGP_FP:-}" ]]; then
-    log.fatal "CK8S_PGP_FP is unset"
+    if [[ -f "${env_file}" ]]; then
+      # shellcheck disable=SC1090
+      source "${env_file}"
+      log.info "CK8S_PGP_FP was unset. Reusing temporary GPG environment from ${env_file}"
+      log.info "To persist this in your current terminal, run:"
+      log.info "  source ${env_file}"
+    elif [[ -x "${ROOT}/bin/setup-local-gpg.bash" ]]; then
+      source "${ROOT}/bin/setup-local-gpg.bash"
+      echo "export GNUPGHOME='${GNUPGHOME}'" >"${env_file}"
+      echo "export CK8S_PGP_FP='${CK8S_PGP_FP}'" >>"${env_file}"
+      log.info "CK8S_PGP_FP was unset. Generated temporary GPG key: ${CK8S_PGP_FP}"
+      log.warn "Once this is cleared you will lose the ability to decrypt the secrets for this config path."
+      log.info "To load this in your current terminal, run:"
+      log.info "  source ${env_file}"
+    fi
+
+    if [[ -z "${CK8S_PGP_FP:-}" ]]; then
+      log.fatal "CK8S_PGP_FP is unset and automatic generation failed."
+    fi
   fi
 
   if ! [[ -d "${CK8S_CONFIG_PATH}" ]]; then
