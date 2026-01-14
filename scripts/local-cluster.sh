@@ -310,7 +310,7 @@ config() {
       # shellcheck disable=SC1090
       source "${env_file}"
       log.info "CK8S_PGP_FP was unset. Reusing temporary GPG environment from ${env_file}"
-      log.info "To persist this in your current terminal, run:"
+      log.info "To load this in your current terminal, run:"
       log.info "  source ${env_file}"
     elif [[ -x "${ROOT}/bin/setup-local-gpg.bash" ]]; then
       source "${ROOT}/bin/setup-local-gpg.bash"
