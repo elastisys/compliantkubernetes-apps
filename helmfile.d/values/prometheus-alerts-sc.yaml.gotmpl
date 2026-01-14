@@ -63,6 +63,8 @@ defaultRules:
   enabled:
     CPUThrottlingHigh: {{ .Values.alerts.enabled.CPUThrottlingHigh }}
 
+kubeResourceOvercommitAlertExclude: {{ .Values.prometheus.kubeResourceOvercommitAlertExclude | join "|" }}
+
 capacityManagementAlertsPersistentVolumeEnabled: {{ .Values.prometheus.capacityManagementAlerts.persistentVolume.enabled }}
 capacityManagementAlertsPersistentVolumeLimit: {{ .Values.prometheus.capacityManagementAlerts.persistentVolume.limit }}
 capacityManagementAlertsDiskLimit: {{ .Values.prometheus.capacityManagementAlerts.disklimit }}

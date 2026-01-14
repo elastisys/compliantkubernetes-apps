@@ -4991,6 +4991,13 @@ properties:
               type: string
     additionalProperties: false
     properties:
+      kubeResourceOvercommitAlertExclude:
+        title: Exclude Resource Overcommit Alerts
+        description: This will exclude a list of node groups from being picked up by both kubeOvercommit alerts, as this is a negative prometheus regex, for example to exclude multiple node groups you can add an item such as "control-plane|database|.*worker.*" to the list.
+        type: array
+        items:
+          type: string
+          default: "control-plane"
       replicas:
         title: Prometheus Relicas
         type: number
