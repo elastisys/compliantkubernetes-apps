@@ -88,24 +88,18 @@ The following command will configure node-local DNS and (re)deploy the `node-loc
 
 #### Self-signed certificate setup
 
-If you cannot configure cert-manager to use DNS-01 challenges for various reasons (e.g. you picked an arbitrary `<domain>` which you don't have authority over), you have the option of using self-signed certificates.
+By default, the `dev` flavor is configured to use self-signed certificates. This allows you to use an arbitrary `<domain>` without needing authority to set up DNS-01 challenges.
 
-Add the following block to `$CK8S_CONFIG_PATH/common-config.yaml` (you might need to merge the keys in `global` map manually):
+If you wish to use Let's Encrypt instead, you must explicitly enable it in `$CK8S_CONFIG_PATH/common-config.yaml` (you might need to merge the keys in `global` map manually):
 
 ```yaml
 global:
-  issuer: selfsigned
-  verifyTls: false
+  issuer: letsencrypt-staging
+  verifyTls: true
 issuers:
     letsencrypt:
-      enabled: false
-    extraIssuers:
-    - apiVersion: cert-manager.io/v1
-      kind: ClusterIssuer
-      metadata:
-        name: selfsigned
-      spec:
-        selfSigned: {}
+      enabled: true
+    extraIssuers: []
 ```
 
 ### Deploy
@@ -117,6 +111,13 @@ issuers:
 > If you are using Docker and deploying the `allow-coredns` network policy in the `networkpolicy/common` chart DNS resolution will stop working.
 > This seems to be because Kind uses a user-defined Docker network which in turn uses an embedded DNS server that isn't actually listening on port 53.
 > To solve this remove the port 53 restriction from the `allow-coredns` egress network policy and things should start working again.
+
+The `dev` flavor has been "leaned" to optimize resource usage. If your machine has at least 16GB+ RAM, you can deploy most of the Welkin apps in the local cluster by running:
+
+```sh
+./bin/ck8s apply sc
+./bin/ck8s apply wc
+```
 
 Manage apps by using `helmfile` directly and with needs it will pull in all required releases:
 

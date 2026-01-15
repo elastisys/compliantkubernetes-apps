@@ -447,9 +447,6 @@ create() {
     helmfile -e local_cluster -f "${ROOT}/helmfile.d" -lapp=minio apply --output simple
   fi
 
-  log.info "applying welkin configuration for ${affix}"
-  "${ROOT}/bin/ck8s" apply "${affix}"
-
   index.state "${cluster}" "ready"
   log.info "cluster ${cluster} is ready"
 }
