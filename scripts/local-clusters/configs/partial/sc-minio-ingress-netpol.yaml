@@ -1,0 +1,13 @@
+networkPolicies:
+  ingressNginx:
+    extraEgress:
+      - to:
+          - namespaceSelector:
+              matchLabels:
+                kubernetes.io/metadata.name: minio-system
+            podSelector:
+              matchLabels:
+                app: minio
+        ports:
+          - port: 9000
+          - port: 9001

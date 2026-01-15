@@ -453,7 +453,16 @@ create() {
   fi
 
   # install s3
-  if [[ "${cluster}" == "sc" ]] && ! [[ "${*}" =~ --skip-minio ]]; then
+  if [[ "${affix}" == "sc" ]] && ! [[ "${*}" =~ --skip-minio ]]; then
+    # shellcheck source=scripts/migration/yq.sh
+    source "${ROOT}/scripts/migration/yq.sh"
+    yq_merge \
+      "$CK8S_CONFIG_PATH/sc-config.yaml" \
+      "${HERE}/local-clusters/configs/partial/sc-minio-ingress-netpol.yaml" |
+      envsubst >"$CK8S_CONFIG_PATH/sc-config.yaml.new"
+
+    mv -f "$CK8S_CONFIG_PATH/sc-config.yaml.new" "$CK8S_CONFIG_PATH/sc-config.yaml"
+
     log.info "Installing ingress-nginx in SC"
     "${ROOT}/bin/ck8s" ops helmfile sc -lapp=ingress-nginx apply --include-transitive-needs --output simple
 
