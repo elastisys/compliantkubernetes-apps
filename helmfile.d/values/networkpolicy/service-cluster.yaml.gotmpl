@@ -75,6 +75,9 @@ ingressNginx:
     {{- if .Values.networkPolicies.ingressNginx.ingressOverride.enabled }}
     ips: {{- toYaml .Values.networkPolicies.ingressNginx.ingressOverride.ips | nindent 4 }}
     {{- end }}
+  {{- if .Values.networkPolicies.ingressNginx.extraEgress }}
+  extraEgress: {{- toYaml .Values.networkPolicies.ingressNginx.extraEgress | nindent 4 }}
+  {{- end }}
 
 dex:
   enabled: {{ .Values.networkPolicies.dex.enabled }}

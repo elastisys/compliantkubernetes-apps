@@ -127,6 +127,7 @@ ingressNginx:
     enabled: false
     ips:
       - set-me-if-enabled
+  extraEgress: []
 
 dex:
   enabled: true

@@ -14,3 +14,13 @@ buckets:
   {{- range $key, $value := .Values.objectStorage.buckets }}
   - name: {{ $value }}
   {{- end }}
+
+ingress:
+  enabled: true
+  hosts:
+    - minio.{{ .Values.global.opsDomain }}
+
+consoleIngress:
+  enabled: true
+  hosts:
+    - minio.{{ .Values.global.baseDomain }}

@@ -13,7 +13,7 @@ This requires that `kind` is installed and that either `podman` or `docker` is a
 ### Terminology
 
 - `apps-flavor` - one of `prod`, `dev` or `air-gapped` is a global switch for configuring the clusters and deployed applications in different ways. The recommended value when working with local clusters is `dev`.
-- `local-cluster-profile` - a reference to a preconfigured `Cluster` config passed to `kind` when creating or updating local clusters. We use profiles to differentiate between single-/multi-node clusters and/or to enable special features such as container image caching. Use `./scripts/local-clusters.sh list profiles` to see a list of built-in profiles.
+- `local-cluster-profile` - a reference to a preconfigured `Cluster` config passed to `kind` when creating or updating local clusters. We use profiles to differentiate between single-/multi-node clusters and/or to enable special features such as container image caching. Use `./scripts/local-cluster.sh list profiles` to see a list of built-in profiles.
 - `domain` - a local domain name. This can be arbitrary, but using a real domain (or subdomain) for which we have authority allows for setting up DNS based challenges for certificates issued by `cert-manager`.
 
 ### Setup
@@ -144,7 +144,7 @@ By default, all releases have `name=<release-name>` and `chart=<chart-name>` as 
 Enabling ingress and resolve requires a special setup.
 The ingress will by default be port-mapped on the local address `127.0.64.43`.
 
-The `local-clusters.sh` script provides commands to create and delete a local DNS server to resolve local domain queries. By default, the local resolve CoreDNS configuration will resolve the `dex`, `grafana`, `harbor`, `opensearch` and `ops` subdomains to the SC listen address of `127.0.64.43`, while all other subdomains of `<domain>` will resolve to the WC listen address of `127.0.64.143`.
+The `local-cluster.sh` script provides commands to create and delete a local DNS server to resolve local domain queries. By default, the local resolve CoreDNS configuration will resolve the `dex`, `grafana`, `harbor`, `opensearch` and `ops` subdomains to the SC listen address of `127.0.64.43`, while all other subdomains of `<domain>` will resolve to the WC listen address of `127.0.64.143`.
 
 To create the resolver, run `./scripts/local-cluster.sh resolve <create|delete> <domain>`, matching the base domain of the cluster.
 Note that this will make a temporary override of your current DNS server, and you may need to rerun it if you network settings are reset.
