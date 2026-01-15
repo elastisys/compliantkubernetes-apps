@@ -60,11 +60,10 @@ config:
   staticClients:
     - id: kubelogin
       name: 'Kubernetes CLI'
-      secret: {{ .Values.dex.kubeloginClientSecret }}
+      public: true
       redirectURIs:
       - http://localhost:8000
       - http://localhost:18000
-      - http://localhost:8080/oauth2/callback
       {{- range $uri := .Values.dex.additionalKubeloginRedirects }}
       - {{ $uri }}
       {{- end }}
