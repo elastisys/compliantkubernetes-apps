@@ -18,9 +18,9 @@ buckets:
 ingress:
   enabled: true
   hosts:
-    - minio.{{ .Values.global.baseDomain }}
+    - minio.{{ .Values.global.opsDomain }}
 
 consoleIngress:
   enabled: true
   hosts:
-    - console.minio.{{ .Values.global.opsDomain }}
+    - minio.{{ .Values.global.baseDomain }}

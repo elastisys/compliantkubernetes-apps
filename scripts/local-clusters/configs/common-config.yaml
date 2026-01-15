@@ -13,7 +13,7 @@ objectStorage:
   type: s3
   s3:
     region: local
-    regionEndpoint: http://minio.${domain}
+    regionEndpoint: http://minio.${opsDomain}
     forcePathStyle: true
 calicoAccountant:
   backend: nftables
