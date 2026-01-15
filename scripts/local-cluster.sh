@@ -38,6 +38,7 @@ log.usage() {
   - resolve <create|delete> <domain>                                         - manages local resolve for local clusters
   - config <name> <flavor> <domain> [ops-prefix] [--self-signed]             - configures a local cluster
   - create <name> <profile-name|profile-path> [--skip-calico] [--skip-minio] - creates a local cluster
+  - status [cluster-name] [specific-endpoint-status]                         - checks infrastructure and service connectivity
   - delete <name>                                                            - deletes a local cluster
   - list clusters                                                            - lists available clusters
   - list profiles                                                            - lists available profiles
@@ -542,7 +543,33 @@ delete() {
 }
 
 status() {
-  local target_cluster="${1:-}"
+  local target_cluster=""
+  local component_filter=""
+
+  for arg in "$@"; do
+    if [[ "$arg" =~ -(sc|wc)$ ]]; then
+      target_cluster="$arg"
+    else
+      component_filter="$arg"
+    fi
+  done
+
+  if [[ -z "${CK8S_CONFIG_PATH:-}" ]]; then
+    log.fatal "CK8S_CONFIG_PATH is unset"
+  fi
+
+  local common_config="${CK8S_CONFIG_PATH}/common-config.yaml"
+  if [[ ! -f "${common_config}" ]]; then
+    log.warn "⚠️  common-config.yaml not found. Cannot determine domain."
+    return 1
+  fi
+
+  local domain
+  domain="$(yq e ".global.baseDomain" "${common_config}")"
+  if [[ -z "${domain}" || "${domain}" == "null" ]]; then
+    log.warn "⚠️  Could not determine baseDomain."
+    return 1
+  fi
 
   local index_file="${CK8S_CONFIG_PATH}/cluster-index.yaml"
   local clusters_to_check=()
@@ -564,7 +591,6 @@ status() {
   fi
 
   log.info "Running status checks..."
-  domain="$(yq e ".global.baseDomain" "${CK8S_CONFIG_PATH}/common-config.yaml")"
 
   for cluster in "${clusters_to_check[@]}"; do
     local affix=""
@@ -622,63 +648,69 @@ status() {
   # 7. Resolve Status
   log.info "Checking Resolve Status..."
 
-  if [[ -f "${CK8S_CONFIG_PATH}/common-config.yaml" ]]; then
-    local domain
-    domain="$(yq e ".global.baseDomain" "${CK8S_CONFIG_PATH}/common-config.yaml")"
+  local expected_ip="127.0.64.43"
+  local services=("grafana" "harbor" "minio.ops" "minio" "grafana.ops" "dex" "thanos-receiver.ops")
 
-    if [[ -z "${domain}" || "${domain}" == "null" ]]; then
-      log.warn "⚠️  [WARN] Could not determine baseDomain."
+  for svc in "${services[@]}"; do
+    local fqdn="${svc}.${domain}"
+    local resolved_ip
+    set +e
+    resolved_ip=$(getent hosts "${fqdn}" | awk '{print $1}' | head -n 1)
+
+    if [[ "$resolved_ip" == "$expected_ip" ]]; then
+      log.info "✅ [PASS] ${fqdn} resolves to ${expected_ip}."
     else
-      local expected_ip="127.0.64.43"
-      local services=("grafana" "harbor" "minio" "console.minio.ops" "grafana.ops" "dex" "thanos-receiver.ops")
-
-      for svc in "${services[@]}"; do
-        local fqdn="${svc}.${domain}"
-        local resolved_ip
-        set +e
-        resolved_ip=$(getent hosts "${fqdn}" | awk '{print $1}' | head -n 1)
-
-        if [[ "$resolved_ip" == "$expected_ip" ]]; then
-          log.info "✅ [PASS] ${fqdn} resolves to ${expected_ip}."
-        else
-          log.error "❌ [FAIL] ${fqdn} resolves to '${resolved_ip}' (Expected: ${expected_ip})."
-          log.info "If empty, ensure 'resolve' container is running: ./scripts/local-clusters.sh resolve create ${domain}"
-        fi
-      done
-      set -e
+      log.error "❌ [FAIL] ${fqdn} resolves to '${resolved_ip}' (Expected: ${expected_ip})."
+      log.info "If empty, ensure 'resolve' container is running: ./scripts/local-clusters.sh resolve create ${domain}"
     fi
+  done
+  set -e
 
-    log.info "Checking Service Connectivity (HTTP)..."
+  log.info "Checking Service Connectivity (HTTP)..."
 
-    FUNCS_PATH="${ROOT}/pipeline/test/services/funcs.sh"
-    if [[ -f "${FUNCS_PATH}" ]]; then
-      # Initialize variables that funcs.sh relies on
-      export SUCCESSES=0
-      export FAILURES=0
-      export RETRY_COUNT=6
-      export RETRY_WAIT=5
-      # shellcheck source=pipeline/test/services/funcs.sh
-      source "${FUNCS_PATH}"
-    else
-      log.error "Could not find funcs.sh at ${FUNCS_PATH}"
-      return 1
-    fi
-
-    testEndpointProtected "Dex" "https://dex.${domain}/.well-known/openid-configuration" "200"
-    testEndpointProtected "Harbor" "https://harbor.${domain}/api/v2.0/ping" "200"
-    testEndpointProtected "MiniO" "https://minio.${domain}/minio/health/live" "200"
-    testEndpointProtected "MinioConsole" "https://console.minio.ops.${domain}" "200"
-    testEndpointProtected "Grafana (Ops)" "https://grafana.ops.${domain}/login" "200"
-    testEndpointProtected "Grafana (User)" "https://grafana.${domain}/login" "200"
-    testEndpointProtected "Thanos Receiver" "https://thanos-receiver.ops.${domain}/" "401"
-
-    if [[ $FAILURES -gt 0 ]]; then
-      log.warn "⚠️  ${FAILURES} service(s) failed connectivity checks. See logs above."
-    else
-      log.info "✅ All services are reachable."
-    fi
+  if [[ -z "$component_filter" ]]; then
+    log.info "Checking Service Connectivity (All)..."
   else
-    log.warn "⚠️  [WARN] common-config.yaml not found."
+    log.info "Checking Service Connectivity (Filter: '${component_filter}')..."
+  fi
+
+  FUNCS_PATH="${ROOT}/pipeline/test/services/funcs.sh"
+  if [[ -f "${FUNCS_PATH}" ]]; then
+    # Initialize variables that funcs.sh relies on
+    export SUCCESSES=0
+    export FAILURES=0
+    export RETRY_COUNT=6
+    export RETRY_WAIT=5
+    # shellcheck source=pipeline/test/services/funcs.sh
+    source "${FUNCS_PATH}"
+  else
+    log.error "Could not find funcs.sh at ${FUNCS_PATH}"
+    return 1
+  fi
+
+  check_service() {
+    local name="$1"
+    local url="$2"
+    local code="$3"
+
+    #specific endpoint test
+    if [[ -z "$component_filter" ]] || [[ "${name,,}" == *"${component_filter,,}"* ]]; then
+      testEndpointProtected "$name" "$url" "$code"
+    fi
+  }
+
+  check_service "Minio" "http://minio.ops.${domain}/minio/health/live" "200"
+  check_service "MinioConsole" "http://minio.${domain}/login" "200"
+  check_service "Dex" "https://dex.${domain}/.well-known/openid-configuration" "200"
+  check_service "Harbor" "https://harbor.${domain}/api/v2.0/ping" "200"
+  check_service "Grafana-Ops" "https://grafana.ops.${domain}/login" "200"
+  check_service "Grafana-User" "https://grafana.${domain}/login" "200"
+  check_service "Thanos-Receiver" "https://thanos-receiver.ops.${domain}/" "401"
+
+  if [[ $FAILURES -gt 0 ]]; then
+    log.warn "⚠️  ${FAILURES} service(s) failed connectivity checks. See logs above."
+  else
+    log.info "✅ All services are reachable."
   fi
 }
 
