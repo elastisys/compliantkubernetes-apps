@@ -168,6 +168,12 @@ setup() {
     "${LOCAL_CLUSTERS_SCRIPT}" create "${CK8S_ENVIRONMENT_NAME}-sc" single-node-cache
     "${LOCAL_CLUSTERS_SCRIPT}" create "${CK8S_ENVIRONMENT_NAME}-wc" single-node-cache --skip-minio
 
+    log_header "Deploying Welkin Apps in ${CK8S_ENVIRONMENT_NAME}-sc..."
+    "${ROOT}/bin/ck8s" apply sc
+
+    log_header "Deploying Welkin Apps in ${CK8S_ENVIRONMENT_NAME}-wc..."
+    "${ROOT}/bin/ck8s" apply wc
+
     wait_for_ready "sc"
     wait_for_ready "wc"
 
