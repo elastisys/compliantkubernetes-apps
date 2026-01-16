@@ -15,7 +15,9 @@ ENV HELM_DATA_HOME="/usr/local/share/helm"
 ENV DOCS_PATH="/usr/local/share/docs"
 
 COPY ./tests/common/install-tools.bash /opt/install-tools.bash
-RUN BATS_CORE_VERSION="1.11.1@sha256:b036dd11d2d22ff82a191233429f9d3e33c62ec6d3e6769243e7dfa3e7ca9908" \
+RUN mkdir -p ~/.ssh && ssh-keyscan github.com >> ~/.ssh/known_hosts
+RUN --mount=type=ssh \
+    BATS_CORE_VERSION="1.11.1@sha256:b036dd11d2d22ff82a191233429f9d3e33c62ec6d3e6769243e7dfa3e7ca9908" \
     BATS_ASSERT_REV="697471b7a89d3ab38571f38c6c7c4b460d1f5e35" \
     BATS_DETIK_REV="ce86871d7fdaed7f31b0e11e228b7b91a58ac1cc" \
     BATS_FILE_REV="c0bb8ef329908cbb2c456c05ebb785d44553f7cd" \

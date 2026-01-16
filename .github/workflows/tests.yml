@@ -31,6 +31,9 @@ jobs:
         uses: actions/checkout@v4
       - name: setup docker with buildx
         uses: docker/setup-buildx-action@v3
+      - name: setup ssh key
+        run: |
+          echo "${{ secrets.APPS_READ_KEY }}" > "${{ runner.temp }}/ssh_key"
       - name: build tests unit container image
         uses: docker/build-push-action@v6
         env:
@@ -46,6 +49,8 @@ jobs:
           push: false
           provenance: false
           tags: compliantkubernetes-apps-tests:unit
+          ssh: |
+            default=${{ runner.temp }}/ssh_key
       - name: run static unit tests
         working-directory: ./tests
         run: make run-unit/${{ matrix.tag }}
@@ -66,6 +71,9 @@ jobs:
         uses: actions/checkout@v4
       - name: setup docker with buildx
         uses: docker/setup-buildx-action@v3
+      - name: setup ssh key
+        run: |
+          echo "${{ secrets.APPS_READ_KEY }}" > "${{ runner.temp }}/ssh_key"
       - name: build tests main container image
         uses: docker/build-push-action@v6
         env:
@@ -81,6 +89,8 @@ jobs:
           push: false
           provenance: false
           tags: compliantkubernetes-apps-tests:main
+          ssh: |
+            default=${{ runner.temp }}/ssh_key
       - name: create local cache
         run: ./scripts/local-cluster.sh cache create
       - name: create local resolve
@@ -122,6 +132,9 @@ jobs:
         uses: actions/checkout@v4
       - name: setup docker with buildx
         uses: docker/setup-buildx-action@v3
+      - name: setup ssh key
+        run: |
+          echo "${{ secrets.APPS_READ_KEY }}" > "${{ runner.temp }}/ssh_key"
       - name: build tests main container image
         uses: docker/build-push-action@v6
         env:
@@ -137,6 +150,8 @@ jobs:
           push: false
           provenance: false
           tags: compliantkubernetes-apps-tests:main
+          ssh: |
+            default=${{ runner.temp }}/ssh_key
       - name: prune docker artefacts
         run: |
           echo -e "\n=== Disk usage before docker prune ==="
