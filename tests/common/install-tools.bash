@@ -24,7 +24,7 @@ unit_install_bats() {
 }
 
 unit_install_docs() {
-  git clone -q --depth 1 --recurse-submodules --shallow-submodules https://github.com/elastisys/welkin.git "${DOCS_PATH}"
+  git clone -q --depth 1 --recurse-submodules --shallow-submodules git@github.com:elastisys/welkin.git "${DOCS_PATH}"
   python3 -m venv "${DOCS_PATH}/.venv"
   pushd "${DOCS_PATH}" >/dev/null
   ./.venv/bin/pip install --no-cache-dir --quiet -r requirements.txt

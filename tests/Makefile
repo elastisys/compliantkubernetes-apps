@@ -40,7 +40,7 @@ $(patsubst $(tests)/%,list-%,$(suites)): list-%:
 
 build: build-main
 build-main build-unit: build-%:
-	docker build --file Dockerfile --target $* --tag $(image):$* ../
+	docker build --ssh default --file Dockerfile --target $* --tag $(image):$* ../
 
 clean:
 	@echo "--- clean"
