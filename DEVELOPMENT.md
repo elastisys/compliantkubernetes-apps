@@ -86,7 +86,7 @@ The following command will configure node-local DNS and (re)deploy the `node-loc
 ./scripts/local-cluster.sh setup node-local-dns
 ```
 
-#### Self-signed certificate setup
+#### Certificate setup
 
 By default, the `dev` flavor is configured to use self-signed certificates. This allows you to use an arbitrary `<domain>` without needing authority to set up DNS-01 challenges.
 
@@ -112,7 +112,7 @@ issuers:
 > This seems to be because Kind uses a user-defined Docker network which in turn uses an embedded DNS server that isn't actually listening on port 53.
 > To solve this remove the port 53 restriction from the `allow-coredns` egress network policy and things should start working again.
 
-The `dev` flavor has been "leaned" to optimize resource usage. If your machine has at least 16GB+ RAM, you can deploy most of the Welkin apps in the local cluster by running:
+The `dev` flavor has been configured to optimize resource usage. If your machine has at least 16GB+ RAM, you can deploy most of the Welkin apps in the local cluster by running:
 
 ```sh
 ./bin/ck8s apply sc
