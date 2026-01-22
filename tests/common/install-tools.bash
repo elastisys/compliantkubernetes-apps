@@ -174,10 +174,14 @@ _git_clone_revision() {
   local -r dest="${2}"
   local -r rev="${3}"
 
-  git clone -q --depth 1 "${repo}" "${dest}"
+  # TODO: Start using this when Git v2.49 is available.
+  # git clone -q --depth 1 --revision "${rev}" "${repo}" "${dest}"
+  mkdir -p "${dest}"
   pushd "${dest}" >/dev/null
-  git reset -q --hard "${rev}"
-  git clean -q -fd
+  git init
+  git remote add origin "${repo}"
+  git fetch --depth 1 origin "${rev}"
+  git checkout FETCH_HEAD
   popd >/dev/null
 }
 
