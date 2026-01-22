@@ -1417,6 +1417,9 @@ networkPolicies:
       ports:
         - 443
 
+  ingressNginx:
+    extraEgress: []
+
 # Tekton Configuration
 tektonPipelines:
   enabled: false

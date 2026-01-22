@@ -7401,6 +7401,13 @@ properties:
                 type: boolean
                 default: false
               ips: true
+          extraEgress:
+             title: Network Policies Ingress Extra Egress
+             description: Configure additional egress rules for Ingress.
+             type: array
+             default: []
+             items:
+               type: object
       certManager:
         title: Network Policies cert-manager
         description: Configure cert-manager network policy rules.
