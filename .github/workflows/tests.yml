@@ -33,7 +33,7 @@ jobs:
         uses: docker/setup-buildx-action@v3
       - name: setup ssh key
         run: |
-          echo "${{ secrets.APPS_READ_KEY }}" > "${{ runner.temp }}/ssh_key"
+          echo "${{ secrets.WELKIN_READ_KEY }}" > "${{ runner.temp }}/ssh_key"
       - name: build tests unit container image
         uses: docker/build-push-action@v6
         env:
@@ -73,7 +73,7 @@ jobs:
         uses: docker/setup-buildx-action@v3
       - name: setup ssh key
         run: |
-          echo "${{ secrets.APPS_READ_KEY }}" > "${{ runner.temp }}/ssh_key"
+          echo "${{ secrets.WELKIN_READ_KEY }}" > "${{ runner.temp }}/ssh_key"
       - name: build tests main container image
         uses: docker/build-push-action@v6
         env:
@@ -134,7 +134,7 @@ jobs:
         uses: docker/setup-buildx-action@v3
       - name: setup ssh key
         run: |
-          echo "${{ secrets.APPS_READ_KEY }}" > "${{ runner.temp }}/ssh_key"
+          echo "${{ secrets.WELKIN_READ_KEY }}" > "${{ runner.temp }}/ssh_key"
       - name: build tests main container image
         uses: docker/build-push-action@v6
         env:
