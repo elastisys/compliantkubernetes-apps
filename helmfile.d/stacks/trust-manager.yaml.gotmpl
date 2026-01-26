@@ -1,0 +1,16 @@
+---
+templates:
+  trust-manager:
+    disableValidationOnInstall: true
+    condition: ck8sAnyCluster.enabled
+    installed: {{ .Values | get "trust-manager.enabled" false }}
+    inherit: [ template: trust-manager-chart ]
+    namespace: cert-manager
+    name: trust-manager
+    labels:
+      app: trust-manager
+    needs:
+      - cert-manager/cert-manager
+    values:
+      - values/trust-manager.yaml.gotmpl
+    wait: true

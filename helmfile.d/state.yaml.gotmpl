@@ -31,6 +31,7 @@ bases:
   - stacks/tekton.yaml.gotmpl
   - stacks/thanos.yaml.gotmpl
   - stacks/velero.yaml.gotmpl
+  - stacks/trust-manager.yaml.gotmpl
 ---
 releases:
   - inherit: [ template: tigera ]
@@ -58,6 +59,8 @@ releases:
   - inherit: [ template: cert-manager-networkpolicy ]
   - inherit: [ template: cert-manager-controller ]
   - inherit: [ template: cert-manager-issuers ]
+
+  - inherit: [ template: trust-manager ]
 
   - inherit: [ template: gatekeeper-controller ]
   - inherit: [ template: gatekeeper-templates ]

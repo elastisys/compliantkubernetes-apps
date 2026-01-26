@@ -1,0 +1,12 @@
+# Additional volumes to add to the trust-manager pod.
+volumes: []
+
+# Additional volume mounts to add to the trust-manager container.
+volumeMounts: []
+
+defaultPackageImage:
+  # The repository for the default package image. This image enables the 'useDefaultCAs' source on Bundles.
+  repository: quay.io/jetstack/trust-pkg-debian-bookworm
+
+  # Override the image tag of the default package image.
+  tag: 20230311-deb12u1.3

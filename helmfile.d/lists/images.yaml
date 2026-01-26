@@ -53,7 +53,7 @@ images:
     image: ghcr.io/kubereboot/kured:1.20.0
   kyverno:
     main: ghcr.io/kyverno/kyverno:v1.13.4
-    init: ghcr.io/kyverno/kyverno:v1.13.4
+    init: ghcr.io/kyverno/kyvernopre:v1.13.4
     webhooksCleanup: ghcr.io/elastisys/bitnami/kubectl:1.32.4
     crdsMigration: ghcr.io/kyverno/kyverno-cli:v1.13.4
   monitoring:
