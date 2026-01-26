@@ -41,6 +41,9 @@ spec:
           spec:
             containers:
             - name: "{{ "{{" }} element.name {{ "}}" }}"
+              env:
+                - name: AWS_CA_BUNDLE
+                  value: /etc/ssl/certs/ca-certificates.crt
               volumeMounts:
               - name: etc-ssl-certs
                 mountPath: /etc/ssl/certs/ca-certificates.crt
