@@ -252,7 +252,7 @@ resolve() {
 
         for link in "${links[@]}"; do
           if log.continue "set local-resolve as current dns server on ${link}?"; then
-            resolvectl dns "${link}" 127.0.64.43
+            sudo resolvectl dns "${link}" 127.0.64.43
           fi
         done
       elif command -v unbound-control || [[ -x /usr/sbin/unbound-control ]]; then
