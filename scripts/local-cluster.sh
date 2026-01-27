@@ -603,7 +603,7 @@ status() {
 
     # 1. Cluster Status Check
     if ! kind get clusters | grep -q "^${cluster}$"; then
-      log.fatal "❌ [FAIL] Cluster '${cluster}' is not running."
+      log.fatal "❌ [FAIL] Cluster '${cluster}' does not exist."
     fi
 
     # Load Kubeconfig
