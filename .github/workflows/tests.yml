@@ -54,6 +54,15 @@ jobs:
       - name: run static unit tests
         working-directory: ./tests
         run: make run-unit/${{ matrix.tag }}
+      - name: Upload network policy artifact
+        if: matrix.tag == 'general' && github.event_name == 'push' && github.ref_name == 'main'
+        uses: actions/upload-artifact@v4
+        with:
+          name: network-policy-values
+          retention-days: 90
+          path: |
+            ./tests/unit/general/.tmp
+            ./tests/unit/general/resources/known-cidrs.yaml
 
   regression:
     runs-on: ubuntu-latest
