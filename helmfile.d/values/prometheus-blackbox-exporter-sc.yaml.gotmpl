@@ -140,10 +140,10 @@ serviceMonitor:
       interval: 60s
       scrapeTimeout: 30s
       module: http_401
-    {{ if .Values.prometheusBlackboxExporter.customKubeapiTargets }}
-    {{ range $kubeapiTarget := .Values.prometheusBlackboxExporter.customKubeapiTargets }}
-    - name: {{ $kubeapiTarget.name }}
-      url: https://kube-apiserver.{{ $kubeapiTarget.domain }}:/healthz
+    {{ if .Values.prometheusBlackboxExporter.customWorkloadTargets }}
+    {{ range $target := .Values.prometheusBlackboxExporter.customWorkloadTargets }}
+    - name: {{ $target.name }}-api-server
+      url: https://kube-apiserver.{{ $target.domain }}:/healthz
       interval: 60s
       scrapeTimeout: 30s
       module: http_401
@@ -163,11 +163,21 @@ serviceMonitor:
       module: http_401
     {{- end }}
     {{- if .Values.prometheusBlackboxExporter.targets.wc}}
+    {{ if .Values.prometheusBlackboxExporter.customWorkloadTargets }}
+    {{ range $target := .Values.prometheusBlackboxExporter.customWorkloadTargets }}
+    - name: {{ $target.name }}-ingress-probe
+      url: https://{{ $.Values.ingressNginx.subDomain }}.{{ $target.domain }}
+      interval: 60s
+      scrapeTimeout: 30s
+      module: http_404
+    {{ end }}
+    {{ else }}
     - name: wc-ingress-probe
       url: https://{{ .Values.ingressNginx.subDomain }}.{{ .Values.global.baseDomain }}
       interval: 60s
       scrapeTimeout: 30s
       module: http_404
+    {{ end }}
     {{- end }}
 
 {{- with .Values.prometheusBlackboxExporter.hostAliases }}

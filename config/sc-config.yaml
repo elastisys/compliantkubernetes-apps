@@ -1227,12 +1227,12 @@ s3Exporter:
   affinity: {}
   nodeSelector: {}
 prometheusBlackboxExporter:
-  # List of kube-apiservers to target, instead of targeting kube-apiserver on baseDomain
-  customKubeapiTargets: []
+  # List of workload clusters to target, instead of targeting solely based on baseDomain
+  customWorkloadTargets: []
   # Example:
   # customKubeapiTargets:
-  #   - name: example-api-server
-  #     domain: example.com
+  #   - name: example-prod
+  #     domain: prod.example.com
   targets:
     fluentd: true
     thanosQuery: true

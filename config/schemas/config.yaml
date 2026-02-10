@@ -5194,21 +5194,21 @@ properties:
         type: object
         additionalProperties:
           type: boolean
-      customKubeapiTargets:
-        title: Prometheus Blackbox Exporter Custom Kube API Targets
-        description: Configure custom Kube API targets Prometheus Blackbox Exporter should probe.
+      customWorkloadTargets:
+        title: Prometheus Blackbox Exporter Custom Workload Targets
+        description: Configure custom workload cluster targets Prometheus Blackbox Exporter should probe.
         type: array
         items:
-          title: Custom Kube API target
-          description: Custom Kube API target Prometheus Blackbox Exporter should probe.
+          title: Custom Workload Target
+          description: Custom workload cluster target Prometheus Blackbox Exporter should probe.
           type: object
           additionalProperties: false
           properties:
             name:
-              title: Custom Kube API Target Name
+              title: Custom Target Name prefix
               type: string
             domain:
-              title: Custom Kube API Target Domain
+              title: Custom Target Domain
               type: string
               format: hostname
       hostAliases:
