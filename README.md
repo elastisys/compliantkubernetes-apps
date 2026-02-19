@@ -6,7 +6,7 @@
 >
 > The product lives on and development continues! However, we are focusing our efforts on developing it as a component in our **Elastisys Welkin® Enterprise** offering.
 >
-> This repository will remain public and it will continue to receive security patches on a best-effort basis. However, v0.50 is the final version officially supported by Elastisys.
+> This repository will remain public but will not continue to receive security patches. v0.50 is the final version officially supported by Elastisys.
 >
 > Want to learn more about Elastisys Welkin® Enterprise? Visit :point_right: https://elastisys.com/welkin-enterprise for more info and news!
 
