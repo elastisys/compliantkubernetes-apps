@@ -67,6 +67,12 @@
       set_fact:
         requirements: "{{ parse_requirements_result.stdout | from_json }}"
 
+    - name: Ensure install path exists
+      file:
+        path: "{{ install_path }}"
+        state: directory
+        mode: '0755'
+
     - name: Install apt-packages
       become: yes
       become_user: root
